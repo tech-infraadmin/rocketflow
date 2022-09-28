@@ -286,6 +286,7 @@
         <entry key="rocketFlowSdk/src/main/res/menu/filter_attendance_leave.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/menu/filter_clear_geo_location.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/menu/view_delete_menu.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/xml/backup_rules.xml" value="0.11141304347826086" />
       </map>
     </option>
   </component>
