@@ -299,14 +299,6 @@ public class IhaveAssignedFragment extends BaseFragment<FragmentIHaveAssignedBin
         if (getBaseActivity() != null && getBaseActivity().isNetworkConnected()) {
             //TODO
             api = TrackiApplication.getApiMap().get(ApiType.TASKS);
-            if(api==null){
-                api = new Api();
-                api.setUrl(AppConstants.BASE_URL+"tasks");
-                api.setName(ApiType.TASKS);
-                api.setTimeOut(12);
-                api.setCacheable(true);
-                api.setVersion("1.0");
-            }
 
             if (api != null) {
                 api.setAppendWithKey("ASSIGNED_BY_ME");
@@ -471,14 +463,6 @@ public class IhaveAssignedFragment extends BaseFragment<FragmentIHaveAssignedBin
                 showLoading();
                 //buddyRequest.setCategoryId(categoryMap.get("categoryId"));
                 api = TrackiApplication.getApiMap().get(ApiType.TASKS);
-                if(api==null){
-                    api = new Api();
-                    api.setUrl(AppConstants.BASE_URL+"tasks");
-                    api.setName(ApiType.TASKS);
-                    api.setTimeOut(12);
-                    api.setCacheable(true);
-                    api.setVersion("1.0");
-                }
 
                 if (api != null) {
                     api.setAppendWithKey("ASSIGNED_BY_ME");

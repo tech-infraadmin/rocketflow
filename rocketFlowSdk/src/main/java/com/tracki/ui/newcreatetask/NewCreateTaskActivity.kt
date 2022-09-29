@@ -69,9 +69,9 @@ open class NewCreateTaskActivity :
     BaseActivity<ActivityNewCreateTaskBinding, NewCreateTaskViewModel>(),
     NewCreateTaskNavigator, FormSubmitListener, HasSupportFragmentInjector,
     BaseAutocompleteAdapter.OnItemSelectedAUtoComplete {
-    init {
-        System.loadLibrary("keys")
-    }
+//    init {
+//        System.loadLibrary("keys")
+//    }
 
     external fun getGoogleMapKey(): String?
     private var snackBar: Snackbar? = null
@@ -528,7 +528,7 @@ open class NewCreateTaskActivity :
     @SuppressLint("SetTextI18n")
     private fun setUp() {
 
-        Places.initialize(this@NewCreateTaskActivity, getGoogleMapKey()!!)
+        //Places.initialize(this@NewCreateTaskActivity, getGoogleMapKey()!!)
         if (intent.hasExtra(AppConstants.Extra.EXTRA_PAREN_TASK_ID)) {
             parentTaskId = intent.getStringExtra(AppConstants.Extra.EXTRA_PAREN_TASK_ID)
             CommonUtils.showLogMessage("e", "parentTaskId", parentTaskId)

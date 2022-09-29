@@ -21,6 +21,24 @@
             android:exported="true"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
 
+        <activity
+            android:name=".ui.taskdetails.TaskDetailActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name=".ui.newcreatetask.NewCreateTaskActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name=".ui.taskdetails.NewTaskDetailsActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
     </application>
 
 </manifest>

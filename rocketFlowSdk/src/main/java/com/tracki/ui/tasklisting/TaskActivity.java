@@ -280,7 +280,7 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
 
         if(mMapCategory==null){
             mMapCategory = new HashMap<>();
-            categoryMap = "{\"categoryId\":\""+categoryId+"\"}";
+            categoryMap = "{\"categoryId\":\""+getIntent().getStringExtra(AppConstants.Extra.EXTRA_STAGEID)+"\"}";
 
             mMapCategory.put("categoryId",getIntent().getStringExtra(AppConstants.Extra.EXTRA_STAGEID));
         }

@@ -488,14 +488,6 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
 
         if (getBaseActivity() != null && getBaseActivity().isNetworkConnected()) {
             api = TrackiApplication.getApiMap().get(ApiType.TASKS);
-            if(api==null){
-                api = new Api();
-                api.setUrl(AppConstants.BASE_URL+"tasks");
-                api.setName(ApiType.TASKS);
-                api.setTimeOut(12);
-                api.setCacheable(true);
-                api.setVersion("1.0");
-            }
             if (api != null) {
                 //api.setAppendWithKey("ASSIGNED_TO_ME");
                 if(buddyRequest.getLoadBy()!=null) {
@@ -576,15 +568,6 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
                 showLoading();
                 //buddyRequest.setCategoryId(categoryMap.get("categoryId"));
                 api = TrackiApplication.getApiMap().get(ApiType.TASKS);
-                if(api==null){
-                    api = new Api();
-                    api.setUrl(AppConstants.BASE_URL+"tasks");
-                    api.setName(ApiType.TASKS);
-                    api.setTimeOut(12);
-                    api.setCacheable(true);
-                    api.setVersion("1.0");
-                }
-
                 if (api != null) {
                     if(buddyRequest.getLoadBy()!=null) {
                         api.setAppendWithKey(buddyRequest.getLoadBy().name());

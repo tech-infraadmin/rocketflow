@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.1975419664268585" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.19610507246376813" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1895" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1895" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/drawable/bg_diff_shape.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/drawable/ic_money_credit.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/drawable/ic_money_debit.xml" value="0.1" />

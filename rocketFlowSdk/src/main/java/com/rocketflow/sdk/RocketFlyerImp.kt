@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import com.rocketflow.sdk.util.RFLog
+import com.tracki.TrackiApplication
 import com.tracki.ui.tasklisting.TaskActivity
 import com.tracki.utils.AppConstants
 import java.lang.ref.WeakReference

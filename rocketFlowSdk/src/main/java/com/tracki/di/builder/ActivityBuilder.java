@@ -104,7 +104,7 @@ import com.tracki.ui.main.filter.TaskFilterActivityModule;
 //import com.tracki.ui.myInventory.MyInventoryModule;
 import com.tracki.ui.newcreatetask.NewCreateTaskActivity;
 import com.tracki.ui.newcreatetask.NewCreateTaskActivityModule;
-//import com.tracki.ui.newdynamicform.NewDynamicFragmentProvider;
+import com.tracki.ui.newdynamicform.NewDynamicFragmentProvider;
 //import com.tracki.ui.notification.NotificationActivity;
 //import com.tracki.ui.notification.NotificationActivityModule;
 //import com.tracki.ui.otp.OtpActivity;
@@ -294,8 +294,8 @@ public abstract class ActivityBuilder {
 //    @ContributesAndroidInjector(modules = MyPlaceActivityModule.class)
 //    abstract MyPlaceListActivity bindMyPlaceActivity();
 
-//    @ContributesAndroidInjector(modules = {NewCreateTaskActivityModule.class, NewDynamicFragmentProvider.class})
-//    abstract NewCreateTaskActivity bindNewCreateTaskActivity();
+    @ContributesAndroidInjector(modules = {NewCreateTaskActivityModule.class, NewDynamicFragmentProvider.class})
+    abstract NewCreateTaskActivity bindNewCreateTaskActivity();
 
     @ContributesAndroidInjector(modules = TaskDetailActivityModule.class)
     abstract TaskDetailActivity bindTaskDetailActivity();
