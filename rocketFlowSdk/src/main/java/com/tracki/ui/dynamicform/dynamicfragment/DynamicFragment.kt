@@ -30,7 +30,7 @@ import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.gson.Gson
-import com.iceteck.silicompressorr.SiliCompressor
+//import com.iceteck.silicompressorr.SiliCompressor
 import com.tracki.BR
 import com.tracki.BuildConfig
 import com.tracki.R
@@ -536,9 +536,10 @@ class DynamicFragment : BaseFragment<FragmentFormListBinding, DynamicViewModel>(
                             var thread = Thread(Runnable {
 
                                 if (adapter.formDataList[vidViewposition] != null && adapter.formDataList[vidViewposition].type == DataType.VIDEO) {
-                                    var filePath = SiliCompressor.with(baseActivity)
-                                        .compressVideo(file.path, file.parent)
-                                    adapter.formDataList[vidViewposition].enteredValue = filePath
+//                                    var filePath = SiliCompressor.with(baseActivity)
+//                                        .compressVideo(file.path, file.parent)
+                                    var filePath = file.path;
+                                        adapter.formDataList[vidViewposition].enteredValue = filePath
                                     if (file.exists()) {
                                         if (file.delete()) {
                                             Log.e("file Deleted :", file!!.path!!)
@@ -562,12 +563,13 @@ class DynamicFragment : BaseFragment<FragmentFormListBinding, DynamicViewModel>(
                                             if (llFormData != null) {
                                                 for (data in llFormData) {
                                                     if (data.type == DataType.VIDEO) {
-                                                        var filePath =
-                                                            SiliCompressor.with(baseActivity)
-                                                                .compressVideo(
-                                                                    file.path,
-                                                                    file.parent
-                                                                )
+                                                        var filePath = file.path;
+//                                                        var filePath =
+//                                                            SiliCompressor.with(baseActivity)
+//                                                                .compressVideo(
+//                                                                    file.path,
+//                                                                    file.parent
+//                                                                )
                                                         // data.enteredValue=file.path
                                                         data.enteredValue = filePath
                                                         if (file.exists()) {
