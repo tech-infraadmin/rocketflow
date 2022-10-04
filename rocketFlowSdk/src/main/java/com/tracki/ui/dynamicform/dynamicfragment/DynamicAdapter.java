@@ -61,7 +61,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.gcacace.signaturepad.views.SignaturePad;
 //import com.google.android.gms.maps.model.LatLng;
-import com.iceteck.silicompressorr.SiliCompressor;
+//import com.iceteck.silicompressorr.SiliCompressor;
 import com.tracki.R;
 import com.tracki.TrackiApplication;
 import com.tracki.data.local.prefs.PreferencesHelper;
