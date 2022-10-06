@@ -1,5 +1,7 @@
 package com.tracki.ui.newcreatetask
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.tracki.data.DataManager
 import com.tracki.data.model.request.*
 import com.tracki.data.model.response.config.Api
@@ -8,6 +10,7 @@ import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
 import com.tracki.ui.base.BaseViewModel
 import com.tracki.utils.*
+import com.tracki.utils.rx.AppSchedulerProvider
 import com.tracki.utils.rx.SchedulerProvider
 
 open class GetUserSuggestionListViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
@@ -48,6 +51,13 @@ open class GetUserSuggestionListViewModel(dataManager: DataManager, schedulerPro
         }
 
         override fun onLogout() {
+        }
+    }
+
+
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return GetUserSuggestionListViewModel(mDataManager, AppSchedulerProvider()) as T
         }
     }
 

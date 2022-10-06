@@ -24,7 +24,7 @@ import java.util.List;
 public class TaskViewModel extends BaseViewModel<TaskNavigator> {
     private HttpManager httpManager;
 
-    TaskViewModel(DataManager dataManager, SchedulerProvider schedulerProvider) {
+    public TaskViewModel(DataManager dataManager, SchedulerProvider schedulerProvider) {
         super(dataManager, schedulerProvider);
     }
 

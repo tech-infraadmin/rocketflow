@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.databinding.ObservableArrayList;
 import androidx.databinding.ObservableList;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.tracki.data.DataManager;
 import com.tracki.data.model.request.ExecuteUpdateRequest;
@@ -14,6 +16,8 @@ import com.tracki.data.network.APIError;
 import com.tracki.data.network.ApiCallback;
 import com.tracki.data.network.HttpManager;
 import com.tracki.ui.base.BaseViewModel;
+import com.tracki.ui.tasklisting.TaskViewModel;
+import com.tracki.utils.rx.AppSchedulerProvider;
 import com.tracki.utils.rx.SchedulerProvider;
 
 import java.util.List;
@@ -140,6 +144,20 @@ public class AssignedToMeViewModel extends BaseViewModel<AssignedtoMeNavigator> 
         @Override
         public void onLogout() {
 
+        }
+    }
+
+
+   static class Factory implements ViewModelProvider.Factory {
+        private final DataManager mDataManager;
+
+       Factory(DataManager mDataManager) {
+           this.mDataManager = mDataManager;
+       }
+
+       @Override
+        public <T extends ViewModel> T create(Class<T> modelClass) {
+            return (T) new AssignedToMeViewModel(mDataManager, new AppSchedulerProvider());
         }
     }
 

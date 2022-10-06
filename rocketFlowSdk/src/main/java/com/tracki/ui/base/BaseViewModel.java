@@ -13,7 +13,7 @@ import io.reactivex.disposables.CompositeDisposable;
  * Created by rahul.
  */
 
-public abstract class BaseViewModel<N> extends ViewModel {
+public class BaseViewModel<N> extends ViewModel {
 
     private final DataManager mDataManager;
 

@@ -18,6 +18,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.rocketflow.sdk.RocketFlyer
 import com.tracki.BR
 import com.tracki.R
 import com.tracki.TrackiApplication
@@ -77,15 +79,15 @@ class TaskDetailActivity : BaseActivity<ActivityTaskDetailBinding, TaskDetailVie
     private var name: String? = null
     private var buddyId: String? = null
 
-    @Inject
+    //@Inject
     lateinit var mTaskDetailViewModel: TaskDetailViewModel
-
-    @Inject
+    //@Inject
     lateinit var httpManager: HttpManager
+    //@Inject
+    lateinit var preferencesHelper: PreferencesHelper
+
     var distinationMarker = false;
 
-    @Inject
-    lateinit var preferencesHelper: PreferencesHelper
     private var mobile: String? = null
     private var eventDialog: EventDialogFragment? = null
     private val tag = TaskDetailActivity::class.java.simpleName
@@ -152,8 +154,19 @@ class TaskDetailActivity : BaseActivity<ActivityTaskDetailBinding, TaskDetailVie
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        val factory = RocketFlyer.dataManager()?.let { TaskDetailViewModel.Factory(it) } // Factory
+        if (factory != null) {
+            ViewModelProvider(this, factory)[TaskDetailViewModel::class.java]
+        } // ViewModel
+
         mActivityTaskDetailBinding = viewDataBinding
         mTaskDetailViewModel.navigator = this
+
+        httpManager = RocketFlyer.httpManager()!!
+        preferencesHelper = RocketFlyer.preferenceHelper()!!
+
         setUp()
         buttonDetail = mActivityTaskDetailBinding.bottomSheetTrip.buttonDetail
         buttonDetail.setOnClickListener {

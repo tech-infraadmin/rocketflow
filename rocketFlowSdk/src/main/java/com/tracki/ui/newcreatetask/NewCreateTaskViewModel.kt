@@ -1,6 +1,8 @@
 package com.tracki.ui.newcreatetask
 
 import android.view.View
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.tracki.TrackiApplication
 import com.tracki.data.DataManager
 import com.tracki.data.model.request.*
@@ -9,7 +11,9 @@ import com.tracki.data.network.APIError
 import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
 import com.tracki.ui.base.BaseViewModel
+import com.tracki.ui.taskdetails.subtask.SubTaskViewModel
 import com.tracki.utils.*
+import com.tracki.utils.rx.AppSchedulerProvider
 import com.tracki.utils.rx.SchedulerProvider
 import java.io.File
 import java.util.*
@@ -487,6 +491,12 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
         }
 
         override fun onLogout() {
+        }
+    }
+
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return NewCreateTaskViewModel(mDataManager, AppSchedulerProvider()) as T
         }
     }
 }

@@ -2,6 +2,10 @@ package com.rocketflow.sdk
 
 import android.content.Context
 import androidx.annotation.Keep
+import com.tracki.data.DataManager
+import com.tracki.data.local.prefs.PreferencesHelper
+import com.tracki.data.network.HttpManager
+import com.tracki.data.network.NetworkManager
 
 @Keep
 class RocketFlyer private constructor(){
@@ -61,6 +65,22 @@ class RocketFlyer private constructor(){
          */
         fun terminate() {
             RocketFlyerBuilder.getRFInstance()!!.terminate()
+        }
+
+        fun preferenceHelper() : PreferencesHelper? {
+            return RocketFlyerBuilder.getPrefInstance()
+        }
+
+        fun httpManager() : HttpManager? {
+            return RocketFlyerBuilder.getHttpManagerInstance()
+        }
+
+        fun dataManager() : DataManager? {
+            return RocketFlyerBuilder.getDataManagerInstance()
+        }
+
+        fun networkManager() : NetworkManager? {
+            return RocketFlyerBuilder.getNetworkManagerInstance()
         }
 
     }

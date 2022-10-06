@@ -16,6 +16,7 @@ import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
@@ -29,6 +30,7 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.rocketflow.sdk.RocketFlyer
 import com.tracki.BR
 import com.tracki.R
 import com.tracki.TrackiApplication
@@ -48,6 +50,7 @@ import com.tracki.ui.custom.ExecutorThread
 import com.tracki.ui.custom.GlideApp
 import com.tracki.ui.dynamicform.DynamicFormActivity
 import com.tracki.ui.dynamicform.dynamicfragment.FormSubmitListener
+import com.tracki.ui.taskdetails.TaskDetailsActivityViewModel
 //import com.tracki.ui.newdynamicform.NewDynamicFormFragment
 import com.tracki.utils.*
 import com.trackthat.lib.TrackThat
@@ -55,9 +58,6 @@ import com.trackthat.lib.internal.network.TrackThatCallback
 import com.trackthat.lib.models.ErrorResponse
 import com.trackthat.lib.models.SuccessResponse
 import com.trackthat.lib.models.TrackthatLocation
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_new_create_task.*
 import java.io.File
 import java.util.*
@@ -67,7 +67,7 @@ import javax.inject.Inject
 
 open class NewCreateTaskActivity :
     BaseActivity<ActivityNewCreateTaskBinding, NewCreateTaskViewModel>(),
-    NewCreateTaskNavigator, FormSubmitListener, HasSupportFragmentInjector,
+    NewCreateTaskNavigator, FormSubmitListener,
     BaseAutocompleteAdapter.OnItemSelectedAUtoComplete {
 //    init {
 //        System.loadLibrary("keys")
@@ -87,16 +87,13 @@ open class NewCreateTaskActivity :
 
     private lateinit var dialogSlot: Dialog
 
-    @Inject
+    //@Inject
     lateinit var mCreateTaskViewModel: NewCreateTaskViewModel
 
-    @Inject
+    //@Inject
     lateinit var mGetSuggetionViewModel: GetUserSuggestionListViewModel
 
-    @Inject
     lateinit var preferencesHelper: PreferencesHelper
-
-    @Inject
     lateinit var httpManager: HttpManager
 
     var lookUps: List<LookUps>? = null
@@ -130,7 +127,7 @@ open class NewCreateTaskActivity :
     var assigneeLabel: String? = null
     override fun getBindingVariable() = BR.viewModel
     override fun getLayoutId() = R.layout.activity_new_create_task
-    override fun getViewModel() = mCreateTaskViewModel
+
     private var buddyId: String? = null
     private var fleetId: String? = null
     private var regionId: String? = null
@@ -159,8 +156,6 @@ open class NewCreateTaskActivity :
     var rlProgress: RelativeLayout? = null
     var rlSubmittingData: RelativeLayout? = null
 
-    @Inject
-    lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
     private var mDynamicHandler: DynamicHandler? = null
     private var handlerThread: ExecutorThread? = null
 
@@ -174,6 +169,11 @@ open class NewCreateTaskActivity :
         mActivityCreateTaskBinding = viewDataBinding
         mCreateTaskViewModel.navigator = this
         handlerThread = ExecutorThread()
+        httpManager = RocketFlyer.httpManager()!!
+        preferencesHelper = RocketFlyer.preferenceHelper()!!
+
+        mGetSuggetionViewModel = getUserSuggestionListViewModel()
+
         setUp()
         getCurrentLocation()
     }
@@ -3068,10 +3068,6 @@ open class NewCreateTaskActivity :
         }
     }
 
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
-        return fragmentDispatchingAndroidInjector
-    }
-
     var count = 0
     var fileUploadCounter = 0
 
@@ -3198,6 +3194,23 @@ open class NewCreateTaskActivity :
             mActivityCreateTaskBinding.coordinatorLayout,
             getString(R.string.please_check_your_internet_connection)
         )
+    }
+
+    override fun getViewModel(): NewCreateTaskViewModel {
+        val factory = RocketFlyer.dataManager()?.let { NewCreateTaskViewModel.Factory(it) } // Factory
+        if (factory != null) {
+            mCreateTaskViewModel = ViewModelProvider(this, factory)[NewCreateTaskViewModel::class.java]
+        }
+        return mCreateTaskViewModel!!
+    }
+
+
+    private fun getUserSuggestionListViewModel(): GetUserSuggestionListViewModel {
+        val factory = RocketFlyer.dataManager()?.let { GetUserSuggestionListViewModel.Factory(it) } // Factory
+        if (factory != null) {
+            mGetSuggetionViewModel = ViewModelProvider(this, factory)[GetUserSuggestionListViewModel::class.java]
+        }
+        return mGetSuggetionViewModel
     }
 
 

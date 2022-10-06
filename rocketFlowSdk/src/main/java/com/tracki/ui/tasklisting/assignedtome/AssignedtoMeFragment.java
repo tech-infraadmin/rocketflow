@@ -48,6 +48,7 @@ import androidx.work.WorkRequest;
 //import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rocketflow.sdk.RocketFlyer;
 import com.tracki.BR;
 import com.tracki.R;
 import com.tracki.TrackiApplication;
@@ -140,20 +141,11 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
     private static final String TAG = AssignedtoMeFragment.class.getSimpleName();
 
 
-    @Inject
     TaskListingAdapter mAssignedtoMeAdapter;
-
-   /* @Inject
-    TaskListingAdapter mAdapter;*/
-
-    @Inject
     LinearLayoutManager mLayoutManager;
-    @Inject
-    ViewModelProvider.Factory mViewModelFactory;
-    @Inject
     HttpManager httpManager;
-    @Inject
     PreferencesHelper preferencesHelper;
+
     private FragmentAssignedToMeBinding mFragmentAssignedToMeBinding;
     private Api api;
     private TaskRequest buddyRequest;
@@ -245,7 +237,8 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
 
     @Override
     public AssignedToMeViewModel getViewModel() {
-        mAssignedToMeViewModel = ViewModelProviders.of(this, mViewModelFactory).get(AssignedToMeViewModel.class);
+        AssignedToMeViewModel.Factory factory = new AssignedToMeViewModel.Factory(RocketFlyer.Companion.dataManager());
+        mAssignedToMeViewModel = ViewModelProviders.of(this,factory).get(AssignedToMeViewModel.class);
         return mAssignedToMeViewModel;
     }
 
@@ -253,7 +246,13 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // setHasOptionsMenu(true);
+
+        httpManager = RocketFlyer.Companion.httpManager();
+        preferencesHelper = RocketFlyer.Companion.preferenceHelper();
+
         mAssignedToMeViewModel.setNavigator(this);
+
+        mAssignedtoMeAdapter = new TaskListingAdapter(new ArrayList<>(), RocketFlyer.Companion.preferenceHelper());
         mAssignedtoMeAdapter.setListener(this);
         mAssignedtoMeAdapter.setAssignedToTask(true);
 
@@ -547,6 +546,7 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
     private void setRecyclerView() {
         if (rvAssignedToMe == null) {
             rvAssignedToMe = mFragmentAssignedToMeBinding.rvAssignedToMe;
+            mLayoutManager = new LinearLayoutManager(this.getActivity());
             mLayoutManager.setOrientation(RecyclerView.VERTICAL);
             rvAssignedToMe.setLayoutManager(mLayoutManager);
             rvAssignedToMe.setItemAnimator(new DefaultItemAnimator());

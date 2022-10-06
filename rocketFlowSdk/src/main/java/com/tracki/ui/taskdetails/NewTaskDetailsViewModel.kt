@@ -1,6 +1,8 @@
 package com.tracki.ui.taskdetails
 
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.tracki.TrackiApplication
 import com.tracki.data.DataManager
 import com.tracki.data.model.request.AcceptRejectRequest
@@ -13,6 +15,7 @@ import com.tracki.data.network.HttpManager
 import com.tracki.ui.base.BaseViewModel
 //import com.tracki.ui.dynamicform.dynamicfragment.DynamicNavigator
 import com.tracki.utils.ApiType
+import com.tracki.utils.rx.AppSchedulerProvider
 import com.tracki.utils.rx.SchedulerProvider
 
 
@@ -222,6 +225,13 @@ class NewTaskDetailsViewModel(dataManager: DataManager, schedulerProvider: Sched
 
         override fun onLogout() {}
 
+    }
+
+
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return NewTaskDetailsViewModel(mDataManager, AppSchedulerProvider()) as T
+        }
     }
 
 

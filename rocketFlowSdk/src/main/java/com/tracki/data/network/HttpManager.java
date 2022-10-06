@@ -67,7 +67,7 @@ public class HttpManager {
     /**
      * constructor of this class.
      */
-    private HttpManager(Context context, PreferencesHelper preferencesHelper) {
+    public HttpManager(Context context, PreferencesHelper preferencesHelper) {
         this.preferencesHelper = preferencesHelper;
         this.context = context;
         client = new OkHttpClient.Builder()

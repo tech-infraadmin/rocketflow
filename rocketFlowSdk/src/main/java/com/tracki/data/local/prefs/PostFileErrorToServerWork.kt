@@ -15,7 +15,6 @@ import com.tracki.data.network.NetworkManagerImpl
 import com.tracki.utils.AppConstants
 import com.tracki.utils.CommonUtils
 import com.tracki.utils.rx.AppSchedulerProvider
-import dagger.android.AndroidInjection
 
 import java.util.HashMap
 import javax.inject.Inject

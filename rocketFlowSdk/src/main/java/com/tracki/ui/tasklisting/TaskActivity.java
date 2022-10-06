@@ -9,6 +9,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -16,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rocketflow.sdk.RocketFlyer;
 import com.tracki.BR;
 import com.tracki.R;
 import com.tracki.data.local.prefs.PreferencesHelper;
@@ -37,6 +39,7 @@ import com.tracki.data.network.ApiCallback;
 import com.tracki.data.network.HttpManager;
 import com.tracki.data.network.SyncCallback;
 import com.tracki.databinding.ActivityTaskBinding;
+import com.tracki.factory.TaskViewModelFactory;
 import com.tracki.ui.base.BaseActivity;
 //import com.tracki.ui.buddylisting.BuddyListingActivity;
 //import com.tracki.ui.chat.ChatActivity;
@@ -58,6 +61,7 @@ import com.tracki.utils.CommonUtils;
 import com.tracki.utils.JSONConverter;
 import com.tracki.utils.Log;
 import com.tracki.utils.TrackiToast;
+import com.tracki.utils.rx.SchedulerProvider;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -68,9 +72,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
 
 import static com.tracki.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU;
 import static com.tracki.utils.AppConstants.Extra.EXTRA_FLEET_LIST_CALLING_FROM_DASHBOARD_MENU;
@@ -79,23 +80,15 @@ import static com.tracki.utils.AppConstants.Extra.EXTRA_FLEET_LIST_CALLING_FROM_
  * Created by rahul on 8/10/18
  */
 public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewModel>
-        implements TaskNavigator, HasSupportFragmentInjector, View.OnClickListener, IhaveAssignedFragment.setIHaveChatListener, AssignedtoMeFragment.setAssignToMeChatListener{
+        implements TaskNavigator, View.OnClickListener, IhaveAssignedFragment.setIHaveChatListener, AssignedtoMeFragment.setAssignToMeChatListener{
 
-    @Inject
-    DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
-    @Inject
+   // @Inject
+    //DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
     TaskViewModel mTaskViewModel;
-    @Inject
     TaskPagerAdapter mPagerAdapter;
-    @Inject
-    HttpManager httpManager;
-
-
-    //@Inject
-    //SplashViewModel mSplashViewModel;
-
-    @Inject
     PreferencesHelper preferencesHelper;
+
+
     private boolean isTagInventory = false;
     private boolean showMerchantTab = false;
     private ActivityTaskBinding mActivityTaskBinding;
@@ -134,24 +127,23 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
     }
 
     @Override
-    public AndroidInjector<Fragment> supportFragmentInjector() {
-        return fragmentDispatchingAndroidInjector;
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivityTaskBinding = getViewDataBinding();
+
+        mPagerAdapter = new TaskPagerAdapter(getSupportFragmentManager());
+        mTaskViewModel  = new ViewModelProvider(this, new TaskViewModelFactory(RocketFlyer.Companion.dataManager())).get(TaskViewModel.class);
         mTaskViewModel.setNavigator(this);
+        preferencesHelper = RocketFlyer.Companion.preferenceHelper();
         hitLoginSDKToken("sahshahsss");
     }
 
     private void hitLoginSDKToken(String sdkClintId){
 
-        mTaskViewModel.sdkToken(sdkClintId,httpManager,new SyncCallback() {
+        mTaskViewModel.sdkToken(sdkClintId, RocketFlyer.Companion.httpManager(), new SyncCallback() {
             @Override
             public void hitApi() {
-                //SyncCallback.super.hitApi();
+                //SyncCallback.super.hitApi();z
             }
 
             @Override
@@ -195,7 +187,7 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
     }
 
     private void hitConfig(){
-        mTaskViewModel.hitConfigApi(httpManager,new SyncCallback() {
+        mTaskViewModel.hitConfigApi(RocketFlyer.Companion.httpManager(), new SyncCallback() {
             @Override
             public void hitApi() {
                 //SyncCallback.super.hitApi();
@@ -501,7 +493,7 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
                 } else {
                     if (preferencesHelper.getIsFleetAndBuddySHow()) {
                         showLoading();
-                        mTaskViewModel.checkBuddy(httpManager);
+                        mTaskViewModel.checkBuddy(RocketFlyer.Companion.httpManager());
                     } else {
                         Intent intent = NewCreateTaskActivity.Companion.newIntent(this);
                         intent.putExtra(AppConstants.Extra.FROM, "taskListing");
@@ -533,7 +525,7 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
 //                startActivityForResult(intent,
 //                        AppConstants.REQUEST_CODE_CREATE_TASK);
             } else {
-                mTaskViewModel.checkFleet(httpManager);
+                mTaskViewModel.checkFleet(RocketFlyer.Companion.httpManager());
             }
         }
     }
@@ -726,7 +718,7 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
         } else {
             if (preferencesHelper.getIsFleetAndBuddySHow()) {
                 showLoading();
-                mTaskViewModel.checkBuddy(httpManager);
+                mTaskViewModel.checkBuddy(RocketFlyer.Companion.httpManager());
             } else {
                 // Intent intent=CreateTaskActivity.Companion.newIntent(this);
                 Intent intent = NewCreateTaskActivity.Companion.newIntent(this);

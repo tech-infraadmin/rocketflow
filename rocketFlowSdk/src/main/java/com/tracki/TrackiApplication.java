@@ -17,8 +17,6 @@ import com.tracki.data.model.response.config.DynamicFormsNew;
 import com.tracki.data.model.response.config.EmergencyContact;
 import com.tracki.data.model.response.config.LookUps;
 import com.tracki.data.model.response.config.Navigation;
-import com.tracki.di.component.DaggerAppComponent;
-//import com.tracki.ui.receiver.ServiceRestartReceiver;
 import com.tracki.utils.ApiType;
 import com.tracki.utils.CommonUtils;
 import com.tracki.utils.JSONConverter;
@@ -38,11 +36,6 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasActivityInjector;
-import dagger.android.HasBroadcastReceiverInjector;
-import dagger.android.HasServiceInjector;
 
 //import com.crashlytics.android.Crashlytics;
 
@@ -50,8 +43,7 @@ import dagger.android.HasServiceInjector;
  * Created by rahul on 2/9/18
  * Application
  */
-public class TrackiApplication extends Application implements HasActivityInjector,
-        HasServiceInjector, HasBroadcastReceiverInjector {
+public class TrackiApplication extends Application {
 
     private static List<Navigation> navigationMenuList;
     private static Map<ApiType, Api> apiMap;
@@ -66,12 +58,12 @@ public class TrackiApplication extends Application implements HasActivityInjecto
     public static TrackiApplication instance;
 
 
-    @Inject
-    DispatchingAndroidInjector<Activity> activityDispatchingAndroidInjector;
-    @Inject
-    DispatchingAndroidInjector<Service> serviceDispatchingAndroidInjector;
-    @Inject
-    DispatchingAndroidInjector<BroadcastReceiver> receiverDispatchingAndroidInjector;
+//    @Inject
+//    DispatchingAndroidInjector<Activity> activityDispatchingAndroidInjector;
+//    @Inject
+//    DispatchingAndroidInjector<Service> serviceDispatchingAndroidInjector;
+//    @Inject
+//    DispatchingAndroidInjector<BroadcastReceiver> receiverDispatchingAndroidInjector;
     //private MyContentObserver contactObserver;
 
     public static List<DynamicFormsNew> getDynamicFormsNews() {
@@ -212,32 +204,32 @@ public class TrackiApplication extends Application implements HasActivityInjecto
         }
 
         //Stetho.initializeWithDefaults(this);
-        DaggerAppComponent.builder()
-                .application(this)
-                .build()
-                .inject(this);
-        if (instance == null) {
-            instance = this;
-        }
+//        DaggerAppComponent.builder()
+//                .application(this)
+//                .build()
+//                .inject(this);
+//        if (instance == null) {
+//            instance = this;
+//        }
         contactReceiver();
         //register a receiver to check if user have a working internet connection
         //registerReceiver(new ServiceRestartReceiver(), new IntentFilter(ServiceRestartReceiver.ACTION_INTERNET_CONNECTON));
     }
 
-    @Override
-    public AndroidInjector<Activity> activityInjector() {
-        return activityDispatchingAndroidInjector;
-    }
-
-    @Override
-    public AndroidInjector<Service> serviceInjector() {
-        return serviceDispatchingAndroidInjector;
-    }
-
-    @Override
-    public AndroidInjector<BroadcastReceiver> broadcastReceiverInjector() {
-        return receiverDispatchingAndroidInjector;
-    }
+//    @Override
+//    public AndroidInjector<Activity> activityInjector() {
+//        return activityDispatchingAndroidInjector;
+//    }
+//
+//    @Override
+//    public AndroidInjector<Service> serviceInjector() {
+//        return serviceDispatchingAndroidInjector;
+//    }
+//
+//    @Override
+//    public AndroidInjector<BroadcastReceiver> broadcastReceiverInjector() {
+//        return receiverDispatchingAndroidInjector;
+//    }
 
     private void contactReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -8,6 +8,8 @@ import android.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.maps.model.*
 import com.tracki.R
@@ -22,7 +24,9 @@ import com.tracki.data.network.APIError
 import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
 import com.tracki.ui.base.BaseViewModel
+import com.tracki.ui.tasklisting.ihaveassigned.IhaveAssignedViewModel
 import com.tracki.utils.Log
+import com.tracki.utils.rx.AppSchedulerProvider
 import com.tracki.utils.rx.SchedulerProvider
 import com.trackthat.lib.TrackThat
 import com.trackthat.lib.TrackThatConstants
@@ -624,6 +628,13 @@ class TaskDetailViewModel(dataManager: DataManager, schedulerProvider: Scheduler
 
     fun getLiveTrip(lastTimeStamp: Long): List<LocationData>? {
         return TrackThat.getLiveTrip(lastTimeStamp)
+    }
+
+
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return TaskDetailViewModel(mDataManager, AppSchedulerProvider()) as T
+        }
     }
 
 }

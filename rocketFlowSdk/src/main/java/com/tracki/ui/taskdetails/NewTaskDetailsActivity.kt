@@ -13,12 +13,14 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 //import androidmads.library.qrgenearator.QRGContents
 //import androidmads.library.qrgenearator.QRGEncoder
 //import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.TabLayoutOnPageChangeListener
+import com.rocketflow.sdk.RocketFlyer
 //import com.google.zxing.WriterException
 import com.tracki.BR
 import com.tracki.R
@@ -33,34 +35,29 @@ import com.tracki.ui.taskdetails.timeline.TaskDetailsFragment
 import com.tracki.ui.tasklisting.TaskPagerAdapter
 import com.tracki.ui.tasklisting.ihaveassigned.TabDataClass
 import com.tracki.utils.*
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_new_task_details.*
 import java.security.NoSuchAlgorithmException
 import java.security.spec.InvalidKeySpecException
 import javax.inject.Inject
 
 
-open class NewTaskDetailsActivity : BaseActivity<ActivityNewTaskDetailsBinding, TaskDetailsActivityViewModel>(), HasSupportFragmentInjector {
+open class NewTaskDetailsActivity : BaseActivity<ActivityNewTaskDetailsBinding, TaskDetailsActivityViewModel>() {
 
     private var categoryId: String? = null
     private var from: String? = null
 
-    @Inject
-    lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    //@Inject
+    //lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
 
-    @Inject
+    //@Inject
     lateinit var mNewTaskViewModel: TaskDetailsActivityViewModel
     private lateinit var mActivityNewTaskDetailBinding: ActivityNewTaskDetailsBinding
 
-    @Inject
+    //@Inject
     lateinit var mPagerAdapter: TaskPagerAdapter
 
-    @Inject
-    lateinit var httpManager: HttpManager
 
-    @Inject
+    lateinit var httpManager: HttpManager
     lateinit var preferencesHelper: PreferencesHelper
 
 
@@ -91,6 +88,10 @@ open class NewTaskDetailsActivity : BaseActivity<ActivityNewTaskDetailsBinding, 
     }
 
     override fun getViewModel(): TaskDetailsActivityViewModel {
+        val factory = RocketFlyer.dataManager()?.let { TaskDetailsActivityViewModel.Factory(it) } // Factory
+        if (factory != null) {
+            mNewTaskViewModel = ViewModelProvider(this, factory)[TaskDetailsActivityViewModel::class.java]
+        }
         return mNewTaskViewModel!!
     }
 
@@ -98,6 +99,9 @@ open class NewTaskDetailsActivity : BaseActivity<ActivityNewTaskDetailsBinding, 
         super.onCreate(savedInstanceState)
         mActivityNewTaskDetailBinding = viewDataBinding
         setToolbar(mActivityNewTaskDetailBinding.toolbar, "Task Details")
+
+        httpManager = RocketFlyer.httpManager()!!
+        preferencesHelper = RocketFlyer.preferenceHelper()!!
 
         getTaskData()
 
@@ -133,6 +137,7 @@ open class NewTaskDetailsActivity : BaseActivity<ActivityNewTaskDetailsBinding, 
                     tabLayout.visibility = View.GONE
                 }
 
+                mPagerAdapter = TaskPagerAdapter(supportFragmentManager)
                 mPagerAdapter.setFragments(fragments)
                 vpTask.adapter = mPagerAdapter
                 tabLayout.tabGravity = TabLayout.GRAVITY_FILL
@@ -171,9 +176,9 @@ open class NewTaskDetailsActivity : BaseActivity<ActivityNewTaskDetailsBinding, 
 
     }
 
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
-        return fragmentDispatchingAndroidInjector
-    }
+//    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
+//        return fragmentDispatchingAndroidInjector
+//    }
 
     private fun openQrCode() {
         var qrCodeRequest = QrCodeRequest()

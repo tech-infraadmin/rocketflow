@@ -14,14 +14,14 @@
  *  limitations under the License
  */
 
-package com.tracki.ui.tasklisting.ihaveassigned;
-
-import dagger.Module;
-import dagger.android.ContributesAndroidInjector;
-
-@Module
-public abstract class IhaveAssignedFragmentProvider {
-
-    @ContributesAndroidInjector(modules = IhaveAssignedFragmentModule.class)
-    abstract IhaveAssignedFragment provideIhaveAssignedFragmentFactory();
-}
+//package com.tracki.ui.tasklisting.ihaveassigned;
+//
+//import dagger.Module;
+//import dagger.android.ContributesAndroidInjector;
+//
+//@Module
+//public abstract class IhaveAssignedFragmentProvider {
+//
+//    @ContributesAndroidInjector(modules = IhaveAssignedFragmentModule.class)
+//    abstract IhaveAssignedFragment provideIhaveAssignedFragmentFactory();
+//}

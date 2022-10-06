@@ -32,9 +32,9 @@ import com.tracki.ui.custom.ExecutorThread
 import com.tracki.ui.dynamicform.dynamicfragment.DynamicFragment
 import com.tracki.ui.dynamicform.dynamicfragment.FormSubmitListener
 import com.tracki.utils.*
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+//import dagger.android.AndroidInjector
+//import dagger.android.DispatchingAndroidInjector
+//import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_dynamic_form.*
 import kotlinx.android.synthetic.main.activity_dynamic_form.container
 import kotlinx.android.synthetic.main.activity_dynamic_form.nestedScrollView
@@ -53,7 +53,7 @@ import kotlin.collections.ArrayList
  * Created by rahul on 29/3/19
  */
 class DynamicFormActivity : BaseActivity<ActivityDynamicFormBinding, DynamicFormViewModel>(),
-    DynamicFormNavigator, FormSubmitListener, HasSupportFragmentInjector {
+    DynamicFormNavigator, FormSubmitListener {
 //    init {
 //        System.loadLibrary("keys")
 //    }
@@ -64,8 +64,6 @@ class DynamicFormActivity : BaseActivity<ActivityDynamicFormBinding, DynamicForm
     private var showToolbar: Boolean = true //it is used for main activity
     external fun getGoogleMapKey(): String?
 
-    @Inject
-    lateinit var fragmentDispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
 
     @Inject
     lateinit var httpManager: HttpManager
@@ -198,9 +196,6 @@ class DynamicFormActivity : BaseActivity<ActivityDynamicFormBinding, DynamicForm
         Places.initialize(this@DynamicFormActivity, getGoogleMapKey()!!)
     }
 
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
-        return fragmentDispatchingAndroidInjector
-    }
 
     private val formList = ArrayList<String>()
 

@@ -31,6 +31,7 @@ import androidx.work.WorkRequest;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rocketflow.sdk.RocketFlyer;
 import com.tracki.BR;
 import com.tracki.BuildConfig;
 import com.tracki.R;
@@ -74,6 +75,7 @@ import com.tracki.ui.tasklisting.StageListAdapter;
 import com.tracki.ui.tasklisting.TaskClickListener;
 import com.tracki.ui.tasklisting.TaskItemClickListener;
 import com.tracki.ui.tasklisting.TaskListingAdapter;
+import com.tracki.ui.tasklisting.assignedtome.AssignedToMeViewModel;
 import com.tracki.utils.ApiType;
 import com.tracki.utils.AppConstants;
 import com.tracki.utils.BuddyInfo;
@@ -118,18 +120,13 @@ public class IhaveAssignedFragment extends BaseFragment<FragmentIHaveAssignedBin
         implements IhaveAssignedNavigator, TaskItemClickListener, SwipeRefreshLayout.OnRefreshListener, StageListAdapter.DashBoardListener, View.OnClickListener {
 
     private static final String TAG = IhaveAssignedFragment.class.getSimpleName();
-    @Inject
+
     TaskListingAdapter mIhaveAssignedAdapter;
-    @Inject
     LinearLayoutManager mLayoutManager;
-    @Inject
-    ViewModelProvider.Factory mViewModelFactory;
-    @Inject
     HttpManager httpManager;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-
-    @Inject
     PreferencesHelper preferencesHelper;
+
     private CardView cvStages;
     private FragmentIHaveAssignedBinding mFragmentIHaveAssignedBinding;
     private Api api;
@@ -188,8 +185,9 @@ public class IhaveAssignedFragment extends BaseFragment<FragmentIHaveAssignedBin
 
     @Override
     public IhaveAssignedViewModel getViewModel() {
-//        mIhaveAssignedViewModel = new ViewModelProvider(this).get(IhaveAssignedViewModel.class);
-        mIhaveAssignedViewModel = ViewModelProviders.of(this, mViewModelFactory).get(IhaveAssignedViewModel.class);
+
+        IhaveAssignedViewModel.Factory factory = new IhaveAssignedViewModel.Factory(RocketFlyer.Companion.dataManager());
+        mIhaveAssignedViewModel = ViewModelProviders.of(this, factory).get(IhaveAssignedViewModel.class);
         return mIhaveAssignedViewModel;
     }
 
@@ -197,6 +195,13 @@ public class IhaveAssignedFragment extends BaseFragment<FragmentIHaveAssignedBin
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setHasOptionsMenu(true);
+
+        httpManager = RocketFlyer.Companion.httpManager();
+        preferencesHelper = RocketFlyer.Companion.preferenceHelper();
+
+
+        mIhaveAssignedAdapter = new TaskListingAdapter(new ArrayList<>(), RocketFlyer.Companion.preferenceHelper());
+
         mIhaveAssignedViewModel.setNavigator(this);
         mIhaveAssignedAdapter.setListener(this);
 
@@ -446,6 +451,7 @@ public class IhaveAssignedFragment extends BaseFragment<FragmentIHaveAssignedBin
     private void setRecyclerView() {
         if (rvIhaveAssigned == null) {
             rvIhaveAssigned = mFragmentIHaveAssignedBinding.rvIhaveAssigned;
+            mLayoutManager = new LinearLayoutManager(this.getActivity());
             mLayoutManager.setOrientation(RecyclerView.VERTICAL);
             rvIhaveAssigned.setLayoutManager(mLayoutManager);
             rvIhaveAssigned.setItemAnimator(new DefaultItemAnimator());

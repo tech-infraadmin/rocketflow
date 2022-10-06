@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.tabs.TabLayout
 import com.google.gson.Gson
+import com.rocketflow.sdk.RocketFlyer
 import com.tracki.BR
 import com.tracki.R
 import com.tracki.data.local.prefs.PreferencesHelper
@@ -14,6 +15,7 @@ import com.tracki.data.model.response.config.WorkFlowCategories
 import com.tracki.data.network.HttpManager
 import com.tracki.databinding.LayoutFragmentSubtasklistBinding
 import com.tracki.ui.base.BaseFragment
+import com.tracki.ui.taskdetails.NewTaskDetailsViewModel
 import com.tracki.ui.tasklisting.TaskPagerAdapter
 import com.tracki.ui.tasklisting.assignedtome.AssignedtoMeFragment
 import com.tracki.ui.tasklisting.ihaveassigned.TabDataClass
@@ -32,17 +34,12 @@ class SubTaskFragment : BaseFragment<LayoutFragmentSubtasklistBinding, SubTaskVi
     lateinit var mSubTaskViewModel: SubTaskViewModel
     lateinit var mPagerAdapter: TaskPagerAdapter
 
-    @Inject
-    lateinit var mViewModelFactory: ViewModelProvider.Factory
     private lateinit var mBinding: LayoutFragmentSubtasklistBinding
     private var fromDate: Long = 0
     private var toDate: Long = 0
     private var allowSubTask:Boolean=false
     private var subTaskCategoryId : ArrayList<String>?=null
-    @Inject
     lateinit var httpManager: HttpManager
-
-    @Inject
     lateinit var preferencesHelper: PreferencesHelper
 
     private val fragments: MutableList<TabDataClass> = ArrayList()
@@ -81,14 +78,20 @@ class SubTaskFragment : BaseFragment<LayoutFragmentSubtasklistBinding, SubTaskVi
     }
 
     override fun getViewModel(): SubTaskViewModel {
-        mSubTaskViewModel = ViewModelProviders.of(this, mViewModelFactory).get(SubTaskViewModel::class.java)
-        return mSubTaskViewModel
+
+        val factory = RocketFlyer.dataManager()?.let { SubTaskViewModel.Factory(it) } // Factory
+        if (factory != null) {
+            mSubTaskViewModel = ViewModelProvider(this, factory)[SubTaskViewModel::class.java]
+        }
+        return mSubTaskViewModel!!
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding = viewDataBinding
         mPagerAdapter = TaskPagerAdapter(childFragmentManager)
+        httpManager = RocketFlyer.httpManager()!!
+        preferencesHelper = RocketFlyer.preferenceHelper()!!
         getTaskData()
     }
 

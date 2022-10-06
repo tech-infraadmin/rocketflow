@@ -31,7 +31,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
 
 /**
  * Created by rahul.
@@ -42,8 +41,6 @@ public abstract class BaseFragment<T extends ViewDataBinding, V extends BaseView
     private final String TAG = BaseFragment.class.getName();
 
 
-
-    @Inject
     public AnalyticsHelper analyticsHelper;
     private BaseActivity mActivity;
     private View mRootView;
@@ -141,7 +138,7 @@ public abstract class BaseFragment<T extends ViewDataBinding, V extends BaseView
     }
 
     private void performDependencyInjection() {
-        AndroidSupportInjection.inject(this);
+        //AndroidSupportInjection.inject(this);
     }
 
     public void showTimeOutMessage(@NonNull ApiCallback callBack) {

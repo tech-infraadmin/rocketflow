@@ -42,6 +42,7 @@ import androidx.databinding.ViewDataBinding;
 //import com.google.android.gms.location.LocationRequest;
 //import com.google.android.gms.location.LocationServices;
 //import com.google.android.gms.maps.model.LatLng;
+import com.rocketflow.sdk.RocketFlyer;
 import com.tracki.R;
 import com.tracki.data.local.prefs.AppPreferencesHelper;
 import com.tracki.data.local.prefs.PreferencesHelper;
@@ -68,10 +69,9 @@ import com.tracki.utils.TrackiToast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
-
-import dagger.android.AndroidInjection;
 
 import static com.tracki.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_BOTTOM_SHEET_MENU;
 import static com.tracki.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU;
@@ -94,14 +94,14 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
     private final String TAG = BaseActivity.class.getName();
 
     //public LatLng currentLatLng;
-    @Inject
-    public AnalyticsHelper analyticsHelper;
+    //@Inject
+    //public AnalyticsHelper analyticsHelper;
     //public GeofenceUtil geofenceUtil;
     // protected WebSocketManager webSocketManager = null;
     // private SensorManager mSensorManager;
     private Dialog locationDialog;
-    @Inject
-    PreferencesHelper sharedPreferences;
+    //@Inject
+    //PreferencesHelper sharedPreferences;
     // TODO
     // this can probably depend on isLoading variable of BaseViewModel,
     // since its going to be common for all the activities
@@ -317,7 +317,7 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 //    }
 
     public void performDependencyInjection() {
-        AndroidInjection.inject(this);
+        //AndroidInjection.inject(this);
     }
 
     private void performDataBinding() {
@@ -495,13 +495,13 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 
     public void invalidToken(Intent intent) {
         //clear all data from preferences and open login activity
-        sharedPreferences.clear(AppPreferencesHelper.PreferencesKeys.NOT_ALL);
+        Objects.requireNonNull(RocketFlyer.Companion.preferenceHelper()).clear(AppPreferencesHelper.PreferencesKeys.NOT_ALL);
         openActivityOnTokenExpire(intent);
     }
     public void invalidLoginTokenOnly() {
-        if(sharedPreferences!=null) {
-            sharedPreferences.setLoginToken(null);
-            sharedPreferences.setAccessId(null);
+        if(RocketFlyer.Companion.preferenceHelper()!=null) {
+            Objects.requireNonNull(RocketFlyer.Companion.preferenceHelper()).setLoginToken(null);
+            Objects.requireNonNull(RocketFlyer.Companion.preferenceHelper()).setAccessId(null);
         }
     }
 
@@ -517,7 +517,7 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
             //      Show battery optimization dialog if user disable this feature.
             CommonUtils.showBatteryOptimizationDialog(this);
         }*/
-        if (sharedPreferences.getLocationRequired()) {
+        if (Objects.requireNonNull(RocketFlyer.Companion.preferenceHelper()).getLocationRequired()) {
             IntentFilter intentFilter2 = new IntentFilter();
             intentFilter2.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
             registerReceiver(locationSwitchStateReceiver, intentFilter2);
@@ -578,7 +578,7 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 //            webSocketManager.removeListener();
 //        }
         //unregister when complete
-        if (sharedPreferences.getLocationRequired() && locationSwitchStateReceiver != null)
+        if (Objects.requireNonNull(RocketFlyer.Companion.preferenceHelper()).getLocationRequired() && locationSwitchStateReceiver != null)
             unregisterReceiver(locationSwitchStateReceiver);
         unRegisterShakeListener();
         unRegisterReceiver();

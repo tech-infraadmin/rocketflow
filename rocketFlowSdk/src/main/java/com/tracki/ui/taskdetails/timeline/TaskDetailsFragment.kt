@@ -1,5 +1,13 @@
 package com.tracki.ui.taskdetails.timeline
 
+//import com.tracki.databinding.ItemDynamicFormVideoBinding
+//import com.tracki.ui.chat.ChatActivity
+//import com.tracki.ui.messages.MessagesActivity
+//import com.tracki.ui.scanqrcode.ScanQrAndBarCodeActivity
+//import com.tracki.ui.selectorder.SelectOrderActivity
+//import com.tracki.ui.userlisting.UserListNewActivity
+//import com.tracki.ui.webview.WebViewActivity
+//import com.tracki.utils.geofence.AddGeoFenceUtil
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
@@ -13,11 +21,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentContainer
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
@@ -25,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
+import com.rocketflow.sdk.RocketFlyer
 import com.tracki.BR
 import com.tracki.R
 import com.tracki.TrackiApplication
@@ -37,10 +42,8 @@ import com.tracki.data.model.response.config.*
 import com.tracki.data.network.APIError
 import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
-//import com.tracki.databinding.ItemDynamicFormVideoBinding
 import com.tracki.databinding.LayoutFrgmrntTaskDetailsBinding
 import com.tracki.ui.base.BaseFragment
-//import com.tracki.ui.chat.ChatActivity
 import com.tracki.ui.common.DoubleButtonDialog
 import com.tracki.ui.common.OnClickListener
 import com.tracki.ui.custom.socket.*
@@ -48,21 +51,14 @@ import com.tracki.ui.dynamicform.DynamicFormActivity
 import com.tracki.ui.dynamicform.DynamicFormActivity.Companion.newIntent
 import com.tracki.ui.dynamicform.dynamicfragment.DynamicAdapter
 import com.tracki.ui.dynamicform.dynamicfragment.DynamicFragment
-import com.tracki.ui.dynamicform.dynamicfragment.DynamicViewModel
 import com.tracki.ui.dynamicform.dynamicfragment.ShowDynamicFormDataAdapter
-import com.tracki.ui.main.taskdashboard.TaskDashBoardFragment
-//import com.tracki.ui.messages.MessagesActivity
 import com.tracki.ui.newcreatetask.NewCreateTaskActivity
-//import com.tracki.ui.scanqrcode.ScanQrAndBarCodeActivity
-//import com.tracki.ui.selectorder.SelectOrderActivity
 import com.tracki.ui.taskdetails.*
 import com.tracki.ui.tasklisting.TaskClickListener
 import com.tracki.ui.tasklisting.assignedtome.TaskAssignToMeViewModel
-//import com.tracki.ui.userlisting.UserListNewActivity
-//import com.tracki.ui.webview.WebViewActivity
+import com.tracki.ui.tasklisting.ihaveassigned.IhaveAssignedViewModel
 import com.tracki.utils.*
 import com.tracki.utils.AppConstants.Extra
-//import com.tracki.utils.geofence.AddGeoFenceUtil
 import com.trackthat.lib.TrackThat
 import com.trackthat.lib.internal.network.TrackThatCallback
 import com.trackthat.lib.models.ErrorResponse
@@ -71,8 +67,6 @@ import com.trackthat.lib.models.TrackthatLocation
 import kotlinx.android.synthetic.main.layout_frgmrnt_task_details.*
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 
 class TaskDetailsFragment :
@@ -113,21 +107,15 @@ class TaskDetailsFragment :
     private var isEditable: Boolean = false
     private var isHideButton: Boolean = false
 
-    @Inject
-    lateinit var mViewModelFactory: ViewModelProvider.Factory
+    lateinit var httpManager: HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
+    //var addGeoFenceUtil: AddGeoFenceUtil? = null
 
     private lateinit var mActivityNewTaskDetailBinding: LayoutFrgmrntTaskDetailsBinding
 
     private var task: Task? = null
 
-    @Inject
-    lateinit var httpManager: HttpManager
-
     lateinit var showDynamicFormDataAdapter: ShowDynamicFormDataAdapter
-
-    @Inject
-    lateinit var preferencesHelper: PreferencesHelper
-    //var addGeoFenceUtil: AddGeoFenceUtil? = null
 
     var taskId: String? = null
     private var api: Api? = null
@@ -159,9 +147,12 @@ class TaskDetailsFragment :
 
 
     override fun getViewModel(): NewTaskDetailsViewModel {
-        mNewTaskViewModel =
-            ViewModelProviders.of(this, mViewModelFactory).get(NewTaskDetailsViewModel::class.java)
-        return mNewTaskViewModel
+
+        val factory = RocketFlyer.dataManager()?.let { NewTaskDetailsViewModel.Factory(it) } // Factory
+        if (factory != null) {
+            mNewTaskViewModel = ViewModelProvider(this, factory)[NewTaskDetailsViewModel::class.java]
+        }
+        return mNewTaskViewModel!!
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -173,6 +164,8 @@ class TaskDetailsFragment :
         super.onActivityCreated(savedInstanceState)
         mActivityNewTaskDetailBinding = viewDataBinding
 
+        httpManager = RocketFlyer.httpManager()!!
+        preferencesHelper = RocketFlyer.preferenceHelper()!!
         //container = mActivityNewTaskDetailBinding.container
         timeLineAdapter = TaskTimeLineAdapter(this)
         mActivityNewTaskDetailBinding.timeLineAdapter = timeLineAdapter
