@@ -135,7 +135,15 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
         mTaskViewModel  = new ViewModelProvider(this, new TaskViewModelFactory(RocketFlyer.Companion.dataManager())).get(TaskViewModel.class);
         mTaskViewModel.setNavigator(this);
         preferencesHelper = RocketFlyer.Companion.preferenceHelper();
-        hitLoginSDKToken("sahshahsss");
+        if(preferencesHelper!=null && preferencesHelper.getLoginToken()!=null
+                && !preferencesHelper.getLoginToken().isEmpty()) {
+            hitConfig();
+        }else{
+            String sdkClintId = preferencesHelper!=null
+                    && preferencesHelper.getSDKClientID()!=null
+                    && !preferencesHelper.getSDKClientID().isEmpty()?preferencesHelper.getSDKClientID():"sahshahsss";
+            hitLoginSDKToken(sdkClintId);
+        }
     }
 
     private void hitLoginSDKToken(String sdkClintId){

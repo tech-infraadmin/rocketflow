@@ -15,20 +15,11 @@ internal class RocketFlyerImp(
     private val contextRef = WeakReference(context.applicationContext)
     override fun initialize(sdkInitToken: String) {
 
-        //https://uat.rocketflyer.in/rfapi/sdk/token/exchange
-        //send init token in  X-SDK-INIT-TOKEN header
-//        {
-//            "successful": true,
-//            "responseMsg": "Success",
-//            "responseCode": 200,
-//            "accessId": "2YwC80gKsM",
-//            "token": "92c509f4-d87f-4ccc-83e1-72c424e5f918"
-//        }
-
         contextRef.get()?.let {
             if (sdkInitToken.isEmpty()) throw Exception("Token cannot be null")
             RFLog.d("Token value : $sdkInitToken")
-            showToast(it,"Initialized : Token value : $sdkInitToken");
+            RocketFlyerBuilder.getPrefInstance()?.sdkClientID = sdkInitToken;
+            //showToast(it,"Initialized : Token value : $sdkInitToken");
         }
     }
 
@@ -61,7 +52,8 @@ internal class RocketFlyerImp(
     override fun terminate() {
         contextRef.get()?.let {
             RFLog.d("Terminate")
-            showToast(it,"Terminate");
+            RocketFlyerBuilder.getPrefInstance()?.loginToken = "";
+            //showToast(it,"Terminate");
         }
     }
 
