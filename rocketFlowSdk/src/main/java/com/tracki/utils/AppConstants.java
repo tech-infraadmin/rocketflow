@@ -94,6 +94,7 @@ public final class AppConstants {
     public static final int REQUEST_CODE_DYNAMIC_FORM = 1024;
     public static final int REQUEST_CODE_TAG_INVENTORY = 1025;
     public static final int REQUEST_CODE_SCAN = 1032;
+    public static final int REQUEST_CODE_UNIT_INFO = 1028;
     public static final int SERVICE_ID_1 = 10001;
     public static final int SERVICE_ID_2 = 10002;
     public static final int SERVICE_ID_3 = 10003;

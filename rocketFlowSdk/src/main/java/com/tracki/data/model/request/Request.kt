@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import androidx.databinding.library.baseAdapters.BR
-import com.tracki.data.model.DocType
 import com.tracki.data.model.response.config.*
 //import com.tracki.ui.selectorder.CatalogProduct
 import com.tracki.ui.tasklisting.PagingData
@@ -13,12 +12,7 @@ import com.tracki.utils.*
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 import java.io.Serializable
-
-/**
- * Created by rahul on 16/11/18
- *
- * This class contains all the request data models.
- */
+import java.sql.Time
 
 
 class LoginRequest(var actionType: NextScreen, var mobile: String)
@@ -33,16 +27,16 @@ class RegisterRequest(private var name: String, private var email: String, priva
 class AccountListRequest(val draftId: String)
 
 data class InitiateSignUpRequest(
-        var draftId: String?=null,
-        var merchantId: String?=null,
-        var selectionIds: ArrayList<String>?=null,
-        var signupAs: String?=null
+    var draftId: String?=null,
+    var merchantId: String?=null,
+    var selectionIds: ArrayList<String>?=null,
+    var signupAs: String?=null
 )
 data class UpdateServiceRequest(
-        var draftId: String?=null,
-        var merchantId: String?=null,
-        var roleId: String?=null,
-        var serviceIds: List<String>?=null
+    var draftId: String?=null,
+    var merchantId: String?=null,
+    var roleId: String?=null,
+    var serviceIds: List<String>?=null
 )
 
 class BuddiesRequest(var status: List<BuddyStatus>, var loadBy: BuddyInfo, var includeSelfAsBuddy: Boolean)
@@ -86,24 +80,24 @@ class TaskRequest(var status: MutableList<out TaskStatus>, var loadBy: BuddyInfo
 }
 
 data class RegionRequest(
-        var regionId: String? = null,
-        var userGeoReq: Boolean? = null
+    var regionId: String? = null,
+    var userGeoReq: Boolean? = null
 )
 
 class CreateTaskRequest(
-        var autoCreated: Boolean,
-        var buddyId: String,
-        var fleetId: String,
-        var createdBy: String,
-        var description: String,//req
-        var destination: Place?,//req
-        var source: Place?,//req
-        var startTime: Long,//req
-        var taskName: String,//req
-        var taskId: String,
-        var endTime: Long,
-        var contact: Contact?,
-        var taskType: String?) : Serializable {
+    var autoCreated: Boolean,
+    var buddyId: String,
+    var fleetId: String,
+    var createdBy: String,
+    var description: String,//req
+    var destination: Place?,//req
+    var source: Place?,//req
+    var startTime: Long,//req
+    var taskName: String,//req
+    var taskId: String,
+    var endTime: Long,
+    var contact: Contact?,
+    var taskType: String?) : Serializable {
     var taskData: TaskData? = null
     var categoryId: String? = null
     var dfId: String? = null
@@ -111,10 +105,16 @@ class CreateTaskRequest(
     var parentTaskId: String? = null
     var requestBy: String? = null
     var invIds: List<String>?=null
-    var  directMapping:Boolean=false
+    var directMapping:Boolean=false
+    var timeSlot: TimeSlot? = null
 
     // var location:GeoLocation?=null
 }
+
+data class TimeSlot(
+    var date: String? = null,
+    var slot: String? = null
+): Serializable
 
 class GetManualLocationRequest {
     var regionId: String? = null
@@ -142,16 +142,14 @@ data class TeamAttendanceRequest(var date: Long):Serializable {
  */
 
 class Contact(
-        var name: String?,
-        var mobile: String?) : Serializable
+    var name: String?,
+    var mobile: String?) : Serializable
 
 data class ExecuteUpdateRequest(var taskId: String, var ctaId: String, var timestamp: Long,
                                 var taskData: TaskData?): Serializable {
     var dfdId: String? = null
     var dfId: String? = null
     var location: CtaLocation? = null
-
-
 }
 
 class CtaLocation:Serializable {
@@ -363,45 +361,45 @@ class ExecuteUpdateReq {
 
 
 data class InventoryRequest(
-        var at: Int? = null,
-        var category: Any? = null,
-        var categoryId: String? = null,
-        var inventoryCategoryId: String? = null,
-        var categoryIds: List<String>? = null,
-        var cid: String? = null,
-        var fleetname: String? = null,
-        var gid: String? = null,
-        var inventoryGroupId: String? = null,
-        var inventoryId: String? = null,
-        var modelId: String? = null,
-        var modelIds: List<String>? = null,
-        var paginationData: PagingData? = null,
-        var regNumber: String? = null
+    var at: Int? = null,
+    var category: Any? = null,
+    var categoryId: String? = null,
+    var inventoryCategoryId: String? = null,
+    var categoryIds: List<String>? = null,
+    var cid: String? = null,
+    var fleetname: String? = null,
+    var gid: String? = null,
+    var inventoryGroupId: String? = null,
+    var inventoryId: String? = null,
+    var modelId: String? = null,
+    var modelIds: List<String>? = null,
+    var paginationData: PagingData? = null,
+    var regNumber: String? = null
 )
 
 data class LinkInventoryRequest(
-        var autoApprove: Boolean? = null,
-        var categoryId: String? = null,
-        var createSubTask: Boolean? = null,
-        var ctaId: String? = null,
-        var executeWorkflow: Boolean? = null,
-        var inventoryId: String? = null,
-        var inventoryIds: List<String>? = null,
-        var merchantId: String? = null,
-        var parentTaskId: String? = null,
-        var flavorId: String? = null,
-        var quantity: Int? = null,
-        var quantitys: List<Int>? = null,
-        var subTaskCategory: String? = null,
-        var subTaskId: String? = null,
-        var subCategoryId: String? = null,
-        var taskId: String? = null,
-        var type: String? = null,
-        var action: String? = null,
+    var autoApprove: Boolean? = null,
+    var categoryId: String? = null,
+    var createSubTask: Boolean? = null,
+    var ctaId: String? = null,
+    var executeWorkflow: Boolean? = null,
+    var inventoryId: String? = null,
+    var inventoryIds: List<String>? = null,
+    var merchantId: String? = null,
+    var parentTaskId: String? = null,
+    var flavorId: String? = null,
+    var quantity: Int? = null,
+    var quantitys: List<Int>? = null,
+    var subTaskCategory: String? = null,
+    var subTaskId: String? = null,
+    var subCategoryId: String? = null,
+    var taskId: String? = null,
+    var type: String? = null,
+    var action: String? = null,
 /*
         var products:Map<String,Int>?=null
 */
-        var products:List<SelectedProduct>?=null
+    var products:List<SelectedProduct>?=null
 )
 data class SelectedProduct(
     var price:Float?=0f,
@@ -409,31 +407,31 @@ data class SelectedProduct(
     var quantity:Int?=0,
     var dynamicPricing: Boolean = false,
 
-)
+    )
 
 data class TransactionRequest(
-        var userId: String? = null,
-        var paginationData: PagingData? = null,
-        var txnTypes: ArrayList<String>? = null
+    var userId: String? = null,
+    var paginationData: PagingData? = null,
+    var txnTypes: ArrayList<String>? = null
 )
 
 data class EmployeeListAttendanceRequest(
-        var status: String? = null,
-        var regionId: String? = null,
-        var stateId: String? = null,
-        var cityId: List<String>? = null,
-        var hubId: List<String>? = null,
-        var geoFilter: Boolean? = null,
-        var paginationData: PagingData? = null,
-        var date: Long=0,
-        var from: Long? = null,
-        var mobile: String? = null,
-        var name: String? = null,
-        var to: Long? = null
+    var status: String? = null,
+    var regionId: String? = null,
+    var stateId: String? = null,
+    var cityId: List<String>? = null,
+    var hubId: List<String>? = null,
+    var geoFilter: Boolean? = null,
+    var paginationData: PagingData? = null,
+    var date: Long=0,
+    var from: Long? = null,
+    var mobile: String? = null,
+    var name: String? = null,
+    var to: Long? = null
 )
 
 data class GetCommentsOfPosts(
-        var postId: String? = null
+    var postId: String? = null
 )
 
 class CommentsPostRequest {
@@ -442,9 +440,9 @@ class CommentsPostRequest {
     var like: Boolean? = null
 }
 
- class ClientSearchRequest(
-        val name: String?,
-        val roleIds: List<String>?
+class ClientSearchRequest(
+    val name: String?,
+    val roleIds: List<String>?
 )
 /*class GeoPunchRequest{
     var coordinates: List<Int>?=null
@@ -456,34 +454,34 @@ class CommentsPostRequest {
 }*/
 
 @Parcelize
- class AddEmployeeRequest():Parcelable{
-     var address: Boolean?=null
-     var addressInfo: AddressInfo?=null
-     var dateOfBirth: String?=null
-     var dateOfJoining: String?=null
-     var dfData: ArrayList<DynamicFormData>?=null
-     var email: String?=null
-     var fatherName: String?=null
-     var motherName: String?=null
-     var password: String?=null
-     var firstName: String?=null
-     var lastName: String?=null
-     var middleName: String?=null
-     var mobile: String?=null
-     var profileImg: String?=null
-     var roleId: String?=null
-     var roleName: String?=null
-     var personId: String?=null
-     var userId: String?=null
- }
+class AddEmployeeRequest():Parcelable{
+    var address: Boolean?=null
+    var addressInfo: AddressInfo?=null
+    var dateOfBirth: String?=null
+    var dateOfJoining: String?=null
+    var dfData: ArrayList<DynamicFormData>?=null
+    var email: String?=null
+    var fatherName: String?=null
+    var motherName: String?=null
+    var password: String?=null
+    var firstName: String?=null
+    var lastName: String?=null
+    var middleName: String?=null
+    var mobile: String?=null
+    var profileImg: String?=null
+    var roleId: String?=null
+    var roleName: String?=null
+    var personId: String?=null
+    var userId: String?=null
+}
 
 @Parcelize
 data class AddressInfo(
-        var address: String?=null,
-        var location: Address?=null,
-        var pincode: String?=null,
-        var placeId: String?=null,
-        var userId: String?=null
+    var address: String?=null,
+    var location: Address?=null,
+    var pincode: String?=null,
+    var placeId: String?=null,
+    var userId: String?=null
 ):Parcelable{
     override fun equals(obj: Any?): Boolean {
 
@@ -499,28 +497,28 @@ data class AddressInfo(
 }
 
 data class DfData(
-        var embeddedDf: Boolean?=null,
-        var embeddedDfId: String?=null,
-        var key: String?=null,
-        var label: String?=null,
-        var type: String?=null,
-        var value: String?=null,
-        var weight: Int?=null
+    var embeddedDf: Boolean?=null,
+    var embeddedDfId: String?=null,
+    var key: String?=null,
+    var label: String?=null,
+    var type: String?=null,
+    var value: String?=null,
+    var weight: Int?=null
 )
 
 @Parcelize
 data class Address(
-        var address: String?=null,
-        var location: LocationX?=null,
-        var radius: Int?=null
+    var address: String?=null,
+    var location: LocationX?=null,
+    var radius: Int?=null
 ):Parcelable
 
 @Parcelize
 data class LocationX(
-        var coordinates: List<Double>?=null,
-        var latitude: Double?=null,
-        var locationId: String?=null,
-        var longitude: Double?=null
+    var coordinates: List<Double>?=null,
+    var latitude: Double?=null,
+    var locationId: String?=null,
+    var longitude: Double?=null
 ):Parcelable
 
 class PlaceRequest{
@@ -528,9 +526,37 @@ class PlaceRequest{
 }
 
 
-data class getDocsRequest(
-    var pn: Long?,
-    var rc: Long?,
-    var type: DocType?
-)
+//data class getDocsRequest(
+//    var pn: Long?,
+//    var rc: Long?,
+//    var type: DocType?
+//)
 
+@Parcelize
+data class SKUInfoSpecsRequest(
+    var data: ArrayList<ProductItem>?=null,
+    var taskId: String?=null
+):Parcelable
+
+@Parcelize
+data class ProductItem(
+    var catId: String?=null,
+    var flavorId: String?=null,
+    var itemId: String?=null,
+    var prodId: String?=null,
+    var refId: String?=null,
+    var units: ArrayList<UnitItem>?=null
+):Parcelable
+
+@Parcelize
+data class UnitItem(
+    var upcNumber: String?=null,
+    var specifications: ArrayList<SkuSpecification>?=null
+):Parcelable
+
+@Parcelize
+data class SkuSpecification(
+    var name: String?=null,
+    var specId: String?=null,
+    var value: String?=null
+):Parcelable

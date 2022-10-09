@@ -149,8 +149,7 @@ public class NetworkManagerImpl implements NetworkManager {
     }
 
     @Override
-    public void timeSlotData(ApiCallback apiCallback, HttpManager httpManager, Api api, String geoId, String date) {
-        api.setUrl(api.getUrl() + "?geoId="+geoId+"&?date="+date);
+    public void timeSlotData(ApiCallback apiCallback, HttpManager httpManager, Api api) {
         getApiCall(apiCallback, httpManager, api);
     }
 

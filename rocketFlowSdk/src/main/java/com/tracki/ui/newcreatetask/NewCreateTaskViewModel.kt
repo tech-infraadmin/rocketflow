@@ -11,7 +11,6 @@ import com.tracki.data.network.APIError
 import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
 import com.tracki.ui.base.BaseViewModel
-import com.tracki.ui.taskdetails.subtask.SubTaskViewModel
 import com.tracki.utils.*
 import com.tracki.utils.rx.AppSchedulerProvider
 import com.tracki.utils.rx.SchedulerProvider
@@ -23,6 +22,10 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
 
     private lateinit var httpManager: HttpManager
     private lateinit var api: Api
+
+    var geoId: String = ""
+    var date: String = ""
+
     private lateinit var createTaskRequest: CreateTaskRequest
 
     fun onAssignNowClicked() {
@@ -131,6 +134,8 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
     fun getSlotAvailability(httpManager: HttpManager, api: Api, geoId: String, date: String) {
         this.httpManager = httpManager
         this.api = api
+        this.geoId = geoId
+        this.date = date
         SlotDataAPI().hitApi()
     }
 
@@ -148,8 +153,6 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
     inner class SlotDataAPI: ApiCallback {
 
         var api = TrackiApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!
-        var geoId: String = ""
-        var date: String = ""
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null) {
@@ -158,8 +161,15 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
         }
 
         override fun hitApi() {
+            val apiMain = TrackiApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!
+            val api = Api()
+            api.name = ApiType.GET_TIME_SLOTS
+            api.timeOut = apiMain.timeOut
+
+            api.url = "${apiMain.url}?geoId=$geoId&date=$date"
+
             if(dataManager!=null) {
-                dataManager.timeSlotData(this@SlotDataAPI, httpManager, api, geoId, date)
+                dataManager.timeSlotData(this@SlotDataAPI, httpManager, api)
             }
         }
 
@@ -220,6 +230,39 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
             buddyRequest = BuddiesRequest(statusList, BuddyInfo.TRACKED_BY_ME, true)
             api = TrackiApplication.getApiMap()[ApiType.BUDDIES]
         }
+    }
+
+    fun getUserLocations(httpManager: HttpManager){
+        this.httpManager = httpManager
+        GetUserLocations().hitApi()
+    }
+
+    inner class GetUserLocations : ApiCallback {
+        private val api = TrackiApplication.getApiMap()[ApiType.USER_LOCATIONS]
+        override fun onResponse(result: Any, error: APIError?) {
+            navigator.handleMyPlaceResponse(this@GetUserLocations, result, error)
+        }
+
+        override fun hitApi() {
+            if (api != null){
+                dataManager.getUserLocation(
+                    this@GetUserLocations,
+                    httpManager,
+                    api
+                )
+        }
+        }
+
+        override fun isAvailable(): Boolean {
+            return true
+        }
+
+        override fun onNetworkErrorClose() {}
+        override fun onRequestTimeOut(callBack: ApiCallback) {
+            navigator.showTimeOutMessage(callBack)
+        }
+
+        override fun onLogout() {}
     }
 
     inner class FleetListingAPI : ApiCallback {
@@ -493,6 +536,7 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
         override fun onLogout() {
         }
     }
+
 
     internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

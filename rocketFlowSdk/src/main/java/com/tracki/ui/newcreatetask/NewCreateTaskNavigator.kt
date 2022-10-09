@@ -22,4 +22,5 @@ interface NewCreateTaskNavigator :BaseNavigator {
     fun handleCityListResponse(callback: ApiCallback, result: Any?, error: APIError?,isStart:Boolean)
     fun handleHubListResponse(callback: ApiCallback, result: Any?, error: APIError?,isStart:Boolean)
     fun getSlotDataResponse(callback: ApiCallback, result: Any?, error: APIError?)
+    fun handleMyPlaceResponse(callback: ApiCallback, result: Any?, error: APIError?)
 }

@@ -10,6 +10,7 @@
         <entry key="rocketFlowSdk/src/main/res/drawable/bg_diff_shape.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/drawable/ic_money_credit.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/drawable/ic_money_debit.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/drawable/no_data.xml" value="0.117" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_account_list.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_add_fleet.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_add_location.xml" value="0.1" />

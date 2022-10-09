@@ -51,7 +51,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="@dimen/dimen_10"
+                        android:layout_marginStart="@dimen/dimen_10"
                         android:text="@{data.expiryText}"
                         android:textColor="@color/white" />
 
@@ -90,16 +90,16 @@
                             app:srcCompat="@drawable/ic_current_stage" />
 
                         <TextView
-                            android:layout_toRightOf="@+id/ivReffId"
                             android:id="@+id/tvTaskId"
-                            android:layout_toLeftOf="@+id/tvCounterTime"
-                            android:layout_centerVertical="true"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="@dimen/dimen_5"
+                            android:layout_toLeftOf="@+id/tvCounterTime"
+                            android:layout_toRightOf="@+id/ivReffId"
                             android:fontFamily="@font/campton_book"
                             android:paddingLeft="@dimen/dimen_5"
                             android:paddingTop="@dimen/dimen_10"
-                            android:layout_marginRight="@dimen/dimen_5"
                             android:paddingBottom="@dimen/dimen_10"
                             android:text="@string/current_state"
                             android:textColor="@color/black" />
@@ -195,23 +195,23 @@
                                 tools:text="@string/current_state" />
 
                             <androidx.recyclerview.widget.RecyclerView
-                                android:layout_marginTop="10dp"
-                                android:layout_below="@id/tvCurrentState"
                                 android:id="@+id/rvDynamicFormsMini"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_below="@id/tvCurrentState"
+                                android:layout_marginTop="10dp"
                                 tools:listitem="@layout/item_dynamic_form_signature" />
 
                             <ImageView
-                                android:layout_below="@id/rvDynamicFormsMini"
                                 android:id="@+id/ivCurrentStageLocation"
                                 android:layout_width="@dimen/dimen_25"
                                 android:layout_height="@dimen/dimen_25"
+                                android:layout_below="@id/rvDynamicFormsMini"
                                 android:layout_alignParentEnd="true"
                                 android:layout_centerVertical="true"
+                                android:layout_marginRight="@dimen/dimen_8"
                                 android:layout_toLeftOf="@+id/btnDetails"
                                 android:visibility="gone"
-                                android:layout_marginRight="@dimen/dimen_8"
                                 app:srcCompat="@drawable/ic_app_location" />
 
                             <ImageView
@@ -578,58 +578,99 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <RelativeLayout
-                            android:id="@+id/rlInnerStartDate"
+                        <LinearLayout
+                            android:weightSum="2"
+                            android:id="@+id/llInnerStartDate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:padding="@dimen/dimen_10">
+                            android:orientation="horizontal">
 
-                            <TextView
-                                android:id="@+id/labelCreatedAt"
-                                style="@style/TextViewStyle"
+                            <RelativeLayout
+                                android:layout_weight="1"
+                                android:id="@+id/rlInnerStartDate"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/campton_light"
-                                android:text="@string/created_at"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="@dimen/text_size_14" />
+                                android:layout_centerVertical="true"
+                                android:layout_marginLeft="@dimen/dimen_10"
+                                android:padding="@dimen/dimen_10">
 
-                            <TextView
-                                android:id="@+id/tvCreatedAt"
-                                style="@style/TextViewStyle"
+                                <TextView
+                                    android:id="@+id/labelCreatedAt"
+                                    style="@style/TextViewStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/campton_light"
+                                    android:text="@string/created_at"
+                                    android:textColor="@color/colorTextGreyPunch"
+                                    android:textSize="@dimen/text_size_14" />
+
+                                <TextView
+                                    android:id="@+id/tvCreatedAt"
+                                    style="@style/TextViewStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/labelCreatedAt"
+                                    android:fontFamily="@font/campton_book"
+                                    android:text="@{data.createdAt}"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14"
+                                    tools:text="19 April 2020 ," />
+
+                                <TextView
+                                    android:id="@+id/tvTime"
+                                    style="@style/TextViewStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/labelCreatedAt"
+                                    android:layout_alignBaseline="@+id/tvCreatedAt"
+                                    android:layout_marginLeft="@dimen/dimen_4"
+                                    android:layout_toRightOf="@+id/tvCreatedAt"
+                                    android:fontFamily="@font/campton_book"
+                                    android:text="@{data.createdTimeAt}"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14"
+                                    tools:text="06:36 Am" />
+
+
+                            </RelativeLayout>
+
+                            <LinearLayout
+                                android:visibility="@{data.encCodeUrl != null ? View.VISIBLE : View.GONE}"
+                                android:id="@+id/ll_qr_code"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelCreatedAt"
-                                android:fontFamily="@font/campton_book"
-                                android:text="@{data.createdAt}"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                tools:text="19 April 2020 ," />
+                                android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvTime"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelCreatedAt"
-                                android:layout_alignBaseline="@+id/tvCreatedAt"
-                                android:layout_marginLeft="@dimen/dimen_4"
-                                android:layout_toRightOf="@+id/tvCreatedAt"
-                                android:fontFamily="@font/campton_book"
-                                android:text="@{data.createdTimeAt}"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                tools:text="06:36 Am" />
+                                <ImageView
+                                    android:id="@+id/iv_qr_code"
+                                    android:layout_width="@dimen/dimen_40"
+                                    android:layout_height="@dimen/dimen_40"
+                                    android:layout_gravity="center_horizontal"
+                                    android:layout_marginStart="@dimen/dimen_5"
+                                    android:layout_marginTop="@dimen/dimen_5"
+                                    android:scaleType="fitXY"
+                                    android:src="@drawable/qr_code"
+                                    android:visibility="visible" />
 
+                                <TextView
+                                    android:layout_gravity="center_horizontal"
+                                    android:textSize="@dimen/text_size_12"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Touch to Expand"
+                                    android:textColor="@color/colorPrimary"
+                                    style="@style/TextViewStyle"/>
 
-                        </RelativeLayout>
+                            </LinearLayout>
+
+                        </LinearLayout>
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/dimen_1"
-                            android:layout_below="@+id/rlInnerStartDate"
+                            android:layout_below="@+id/llInnerStartDate"
                             android:layout_marginLeft="@dimen/dimen_10"
                             android:layout_marginTop="@dimen/dimen_10"
                             android:layout_marginRight="@dimen/dimen_10"
@@ -881,8 +922,8 @@
                                 style="@style/TextViewStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/end_location"
                                 android:fontFamily="@font/campton_light"
+                                android:text="@string/end_location"
                                 android:textColor="@color/colorTextGreyPunch"
                                 android:textSize="@dimen/text_size_14" />
 
@@ -1669,9 +1710,7 @@
                 </LinearLayout>
 
 
-
             </LinearLayout>
-
 
 
         </androidx.core.widget.NestedScrollView>

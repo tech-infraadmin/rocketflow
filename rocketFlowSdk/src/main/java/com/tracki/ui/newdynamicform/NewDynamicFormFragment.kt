@@ -440,7 +440,7 @@ class NewDynamicFormFragment : BaseFragment<NewDynamicFormFragmentBinding, NewDy
     }
 
 
-     fun openVidCamera(pos: Int, mBinding: ItemDynamicFormVideoBinding, maxlength: Int) {
+     override fun openVidCamera(pos: Int, mBinding: ItemDynamicFormVideoBinding, maxlength: Int) {
 
         this.vidViewposition = pos;
         this.mBinding = mBinding;

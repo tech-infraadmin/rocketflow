@@ -413,54 +413,54 @@ class DynamicFragment : BaseFragment<FragmentFormListBinding, DynamicViewModel>(
     }
 
 
-//    override fun openVidCamera(pos: Int, mBinding: ItemDynamicFormVideoBinding, maxlength: Int) {
-//
-//        this.vidViewposition = pos;
-//        this.mBinding = mBinding;
-//
-//        val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
-//        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
-//
-//        if (intent.resolveActivity(requireContext().packageManager) != null) {
-//            val file: File?
-//            try {
-//                file = createVideoFile()
-//
-//
-//                if (file != null && file.exists()) {
-//                    vidUri = FileProvider.getUriForFile(
-//                        requireContext().applicationContext,
-//                        "rf_sdk"+ ".provider", file
-//                    )
-//                    //                    uri = Uri.parse(new File(imageFilePath).toString());
-//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, vidUri)
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-//                        intent.putExtra(
-//                            "android.intent.extras.CAMERA_FACING",
-//                            CameraCharacteristics.LENS_FACING_BACK
-//                        ) // Tested on API 24 Android version 7.0(Samsung S6)
-//                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                        intent.putExtra(
-//                            "android.intent.extras.CAMERA_FACING",
-//                            CameraCharacteristics.LENS_FACING_BACK
-//                        ) // Tested on API 27 Android version 8.0(Nexus 6P)
-//                        intent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true)
-//                    } else {
-//                        intent.putExtra(
-//                            "android.intent.extras.CAMERA_FACING",
-//                            1
-//                        ) // Tested API 21 Android version 5.0.1(Samsung S4)
-//                    }
-//                    intent.putExtra("TEST", "String Extra")
-//                    intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
-//                    intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, maxlength)
-//                    startActivityForResult(intent, VIDEO_REQUEST)
-//                }
-//            } catch (e: java.lang.Exception) {
-//                e.printStackTrace()
-//            }
-//        }
-//    }
+    override fun openVidCamera(pos: Int, mBinding: ItemDynamicFormVideoBinding, maxlength: Int) {
+
+        this.vidViewposition = pos;
+        this.mBinding = mBinding;
+
+        val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
+
+        if (intent.resolveActivity(requireContext().packageManager) != null) {
+            val file: File?
+            try {
+                file = createVideoFile()
+
+
+                if (file != null && file.exists()) {
+                    vidUri = FileProvider.getUriForFile(
+                        requireContext().applicationContext,
+                        "rf_sdk"+ ".provider", file
+                    )
+                    //                    uri = Uri.parse(new File(imageFilePath).toString());
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, vidUri)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                        intent.putExtra(
+                            "android.intent.extras.CAMERA_FACING",
+                            CameraCharacteristics.LENS_FACING_BACK
+                        ) // Tested on API 24 Android version 7.0(Samsung S6)
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        intent.putExtra(
+                            "android.intent.extras.CAMERA_FACING",
+                            CameraCharacteristics.LENS_FACING_BACK
+                        ) // Tested on API 27 Android version 8.0(Nexus 6P)
+                        intent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true)
+                    } else {
+                        intent.putExtra(
+                            "android.intent.extras.CAMERA_FACING",
+                            1
+                        ) // Tested API 21 Android version 5.0.1(Samsung S4)
+                    }
+                    intent.putExtra("TEST", "String Extra")
+                    intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
+                    intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, maxlength)
+                    startActivityForResult(intent, VIDEO_REQUEST)
+                }
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

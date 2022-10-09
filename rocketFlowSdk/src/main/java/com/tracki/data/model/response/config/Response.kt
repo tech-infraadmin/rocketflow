@@ -18,7 +18,9 @@ import com.tracki.data.model.request.AddEmployeeRequest
 import com.tracki.data.model.request.AddressInfo
 import com.tracki.data.model.request.Contact
 import com.tracki.data.model.request.Shift
+//import com.tracki.ui.attendance.punchInOut.PunchData
 import com.tracki.ui.custom.GlideApp
+//import com.tracki.ui.products.PackInfo
 import com.tracki.ui.taskdetails.StageHistoryData
 import com.tracki.ui.tasklisting.PagingData
 import com.tracki.utils.*
@@ -190,6 +192,10 @@ data class PayoutHistoryResponse(
         var successful: Boolean? = null
 )
 
+data class SkuResponse(
+    var successful: Boolean? = null
+)
+
 data class PayoutData(
 
         var dataId: String? = null,
@@ -268,6 +274,7 @@ class Task : BaseResponse(), Serializable {
     var autoCancel = false
     var fleetId: String? = null
     var tcfId: String? = null
+    var encCodeUrl: String? =null
     var categoryId: String? = null
     var assigneeDetail: AssigneeDetail? = null
     var buddyDetail: AssigneeDetail? = null
@@ -444,6 +451,7 @@ data class AmountBreakup(
 data class OrderItemsInfo(
     var img: String?,
     var orderItemId: String?,
+    var productId: String?,
     var price: Double?,
     var productName: String?,
     var quantity: Int?,
@@ -605,7 +613,7 @@ class TargetInfo {
 class CtaInventoryConfig(var dynamicPricing:Boolean?=null,var invAction:String?=null)
 
 enum class TRAGETINFO {
-    TAG_INVENTORY, CREATE_TASK,NONE,ASSIGN_EXECUTIVE
+    TAG_INVENTORY, CREATE_TASK,NONE,ASSIGN_EXECUTIVE,UNIT_INFO
 }
 
 enum class Tracking {
@@ -773,14 +781,21 @@ class FleetListResponse : BaseResponse(), Serializable {
 }
 
 class SlotDataResponse: BaseResponse(), Serializable {
-    var availableSlots: Int? = null
-    var data: kotlin.collections.Map<String,SlotData>? = null
+    var data: Map<String,SlotData>? = null
+    var message: String? = null
 }
 
-class SlotData: Serializable {
-    var time: String? = null
-    var available: String? = null
-}
+data class SlotData (
+    val slots: List<Slot>,
+    val totalAvailableSlots: Long,
+    val convertedDate: String? = null
+): Serializable
+
+data class Slot (
+    val time: String,
+    val available: Boolean,
+    val slotAvailable: Long
+): Serializable
 
 class Fleet : Serializable {
     var fleetId: String? = null
@@ -1202,13 +1217,59 @@ class ExecutiveMap : BaseResponse() {
     var data: Map<String, String>? = null
 }
 
-class GetTaskDataResponse : BaseResponse() {
+class GetTaskInfoResponse : BaseResponse() {
+    var data: List<TaskInfo>? = null
+    var dfdId: String? = null
+    var dfId: String? = null
+}
 
+class TaskInfo {
+    var itemId: String? = null
+    var prodId: String? = null
+    var prodName: String? = null
+    var count: Int? = null
+    var orderId: String? = null
+    var refId: String? = null
+    var orderRef: String? = null
+    var flavorId: String? = null
+    var catId: String? = null
+    var specs: List<TaskInfoData>? = null
+    override fun equals(obj: Any?): Boolean {
+        if (this === obj) return true
+        if (obj == null || obj.javaClass != this.javaClass) return false
+        val task: TaskInfo = obj as TaskInfo
+        return task.itemId == this.itemId
+    }
+
+    override fun hashCode(): Int {
+        return this.itemId.hashCode()
+    }
+}
+
+class TaskInfoData {
+    var id: String? = null
+    var name: String? = null
+    var type: DataType? = null
+    var autogenerate: Boolean? = false
+    var required: Boolean? = false
+    var multiple: Boolean? = false
+    override fun equals(obj: Any?): Boolean {
+
+        if (this === obj) return true
+        if (obj == null || obj.javaClass != this.javaClass) return false
+        val task: TaskInfoData = obj as TaskInfoData
+        return task.id == this.id
+    }
+
+    override fun hashCode(): Int {
+        return this.id.hashCode()
+    }
+}
+
+class GetTaskDataResponse : BaseResponse() {
     var data: List<TaskData>? = null
     var dfdId: String? = null
     var dfId: String? = null
-
-
 }
 
 class TaskData {

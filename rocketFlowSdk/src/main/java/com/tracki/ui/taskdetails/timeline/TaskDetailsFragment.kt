@@ -1,30 +1,27 @@
 package com.tracki.ui.taskdetails.timeline
 
-//import com.tracki.databinding.ItemDynamicFormVideoBinding
-//import com.tracki.ui.chat.ChatActivity
-//import com.tracki.ui.messages.MessagesActivity
-//import com.tracki.ui.scanqrcode.ScanQrAndBarCodeActivity
-//import com.tracki.ui.selectorder.SelectOrderActivity
-//import com.tracki.ui.userlisting.UserListNewActivity
-//import com.tracki.ui.webview.WebViewActivity
-//import com.tracki.utils.geofence.AddGeoFenceUtil
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
+import com.bumptech.glide.request.target.Target
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
@@ -42,10 +39,12 @@ import com.tracki.data.model.response.config.*
 import com.tracki.data.network.APIError
 import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
+import com.tracki.databinding.ItemDynamicFormVideoBinding
 import com.tracki.databinding.LayoutFrgmrntTaskDetailsBinding
 import com.tracki.ui.base.BaseFragment
 import com.tracki.ui.common.DoubleButtonDialog
 import com.tracki.ui.common.OnClickListener
+import com.tracki.ui.custom.GlideApp
 import com.tracki.ui.custom.socket.*
 import com.tracki.ui.dynamicform.DynamicFormActivity
 import com.tracki.ui.dynamicform.DynamicFormActivity.Companion.newIntent
@@ -67,6 +66,7 @@ import com.trackthat.lib.models.TrackthatLocation
 import kotlinx.android.synthetic.main.layout_frgmrnt_task_details.*
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 
 class TaskDetailsFragment :
@@ -76,6 +76,7 @@ class TaskDetailsFragment :
 
 
     private val REQUEST_CAMERA: Int=101
+    private var qrUrl = "na"
     lateinit var foundWidgetItem: FoundWidgetItem
     private var recyclerCtaButton: RecyclerView? = null
     private var tvLabelTakeAction: TextView? = null
@@ -229,8 +230,10 @@ class TaskDetailsFragment :
                 categoryId = requireArguments().getString(AppConstants.Extra.EXTRA_CATEGORY_ID)
 
             }
+            Log.d("categoryId", categoryId)
             showLoading()
             api = TrackiApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
+            Log.d("API", api!!.url);
             if (api != null && ::mNewTaskViewModel.isInitialized)
                 mNewTaskViewModel.getTaskById(httpManager, AcceptRejectRequest(taskId!!), api)
             val startLocationLabel =
@@ -297,6 +300,11 @@ class TaskDetailsFragment :
                 }
 
 
+//                mActivityNewTaskDetailBinding.llQrCode.setOnClickListener {
+//                    if (qrUrl != "na")
+//                        startActivity(Intent(context,OrderCodeActivity::class.java).putExtra("qrUrl",qrUrl))
+//                }
+
 
 
             }
@@ -361,28 +369,24 @@ class TaskDetailsFragment :
 
 
                     if (task!!.orderDetails != null && task!!.orderDetails!!.isNotEmpty()) {
-//                        val listOrderDetais = ArrayList<OrderInnerData>()
-
-                        /* val hmIterator: Iterator<*> = task!!.orderDetails!!.entries.iterator()
-                         while (hmIterator.hasNext()) {
-                             val mapElement = hmIterator.next() as Map.Entry<*, *>
-                             val orderInnerData = OrderInnerData()
-                             orderInnerData.orderId = mapElement.key.toString()
-                             orderInnerData.orderDetails = mapElement.value as OrderDetails?
-
-                             listOrderDetais.add(orderInnerData)
-                         }*/
                         cardOrders.visibility = View.VISIBLE
-                        var adapter = OrderListAdapter(task!!.orderDetails)
+                        val adapter = OrderListAdapter(task!!.orderDetails)
                         rvOrderList.adapter = adapter
-
+//                        adapter.onItemClick = { item ->
+//                            val intent = SkuInfoPreviewActivity.newIntent(requireActivity())
+//                            intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+//                            intent.putExtra(Extra.EXTRA_PRODUCT_ID, item.productId.toString())
+//                            intent.putExtra(Extra.EXTRA_PRODUCT_NAME, item.productName.toString())
+//                            startActivityForResult(
+//                                intent,
+//                                AppConstants.REQUEST_CODE_TAG_INVENTORY
+//                            )
+//                        }
                     } else if (task!!.products != null && task!!.products!!.isNotEmpty()) {
-
                         cardOrders.visibility = View.VISIBLE
                         tvInventoriesLabel.text = getString(R.string.inventory_label)
-                        var adapter = ProductOrderAdapter(task!!.products)
+                        val adapter = ProductOrderAdapter(task!!.products)
                         rvOrderList.adapter = adapter
-
                     } else {
                         cardOrders.visibility = View.GONE
                     }
@@ -402,6 +406,15 @@ class TaskDetailsFragment :
                             )
                         }
 
+                    }
+
+                    if (task!!.encCodeUrl != null){
+                        qrUrl = task!!.encCodeUrl.toString()
+                        GlideApp.with(baseActivity).load(qrUrl)
+                            .into(mActivityNewTaskDetailBinding.ivQrCode)
+                    }
+                    else{
+                        mActivityNewTaskDetailBinding.llQrCode.visibility = View.GONE
                     }
                     ivPinEndLocation.setOnClickListener {
 
@@ -520,38 +533,38 @@ class TaskDetailsFragment :
         }
     }
 
-     override fun handleGetTaskDataResponse(callback: ApiCallback, result: Any?, error: APIError?) {
-         hideLoading()
+    override fun handleGetTaskDataResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        hideLoading()
 
-         if (CommonUtils.handleResponse(callback, error, result, context)) {
-             val getTaskDataResponse = Gson().fromJson<GetTaskDataResponse>(
-                 result.toString(),
-                 GetTaskDataResponse::class.java
-             )
-             var data: List<com.tracki.data.model.response.config.TaskData>? = null
-             if (getTaskDataResponse != null && getTaskDataResponse.successful) {
+        if (CommonUtils.handleResponse(callback, error, result, context)) {
+            val getTaskDataResponse = Gson().fromJson<GetTaskDataResponse>(
+                result.toString(),
+                GetTaskDataResponse::class.java
+            )
+            var data: List<com.tracki.data.model.response.config.TaskData>? = null
+            if (getTaskDataResponse != null && getTaskDataResponse.successful) {
 
-                 if (getTaskDataResponse.data != null) {
-                     data = getTaskDataResponse.data!!
-                     getTaskDataResponse.data!!.let {
-                         var list1 = ArrayList<com.tracki.data.model.response.config.TaskData>()
-                         list1.addAll(it as ArrayList<com.tracki.data.model.response.config.TaskData>)
+                if (getTaskDataResponse.data != null) {
+                    data = getTaskDataResponse.data!!
+                    getTaskDataResponse.data!!.let {
+                        var list1 = ArrayList<com.tracki.data.model.response.config.TaskData>()
+                        list1.addAll(it as ArrayList<com.tracki.data.model.response.config.TaskData>)
 
 
 
-                         showDynamicFormDataAdapter.addData(list1)
+                        showDynamicFormDataAdapter.addData(list1)
 
-                     }
-                 }
-                 if (getTaskDataResponse.dfdId != null) {
-                     dfdId = getTaskDataResponse.dfdId!!
-                 }
-             }
+                    }
+                }
+                if (getTaskDataResponse.dfdId != null) {
+                    dfdId = getTaskDataResponse.dfdId!!
+                }
+            }
 
-         }
-     }
+        }
+    }
 
-     private fun perFormLocationReminder(task: Task?) {
+    private fun perFormLocationReminder(task: Task?) {
         if (task != null) {
             if (task.currentStage != null && !task.currentStage!!.terminal!! && task.startTime > System.currentTimeMillis()) {
                 if (task.source != null && task.source!!.location != null) {
@@ -759,65 +772,65 @@ class TaskDetailsFragment :
 
 
 
-                if (callToActionList != null && callToActionList.size > 0) {
-                    for (i in callToActionList.indices) {
-                        if (callToActionList[i].id.equals(id, ignoreCase = true)) {
-                            callToActions = callToActionList[i]
-                            break
-                        }
+            if (callToActionList != null && callToActionList.size > 0) {
+                for (i in callToActionList.indices) {
+                    if (callToActionList[i].id.equals(id, ignoreCase = true)) {
+                        callToActions = callToActionList[i]
+                        break
                     }
                 }
-                if (callToActions != null) {
+            }
+            if (callToActions != null) {
 
 
-                        // if (callToActions.getTargetInfo() != null && callToActions.getTargetInfo().getTarget() == TRAGETINFO.CREATE_TASK)
-                    if (callToActions!!.targetInfo != null && callToActions!!.targetInfo!!.target == TRAGETINFO.CREATE_TASK) {
-                        //                    val message = "Are you sure you want to perform ?"
-                        //                    val dialog = DoubleButtonDialog(requireContext(),
-                        //                            true,
-                        //                            null,
-                        //                            message,
-                        //                            getString(R.string.yes),
-                        //                            getString(R.string.no),
-                        //                            object : OnClickListener {
-                        //                                override fun onClickCancel() {}
-                        //                                override fun onClick() {
-                        //                                    val intent = newIntent(baseActivity)
-                        //                                    intent.putExtra(Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, false)
-                        //                                    intent.putExtra(Extra.FROM, "taskListing")
-                        //                                    if (callToActions!!.categoryId != null) {
-                        //                                        val dashBoardBoxItem = DashBoardBoxItem()
-                        //                                        dashBoardBoxItem.categoryId = callToActions!!.categoryId
-                        //                                        val map = Gson().toJson(dashBoardBoxItem)
-                        //                                        intent.putExtra(Extra.EXTRA_CATEGORIES, map)
-                        //                                        intent.putExtra(Extra.EXTRA_PAREN_TASK_ID, task.taskId)
-                        //                                        intent.putExtra(Extra.EXTRA_PARENT_REF_ID, task.referenceId)
-                        //                                    }
-                        //                                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
-                        //                                }
-                        //                            })
-                        //                    dialog.show()
-                        val intent = NewCreateTaskActivity.newIntent(baseActivity)
-                        intent.putExtra(
-                            Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU,
-                            false
-                        )
-                        intent.putExtra(Extra.FROM, "taskListing")
-                        if (callToActions!!.categoryId != null) {
-                            val dashBoardBoxItem = DashBoardBoxItem()
-                            // dashBoardBoxItem.categoryId = callToActions!!.categoryId
-                            if (callToActions!!.targetInfo!!.category != null)
-                                dashBoardBoxItem.categoryId =
-                                    callToActions!!.targetInfo!!.category
-                            val map = Gson().toJson(dashBoardBoxItem)
-                            intent.putExtra(Extra.EXTRA_CATEGORIES, map)
-                            intent.putExtra(Extra.EXTRA_PAREN_TASK_ID, task.taskId)
-                            intent.putExtra(Extra.EXTRA_PARENT_REF_ID, task.referenceId)
-                        }
-                        startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
-                    } else {
-                        perFormCtaAction()
+                // if (callToActions.getTargetInfo() != null && callToActions.getTargetInfo().getTarget() == TRAGETINFO.CREATE_TASK)
+                if (callToActions!!.targetInfo != null && callToActions!!.targetInfo!!.target == TRAGETINFO.CREATE_TASK) {
+                    //                    val message = "Are you sure you want to perform ?"
+                    //                    val dialog = DoubleButtonDialog(requireContext(),
+                    //                            true,
+                    //                            null,
+                    //                            message,
+                    //                            getString(R.string.yes),
+                    //                            getString(R.string.no),
+                    //                            object : OnClickListener {
+                    //                                override fun onClickCancel() {}
+                    //                                override fun onClick() {
+                    //                                    val intent = newIntent(baseActivity)
+                    //                                    intent.putExtra(Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, false)
+                    //                                    intent.putExtra(Extra.FROM, "taskListing")
+                    //                                    if (callToActions!!.categoryId != null) {
+                    //                                        val dashBoardBoxItem = DashBoardBoxItem()
+                    //                                        dashBoardBoxItem.categoryId = callToActions!!.categoryId
+                    //                                        val map = Gson().toJson(dashBoardBoxItem)
+                    //                                        intent.putExtra(Extra.EXTRA_CATEGORIES, map)
+                    //                                        intent.putExtra(Extra.EXTRA_PAREN_TASK_ID, task.taskId)
+                    //                                        intent.putExtra(Extra.EXTRA_PARENT_REF_ID, task.referenceId)
+                    //                                    }
+                    //                                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
+                    //                                }
+                    //                            })
+                    //                    dialog.show()
+                    val intent = NewCreateTaskActivity.newIntent(baseActivity)
+                    intent.putExtra(
+                        Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU,
+                        false
+                    )
+                    intent.putExtra(Extra.FROM, "taskListing")
+                    if (callToActions!!.categoryId != null) {
+                        val dashBoardBoxItem = DashBoardBoxItem()
+                        // dashBoardBoxItem.categoryId = callToActions!!.categoryId
+                        if (callToActions!!.targetInfo!!.category != null)
+                            dashBoardBoxItem.categoryId =
+                                callToActions!!.targetInfo!!.category
+                        val map = Gson().toJson(dashBoardBoxItem)
+                        intent.putExtra(Extra.EXTRA_CATEGORIES, map)
+                        intent.putExtra(Extra.EXTRA_PAREN_TASK_ID, task.taskId)
+                        intent.putExtra(Extra.EXTRA_PARENT_REF_ID, task.referenceId)
                     }
+                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
+                } else {
+                    perFormCtaAction()
+                }
 
             }
 
@@ -842,15 +855,15 @@ class TaskDetailsFragment :
         return invAction
     }
 
-   fun String.getCtaInventoryConfig():CtaInventoryConfig{
-       var ctaInventoryConfig=CtaInventoryConfig()
+    fun String.getCtaInventoryConfig():CtaInventoryConfig{
+        var ctaInventoryConfig=CtaInventoryConfig()
         try {
             var jsonConverter=JSONConverter<CtaInventoryConfig>()
             ctaInventoryConfig=jsonConverter.jsonToObject(this,CtaInventoryConfig::class.java)
         }catch (e:JsonParseException){
             return ctaInventoryConfig
         }
-       return ctaInventoryConfig
+        return ctaInventoryConfig
     }
 
     override fun onRequestPermissionsResult(
@@ -873,7 +886,7 @@ class TaskDetailsFragment :
             } else {
                 requestPermissions(
                     arrayOf(Manifest.permission.CAMERA),
-                   REQUEST_CAMERA
+                    REQUEST_CAMERA
                 )
             }
         } else {
@@ -888,7 +901,7 @@ class TaskDetailsFragment :
     }
 
     private fun perFormCtaAction() {
-        Log.e("checkLog","${callToActions!!.categoryId}")
+        Log.e("checkLog","$callToActions")
         if (callToActions!!.dynamicFormId != null && callToActions!!.dynamicFormId!!.isNotEmpty() ) {
 
 
@@ -966,45 +979,69 @@ class TaskDetailsFragment :
                 }
             }
             else {
-
-                val message = "Are you sure you want to perform ?"
-                val dialog = DoubleButtonDialog(requireContext(),
-                    true,
-                    null,
-                    message,
-                    getString(R.string.yes),
-                    getString(R.string.no),
-                    object : OnClickListener {
-                        override fun onClickCancel() {}
-                        override fun onClick() {
-                            try {
-                                if (callToActions!!.targetInfo != null && callToActions!!.targetInfo!!.target === TRAGETINFO.TAG_INVENTORY) {
-                                    if (activity != null) {
-//                                        val intent = SelectOrderActivity.newIntent(activity!!)
-//                                        val dashBoardBoxItem = DashBoardBoxItem()
+                if (callToActions!!.targetInfo!!.target == TRAGETINFO.UNIT_INFO) {
+//                    if (activity != null) {
+//                        val intent = SkuInfoActivity.newIntent(baseActivity)
+//                        intent.putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
+//                        intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+//                        startActivityForResult(
+//                            intent,
+//                            AppConstants.REQUEST_CODE_UNIT_INFO
+//                        )
+//                    }
+                } else {
+                    val message = "Are you sure you want to perform ?"
+                    val dialog = DoubleButtonDialog(requireContext(),
+                        true,
+                        null,
+                        message,
+                        getString(R.string.yes),
+                        getString(R.string.no),
+                        object : OnClickListener {
+                            override fun onClickCancel() {}
+                            override fun onClick() {
+                                try {
+                                    if (callToActions!!.targetInfo != null && callToActions!!.targetInfo!!.target === TRAGETINFO.TAG_INVENTORY) {
+                                        if (activity != null) {
+//                                            val intent = SelectOrderActivity.newIntent(activity!!)
+//                                            val dashBoardBoxItem = DashBoardBoxItem()
 //
-//                                        dashBoardBoxItem.categoryId = categoryId
-//                                        intent.putExtra(
-//                                            Extra.EXTRA_CATEGORIES,
-//                                            Gson().toJson(dashBoardBoxItem)
-//                                        )
-//                                        intent.putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
-//                                        intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-//                                        if (callToActions!!.targetInfo!!.category != null && callToActions!!.targetInfo!!.category!!.isNotEmpty())
+//                                            dashBoardBoxItem.categoryId = categoryId
 //                                            intent.putExtra(
-//                                                Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID,
-//                                                callToActions!!.targetInfo!!.category
+//                                                Extra.EXTRA_CATEGORIES,
+//                                                Gson().toJson(dashBoardBoxItem)
 //                                            )
-//
-//
-//                                        if (!callToActions!!.targetInfo!!.targetInfo.isNullOrEmpty()) {
-//                                            var ctaInventoryConfig =
-//                                                callToActions!!.targetInfo!!.targetInfo!!.getCtaInventoryConfig()
-//                                            if (!ctaInventoryConfig.invAction.isNullOrEmpty()) {
+//                                            intent.putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
+//                                            intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+//                                            if (callToActions!!.targetInfo!!.category != null && callToActions!!.targetInfo!!.category!!.isNotEmpty())
 //                                                intent.putExtra(
-//                                                    Extra.EXTRA_TASK_TAG_INV_TARGET,
-//                                                    ctaInventoryConfig.invAction
+//                                                    Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID,
+//                                                    callToActions!!.targetInfo!!.category
 //                                                )
+//
+//
+//                                            if (!callToActions!!.targetInfo!!.targetInfo.isNullOrEmpty()) {
+//                                                var ctaInventoryConfig =
+//                                                    callToActions!!.targetInfo!!.targetInfo!!.getCtaInventoryConfig()
+//                                                if (!ctaInventoryConfig.invAction.isNullOrEmpty()) {
+//                                                    intent.putExtra(
+//                                                        Extra.EXTRA_TASK_TAG_INV_TARGET,
+//                                                        ctaInventoryConfig.invAction
+//                                                    )
+//                                                } else {
+//                                                    var invAction = getInvAction(categoryId)
+//                                                    if (invAction != null && invAction.isNotEmpty())
+//                                                        intent.putExtra(
+//                                                            Extra.EXTRA_TASK_TAG_INV_TARGET,
+//                                                            invAction
+//                                                        )
+//                                                }
+//                                                if (ctaInventoryConfig.dynamicPricing != null)
+//                                                    intent.putExtra(
+//                                                        Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING,
+//                                                        ctaInventoryConfig.dynamicPricing
+//                                                    )
+//
 //                                            } else {
 //                                                var invAction = getInvAction(categoryId)
 //                                                if (invAction != null && invAction.isNotEmpty())
@@ -1013,36 +1050,23 @@ class TaskDetailsFragment :
 //                                                        invAction
 //                                                    )
 //                                            }
-//                                            if (ctaInventoryConfig.dynamicPricing != null)
-//                                                intent.putExtra(
-//                                                    Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING,
-//                                                    ctaInventoryConfig.dynamicPricing
-//                                                )
-//
-//                                        } else {
-//                                            var invAction = getInvAction(categoryId)
-//                                            if (invAction != null && invAction.isNotEmpty())
-//                                                intent.putExtra(
-//                                                    Extra.EXTRA_TASK_TAG_INV_TARGET,
-//                                                    invAction
-//                                                )
-//                                        }
-//                                        startActivityForResult(
-//                                            intent,
-//                                            AppConstants.REQUEST_CODE_TAG_INVENTORY
-//                                        )
+//                                            startActivityForResult(
+//                                                intent,
+//                                                AppConstants.REQUEST_CODE_TAG_INVENTORY
+//                                            )
+                                        }
+                                    } else {
+                                        checkConditionsAndRequestAPI(null)
                                     }
-                                } else {
-                                    checkConditionsAndRequestAPI(null)
+                                } catch (e: java.lang.Exception) {
+                                    hideLoading()
+                                    Log.e(TAG, "onExecuteUpdates: ${e}")
+                                    e.printStackTrace()
                                 }
-                            } catch (e: java.lang.Exception) {
-                                hideLoading()
-                                Log.e(TAG, "onExecuteUpdates: ${e}")
-                                e.printStackTrace()
                             }
-                        }
-                    })
-                dialog.show()
+                        })
+                    dialog.show()
+                }
             }
 
         }
@@ -1544,24 +1568,32 @@ class TaskDetailsFragment :
                 }
 
             }
-        } else if (requestCode == AppConstants.REQUEST_CODE_CREATE_TASK) {
-            if (resultCode == Activity.RESULT_OK) {
-                perFormCtaActionWithoutDialog()
-            }
-        }
-        else if (requestCode == AppConstants.REQUEST_CODE_SCAN) {
-            if (resultCode == Activity.RESULT_OK) {
-                if (data != null && data.hasExtra("id")) {
-                   var id=data.getStringExtra("id")
-                    openDynamicFormScreen(id)
+        } else
+            if (requestCode == AppConstants.REQUEST_CODE_CREATE_TASK) {
+                if (resultCode == Activity.RESULT_OK) {
+                    perFormCtaActionWithoutDialog()
+                }
+            } else if (requestCode == AppConstants.REQUEST_CODE_SCAN) {
+                if (resultCode == Activity.RESULT_OK) {
+                    if (data != null && data.hasExtra("id")) {
+                        var id=data.getStringExtra("id")
+                        openDynamicFormScreen(id)
+                    }else{
+                        openDynamicFormScreen()
+                    }
+
                 }else{
                     openDynamicFormScreen()
                 }
-
-            }else{
-                openDynamicFormScreen()
-            }
-        }
+            } else
+                if (requestCode == AppConstants.REQUEST_CODE_UNIT_INFO) {
+                    if (resultCode == Activity.RESULT_OK) {
+                        Log.d("AppConstants.Extra.EXTRA_CATEGORY_ID", "data!!.getStringExtra(Extra.EXTRA_CATEGORY_ID)")
+                        //  Log.d("AppConstants.Extra.EXTRA_CATEGORY_ID", data!!.getStringExtra(Extra.EXTRA_CATEGORY_ID))
+                        //  Log.d("AppConstants.Extra.EXTRA_TASK_ID", data.getStringExtra(Extra.EXTRA_TASK_ID))
+                        getTaskData()
+                    }
+                }
     }
 
     private fun perFormCtaActionWithoutDialog() {
@@ -1780,40 +1812,38 @@ class TaskDetailsFragment :
         }
     }
 
-     override fun onUploadPic(position: Int, formData: FormData?) {
+    override fun onUploadPic(position: Int, formData: FormData?) {
 
-     }
+    }
 
-     override fun uploadCameraImage(adapterPosition: Int) {
+    override fun uploadCameraImage(adapterPosition: Int) {
 
-     }
+    }
 
-     override fun onProcessClick(formData: FormData?) {
+    override fun onProcessClick(formData: FormData?) {
 
-     }
+    }
 
-     override fun getDropdownItems(position: Int, target: String?, rollId: String?) {
+    override fun getDropdownItems(position: Int, target: String?, rollId: String?) {
+    }
 
-     }
+    override fun openVidCamera(pos: Int, mBinding: ItemDynamicFormVideoBinding?, maxLength: Int) {
+    }
 
-//     override fun openVidCamera(pos: Int, mBinding: ItemDynamicFormVideoBinding?, maxLength: Int) {
-//
-//     }
+    override fun onVeriFyOtpButtonClick(formData: FormData?, mobile: String?) {
 
-     override fun onVeriFyOtpButtonClick(formData: FormData?, mobile: String?) {
+    }
 
-     }
+    override fun openPlacePicker(position: Int, formData: FormData?) {
 
-     override fun openPlacePicker(position: Int, formData: FormData?) {
+    }
 
-     }
+    override fun openScanner(position: Int, formData: FormData?) {
 
-     override fun openScanner(position: Int, formData: FormData?) {
+    }
 
-     }
+    override fun sendButtonInstance(button: Button?, isEditable: Boolean) {
 
-     override fun sendButtonInstance(button: Button?, isEditable: Boolean) {
+    }
 
-     }
-
- }
+}

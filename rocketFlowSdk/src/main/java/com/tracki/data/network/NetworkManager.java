@@ -37,7 +37,7 @@ public interface NetworkManager {
 
     void buddyListing(ApiCallback apiCallback, HttpManager httpManager, Api api, Object data);
 
-    void timeSlotData(ApiCallback apiCallback, HttpManager httpManager, Api api, String geoId, String date);
+    void timeSlotData(ApiCallback apiCallback, HttpManager httpManager, Api api);
 
     void addBuddyInvitation(ApiCallback apiCallback, HttpManager httpManager, Object data, Api api);
 

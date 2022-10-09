@@ -669,7 +669,7 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
         void getDropdownItems(int position, String target, @Nullable String rollId);
 
-        //void openVidCamera(int pos, ItemDynamicFormVideoBinding mBinding, int maxLength);
+        void openVidCamera(int pos, ItemDynamicFormVideoBinding mBinding, int maxLength);
 
 
         void onVeriFyOtpButtonClick(FormData formData, String mobile);

@@ -1295,6 +1295,7 @@
                         android:paddingLeft="@dimen/dimen_8"
                         android:paddingRight="@dimen/dimen_8"
                         android:visibility="gone" />
+
                     <include
                         android:id="@+id/viewProgress"
                         android:visibility="gone"

@@ -444,8 +444,8 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
-    public void timeSlotData(ApiCallback apiCallback, HttpManager httpManager, Api api, String geoId, String date) {
-        networkManager.timeSlotData(apiCallback, httpManager, api, geoId, date);
+    public void timeSlotData(ApiCallback apiCallback, HttpManager httpManager, Api api) {
+        networkManager.timeSlotData(apiCallback, httpManager, api);
     }
 
     @Override

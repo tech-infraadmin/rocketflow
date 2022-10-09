@@ -115,8 +115,8 @@ public class AssignTaskViewModel {
 //                                    Calendar calendar = Calendar.getInstance();
 //                                    calendar.add(Calendar.SECOND, timeOutInSec);
 
-//                                                CommonUtils.registerAlarm(counterEndTime, context.getApplicationContext(),
-//                                                        ServiceRestartReceiver.ACTION_CALL_TO_ACTOIN_TIMER, task.getRequestCode(), task.getTaskId());
+       /*                                         CommonUtils.registerAlarm(counterEndTime, context.getApplicationContext(),
+                                                        ServiceRestartReceiver.ACTION_CALL_TO_ACTOIN_TIMER, task.getRequestCode(), task.getTaskId());*/
                                             }
 
                                         }
@@ -208,7 +208,7 @@ public class AssignTaskViewModel {
                         contactMobile.set(mobile);
                     }
                 }
-               else if (task.getBuddyDetail() != null && task.getBuddyDetail().getMobile() != null && !task.getBuddyDetail().getMobile().isEmpty()) {
+                else if (task.getBuddyDetail() != null && task.getBuddyDetail().getMobile() != null && !task.getBuddyDetail().getMobile().isEmpty()) {
                     isCallRelativeLayoutVisible.set(true);
                     if (task.getBuddyDetail().getProfileImage() != null && !task.getBuddyDetail().getProfileImage().isEmpty())
                         contactPersonImage.set(task.getBuddyDetail().getProfileImage());

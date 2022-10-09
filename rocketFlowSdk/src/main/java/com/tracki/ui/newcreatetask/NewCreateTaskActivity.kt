@@ -1,5 +1,7 @@
 package com.tracki.ui.newcreatetask
 
+import SlotAdapter
+import SlotChildAdapter
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DatePickerDialog
@@ -9,14 +11,19 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
+import android.media.Image
 import android.os.*
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
 import android.widget.*
+import android.widget.AdapterView.OnItemSelectedListener
+import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
 import com.google.android.gms.common.GooglePlayServicesRepairableException
@@ -24,6 +31,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
@@ -44,14 +52,17 @@ import com.tracki.data.network.APIError
 import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
 import com.tracki.databinding.ActivityNewCreateTaskBinding
+//import com.tracki.ui.addcustomer.AddCustomerActivity
+import com.tracki.ui.addplace.Hub
+import com.tracki.ui.addplace.LocationListResponse
 import com.tracki.ui.base.BaseActivity
 import com.tracki.ui.custom.CircleTransform
 import com.tracki.ui.custom.ExecutorThread
 import com.tracki.ui.custom.GlideApp
 import com.tracki.ui.dynamicform.DynamicFormActivity
 import com.tracki.ui.dynamicform.dynamicfragment.FormSubmitListener
-import com.tracki.ui.taskdetails.TaskDetailsActivityViewModel
-//import com.tracki.ui.newdynamicform.NewDynamicFormFragment
+//import com.tracki.ui.main.MainActivity
+import com.tracki.ui.newdynamicform.NewDynamicFormFragment
 import com.tracki.utils.*
 import com.trackthat.lib.TrackThat
 import com.trackthat.lib.internal.network.TrackThatCallback
@@ -63,6 +74,7 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import kotlin.collections.HashMap
 
 
 open class NewCreateTaskActivity :
@@ -73,7 +85,7 @@ open class NewCreateTaskActivity :
 //        System.loadLibrary("keys")
 //    }
 
-    external fun getGoogleMapKey(): String?
+
     private var snackBar: Snackbar? = null
     private lateinit var selectedUserId: String
     private lateinit var selectedUsername: String
@@ -83,7 +95,23 @@ open class NewCreateTaskActivity :
     private var parentTaskId: String? = null
     private var parentReffId: String? = null
 
-    private lateinit var gridView: GridView
+    private lateinit var llSlots: LinearLayout
+    private lateinit var ivNoData: ImageView
+
+    var slotDataResponse: SlotDataResponse = SlotDataResponse()
+
+    private var timePosition = 0
+    private var dayPosition = 0
+    private var dateFinal = ""
+    private var date = ""
+    private var timeFinal = ""
+    private var hubIdFinal = ""
+    private var hubs: List<Hub> = ArrayList()
+    private var hub: Hub? = null
+    private lateinit var etSlot: EditText
+
+    private lateinit var rvSlot: RecyclerView
+    private lateinit var rvDate: RecyclerView
 
     private lateinit var dialogSlot: Dialog
 
@@ -127,7 +155,6 @@ open class NewCreateTaskActivity :
     var assigneeLabel: String? = null
     override fun getBindingVariable() = BR.viewModel
     override fun getLayoutId() = R.layout.activity_new_create_task
-
     private var buddyId: String? = null
     private var fleetId: String? = null
     private var regionId: String? = null
@@ -146,7 +173,7 @@ open class NewCreateTaskActivity :
     private var mainMap: HashMap<String, ArrayList<FormData>>? = null
     private var dynamicFormsNew: DynamicFormsNew? = null
     private var isEditable: Boolean = true
-    //private var dynamicFragment: NewDynamicFormFragment? = null
+    private var dynamicFragment: NewDynamicFormFragment? = null
     private var formList = ArrayList<String>()
     var mainData: ArrayList<FormData>? = null
     var titleText: TextView? = null
@@ -176,6 +203,7 @@ open class NewCreateTaskActivity :
 
         setUp()
         getCurrentLocation()
+        Log.d("NewCreateTaskActivity","NewCreateTaskActivity")
     }
 
 
@@ -247,7 +275,10 @@ open class NewCreateTaskActivity :
         intent.putExtra(AppConstants.Extra.EXTRA_FLEET_ID, fleetId)
         intent.putExtra(AppConstants.Extra.EXTRA_BUDDY_NAME, buddyName)
         intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
+        intent.putExtra("backAlpha",true)
         setResult(Activity.RESULT_OK, intent)
+        val sharedPreferences = getSharedPreferences("backAlpha",Context.MODE_PRIVATE)
+        sharedPreferences.edit().putBoolean("back",true).apply()
         finish()
     }
 
@@ -271,15 +302,15 @@ open class NewCreateTaskActivity :
     fun getCurrentLocation() {
         TrackThat.getCurrentLocation(object : TrackThatCallback() {
             override fun onSuccess(successResponse: SuccessResponse) {
-//                val loc = successResponse.responseObject as TrackthatLocation
-//                currentLocation = GeoCoordinates()
-//                currentLocation!!.latitude = loc.latitude
-//                currentLocation!!.longitude = loc.longitude
-//                currentLatLng = LatLng(loc.latitude, loc.longitude)
-//                startLatLng = currentLatLng
-//                var placeName = CommonUtils.getAddress(this@NewCreateTaskActivity, currentLatLng)
-//                edEnterStartLocation.setText(placeName)
-//                edEnterEndLocation.setText(placeName)
+                val loc = successResponse.responseObject as TrackthatLocation
+                currentLocation = GeoCoordinates()
+                currentLocation!!.latitude = loc.latitude
+                currentLocation!!.longitude = loc.longitude
+                currentLatLng = LatLng(loc.latitude, loc.longitude)
+                startLatLng = currentLatLng
+                var placeName = CommonUtils.getAddress(this@NewCreateTaskActivity, currentLatLng)
+                edEnterStartLocation.setText(placeName)
+                edEnterEndLocation.setText(placeName)
 
             }
 
@@ -290,20 +321,20 @@ open class NewCreateTaskActivity :
     }
 
     override fun openPlaceAutoComplete(view: View) {
-//        this.view = view
-//        try {
-//            val fields: List<Place.Field> =
-//                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
-//
-//            // Start the autocomplete intent.
-//            val intent: Intent =
-//                Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields).build(this)
-//            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
-//        } catch (e: GooglePlayServicesRepairableException) {
-//            Log.e(NewCreateTaskActivity.TAG, e.message)
-//        } catch (e: GooglePlayServicesNotAvailableException) {
-//            Log.e(NewCreateTaskActivity.TAG, e.message)
-//        }
+        this.view = view
+        try {
+            val fields: List<Place.Field> =
+                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
+
+            // Start the autocomplete intent.
+            val intent: Intent =
+                Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields).build(this)
+            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
+        } catch (e: GooglePlayServicesRepairableException) {
+            Log.e(NewCreateTaskActivity.TAG, e.message)
+        } catch (e: GooglePlayServicesNotAvailableException) {
+            Log.e(NewCreateTaskActivity.TAG, e.message)
+        }
     }
 
     override fun handleUpdateResponse(callback: ApiCallback, result: Any?, error: APIError?) {
@@ -528,7 +559,9 @@ open class NewCreateTaskActivity :
     @SuppressLint("SetTextI18n")
     private fun setUp() {
 
-        //Places.initialize(this@NewCreateTaskActivity, getGoogleMapKey()!!)
+        etSlot = mActivityCreateTaskBinding.etVisitTime
+
+        Places.initialize(this@NewCreateTaskActivity, getGoogleMapKey()!!)
         if (intent.hasExtra(AppConstants.Extra.EXTRA_PAREN_TASK_ID)) {
             parentTaskId = intent.getStringExtra(AppConstants.Extra.EXTRA_PAREN_TASK_ID)
             CommonUtils.showLogMessage("e", "parentTaskId", parentTaskId)
@@ -595,13 +628,13 @@ open class NewCreateTaskActivity :
         enableEndLocation.isOn = false
         btnCLick.setOnClickListener {
             if (dynamicFormsNew != null) {
-//                if (dynamicFragment != null) {
-//                    dynamicFragment!!.onclickMainButton()
-//                } else {
-//                    var dynamicActionConfig = DynamicActionConfig()
-//                    dynamicActionConfig.action = Type.DISPOSE
-//                    onProcessClick(ArrayList(), dynamicActionConfig, null, null)
-//                }
+                if (dynamicFragment != null) {
+                    dynamicFragment!!.onclickMainButton()
+                } else {
+                    var dynamicActionConfig = DynamicActionConfig()
+                    dynamicActionConfig.action = Type.DISPOSE
+                    onProcessClick(ArrayList(), dynamicActionConfig, null, null)
+                }
             } else {
                 var dynamicActionConfig = DynamicActionConfig()
                 dynamicActionConfig.action = Type.DISPOSE
@@ -952,6 +985,9 @@ open class NewCreateTaskActivity :
                     }
                     val TIME_SLOT = Field(field = FIELD.TIME_SLOT.name)
                     if (llallowedFields.contains(TIME_SLOT)){
+
+                        mCreateTaskViewModel.getUserLocations(httpManager)
+
                         mActivityCreateTaskBinding.cvTimeSlot.visibility = View.VISIBLE
 
                         dialogSlot = Dialog(this)
@@ -964,7 +1000,17 @@ open class NewCreateTaskActivity :
                         dialogSlot.setCancelable(false)
                         dialogSlot.setCanceledOnTouchOutside(true)
                         dialogSlot.setContentView(R.layout.item_dynamic_form_slot)
-                        gridView = dialogSlot.findViewById<GridView>(R.id.gv_slot)
+                        rvSlot = dialogSlot.findViewById<RecyclerView>(R.id.gv_slot)
+
+                        llSlots = dialogSlot.findViewById<LinearLayout>(R.id.ll_slots)
+                        ivNoData = dialogSlot.findViewById<ImageView>(R.id.iv_no_data)
+
+                        val ddHubs = dialogSlot.findViewById<Spinner>(R.id.dd_hubs)
+                        val btnDone = dialogSlot.findViewById<AppCompatButton>(R.id.btn_done)
+                        val btnClose = dialogSlot.findViewById<ImageView>(R.id.btnClose)
+                        rvDate = dialogSlot.findViewById(R.id.rv_date)
+                        rvSlot.layoutManager = GridLayoutManager(this,3)
+
                         val lp = WindowManager.LayoutParams()
                         lp.copyFrom(dialogSlot.window!!.attributes)
                         lp.width = WindowManager.LayoutParams.MATCH_PARENT
@@ -980,7 +1026,29 @@ open class NewCreateTaskActivity :
                         dialogSlot.window!!.attributes = lp
 
                         mActivityCreateTaskBinding.etVisitTime.setOnClickListener {
-                            mCreateTaskViewModel.getSlotAvailability(httpManager, TrackiApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,"","")
+                            dialogSlot.show()
+                            timePosition = 0
+
+                            btnDone?.setOnClickListener {
+                                if (dateFinal != "" && timeFinal != "") {
+                                    dialogSlot.dismiss()
+                                    etSlot.setText("$dateFinal $timeFinal")
+
+
+                                    hub = hubs.find { it.hubId == hubIdFinal }!!
+
+                                }
+                                else{
+                                    TrackiToast.Message.showShort(this@NewCreateTaskActivity,"Select Slot To Continue")
+                                }
+                            }
+                            btnClose?.setOnClickListener {
+                                dialogSlot.dismiss()
+                            }
+
+                            callSlotApi(ddHubs)
+
+
                         }
                     }
                     else{
@@ -1018,13 +1086,13 @@ open class NewCreateTaskActivity :
                 }
 
                 if (getDynamicFormId(categoryId) != null) {
-//                    dynamicFragment = NewDynamicFormFragment.getInstance(
-//                        getDynamicFormId(categoryId),
-//                        categoryId,
-//                        isEditable,
-//                        ArrayList()
-//                    )
-//                    replaceFragment(dynamicFragment!!, getDynamicFormId(categoryId))categoryId
+                    dynamicFragment = NewDynamicFormFragment.getInstance(
+                        getDynamicFormId(categoryId),
+                        categoryId,
+                        isEditable,
+                        ArrayList()
+                    )
+                    replaceFragment(dynamicFragment!!, getDynamicFormId(categoryId))
                 }
                 dynamicFormsNew = CommonUtils.getFormByFormId(getDynamicFormId(categoryId))
                 if (dynamicFormsNew != null && dynamicFormsNew!!.fields != null && dynamicFormsNew!!.fields!!.isNotEmpty()) {
@@ -1282,6 +1350,67 @@ open class NewCreateTaskActivity :
         }
     }
 
+    private fun callSlotApi(ddHubs: Spinner){
+        var list = ArrayList<Hub>()
+        var listNames = kotlin.collections.ArrayList<String>()
+        hubs = preferencesHelper.userHubList
+        Log.e("hubs","$hubs")
+        if (hubs.isNotEmpty()) {
+            if(hubs.size > 1) {
+                for (hub in hubs) {
+                    list.add(hub)
+                    listNames.add(hub.name.toString())
+                }
+                ddHubs.visibility = View.VISIBLE
+                val hubAdapter =
+                    ArrayAdapter(this, android.R.layout.simple_spinner_item, listNames)
+                ddHubs.adapter = hubAdapter
+
+
+
+                ddHubs.onItemSelectedListener = object : OnItemSelectedListener {
+                    @SuppressLint("NewApi")
+                    override fun onItemSelected(
+                        p0: AdapterView<*>?,
+                        p1: View?,
+                        p2: Int,
+                        p3: Long
+                    ) {
+                        timePosition = p2
+                        hubIdFinal = list[timePosition].hubId.toString()
+                        mCreateTaskViewModel.getSlotAvailability(
+                            httpManager,
+                            TrackiApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
+                            hubIdFinal,
+                            date
+                        )
+                    }
+
+                    override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                    }
+
+                }
+            }
+            else{
+                timePosition = 0
+                list.add(hubs[0])
+                listNames.add(hubs[0].name.toString())
+                ddHubs.visibility = View.GONE
+            }
+
+            mCreateTaskViewModel.getSlotAvailability(
+                httpManager,
+                TrackiApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
+                "${list[timePosition].hubId}",
+                date
+            )
+        }
+        else{
+            TrackiToast.Message.showShort(this,"No Hub Found")
+        }
+    }
+
     private fun performSearchWidgetTask() {
         if (assigneeLabel != null) {
             tvTitleSelectUser.text = assigneeLabel
@@ -1354,6 +1483,7 @@ open class NewCreateTaskActivity :
     override fun handleUserNotFound() {
         openDialogUserNotFound()
     }
+
     private fun openDialogUserNotFound() {
 
         val dialog = Dialog(this)
@@ -1394,10 +1524,10 @@ open class NewCreateTaskActivity :
 //        intent.putExtra("from", AppConstants.EMPLOYEES)
 //        intent.putExtra("action", "add")
 //        if(!requestUserType.isNullOrEmpty())
-//        intent.putStringArrayListExtra(
-//            AppConstants.REQUESTED_USER_TYPES,
-//            requestUserType as java.util.ArrayList<String>?
-//        )
+//            intent.putStringArrayListExtra(
+//                AppConstants.REQUESTED_USER_TYPES,
+//                requestUserType as java.util.ArrayList<String>?
+//            )
 //
 //        startActivity(intent)
     }
@@ -1476,8 +1606,6 @@ open class NewCreateTaskActivity :
                     TrackiToast.Message.showShort(this, "operation cancelled.")
             }
         }
-
-
     }
 
     override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
@@ -1494,7 +1622,6 @@ open class NewCreateTaskActivity :
         }
     }
 
-
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             if (locationResult == null) {
@@ -1502,7 +1629,7 @@ open class NewCreateTaskActivity :
             }
             for (location in locationResult.locations) {
                 if (location != null) {
-                    //removeLocationUpdates(this)
+                    removeLocationUpdates(this)
                     startLatLng = LatLng(location.latitude, location.longitude)
                     endLatLng = LatLng(location.latitude, location.longitude)
                     var stringAddress =
@@ -1534,7 +1661,6 @@ open class NewCreateTaskActivity :
         currentFormId: String?,
         dfdid: String?
     ) {
-
 
         var startAddress = ""
         var endAddress = ""
@@ -1657,18 +1783,18 @@ open class NewCreateTaskActivity :
             )
 
         }
-       /* if (cardManualStartLocation.visibility == View.VISIBLE && regionId == null) {
-            TrackiToast.Message.showShort(this, "Please Select Start Location Region")
+        /* if (cardManualStartLocation.visibility == View.VISIBLE && regionId == null) {
+             TrackiToast.Message.showShort(this, "Please Select Start Location Region")
 
-        } else if (cardManualStartLocation.visibility == View.VISIBLE && stateId == null) {
-            TrackiToast.Message.showShort(this, "Please Select Start Location State")
-        } else if (cardManualStartLocation.visibility == View.VISIBLE && cityId == null) {
-            TrackiToast.Message.showShort(this, "Please Select Start Location City")
+         } else if (cardManualStartLocation.visibility == View.VISIBLE && stateId == null) {
+             TrackiToast.Message.showShort(this, "Please Select Start Location State")
+         } else if (cardManualStartLocation.visibility == View.VISIBLE && cityId == null) {
+             TrackiToast.Message.showShort(this, "Please Select Start Location City")
 
-        } else if (cardManualStartLocation.visibility == View.VISIBLE && hubId == null) {
-            TrackiToast.Message.showShort(this, "Please Select Start Location Hub")
+         } else if (cardManualStartLocation.visibility == View.VISIBLE && hubId == null) {
+             TrackiToast.Message.showShort(this, "Please Select Start Location Hub")
 
-        }*//* else if (cardManualStartLocation.visibility == View.VISIBLE && startAddress.isEmpty()) {
+         }*//* else if (cardManualStartLocation.visibility == View.VISIBLE && startAddress.isEmpty()) {
             TrackiToast.Message.showShort(this,"Start location field cannot be empty")
         }*/ /*else if (cardManualEndLocation.visibility == View.VISIBLE && regionIdEnd == null) {
             TrackiToast.Message.showShort(this, "Please Select End Location  Region")
@@ -1909,16 +2035,17 @@ open class NewCreateTaskActivity :
             if (dynamicActionConfig?.action == Type.FORM) {
                 showLoading()
                 //make the back button visible if user click on next form
-               // replaceFragment(
-//                    NewDynamicFormFragment.getInstance(
-//                        dynamicActionConfig.target!!,
-//                        taskId!!,
-//                        isEditable,
-//                        ArrayList()
-//                    ), dynamicActionConfig.target!!
-                //)
+                replaceFragment(
+                    NewDynamicFormFragment.getInstance(
+                        dynamicActionConfig.target!!,
+                        taskId!!,
+                        isEditable,
+                        ArrayList()
+                    ), dynamicActionConfig.target!!
+                )
                 hideLoading()
-            } else if (dynamicActionConfig?.action == Type.API) {
+            }
+            else if (dynamicActionConfig?.action == Type.API) {
                 mainData = ArrayList()
                 //add all the values of map to the hashMap and go to all
                 // elements to get the required data
@@ -2017,7 +2144,8 @@ open class NewCreateTaskActivity :
                         finalApiHit()
                     }
                 }
-            } else if (dynamicActionConfig?.action == Type.DISPOSE) {
+            }
+            else if (dynamicActionConfig?.action == Type.DISPOSE) {
 
                 mainData = ArrayList()
                 //add all the values of map to the hashMap and go to all
@@ -2152,6 +2280,25 @@ open class NewCreateTaskActivity :
         if (categoryId != null)
             createTaskRequest!!.categoryId = categoryId
 
+        if (dateFinal != "" && timeFinal != "")
+            createTaskRequest?.timeSlot = TimeSlot(dateFinal,timeFinal)
+
+        if (hubIdFinal != ""){
+            val destination = com.tracki.data.model.response.config.Place()
+            destination.regionId = hub?.regionId
+            destination.address = hub?.hubLocation?.address
+            destination.cityId = hub?.cityId
+            destination.hubId = hub?.hubId
+            destination.stateId = hub?.stateId
+
+            val location = GeoCoordinates()
+            location.latitude = hub?.hubLocation?.location?.latitude!!
+            location.longitude = hub?.hubLocation?.location?.longitude!!
+
+            destination.location = location
+
+            createTaskRequest?.destination = destination
+        }
 
         var jsonConverter = JSONConverter<CreateTaskRequest>()
         var json = jsonConverter.objectToJson(createTaskRequest)
@@ -2856,7 +3003,7 @@ open class NewCreateTaskActivity :
                 ) {
                     cardManualEndLocation.visibility = View.VISIBLE
                 } else {
-                  //  cardManualEndLocation.visibility = View.GONE
+                    //  cardManualEndLocation.visibility = View.GONE
                 }
                 spnCategoryEndCity.visibility = View.GONE
                 cvspnCategoryEndCity.visibility = View.GONE
@@ -3056,17 +3203,76 @@ open class NewCreateTaskActivity :
     }
 
     override fun getSlotDataResponse(callback: ApiCallback, result: Any?, error: APIError?) {
-        val slotDataResponse =
+        val slotDataResponse1 =
             Gson().fromJson(result.toString(), SlotDataResponse::class.java)
-        if (slotDataResponse.successful) {
-//            val adapter = SlotAdapter()
-//            gridView.adapter = adapter
-//            if (!dialogSlot.isShowing) dialogSlot.show()
+        val slotAdapter = SlotAdapter(this)
+        rvDate.adapter = slotAdapter
+        slotAdapter.clearAll()
+        if (slotDataResponse1.successful) {
+            llSlots.visibility = View.VISIBLE
+            ivNoData.visibility = View.GONE
 
-
-
+            slotDataResponse = slotDataResponse1
+            if (slotDataResponse.data != null) {
+                slotAdapter.setMap(slotDataResponse.data!!)
+                slotAdapter.onItemClick = {dateString: String,position: Int->
+                    selectDayCall(position)
+                }
+                setSlots()
+            }
+        }
+        else{
+            llSlots.visibility = View.GONE
+            ivNoData.visibility = View.VISIBLE
+            slotAdapter.clearAll()
+            TrackiToast.Message.showShort(this,"No Slots Found")
         }
     }
+
+    private fun setSlots() {
+        val key = slotDataResponse.data!!.keys.elementAt(timePosition)
+        dateFinal = key
+        val timeSlots = slotDataResponse.data!!.get(key)
+
+        if (timeSlots?.totalAvailableSlots != null) {
+            if (timeSlots.totalAvailableSlots > 0) {
+                val slotChildAdapter = SlotChildAdapter(timeSlots.slots as ArrayList<Slot>,this)
+                rvSlot.adapter = slotChildAdapter
+                slotChildAdapter.onItemClick = { timeString ->
+                    selectTimeCall(timeString)
+                }
+            }
+        }
+    }
+
+    private fun selectTimeCall(timeString: String){
+        timeFinal = timeString
+    }
+
+    private fun selectDayCall(position: Int){
+        timePosition = position
+        setSlots()
+    }
+
+    override fun handleMyPlaceResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
+            val jsonConverter: JSONConverter<*> = JSONConverter<Any?>()
+            val response:LocationListResponse = Gson().fromJson(result.toString(), LocationListResponse::class.java)
+            if (response.successful!!) {
+                Log.e("appLog1", "" + response.hubs)
+                if (response.hubs != null && !response.hubs!!.isEmpty()) {
+                    preferencesHelper.saveUserHubList(response.hubs)
+                } else {
+                    preferencesHelper.saveUserHubList(ArrayList())
+                }
+            } else {
+                preferencesHelper.saveUserHubList(ArrayList())
+            }
+        } else {
+            preferencesHelper.saveUserHubList(ArrayList())
+        }
+    }
+
 
     var count = 0
     var fileUploadCounter = 0
@@ -3213,5 +3419,7 @@ open class NewCreateTaskActivity :
         return mGetSuggetionViewModel
     }
 
-
+    private fun getGoogleMapKey(): String?{
+        return "AIzaSyATO_5mNZJ8h6V64L6eHeZfiVjk63803ec";
+    }
 }

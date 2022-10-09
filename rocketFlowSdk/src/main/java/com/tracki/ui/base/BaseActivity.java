@@ -42,6 +42,11 @@ import androidx.databinding.ViewDataBinding;
 //import com.google.android.gms.location.LocationRequest;
 //import com.google.android.gms.location.LocationServices;
 //import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.rocketflow.sdk.RocketFlyer;
 import com.tracki.R;
 import com.tracki.data.local.prefs.AppPreferencesHelper;
@@ -93,7 +98,7 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 
     private final String TAG = BaseActivity.class.getName();
 
-    //public LatLng currentLatLng;
+    public LatLng currentLatLng;
     //@Inject
     //public AnalyticsHelper analyticsHelper;
     //public GeofenceUtil geofenceUtil;
@@ -108,9 +113,9 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
     private ProgressDialog mProgressDialog;
     private T mViewDataBinding;
     private V mViewModel;
-//    private FusedLocationProviderClient mFusedLocationClient;
-//    private LocationRequest locationRequest;
-//    private ErrorScreenHelper mScreenHelper;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationRequest locationRequest;
+    //private ErrorScreenHelper mScreenHelper;
     private float mAccel;
     private float mAccelCurrent;
     private float mAccelLast;
@@ -295,26 +300,26 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
     };
 
     private void createLocationRequest() {
-//        locationRequest = LocationRequest.create();
-//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        locationRequest.setInterval(1000);
-//        locationRequest.setInterval(5000);
-//        locationRequest.setFastestInterval(2000);
-//        locationRequest.setSmallestDisplacement(20f);
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(1000);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(2000);
+        locationRequest.setSmallestDisplacement(20f);
     }
 
     @SuppressLint("MissingPermission")
-//    public void requestCurrentLocation(LocationCallback locationCallback) {
-//        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//        createLocationRequest();
-//        mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-//    }
-//
-//    public void removeLocationUpdates(LocationCallback locationCallback) {
-//        if (mFusedLocationClient != null) {
-//            mFusedLocationClient.removeLocationUpdates(locationCallback);
-//        }
-//    }
+    public void requestCurrentLocation(LocationCallback locationCallback) {
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        createLocationRequest();
+        mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+    }
+
+    public void removeLocationUpdates(LocationCallback locationCallback) {
+        if (mFusedLocationClient != null) {
+            mFusedLocationClient.removeLocationUpdates(locationCallback);
+        }
+    }
 
     public void performDependencyInjection() {
         //AndroidInjection.inject(this);
