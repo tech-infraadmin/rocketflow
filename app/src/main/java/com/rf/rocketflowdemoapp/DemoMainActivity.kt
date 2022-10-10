@@ -12,13 +12,12 @@ class DemoMainActivity : AppCompatActivity() {
     }
 
     fun initialize(view: View) {
-        //this.preferencesHelper.setAccessId("2YwC80gKsM");
-        //this.preferencesHelper.setLoginToken("abb55484-3d4f-4335-aa01-cd0320208dc9");
         RocketFlyer.initialize("7aa1fa51f3e7") // SDK init token
     }
 
     fun start(view: View) {
-        RocketFlyer.start("05bc0d97-2119-43a9-8b63-7aa1fa51f3e7") //ProcessId
+        //RocketFlyer.start("05bc0d97-2119-43a9-8b63-7aa1fa51f3e7") //ProcessId UAT
+        RocketFlyer.start("35a7b1f2-839a-4446-958a-cd2c218f6174") //ProcessId PROD
     }
     fun terminate(view: View) {
         RocketFlyer.terminate() // terminate

@@ -2,7 +2,8 @@ package com.tracki.utils;
 
 public final class AppConstants {
 
-    public static final String CORE_BASE_URL = "https://uat.rocketflyer.in/rfapi/";
+    //public static final String CORE_BASE_URL = "https://uat.rocketflyer.in/rfapi/";
+    public static final String CORE_BASE_URL = "https://api.rocketflow.in/rfapi/";
     public static final String BASE_URL = CORE_BASE_URL+"secure/tracki/";
 
     public static final String TRACKI_ENCRYPT_DECRYPT_IV = "tracki9990731159";
