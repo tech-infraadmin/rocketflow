@@ -1,5 +1,7 @@
 package com.tracki.ui.newdynamicform
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.tracki.TrackiApplication
 import com.tracki.data.DataManager
 import com.tracki.data.model.request.OtpRequest
@@ -8,7 +10,9 @@ import com.tracki.data.network.APIError
 import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
 import com.tracki.ui.base.BaseViewModel
+import com.tracki.ui.newcreatetask.NewCreateTaskViewModel
 import com.tracki.utils.ApiType
+import com.tracki.utils.rx.AppSchedulerProvider
 import com.tracki.utils.rx.SchedulerProvider
 import java.io.File
 import java.net.URLEncoder
@@ -157,6 +161,13 @@ class NewDynamicViewModel (dataManager: DataManager, schedulerProvider: Schedule
         override fun onLogout() {
         }
 
+    }
+
+
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return NewDynamicViewModel(mDataManager, AppSchedulerProvider()) as T
+        }
     }
 
 

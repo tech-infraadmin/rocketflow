@@ -487,31 +487,39 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.ivCreateTask) {
-            if(preferencesHelper.getIsTrackingLiveTrip()&&categoryId.equals(preferencesHelper.getActiveTaskCategoryId())){
-                TrackiToast.Message.showShort(this, AppConstants.MSG_ONGOING_TASK_SAME_CATGEORY);
-            }else {
-                if (isTagInventory) {
+
+            Intent intent = NewCreateTaskActivity.Companion.newIntent(this);
+            intent.putExtra(AppConstants.Extra.FROM, "taskListing");
+            intent.putExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true);
+            if (categoryMap != null)
+                intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES, categoryMap);
+            startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
+
+//            if(preferencesHelper.getIsTrackingLiveTrip()&&categoryId.equals(preferencesHelper.getActiveTaskCategoryId())){
+//                TrackiToast.Message.showShort(this, AppConstants.MSG_ONGOING_TASK_SAME_CATGEORY);
+//            }else {
+//                if (isTagInventory) {
 //                    Intent intent = SelectOrderActivity.Companion.newIntent(this);
 //                    DashBoardBoxItem dashBoardBoxItem = new DashBoardBoxItem();
 //                    dashBoardBoxItem.setCategoryId(categoryId);
 //                    intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES,
 //                            new Gson().toJson(dashBoardBoxItem));
 //                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
-
-                } else {
-                    if (preferencesHelper.getIsFleetAndBuddySHow()) {
-                        showLoading();
-                        mTaskViewModel.checkBuddy(RocketFlyer.Companion.httpManager());
-                    } else {
-                        Intent intent = NewCreateTaskActivity.Companion.newIntent(this);
-                        intent.putExtra(AppConstants.Extra.FROM, "taskListing");
-                        intent.putExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true);
-                        if (categoryMap != null)
-                            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES, categoryMap);
-                        startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
-                    }
-                }
-            }
+//
+//                } else {
+//                    if (preferencesHelper.getIsFleetAndBuddySHow()) {
+//                        showLoading();
+//                        mTaskViewModel.checkBuddy(RocketFlyer.Companion.httpManager());
+//                    } else {
+//                        Intent intent = NewCreateTaskActivity.Companion.newIntent(this);
+//                        intent.putExtra(AppConstants.Extra.FROM, "taskListing");
+//                        intent.putExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true);
+//                        if (categoryMap != null)
+//                            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES, categoryMap);
+////                        startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
+//                    }
+//                }
+            //}
 
         }
     }

@@ -101,7 +101,9 @@ open class NewCreateTaskActivity :
     var slotDataResponse: SlotDataResponse = SlotDataResponse()
 
     private var timePosition = 0
+    private var keyPosition = 0
     private var dayPosition = 0
+    private var key = "0"
     private var dateFinal = ""
     private var date = ""
     private var timeFinal = ""
@@ -182,6 +184,9 @@ open class NewCreateTaskActivity :
     var progressBar: ProgressBar? = null
     var rlProgress: RelativeLayout? = null
     var rlSubmittingData: RelativeLayout? = null
+
+    var listSlots: kotlin.collections.ArrayList<SlotData> = ArrayList()
+    var listKeys: kotlin.collections.ArrayList<String> = ArrayList()
 
     private var mDynamicHandler: DynamicHandler? = null
     private var handlerThread: ExecutorThread? = null
@@ -1035,7 +1040,11 @@ open class NewCreateTaskActivity :
                                     etSlot.setText("$dateFinal $timeFinal")
 
 
+                                    Log.e("slots","$hubIdFinal")
+
                                     hub = hubs.find { it.hubId == hubIdFinal }!!
+
+                                    Log.e("slots","${hub!!.hubId}")
 
                                 }
                                 else{
@@ -1396,6 +1405,7 @@ open class NewCreateTaskActivity :
                 timePosition = 0
                 list.add(hubs[0])
                 listNames.add(hubs[0].name.toString())
+                hubIdFinal = list[0].hubId.toString()
                 ddHubs.visibility = View.GONE
             }
 
@@ -3215,8 +3225,11 @@ open class NewCreateTaskActivity :
             slotDataResponse = slotDataResponse1
             if (slotDataResponse.data != null) {
                 slotAdapter.setMap(slotDataResponse.data!!)
-                slotAdapter.onItemClick = {dateString: String,position: Int->
+                slotAdapter.onItemClick = {dateString: String, position: Int, listValues1: kotlin.collections.ArrayList<SlotData>, list: kotlin.collections.ArrayList<String>->
                     selectDayCall(position)
+                    listSlots = listValues1
+                    listKeys = list
+                    key = dateString
                 }
                 setSlots()
             }
@@ -3236,8 +3249,12 @@ open class NewCreateTaskActivity :
 
         if (timeSlots?.totalAvailableSlots != null) {
             if (timeSlots.totalAvailableSlots > 0) {
-                val slotChildAdapter = SlotChildAdapter(timeSlots.slots as ArrayList<Slot>,this)
+
+                val slots = timeSlots.slots as ArrayList<Slot>
+
+                val slotChildAdapter = SlotChildAdapter(slots,this)
                 rvSlot.adapter = slotChildAdapter
+
                 slotChildAdapter.onItemClick = { timeString ->
                     selectTimeCall(timeString)
                 }

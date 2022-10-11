@@ -7,18 +7,23 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.tracki.R
+import com.tracki.data.model.response.config.Slot
 import com.tracki.data.model.response.config.SlotData
 import com.tracki.databinding.DateDayCardBinding
 import com.tracki.ui.base.BaseViewHolder
 import com.tracki.utils.Log
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashMap
 
 class SlotAdapter(val context: Context) : RecyclerView.Adapter<BaseViewHolder>() {
-    var list: HashMap<String, SlotData> = HashMap()
+    var list: LinkedHashMap<String, SlotData> = LinkedHashMap()
     var index = 0
-    var onItemClick: ((String,Int) -> Unit)? = null
+    var onItemClick: ((String,Int, kotlin.collections.ArrayList<SlotData>, kotlin.collections.ArrayList<String>) -> Unit)? = null
+    var listKey: kotlin.collections.ArrayList<String> = ArrayList()
+    var listValues: kotlin.collections.ArrayList<SlotData> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val binding: DateDayCardBinding = DateDayCardBinding
@@ -31,10 +36,17 @@ class SlotAdapter(val context: Context) : RecyclerView.Adapter<BaseViewHolder>()
         holder.onBind(position)
     }
 
+    fun String.toDate(): Date{
+        return SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).parse(this)!!
+    }
+
     fun setMap(list1: Map<String, SlotData>){
+
         list1.forEach {
             list.put(it.key,it.value)
         }
+
+        list.map { it.key to it.value }.sortedBy { it.first.toDate() }
 
         notifyItemRangeInserted(0,list.size)
         notifyDataSetChanged()
@@ -70,7 +82,7 @@ class SlotAdapter(val context: Context) : RecyclerView.Adapter<BaseViewHolder>()
             }
 
             binding.cvDay.setOnClickListener {
-                onItemClick?.invoke(key,position)
+                onItemClick?.invoke(key,position,listValues,listKey)
                 index = position
                 notifyItemChanged(index)
                 notifyDataSetChanged()

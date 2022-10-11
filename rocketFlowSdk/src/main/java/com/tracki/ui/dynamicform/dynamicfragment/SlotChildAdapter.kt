@@ -6,9 +6,14 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.tracki.R
 import com.tracki.data.model.response.config.Slot
+import com.tracki.data.model.response.config.SlotData
 import com.tracki.databinding.TimeCardBinding
 import com.tracki.ui.base.BaseViewHolder
 import com.tracki.utils.Log
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashMap
 
 class SlotChildAdapter(var list: ArrayList<Slot>, var context: Context) : RecyclerView.Adapter<BaseViewHolder>() {
 
@@ -30,11 +35,14 @@ class SlotChildAdapter(var list: ArrayList<Slot>, var context: Context) : Recycl
         return if (list != null) list.size else 0
     }
 
+    fun String.toDate(): Date {
+        return SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).parse(this)!!
+    }
+
     inner class SlotViewHolder(mBinding: TimeCardBinding) : BaseViewHolder(mBinding.root) {
         var binding = mBinding
         @RequiresApi(Build.VERSION_CODES.M)
         override fun onBind(position: Int) {
-
             val data = list.get(position)
             binding.data = data
 
