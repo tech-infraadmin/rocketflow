@@ -54,6 +54,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/activity_new_create_task.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_new_task_details.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_notification.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/activity_order_code.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_otp.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_play_video.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_play_video_vertically.xml" value="0.1" />
@@ -70,6 +71,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/activity_services.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_settings.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_share_trip.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/activity_sku_info.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_splash.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_stock_history_details.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_task.xml" value="0.1" />
@@ -202,7 +204,9 @@
         <entry key="rocketFlowSdk/src/main/res/layout/item_row_product_order.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_row_select_order.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_row_stock_history_details.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/item_row_sub_category.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_row_task_list.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/item_row_unit.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_show_qr_code.xml" value="0.1609375" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_simple_spinner.xml" value="0.13697916666666668" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_task_status.xml" value="0.1" />

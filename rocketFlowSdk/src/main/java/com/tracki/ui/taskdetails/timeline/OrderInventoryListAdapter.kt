@@ -6,12 +6,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tracki.R
 import com.tracki.data.model.response.config.OrderData
+import com.tracki.data.model.response.config.OrderDetails
 import com.tracki.data.model.response.config.OrderItemsInfo
 import com.tracki.databinding.ItemMyEarningEmptyBinding
 import com.tracki.databinding.ItemRowOrderListBinding
 import com.tracki.ui.base.BaseViewHolder
 import com.tracki.ui.custom.GlideApp
-
+import com.tracki.ui.earnings.MyEarningsEmptyItemViewModel
+//import com.tracki.ui.payouts.AdminUserPayoutsActivity
+import com.tracki.utils.Log
 
 
 /**
@@ -22,6 +25,7 @@ import com.tracki.ui.custom.GlideApp
 class OrderInventoryListAdapter(private var mList: ArrayList<OrderItemsInfo>?) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private var context: Context? = null
+    var onItemClick: ((OrderItemsInfo) -> Unit)? = null
 
 
     companion object {
@@ -34,14 +38,14 @@ class OrderInventoryListAdapter(private var mList: ArrayList<OrderItemsInfo>?) :
         return when (viewType) {
             VIEW_TYPE_INVENTORY -> {
                 val simpleViewItemBinding: ItemRowOrderListBinding =
-                        ItemRowOrderListBinding.inflate(
-                                LayoutInflater.from(parent.context), parent, false)
+                    ItemRowOrderListBinding.inflate(
+                        LayoutInflater.from(parent.context), parent, false)
                 OrdersListViewModel(simpleViewItemBinding)
             }
             else -> {
                 val emptyViewBinding: ItemMyEarningEmptyBinding =
-                        ItemMyEarningEmptyBinding.inflate(
-                                LayoutInflater.from(parent.context), parent, false)
+                    ItemMyEarningEmptyBinding.inflate(
+                        LayoutInflater.from(parent.context), parent, false)
                 EmptyViewHolder(emptyViewBinding)
             }
         }
@@ -69,15 +73,19 @@ class OrderInventoryListAdapter(private var mList: ArrayList<OrderItemsInfo>?) :
 
 
     inner class OrdersListViewModel(private val mBinding: ItemRowOrderListBinding) :
-            BaseViewHolder(mBinding.root) {
+        BaseViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
+            itemView.setOnClickListener {
+                Log.d("TAG", "customerName.toString()")
+                onItemClick?.invoke(mList!![position])
+            }
             val lists = mList!![position]
             mBinding.data = lists
             if (lists.img != null && lists.img!!.isNotEmpty()) {
                 GlideApp.with(context!!).load(lists.img)
-                        .placeholder(R.drawable.ic_picture)
-                        .into(mBinding.ivProduct)
+                    .placeholder(R.drawable.ic_picture)
+                    .into(mBinding.ivProduct)
 
             }else{
                 mBinding.ivProduct.setImageResource(R.drawable.ic_picture)
@@ -89,11 +97,14 @@ class OrderInventoryListAdapter(private var mList: ArrayList<OrderItemsInfo>?) :
     }
 
     inner class EmptyViewHolder(private val mBinding: ItemMyEarningEmptyBinding) :
-            BaseViewHolder(mBinding.root) {
+        BaseViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
-//            val emptyViewModel = MyEarningsEmptyItemViewModel()
-//            mBinding.viewModel = emptyViewModel
+            itemView.setOnClickListener {
+                onItemClick?.invoke(mList!![position])
+            }
+            val emptyViewModel = MyEarningsEmptyItemViewModel()
+            mBinding.viewModel = emptyViewModel
 //            if (context is AdminUserPayoutsActivity) {
 //                mBinding.tvMessage.text = "No Orders"
 //            }

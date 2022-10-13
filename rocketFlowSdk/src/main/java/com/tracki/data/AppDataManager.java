@@ -14,6 +14,7 @@ import com.tracki.data.model.DataObject;
 import com.tracki.data.model.request.AddEmployeeRequest;
 import com.tracki.data.model.request.AddressInfo;
 import com.tracki.data.model.request.PlaceRequest;
+import com.tracki.data.model.request.SKUInfoSpecsRequest;
 import com.tracki.data.model.request.SaveFilterData;
 import com.tracki.data.model.request.UserGetRequest;
 import com.tracki.data.model.response.config.Api;
@@ -40,6 +41,11 @@ import com.tracki.ui.addplace.Hub;
 //import com.tracki.ui.products.AddProductRequest;
 //import com.tracki.ui.selectorder.CataLogProductCategory;
 //import com.tracki.ui.selectorder.CatalogProduct;
+import com.tracki.ui.category.AddCategoryRequest;
+import com.tracki.ui.products.AddProductRequest;
+import com.tracki.ui.selectorder.CataLogProductCategory;
+import com.tracki.ui.selectorder.CatalogProduct;
+import com.tracki.ui.taskdetails.timeline.skuinfopreview.UnitInfoRequest;
 import com.tracki.utils.ApiType;
 import com.tracki.utils.ShiftTime;
 import com.tracki.utils.UserType;
@@ -978,31 +984,31 @@ public class AppDataManager implements DataManager {
         networkManager.addAddress(apiCallback, data, httpManager, api);
     }
 
-//    @Override
-//    public void addProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api) {
-//        networkManager.addProductCategory(apiCallback, data, httpManager, api);
-//    }
+    @Override
+    public void addProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api) {
+        networkManager.addProductCategory(apiCallback, data, httpManager, api);
+    }
 
-//    @Override
-//    public void updateProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api) {
-//        networkManager.updateProductCategory(apiCallback, data, httpManager, api);
-//    }
-//
-//    @Override
-//    public void addProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api) {
-//        networkManager.addProduct(apiCallback, data, httpManager, api);
-//    }
+    @Override
+    public void updateProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api) {
+        networkManager.updateProductCategory(apiCallback, data, httpManager, api);
+    }
 
-//    @Override
-//    public void updateProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api) {
-//        networkManager.updateProduct(apiCallback, data, httpManager, api);
-//    }
-//
-//    @Override
-//    public void deleteProductCategory(ApiCallback apiCallback, CataLogProductCategory data, HttpManager httpManager, Api api) {
-//        networkManager.deleteProductCategory(apiCallback, data, httpManager, api);
-//    }
-//
+    @Override
+    public void addProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api) {
+        networkManager.addProduct(apiCallback, data, httpManager, api);
+    }
+
+    @Override
+    public void updateProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api) {
+        networkManager.updateProduct(apiCallback, data, httpManager, api);
+    }
+
+    @Override
+    public void deleteProductCategory(ApiCallback apiCallback, CataLogProductCategory data, HttpManager httpManager, Api api) {
+        networkManager.deleteProductCategory(apiCallback, data, httpManager, api);
+    }
+
 //    @Override
 //    public void deleteProduct(ApiCallback apiCallback, CatalogProduct data, HttpManager httpManager, Api api) {
 //        networkManager.deleteProduct(apiCallback, data, httpManager, api);
@@ -1031,6 +1037,21 @@ public class AppDataManager implements DataManager {
     @Override
     public void initiateDeviceChange(ApiCallback apiCallback, HttpManager httpManager, Api api) {
         networkManager.initiateDeviceChange(apiCallback,httpManager,api);
+    }
+
+    @Override
+    public void ctaInfo(ApiCallback apiCallback, HttpManager httpManager, Api api) {
+        networkManager.ctaInfo(apiCallback, httpManager, api);
+    }
+
+    @Override
+    public void uploadSkuInfoList(@NonNull ApiCallback apiCallback, @Nullable HttpManager httpManager, @NonNull SKUInfoSpecsRequest data, @Nullable Api api) {
+        networkManager.uploadSkuInfoList(apiCallback, httpManager, data , api);
+    }
+
+    @Override
+    public void getUnitInfo(ApiCallback apiCallback, HttpManager httpManager, UnitInfoRequest data, Api api) {
+        networkManager.getUnitInfo(apiCallback, httpManager, data , api);
     }
 
 
@@ -1606,15 +1627,15 @@ public class AppDataManager implements DataManager {
         return mPreferencesHelper.getRoleConfigDataList();
     }
 
-//    @Override
-//    public void saveProductInCartWRC(Map<String, Map<String, CatalogProduct>> map) {
-//        mPreferencesHelper.saveProductInCartWRC(map);
-//    }
-//
-//    @Override
-//    public HashMap<String, HashMap<String, CatalogProduct>> getProductInCartWRC() {
-//        return mPreferencesHelper.getProductInCartWRC();
-//    }
+    @Override
+    public void saveProductInCartWRC(Map<String, Map<String, CatalogProduct>> map) {
+        mPreferencesHelper.saveProductInCartWRC(map);
+    }
+
+    @Override
+    public HashMap<String, HashMap<String, CatalogProduct>> getProductInCartWRC() {
+        return mPreferencesHelper.getProductInCartWRC();
+    }
 
     @Override
     public void saveWorkFlowCategoriesList(List<WorkFlowCategories> workFlowCategoriesList) {

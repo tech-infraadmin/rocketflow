@@ -429,6 +429,9 @@ public final class AppConstants {
         public static final String TASK= "TASK";
         public static final String ATTENDANCE= "ATTENDANCE";
         public static final String DOC_TYPE = "doc_type";
+        public static final String EXTRA_PRODUCT_ID = "product_id";
+        public static final String EXTRA_PRODUCT_NAME = "product_name";
+
 
 
 

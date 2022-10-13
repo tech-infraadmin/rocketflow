@@ -28,6 +28,7 @@ import com.tracki.di.PreferenceInfo;
 import com.tracki.ui.addplace.Hub;
 //import com.tracki.ui.login.UserAccount;
 //import com.tracki.ui.selectorder.CatalogProduct;
+import com.tracki.ui.selectorder.CatalogProduct;
 import com.tracki.utils.ApiType;
 import com.tracki.utils.AppConstants;
 import com.tracki.utils.ShiftTime;
@@ -1326,21 +1327,21 @@ public class AppPreferencesHelper implements PreferencesHelper {
 
 
 
-//    @Override
-//    public void saveProductInCartWRC(Map<String, Map<String, CatalogProduct>> map) {
-//        mPrefs.edit().putString(PREF_KEY_SAVED_CART, new Gson().toJson(map)).apply();
-//    }
-//
-//    @Override
-//    public HashMap<String, HashMap<String, CatalogProduct>> getProductInCartWRC() {
-//        String c = mPrefs.getString(PREF_KEY_SAVED_CART, null);
-//        if (c == null) {
-//            return null;
-//        }
-//        HashMap<String,HashMap<String,CatalogProduct>> dataHashMap = new Gson().fromJson(c, new TypeToken<HashMap<String,HashMap<String,CatalogProduct>>>() {
-//        }.getType());
-//        return dataHashMap;
-//    }
+    @Override
+    public void saveProductInCartWRC(Map<String, Map<String, CatalogProduct>> map) {
+        mPrefs.edit().putString(PREF_KEY_SAVED_CART, new Gson().toJson(map)).apply();
+    }
+
+    @Override
+    public HashMap<String, HashMap<String, CatalogProduct>> getProductInCartWRC() {
+        String c = mPrefs.getString(PREF_KEY_SAVED_CART, null);
+        if (c == null) {
+            return null;
+        }
+        HashMap<String,HashMap<String,CatalogProduct>> dataHashMap = new Gson().fromJson(c, new TypeToken<HashMap<String,HashMap<String,CatalogProduct>>>() {
+        }.getType());
+        return dataHashMap;
+    }
 
     @Override
     public void saveWorkFlowCategoriesList(List<WorkFlowCategories> workFlowCategoriesList) {

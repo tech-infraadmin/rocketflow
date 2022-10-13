@@ -41,7 +41,9 @@ import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
 import com.tracki.databinding.ItemDynamicFormVideoBinding
 import com.tracki.databinding.LayoutFrgmrntTaskDetailsBinding
+import com.tracki.ordercode.OrderCodeActivity
 import com.tracki.ui.base.BaseFragment
+//import com.tracki.ui.chat.ChatActivity
 import com.tracki.ui.common.DoubleButtonDialog
 import com.tracki.ui.common.OnClickListener
 import com.tracki.ui.custom.GlideApp
@@ -51,14 +53,20 @@ import com.tracki.ui.dynamicform.DynamicFormActivity.Companion.newIntent
 import com.tracki.ui.dynamicform.dynamicfragment.DynamicAdapter
 import com.tracki.ui.dynamicform.dynamicfragment.DynamicFragment
 import com.tracki.ui.dynamicform.dynamicfragment.ShowDynamicFormDataAdapter
+//import com.tracki.ui.messages.MessagesActivity
 import com.tracki.ui.newcreatetask.NewCreateTaskActivity
+//import com.tracki.ui.scanqrcode.ScanQrAndBarCodeActivity
+import com.tracki.ui.selectorder.SelectOrderActivity
 import com.tracki.ui.taskdetails.*
+import com.tracki.ui.taskdetails.timeline.skuinfo.SkuInfoActivity
+import com.tracki.ui.taskdetails.timeline.skuinfopreview.SkuInfoPreviewActivity
 import com.tracki.ui.tasklisting.TaskClickListener
 import com.tracki.ui.tasklisting.assignedtome.TaskAssignToMeViewModel
-import com.tracki.ui.tasklisting.ihaveassigned.IhaveAssignedViewModel
 import com.tracki.ui.userlisting.UserListNewActivity
+import com.tracki.ui.webview.WebViewActivity
 import com.tracki.utils.*
 import com.tracki.utils.AppConstants.Extra
+//import com.tracki.utils.geofence.AddGeoFenceUtil
 import com.trackthat.lib.TrackThat
 import com.trackthat.lib.internal.network.TrackThatCallback
 import com.trackthat.lib.models.ErrorResponse
@@ -301,10 +309,10 @@ class TaskDetailsFragment :
                 }
 
 
-//                mActivityNewTaskDetailBinding.llQrCode.setOnClickListener {
-//                    if (qrUrl != "na")
-//                        startActivity(Intent(context,OrderCodeActivity::class.java).putExtra("qrUrl",qrUrl))
-//                }
+                mActivityNewTaskDetailBinding.llQrCode.setOnClickListener {
+                    if (qrUrl != "na")
+                        startActivity(Intent(context,OrderCodeActivity::class.java).putExtra("qrUrl",qrUrl))
+                }
 
 
 
@@ -373,16 +381,16 @@ class TaskDetailsFragment :
                         cardOrders.visibility = View.VISIBLE
                         val adapter = OrderListAdapter(task!!.orderDetails)
                         rvOrderList.adapter = adapter
-//                        adapter.onItemClick = { item ->
-//                            val intent = SkuInfoPreviewActivity.newIntent(requireActivity())
-//                            intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-//                            intent.putExtra(Extra.EXTRA_PRODUCT_ID, item.productId.toString())
-//                            intent.putExtra(Extra.EXTRA_PRODUCT_NAME, item.productName.toString())
-//                            startActivityForResult(
-//                                intent,
-//                                AppConstants.REQUEST_CODE_TAG_INVENTORY
-//                            )
-//                        }
+                        adapter.onItemClick = { item ->
+                            val intent = SkuInfoPreviewActivity.newIntent(requireActivity())
+                            intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+                            intent.putExtra(Extra.EXTRA_PRODUCT_ID, item.productId.toString())
+                            intent.putExtra(Extra.EXTRA_PRODUCT_NAME, item.productName.toString())
+                            startActivityForResult(
+                                intent,
+                                AppConstants.REQUEST_CODE_TAG_INVENTORY
+                            )
+                        }
                     } else if (task!!.products != null && task!!.products!!.isNotEmpty()) {
                         cardOrders.visibility = View.VISIBLE
                         tvInventoriesLabel.text = getString(R.string.inventory_label)
@@ -454,10 +462,10 @@ class TaskDetailsFragment :
                                     // actionConfig.actionUrl = task!!.trackingUrl
                                     navigation.actionConfig = actionConfig
                                     navigation.title = "Tracking Details"
-//                                    startActivity(
-//                                        WebViewActivity.newIntent(baseActivity)
-//                                            .putExtra(AppConstants.Extra.EXTRA_WEB_INFO, navigation)
-//                                    )
+                                    startActivity(
+                                        WebViewActivity.newIntent(baseActivity)
+                                            .putExtra(AppConstants.Extra.EXTRA_WEB_INFO, navigation)
+                                    )
                                 }
                             }
                         }
@@ -477,10 +485,10 @@ class TaskDetailsFragment :
                                 // actionConfig.actionUrl = task!!.trackingUrl
                                 navigation.actionConfig = actionConfig
                                 navigation.title = "Tracking Details"
-//                                startActivity(
-//                                    WebViewActivity.newIntent(baseActivity)
-//                                        .putExtra(AppConstants.Extra.EXTRA_WEB_INFO, navigation)
-//                                )
+                                startActivity(
+                                    WebViewActivity.newIntent(baseActivity)
+                                        .putExtra(AppConstants.Extra.EXTRA_WEB_INFO, navigation)
+                                )
                             }
                         }
                     })
@@ -929,46 +937,46 @@ class TaskDetailsFragment :
                 try {
                     if (callToActions!!.targetInfo != null && callToActions!!.targetInfo!!.target === TRAGETINFO.TAG_INVENTORY) {
                         if (activity != null) {
-//                            val intent = SelectOrderActivity.newIntent(requireActivity())
-//                            val dashBoardBoxItem = DashBoardBoxItem()
-//
-//                            dashBoardBoxItem.categoryId = categoryId
-//                            intent.putExtra(
-//                                Extra.EXTRA_CATEGORIES,
-//                                Gson().toJson(dashBoardBoxItem)
-//                            )
-//                            intent.putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
-//                            intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-//                            if(callToActions!!.targetInfo!!.category!=null&&callToActions!!.targetInfo!!.category!!.isNotEmpty())
-//                                intent.putExtra(Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, callToActions!!.targetInfo!!.category)
-//
-//
-//                            if(!callToActions!!.targetInfo!!.targetInfo.isNullOrEmpty()){
-//                                var ctaInventoryConfig=callToActions!!.targetInfo!!.targetInfo!!.getCtaInventoryConfig()
-//                                if(!ctaInventoryConfig.invAction.isNullOrEmpty()) {
-//                                    intent.putExtra(
-//                                        Extra.EXTRA_TASK_TAG_INV_TARGET,
-//                                        ctaInventoryConfig.invAction
-//                                    )
-//                                }
-//                                else{
-//                                    var invAction=getInvAction(categoryId)
-//                                    if(invAction!=null&&invAction.isNotEmpty())
-//                                        intent.putExtra(Extra.EXTRA_TASK_TAG_INV_TARGET, invAction)
-//                                }
-//                                if(ctaInventoryConfig.dynamicPricing!=null)
-//                                    intent.putExtra(Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, ctaInventoryConfig.dynamicPricing)
-//
-//                            }
-//                            else{
-//                                var invAction=getInvAction(categoryId)
-//                                if(invAction!=null&&invAction.isNotEmpty())
-//                                    intent.putExtra(Extra.EXTRA_TASK_TAG_INV_TARGET, invAction)
-//                            }
-//                            startActivityForResult(
-//                                intent,
-//                                AppConstants.REQUEST_CODE_TAG_INVENTORY
-//                            )
+                            val intent = SelectOrderActivity.newIntent(requireActivity())
+                            val dashBoardBoxItem = DashBoardBoxItem()
+
+                            dashBoardBoxItem.categoryId = categoryId
+                            intent.putExtra(
+                                Extra.EXTRA_CATEGORIES,
+                                Gson().toJson(dashBoardBoxItem)
+                            )
+                            intent.putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
+                            intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+                            if(callToActions!!.targetInfo!!.category!=null&&callToActions!!.targetInfo!!.category!!.isNotEmpty())
+                                intent.putExtra(Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, callToActions!!.targetInfo!!.category)
+
+
+                            if(!callToActions!!.targetInfo!!.targetInfo.isNullOrEmpty()){
+                                var ctaInventoryConfig=callToActions!!.targetInfo!!.targetInfo!!.getCtaInventoryConfig()
+                                if(!ctaInventoryConfig.invAction.isNullOrEmpty()) {
+                                    intent.putExtra(
+                                        Extra.EXTRA_TASK_TAG_INV_TARGET,
+                                        ctaInventoryConfig.invAction
+                                    )
+                                }
+                                else{
+                                    var invAction=getInvAction(categoryId)
+                                    if(invAction!=null&&invAction.isNotEmpty())
+                                        intent.putExtra(Extra.EXTRA_TASK_TAG_INV_TARGET, invAction)
+                                }
+                                if(ctaInventoryConfig.dynamicPricing!=null)
+                                    intent.putExtra(Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, ctaInventoryConfig.dynamicPricing)
+
+                            }
+                            else{
+                                var invAction=getInvAction(categoryId)
+                                if(invAction!=null&&invAction.isNotEmpty())
+                                    intent.putExtra(Extra.EXTRA_TASK_TAG_INV_TARGET, invAction)
+                            }
+                            startActivityForResult(
+                                intent,
+                                AppConstants.REQUEST_CODE_TAG_INVENTORY
+                            )
                         }
                     } else {
                         checkConditionsAndRequestAPI(null)
@@ -981,15 +989,15 @@ class TaskDetailsFragment :
             }
             else {
                 if (callToActions!!.targetInfo!!.target == TRAGETINFO.UNIT_INFO) {
-//                    if (activity != null) {
-//                        val intent = SkuInfoActivity.newIntent(baseActivity)
-//                        intent.putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
-//                        intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-//                        startActivityForResult(
-//                            intent,
-//                            AppConstants.REQUEST_CODE_UNIT_INFO
-//                        )
-//                    }
+                    if (activity != null) {
+                        val intent = SkuInfoActivity.newIntent(baseActivity)
+                        intent.putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
+                        intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+                        startActivityForResult(
+                            intent,
+                            AppConstants.REQUEST_CODE_UNIT_INFO
+                        )
+                    }
                 } else {
                     val message = "Are you sure you want to perform ?"
                     val dialog = DoubleButtonDialog(requireContext(),
@@ -1004,57 +1012,57 @@ class TaskDetailsFragment :
                                 try {
                                     if (callToActions!!.targetInfo != null && callToActions!!.targetInfo!!.target === TRAGETINFO.TAG_INVENTORY) {
                                         if (activity != null) {
-//                                            val intent = SelectOrderActivity.newIntent(activity!!)
-//                                            val dashBoardBoxItem = DashBoardBoxItem()
-//
-//                                            dashBoardBoxItem.categoryId = categoryId
-//                                            intent.putExtra(
-//                                                Extra.EXTRA_CATEGORIES,
-//                                                Gson().toJson(dashBoardBoxItem)
-//                                            )
-//                                            intent.putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
-//                                            intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-//                                            if (callToActions!!.targetInfo!!.category != null && callToActions!!.targetInfo!!.category!!.isNotEmpty())
-//                                                intent.putExtra(
-//                                                    Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID,
-//                                                    callToActions!!.targetInfo!!.category
-//                                                )
-//
-//
-//                                            if (!callToActions!!.targetInfo!!.targetInfo.isNullOrEmpty()) {
-//                                                var ctaInventoryConfig =
-//                                                    callToActions!!.targetInfo!!.targetInfo!!.getCtaInventoryConfig()
-//                                                if (!ctaInventoryConfig.invAction.isNullOrEmpty()) {
-//                                                    intent.putExtra(
-//                                                        Extra.EXTRA_TASK_TAG_INV_TARGET,
-//                                                        ctaInventoryConfig.invAction
-//                                                    )
-//                                                } else {
-//                                                    var invAction = getInvAction(categoryId)
-//                                                    if (invAction != null && invAction.isNotEmpty())
-//                                                        intent.putExtra(
-//                                                            Extra.EXTRA_TASK_TAG_INV_TARGET,
-//                                                            invAction
-//                                                        )
-//                                                }
-//                                                if (ctaInventoryConfig.dynamicPricing != null)
-//                                                    intent.putExtra(
-//                                                        Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING,
-//                                                        ctaInventoryConfig.dynamicPricing
-//                                                    )
-//
-//                                            } else {
-//                                                var invAction = getInvAction(categoryId)
-//                                                if (invAction != null && invAction.isNotEmpty())
-//                                                    intent.putExtra(
-//                                                        Extra.EXTRA_TASK_TAG_INV_TARGET,
-//                                                        invAction
-//                                                    )
-//                                            }
-//                                            startActivityForResult(
-//                                                intent,
-//                                                AppConstants.REQUEST_CODE_TAG_INVENTORY
-//                                            )
+                                            val intent = SelectOrderActivity.newIntent(activity!!)
+                                            val dashBoardBoxItem = DashBoardBoxItem()
+
+                                            dashBoardBoxItem.categoryId = categoryId
+                                            intent.putExtra(
+                                                Extra.EXTRA_CATEGORIES,
+                                                Gson().toJson(dashBoardBoxItem)
+                                            )
+                                            intent.putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
+                                            intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+                                            if (callToActions!!.targetInfo!!.category != null && callToActions!!.targetInfo!!.category!!.isNotEmpty())
+                                                intent.putExtra(
+                                                    Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID,
+                                                    callToActions!!.targetInfo!!.category
+                                                )
+
+
+                                            if (!callToActions!!.targetInfo!!.targetInfo.isNullOrEmpty()) {
+                                                var ctaInventoryConfig =
+                                                    callToActions!!.targetInfo!!.targetInfo!!.getCtaInventoryConfig()
+                                                if (!ctaInventoryConfig.invAction.isNullOrEmpty()) {
+                                                    intent.putExtra(
+                                                        Extra.EXTRA_TASK_TAG_INV_TARGET,
+                                                        ctaInventoryConfig.invAction
+                                                    )
+                                                } else {
+                                                    var invAction = getInvAction(categoryId)
+                                                    if (invAction != null && invAction.isNotEmpty())
+                                                        intent.putExtra(
+                                                            Extra.EXTRA_TASK_TAG_INV_TARGET,
+                                                            invAction
+                                                        )
+                                                }
+                                                if (ctaInventoryConfig.dynamicPricing != null)
+                                                    intent.putExtra(
+                                                        Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING,
+                                                        ctaInventoryConfig.dynamicPricing
+                                                    )
+
+                                            } else {
+                                                var invAction = getInvAction(categoryId)
+                                                if (invAction != null && invAction.isNotEmpty())
+                                                    intent.putExtra(
+                                                        Extra.EXTRA_TASK_TAG_INV_TARGET,
+                                                        invAction
+                                                    )
+                                            }
+                                            startActivityForResult(
+                                                intent,
+                                                AppConstants.REQUEST_CODE_TAG_INVENTORY
+                                            )
                                         }
                                     } else {
                                         checkConditionsAndRequestAPI(null)
@@ -1524,7 +1532,6 @@ class TaskDetailsFragment :
     ) {
         hideLoading()
         if (CommonUtils.handleResponse(apiCallback, error, result, baseActivity)) {
-
             getTaskData()
         }
     }

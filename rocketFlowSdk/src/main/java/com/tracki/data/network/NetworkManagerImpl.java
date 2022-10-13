@@ -14,6 +14,7 @@ import com.tracki.data.model.BaseResponse;
 import com.tracki.data.model.request.AddEmployeeRequest;
 import com.tracki.data.model.request.AddressInfo;
 import com.tracki.data.model.request.PlaceRequest;
+import com.tracki.data.model.request.SKUInfoSpecsRequest;
 import com.tracki.data.model.request.UpdateFileRequest;
 import com.tracki.data.model.request.UserGetRequest;
 import com.tracki.data.model.response.config.Api;
@@ -23,6 +24,10 @@ import com.tracki.ui.addplace.AddPlaceRequest;
 //import com.tracki.ui.products.AddProductRequest;
 //import com.tracki.ui.selectorder.CataLogProductCategory;
 //import com.tracki.ui.selectorder.CatalogProduct;
+import com.tracki.ui.category.AddCategoryRequest;
+import com.tracki.ui.products.AddProductRequest;
+import com.tracki.ui.selectorder.CataLogProductCategory;
+import com.tracki.ui.taskdetails.timeline.skuinfopreview.UnitInfoRequest;
 import com.tracki.utils.ApiType;
 import com.tracki.utils.AppConstants;
 import com.tracki.utils.CommonUtils;
@@ -678,30 +683,30 @@ public class NetworkManagerImpl implements NetworkManager {
         postApiCall(apiCallback, httpManager, api, data);
     }
 
-//    @Override
-//    public void addProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api) {
-//        postApiCall(apiCallback, httpManager, api, data);
-//    }
+    @Override
+    public void addProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api) {
+        postApiCall(apiCallback, httpManager, api, data);
+    }
+
+    @Override
+    public void updateProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api) {
+        postApiCall(apiCallback, httpManager, api, data);
+    }
+
+    @Override
+    public void addProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api) {
+        postApiCall(apiCallback, httpManager, api, data);
+    }
+
+    @Override
+    public void updateProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api) {
+        postApiCall(apiCallback, httpManager, api, data);
+    }
 //
-//    @Override
-//    public void updateProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api) {
-//        postApiCall(apiCallback, httpManager, api, data);
-//    }
-//
-//    @Override
-//    public void addProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api) {
-//        postApiCall(apiCallback, httpManager, api, data);
-//    }
-//
-//    @Override
-//    public void updateProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api) {
-//        postApiCall(apiCallback, httpManager, api, data);
-//    }
-//
-//    @Override
-//    public void deleteProductCategory(ApiCallback apiCallback, CataLogProductCategory data, HttpManager httpManager, Api api) {
-//        postApiCall(apiCallback, httpManager, api, data);
-//    }
+    @Override
+    public void deleteProductCategory(ApiCallback apiCallback, CataLogProductCategory data, HttpManager httpManager, Api api) {
+        postApiCall(apiCallback, httpManager, api, data);
+    }
 //
 //    @Override
 //    public void deleteProduct(ApiCallback apiCallback, CatalogProduct data, HttpManager httpManager, Api api) {
@@ -731,6 +736,21 @@ public class NetworkManagerImpl implements NetworkManager {
     @Override
     public void initiateDeviceChange(ApiCallback apiCallback, HttpManager httpManager, Api api) {
         initiateDeviceChangeCall(apiCallback,httpManager,api);
+    }
+
+    @Override
+    public void ctaInfo(ApiCallback apiCallback, HttpManager httpManager, Api api) {
+        getApiCall(apiCallback, httpManager, api);
+    }
+
+    @Override
+    public void uploadSkuInfoList(@NonNull ApiCallback apiCallback, @androidx.annotation.Nullable HttpManager httpManager, @NonNull SKUInfoSpecsRequest data, @androidx.annotation.Nullable Api api) {
+        postApiCall(apiCallback, httpManager, api, data);
+    }
+
+    @Override
+    public void getUnitInfo(ApiCallback apiCallback, HttpManager httpManager, UnitInfoRequest data, Api api) {
+        postApiCall(apiCallback, httpManager, api, data);
     }
 
 

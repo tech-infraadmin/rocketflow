@@ -4,10 +4,15 @@ package com.tracki.data.network;
 import com.tracki.data.model.request.AddEmployeeRequest;
 import com.tracki.data.model.request.AddressInfo;
 import com.tracki.data.model.request.PlaceRequest;
+import com.tracki.data.model.request.SKUInfoSpecsRequest;
 import com.tracki.data.model.request.UserGetRequest;
 import com.tracki.data.model.response.config.Api;
 import com.tracki.data.model.response.config.Place;
 import com.tracki.ui.addplace.AddPlaceRequest;
+import com.tracki.ui.category.AddCategoryRequest;
+import com.tracki.ui.products.AddProductRequest;
+import com.tracki.ui.selectorder.CataLogProductCategory;
+import com.tracki.ui.taskdetails.timeline.skuinfopreview.UnitInfoRequest;
 //import com.tracki.ui.category.AddCategoryRequest;
 //import com.tracki.ui.productdetails.StockEntryRequest;
 //import com.tracki.ui.products.AddProductRequest;
@@ -247,16 +252,16 @@ public interface NetworkManager {
     void updateAddress(ApiCallback apiCallback, AddressInfo data, HttpManager httpManager, Api api);
 
     void addAddress(ApiCallback apiCallback, AddressInfo data, HttpManager httpManager, Api api);
-//
-//    void addProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api);
-//
-//    void updateProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api);
-//
-//    void addProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api);
-//
-//    void updateProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api);
 
-    //void deleteProductCategory(ApiCallback apiCallback, CataLogProductCategory data, HttpManager httpManager, Api api);
+    void addProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api);
+
+    void updateProductCategory(ApiCallback apiCallback, AddCategoryRequest data, HttpManager httpManager, Api api);
+
+    void addProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api);
+
+    void updateProduct(ApiCallback apiCallback, AddProductRequest data, HttpManager httpManager, Api api);
+
+    void deleteProductCategory(ApiCallback apiCallback, CataLogProductCategory data, HttpManager httpManager, Api api);
 
     //void deleteProduct(ApiCallback apiCallback, CatalogProduct data, HttpManager httpManager, Api api);
 
@@ -269,5 +274,12 @@ public interface NetworkManager {
     void deleteDocument(ApiCallback apiCallback, HttpManager httpManager, Api api);
 
     void initiateDeviceChange(ApiCallback apiCallback, HttpManager httpManager, Api api);
+
+    void ctaInfo(ApiCallback apiCallback, HttpManager httpManager,Api api);
+
+    void uploadSkuInfoList(@NotNull ApiCallback apiCallback, @Nullable HttpManager httpManager, @NotNull SKUInfoSpecsRequest data, @Nullable Api api);
+
+    void getUnitInfo(ApiCallback apiCallback, HttpManager httpManager, UnitInfoRequest data, Api api);
+
 
 }

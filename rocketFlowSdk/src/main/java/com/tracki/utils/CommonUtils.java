@@ -1,15 +1,5 @@
 package com.tracki.utils;
 
-import static android.content.Context.ALARM_SERVICE;
-import static com.tracki.utils.AppConstants.ALERT_NO_CONNECTION;
-import static com.tracki.utils.AppConstants.ALERT_REQUEST_TIME_OUT;
-import static com.tracki.utils.AppConstants.ALERT_SERVER_UPGRADE_IN_PROGRESS;
-import static com.tracki.utils.AppConstants.ALERT_TRY_AGAIN;
-import static com.tracki.utils.AppConstants.CHANGE_SEETINGS;
-import static com.tracki.utils.AppConstants.CLOSE;
-import static com.tracki.utils.AppConstants.RETRY;
-import static com.tracki.utils.AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
@@ -103,14 +93,8 @@ import androidx.work.WorkRequest;
 
 //import com.google.android.flexbox.FlexDirection;
 //import com.google.android.flexbox.FlexboxLayout;
-//import com.google.android.gms.common.ConnectionResult;
-//import com.google.android.gms.common.GoogleApiAvailability;
-//import com.google.android.gms.maps.GoogleMap;
-//import com.google.android.gms.maps.SupportMapFragment;
-//import com.google.android.gms.maps.model.BitmapDescriptor;
-//import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-//import com.google.android.gms.maps.model.LatLng;
-//import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -119,8 +103,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
-//import com.google.firebase.iid.FirebaseInstanceId;
-//import com.google.firebase.iid.InstanceIdResult;
 //import com.google.firebase.iid.FirebaseInstanceId;
 //import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
@@ -178,30 +160,17 @@ import com.tracki.data.network.ApiCallback;
 //import com.tracki.ui.addplace.AddLocationActivity;
 import com.tracki.ui.base.BaseActivity;
 import com.tracki.ui.common.Base64;
-//import com.tracki.ui.selectorder.CatalogProduct;
+//import com.tracki.ui.consent.ConsentActivity;
+import com.tracki.ui.custom.socket.PacketInfo;
+import com.tracki.ui.selectorder.CatalogProduct;
+import com.tracki.ui.splash.SplashActivity;
+import com.tracki.ui.splash.SplashViewModel;
 import com.tracki.ui.tasklisting.CallToActionButtonAdapter;
 import com.tracki.ui.tasklisting.TaskClickListener;
-//import com.tracki.ui.common.Base64;
-//import com.tracki.ui.consent.ConsentActivity;
-//import com.tracki.ui.custom.socket.PacketInfo;
-//import com.tracki.ui.custom.socket.WebSocketManager;
-//import com.tracki.ui.deviceChange.DeviceChangeActivity;
-//import com.tracki.ui.introscreens.IntroActivity;
-//import com.tracki.ui.login.LoginActivity;
-//import com.tracki.ui.main.MainActivity;
-//import com.tracki.ui.receiver.ServiceRestartReceiver;
-//import com.tracki.ui.register.RegisterActivity;
-//import com.tracki.ui.selectorder.CatalogProduct;
-//import com.tracki.ui.service.sync.SyncService;
-//import com.tracki.ui.service.transition.TransitionService;
-//import com.tracki.ui.splash.SplashActivity;
-//import com.tracki.ui.splash.SplashViewModel;
-//import com.tracki.ui.tasklisting.CallToActionButtonAdapter;
-//import com.tracki.ui.tasklisting.TaskClickListener;
-//import com.tracki.ui.update.AppUpdateScreenActivity;
-//import com.trackthat.lib.TrackThat;
-//import com.trackthat.lib.internal.common.Trunk;
-//import com.trackthat.lib.models.TrackthatLocation;
+import com.trackthat.lib.TrackThat;
+import com.trackthat.lib.internal.common.Trunk;
+import com.trackthat.lib.models.TrackthatLocation;
+import com.trackthat.lib.service.TransitionService;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -231,6 +200,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import kotlin.jvm.internal.Intrinsics;
+
+import static android.content.Context.ALARM_SERVICE;
+import static com.tracki.utils.AppConstants.ALERT_NO_CONNECTION;
+import static com.tracki.utils.AppConstants.ALERT_REQUEST_TIME_OUT;
+import static com.tracki.utils.AppConstants.ALERT_SERVER_UPGRADE_IN_PROGRESS;
+import static com.tracki.utils.AppConstants.ALERT_TRY_AGAIN;
+import static com.tracki.utils.AppConstants.CHANGE_SEETINGS;
+import static com.tracki.utils.AppConstants.CLOSE;
+import static com.tracki.utils.AppConstants.RETRY;
+import static com.tracki.utils.AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE;
 
 public final class CommonUtils {
     public static final String TAG = "CommonUtils";
@@ -372,18 +351,18 @@ public final class CommonUtils {
         int count = 0;
         if (mPref == null)
             return count;
-//        if (mPref.getProductInCartWRC() != null && !mPref.getProductInCartWRC().isEmpty()) {
-//              /*  var searchCustomer = CustomerData()
-//                searchCustomer.userId = userId*/
-//            if (mPref.getProductInCartWRC().containsKey(userId)) {
-//                Map<String, CatalogProduct> map = mPref.getProductInCartWRC().get(userId);
-//                if (map != null && !map.isEmpty()) {
-//                    for (CatalogProduct data : map.values()) {
-//                        count += data.getNoOfProduct();
-//                    }
-//                }
-//            }
-//        }
+        if (mPref.getProductInCartWRC() != null && !mPref.getProductInCartWRC().isEmpty()) {
+              /*  var searchCustomer = CustomerData()
+                searchCustomer.userId = userId*/
+            if (mPref.getProductInCartWRC().containsKey(userId)) {
+                Map<String, CatalogProduct> map = mPref.getProductInCartWRC().get(userId);
+                if (map != null && !map.isEmpty()) {
+                    for (CatalogProduct data : map.values()) {
+                        count += data.getNoOfProduct();
+                    }
+                }
+            }
+        }
 
         return count;
 
@@ -974,9 +953,9 @@ public final class CommonUtils {
                             break;
                         case NETWORK_FAIL:
                             if (showAlertNetwork) {
-//                                if (!(context instanceof TrackiApplication)) {
-//                                    new ErrorScreenHelper(context).display(ErrorScreenHelper.NO_INTERNET_ERROR, callBack);
-//                                }
+                                if (!(context instanceof TrackiApplication)) {
+                                    //new ErrorScreenHelper(context).display(ErrorScreenHelper.NO_INTERNET_ERROR, callBack);
+                                }
                             } else {
                                 TrackiToast.Message.showShort(context, ALERT_NO_CONNECTION);
                             }
@@ -1014,14 +993,14 @@ public final class CommonUtils {
                                             dialog.dismiss();
                                             callBack.hitApi();
                                         }).setNegativeButton(CLOSE, (dialog, which) -> {
-                                    dialog.dismiss();
-                                    callBack.onNetworkErrorClose();
-                                }).show();
+                                            dialog.dismiss();
+                                            callBack.onNetworkErrorClose();
+                                        }).show();
 
                             } else {
-//                                if (!(context instanceof TrackiApplication)) {
-//                                    new ErrorScreenHelper(context).display(ErrorScreenHelper.SOMETHING_WENT_ERROR, callBack);
-//                                }
+                                if (!(context instanceof TrackiApplication)) {
+                                    //new ErrorScreenHelper(context).display(ErrorScreenHelper.SOMETHING_WENT_ERROR, callBack);
+                                }
                             }
                     }
                     /*}*/
@@ -1033,35 +1012,47 @@ public final class CommonUtils {
                             case "205"://invalid accessId
                                 //if user called this method from service then stop tracking service.
                                 if (context instanceof TrackiApplication) {
-//                                    if (CommonUtils.isServiceRunningInForeground(context, TransitionService.class.getName())) {
-//                                        CommonUtils.manageTransitionService(context, false);
-//                                    }
+                                    if (CommonUtils.isServiceRunningInForeground(context, TransitionService.class.getName())) {
+                                        CommonUtils.manageTransitionService(context, false);
+                                    }
                                 } else {
                                     //if method is not called from application the
                                     // expire session and open login page.
                                     Intent intent;
-//                                    if (context instanceof SplashActivity) {
+                                    if (context instanceof SplashActivity) {
+                                        try {
+                                            BaseActivity baseActivity = (BaseActivity) context;
+                                            baseActivity.invalidLoginTokenOnly();
+                                        } catch (Exception e) {
+
+                                        }
+//                                        intent = new Intent(context, SplashActivity.class);
+//                                        BaseActivity baseActivity = (BaseActivity) context;
+//                                        baseActivity.invalidToken(intent);
+                                        if (response.getResponseMsg() != null) {
+                                            TrackiToast.Message.showShort(context, response.getResponseMsg());
+                                        }
+//                                    } else if (context instanceof LoginActivity) {
 //                                        try {
 //                                            BaseActivity baseActivity = (BaseActivity) context;
 //                                            baseActivity.invalidLoginTokenOnly();
 //                                        } catch (Exception e) {
 //
 //                                        }
-////                                        intent = new Intent(context, SplashActivity.class);
-////                                        BaseActivity baseActivity = (BaseActivity) context;
-////                                        baseActivity.invalidToken(intent);
 //                                        if (response.getResponseMsg() != null) {
 //                                            TrackiToast.Message.showShort(context, response.getResponseMsg());
 //                                        }
-//                                    }  else {
-////                                        if (TrackThat.isTracking()) {
-////                                            TrackThat.stopTracking();
-////                                        }
-////                                        intent = LoginActivity.newIntent(context);
-////                                        intent.putExtra(AppConstants.Extra.EXTRA_LOGOUT, true);
-////                                        BaseActivity baseActivity = (BaseActivity) context;
-////                                        baseActivity.invalidToken(intent);
-//                                    }
+//                                        // ((LoginActivity) context).finish();
+//                                        // System.exit(0);
+//                                    } else {
+                                        if (TrackThat.isTracking()) {
+                                            TrackThat.stopTracking();
+                                        }
+//                                        intent = LoginActivity.newIntent(context);
+//                                        intent.putExtra(AppConstants.Extra.EXTRA_LOGOUT, true);
+//                                        BaseActivity baseActivity = (BaseActivity) context;
+//                                        baseActivity.invalidToken(intent);
+                                    }
 
                                 }
                                 break;
@@ -1122,7 +1113,7 @@ public final class CommonUtils {
 
     public static void showSnakbarForNetworkSettings(Context context, View mainlayout, String message) {
         Snackbar snackbar = Snackbar
-                .make(mainlayout, message, 1)
+                .make(mainlayout, message, Snackbar.LENGTH_LONG)
                 .setAction(CHANGE_SEETINGS, new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -1148,7 +1139,7 @@ public final class CommonUtils {
             throw new NullPointerException("null cannot be cast to non-null type android.os.Handler");
         } else {
             final Handler originalHandler = (Handler) var7;
-            Handler decoratedHandler = new Handler(Looper.getMainLooper(), (Handler.Callback) (new Handler.Callback() {
+            Handler decoratedHandler = new Handler(Looper.getMainLooper(), (android.os.Handler.Callback) (new android.os.Handler.Callback() {
                 public boolean handleMessage(@NotNull Message message) {
                     Intrinsics.checkNotNullParameter(message, "message");
                     switch (message.what) {
@@ -1169,25 +1160,25 @@ public final class CommonUtils {
         }
     }
 
-//    public static void showPermanentSnackBar(@NotNull View view, @NotNull String message, @NotNull final SplashViewModel baseViewModel) {
-//        Snackbar var10000 = Snackbar.make(view, (CharSequence) message, Snackbar.LENGTH_INDEFINITE).setAction((CharSequence) "Retry", (View.OnClickListener) (new View.OnClickListener() {
-//            public final void onClick(View it) {
-//                baseViewModel.hitApi();
-//            }
-//        }));
-//        Snackbar snackbar = var10000;
-//        snackbar.show();
-//
-//        try {
-//            doNotHideSnackbar(snackbar);
-//        } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException var6) {
-//            var6.printStackTrace();
-//        }
-//
-//    }
+    public static void showPermanentSnackBar(@NotNull View view, @NotNull String message, @NotNull final SplashViewModel baseViewModel) {
+        Snackbar var10000 = Snackbar.make(view, (CharSequence) message, Snackbar.LENGTH_INDEFINITE).setAction((CharSequence) "Retry", (View.OnClickListener) (new View.OnClickListener() {
+            public final void onClick(View it) {
+                baseViewModel.hitApi();
+            }
+        }));
+        Snackbar snackbar = var10000;
+        snackbar.show();
+
+        try {
+            doNotHideSnackbar(snackbar);
+        } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException var6) {
+            var6.printStackTrace();
+        }
+
+    }
 
     public static Snackbar showNetWorkConnectionIssue(@NotNull View view, @NotNull String message) {
-        Snackbar snackbar = Snackbar.make(view, (CharSequence) message,BaseTransientBottomBar.LENGTH_INDEFINITE);
+        Snackbar snackbar = Snackbar.make(view, (CharSequence) message, Snackbar.LENGTH_INDEFINITE);
         TextView tv = (TextView) (snackbar.getView()).findViewById(com.google.android.material.R.id.snackbar_text);
         Typeface font = Typeface.createFromAsset(view.getContext().getAssets(), "fonts/campton_book.ttf");
         tv.setTypeface(font);
@@ -1328,7 +1319,7 @@ public final class CommonUtils {
 //        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 //        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Title", null);
         // Uri imageUri =  Uri.parse(path);
-        shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent = new Intent(android.content.Intent.ACTION_SEND);
         shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         shareIntent.putExtra(Intent.EXTRA_STREAM, bmpUri);
         shareIntent.putExtra(Intent.EXTRA_TEXT, link);
@@ -1476,9 +1467,9 @@ public final class CommonUtils {
 
             Notification notification = builder.build();
             context.startForeground(iD_SERVICE, notification);
-            //Trunk.i(TAG, context.getClass().getSimpleName() + " started in foreground");
+            Trunk.i(TAG, context.getClass().getSimpleName() + " started in foreground");
         } catch (Exception e) {
-            //Trunk.e(TAG, "Exception inside createAndShowForegroundNotification() " + e);
+            Trunk.e(TAG, "Exception inside createAndShowForegroundNotification() " + e);
         }
     }
 
@@ -1521,22 +1512,22 @@ public final class CommonUtils {
     public static void manageTransitionService(Context c, boolean isAutoStart) {
         Context context = c.getApplicationContext();
         Log.e(TAG, "Flag is auto start: " + isAutoStart);
-        //Intent intent = new Intent(context, TransitionService.class);
-//        if (isAutoStart) {
-//            if (!CommonUtils.isServiceRunningInForeground(context, TransitionService.class.getName())) {
-//                intent.putExtra(AppConstants.Extra.EXTRA_STOP_SERVICE, false);
-//                // start transition api service to monitor activity for
-//                // user inside or outside vehicle or start or stop walking.
-//                ContextCompat.startForegroundService(context, intent);
-//            }
-//        } else {
-//            if (CommonUtils.isServiceRunningInForeground(context, TransitionService.class.getName())) {
-//                intent.putExtra(AppConstants.Extra.EXTRA_STOP_SERVICE, true);
-//                // start transition api service to monitor activity for
-//                // user inside or outside vehicle or start or stop walking.
-//                ContextCompat.startForegroundService(context, intent);
-//            }
-//        }
+        Intent intent = new Intent(context, TransitionService.class);
+        if (isAutoStart) {
+            if (!CommonUtils.isServiceRunningInForeground(context, TransitionService.class.getName())) {
+                intent.putExtra(AppConstants.Extra.EXTRA_STOP_SERVICE, false);
+                // start transition api service to monitor activity for
+                // user inside or outside vehicle or start or stop walking.
+                ContextCompat.startForegroundService(context, intent);
+            }
+        } else {
+            if (CommonUtils.isServiceRunningInForeground(context, TransitionService.class.getName())) {
+                intent.putExtra(AppConstants.Extra.EXTRA_STOP_SERVICE, true);
+                // start transition api service to monitor activity for
+                // user inside or outside vehicle or start or stop walking.
+                ContextCompat.startForegroundService(context, intent);
+            }
+        }
     }
 
     public static void hideSpinnerDropDown(Spinner spinner) {
@@ -1629,20 +1620,19 @@ public final class CommonUtils {
     }
 
     public static boolean checkPlayServices(Activity context) {
-//        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
-//        int resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context);
-//        if (resultCode != ConnectionResult.SUCCESS) {
-//            if (googleApiAvailability.isUserResolvableError(resultCode)) {
-//                if (errorDialog == null) {
-//                    errorDialog = googleApiAvailability.getErrorDialog(context, resultCode, 2404);
-//                    errorDialog.setCancelable(false);
-//                }
-//                if (!errorDialog.isShowing())
-//                    errorDialog.show();
-//            }
-//        }
-//        return resultCode == ConnectionResult.SUCCESS;
-        return true;
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (googleApiAvailability.isUserResolvableError(resultCode)) {
+                if (errorDialog == null) {
+                    errorDialog = googleApiAvailability.getErrorDialog(context, resultCode, 2404);
+                    errorDialog.setCancelable(false);
+                }
+                if (!errorDialog.isShowing())
+                    errorDialog.show();
+            }
+        }
+        return resultCode == ConnectionResult.SUCCESS;
     }
 
     public static String getExtension(String photoUrl) {
@@ -1757,15 +1747,30 @@ public final class CommonUtils {
 //        if (configResponse.getDynamicFormConfig() != null) {
 //            TrackiApplication.setDynamicFormConfig(configResponse.getDynamicFormConfig());
 //        }
-        preferencesHelper.saveFilterMap(null);
-//        if (configResponse.getLookups() != null) {
-//            TrackiApplication.setLookups(configResponse.getLookups());
+//        preferencesHelper.saveRefreshConfig(configResponse.getRefreshConfig());
+//        if (Boolean.FALSE.equals(configResponse.getRefreshConfig())) {
+//            Log.d("Config", "Don't Save");
+//            Gson gson = new Gson();
+//            ConfigResponse config = gson.fromJson(String.valueOf(preferencesHelper.getConfigResponse()), ConfigResponse.class);
+//            saveConfigResponse(config,from,jsonobject,preferencesHelper,context);
+//        }else{
+//            Log.d("Config","Config Save");
+//            Gson gson = new Gson();
+//            String json = gson.toJson(configResponse);
+//            preferencesHelper.saveConfigResponse(json);
+//            saveConfigResponse(configResponse,from,jsonobject,preferencesHelper,context);
 //        }
-//
-//        if (configResponse.getDynamicForms() != null) {
-//            TrackiApplication.setDynamicFormsNews(configResponse.getDynamicForms());
-//        }
+    }
 
+    private static void saveConfigResponse(ConfigResponse configResponse, String from, String jsonobject, PreferencesHelper preferencesHelper, Activity context) {
+        preferencesHelper.saveFilterMap(null);
+        if (configResponse.getLookups() != null) {
+            TrackiApplication.setLookups(configResponse.getLookups());
+        }
+
+        if (configResponse.getDynamicForms() != null) {
+            TrackiApplication.setDynamicFormsNews(configResponse.getDynamicForms());
+        }
 
 //        if (configResponse.getTaskCancellationReasons() != null &&
 //                configResponse.getTaskCancellationReasons().size() > 0) {
@@ -1819,9 +1824,9 @@ public final class CommonUtils {
                     preferencesHelper.saveOnIdleOverStopping(onActiveConfig.getOverstoppingConfig());
                 }
             }
-//            TrackThat.setConfig(new Gson().toJson(sdkConfig), false);
-//            if (sdkConfig.getAccessId() != null)
-//                TrackThat.setAccessId(sdkConfig.getAccessId());
+            TrackThat.setConfig(new Gson().toJson(sdkConfig), false);
+            if (sdkConfig.getAccessId() != null)
+                TrackThat.setAccessId(sdkConfig.getAccessId());
 
         }
 
@@ -1835,26 +1840,27 @@ public final class CommonUtils {
             //preferencesHelper.setLocationRequired(true);
             Map<Integer, List<ShiftTime>> newShiftMap = appConfig.getShifts();
             preferencesHelper.setAlwaysNewShiftMap(newShiftMap);
-//            if (newShiftMap != null && newShiftMap.size() > 0) {
-//                ShiftHandlingUtil.setShiftTiming(preferencesHelper, newShiftMap);
-//            } else {
-//                preferencesHelper.remove(AppConstants.OLD_SHIFT_MAP);
-//            }
+            if (newShiftMap != null && newShiftMap.size() > 0) {
+                //ShiftHandlingUtil.setShiftTiming(preferencesHelper, newShiftMap);
+            } else {
+                preferencesHelper.remove(AppConstants.OLD_SHIFT_MAP);
+            }
             preferencesHelper.setEnablePunchGeofencing(appConfig.getEnablePunchGeofencing());
             preferencesHelper.setDefDateRange(appConfig.getDefDateRange());
             preferencesHelper.setMaxDateRange(appConfig.getMaxDateRange());
             preferencesHelper.setMaxPastDaysAllowed(appConfig.getMaxPastDaysAllowed());
             //  preferencesHelper.setEnablePunchGeofencing(false);
             preferencesHelper.saveChatUrl(appConfig.getChatServerUrl());
+            //preferencesHelper.saveConfigVersion(appConfig.getConfigVersion());
             preferencesHelper.saveAllowArrival(appConfig.getAllowArrival());
             preferencesHelper.saveAllowArrivalOnGeoIn(appConfig.getAllowArrivalOnGeoIn());
             preferencesHelper.saveAutoCancelThresholdInMin(appConfig.getAutoCancelThresholdInMin());
             preferencesHelper.setEnableWalletFlag(appConfig.getEnableWallet());
-//            try {
-//                TrackiApplication.setNavigationMenuList(appConfig.getNavigations());
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                TrackiApplication.setNavigationMenuList(appConfig.getNavigations());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             if (appConfig.getIdleTrackingInfo() != null) {
                 preferencesHelper.setIdleTrackingInfo(appConfig.getIdleTrackingInfo());
                 preferencesHelper.setIsIdealTrackingEnable(appConfig.getIdleTrackingInfo().getEnableIdleTracking());
@@ -1865,7 +1871,7 @@ public final class CommonUtils {
 //                startIdleTrackingOff(context);
 //            }
             if (preferencesHelper.getIsIdealTrackingEnable()) {
-                //startIdleTrackingOff(context);
+                startIdleTrackingOff(context);
             }
             if (appConfig.getStatus() != null && !appConfig.getStatus().isEmpty()) {
                 if (appConfig.getStatus().equals("OFFLINE")) {
@@ -1904,13 +1910,13 @@ public final class CommonUtils {
                 preferencesHelper.saveWorkFlowCategoriesChannel(channelConfigMap);
                 //  preferencesHelper.saveWorkFlowAllowCreation(allowCreationMap);
             }
-            if (appConfig.getFlavors() != null){
+            if (appConfig.getFlavors() != null) {
                 preferencesHelper.saveFlavorList(appConfig.getFlavors());
 
                 Map<String, Flavour> flavorMap = new HashMap<>();
                 for (Flavour categories : appConfig.getFlavors()) {
-                    if (categories!=null&&categories.getFlavourId() != null ) {
-                        flavorMap.put(categories.getFlavourId(),categories);
+                    if (categories != null && categories.getFlavourId() != null) {
+                        flavorMap.put(categories.getFlavourId(), categories);
                     }
                 }
                 preferencesHelper.saveFlavourMap(flavorMap);
@@ -1927,18 +1933,17 @@ public final class CommonUtils {
 //                if(preferencesHelper.getUserRoleId()==null&&!profileInfo.getRoleId().isEmpty())
 //                   preferencesHelper.setUserRoleId(profileInfo.getRoleId());
                 preferencesHelper.setUserDetail(configResponse.getUserInfo());
-                //if(profileInfo.getVendorId()!=null)
-                    //TrackThat.setMid(profileInfo.getVendorId());
+                if (profileInfo.getVendorId() != null)
+                    TrackThat.setMid(profileInfo.getVendorId());
             }
-
-//            if (null != appConfig.getAutoStart()) {
-//                TrackiApplication.setAutoStart(appConfig.getAutoStart());
-//            }
+            if (null != appConfig.getAutoStart()) {
+                TrackiApplication.setAutoStart(appConfig.getAutoStart());
+            }
             if (from.equalsIgnoreCase("1")) {
                 //check for the state of the config,alarm & hub locations.
                 if (appConfig.getIdleTrackingInfo() != null && appConfig.getIdleTrackingInfo().getMode() != null && appConfig.getIdleTrackingInfo().getMode().equals("ON_SHIFT") && preferencesHelper.getIsIdealTrackingEnable()) {
-//                    if (preferencesHelper.getOldShiftMap() != null)
-//                        ShiftHandlingUtil.checkAlarms(context, preferencesHelper);
+                    //if (preferencesHelper.getOldShiftMap() != null)
+                        //ShiftHandlingUtil.checkAlarms(context, preferencesHelper);
                 }
 
                 DeprecationAndExpiration screen = configResponse.getAppConfig().getAppVersionInfo();
@@ -1947,15 +1952,16 @@ public final class CommonUtils {
                     //store apis in preferences as well for use inside services
                     preferencesHelper.saveApiList(appConfig.getApis());
                     SharedPreferences prefs = context.getSharedPreferences("DeviceChange", Context.MODE_PRIVATE);
-                    boolean deviceChangeRequestInitiated = prefs.getBoolean("deviceChangeRequestInitiated", false);;
+                    boolean deviceChangeRequestInitiated = prefs.getBoolean("deviceChangeRequestInitiated", false);
+                    ;
                     if (screen.getExpired() || screen.getDeprecated()) {
 //                        context.startActivity(AppUpdateScreenActivity.Companion.newIntent(context)
 //                                .putExtra(AppConstants.Extra.EXTRA_NEXT_SCREEN, configResponse.getNextScreen().name())
 //                                .putExtra(AppConstants.Extra.EXTRA_DEPRICATION_SCREEN, screen.getDeprecated())
 //                                .putExtra(AppConstants.NOTIFICATION_DATA, jsonobject)
-                        //);
-                        //context.finish();
-                    } else if(configResponse.getNextScreen() == NextScreen.DEVICE_CHANGE_HARD_POPUP){
+//                        );
+                        context.finish();
+                    } else if (configResponse.getNextScreen() == NextScreen.DEVICE_CHANGE_HARD_POPUP) {
                         if (deviceChangeRequestInitiated) {
 //                            Intent deviceChangeIntent = new Intent(context, DeviceChangeActivity.class);
 //                            deviceChangeIntent.putExtra("title", "Device Change Under Process");
@@ -1973,8 +1979,7 @@ public final class CommonUtils {
 //                            intent.putExtra("soft", false);
 //                            context.startActivity(intent);
                         }
-                    }
-                    else {
+                    } else {
 
                         if (profileInfo != null && profileInfo.getRoleId() != null && !profileInfo.getRoleId().isEmpty() && preferencesHelper.getUserRoleId() != null && !preferencesHelper.getUserRoleId().isEmpty()) {
 
@@ -2026,6 +2031,10 @@ public final class CommonUtils {
                 //CommonUtils.updateSharedContentProvider(context, preferencesHelper);
             }
         }
+    }
+
+    private static void redirect(String from, AppConfig appConfig) {
+
     }
 
     public static void otpgoToNext(Activity activity, @Nullable NextScreen nextScreen, String mobile) {
@@ -2157,15 +2166,15 @@ public final class CommonUtils {
 
 
     public static AllowedField getFlavourField(String flavorid,String key,PreferencesHelper preferencesHelper){
-       AllowedField rquired=null;
+        AllowedField rquired=null;
         if(preferencesHelper==null||preferencesHelper.getFlavourMap()==null||preferencesHelper.getFlavourMap().size()==0)
             return null;
-         if(!preferencesHelper.getFlavourMap().containsKey(flavorid))
+        if(!preferencesHelper.getFlavourMap().containsKey(flavorid))
             return null;
         Flavour flavour=preferencesHelper.getFlavourMap().get(flavorid);
         if(flavour==null)
             return null;
-         if(flavour.getConfig()==null)
+        if(flavour.getConfig()==null)
             return null;
         if(flavour.getConfig().getAllowedFields()==null||flavour.getConfig().getAllowedFields().size()==0)
             return null;
@@ -2477,8 +2486,7 @@ public final class CommonUtils {
     public static FoundWidgetItem getFormByFormIdContainsWidget(String formId, DataType type) {
         FoundWidgetItem fwi=new FoundWidgetItem();
         DynamicFormsNew dynamicFormsNew = null;
-        //List<DynamicFormsNew> form = TrackiApplication.getDynamicFormsNews();
-        List<DynamicFormsNew> form = null;
+        List<DynamicFormsNew> form = TrackiApplication.getDynamicFormsNews();
         if (form == null || form.size() == 0) {
             return null;
         }
@@ -3131,27 +3139,27 @@ public final class CommonUtils {
                 case PUNCH_IN:
                     if (preferencesHelper.getIsIdealTrackingEnable()) {
                         if (!preferencesHelper.getIdleTripActive()) {
-//                            if (!TrackThat.isTracking()) {
-//                                preferencesHelper.setIdleTripActive(true);
-//                                TrackThat.startTracking(null, false);
-//                            }
+                            if (!TrackThat.isTracking()) {
+                                preferencesHelper.setIdleTripActive(true);
+                                TrackThat.startTracking(null, false);
+                            }
                         }
                     }
                     break;
                 case PUNCH_OUT:
                     if (preferencesHelper.getIsIdealTrackingEnable()) {
-//                        if (TrackThat.isTracking()) {
-//                            preferencesHelper.setIdleTripActive(false);
-//                            TrackThat.stopTracking();
-//                        }
+                        if (TrackThat.isTracking()) {
+                            preferencesHelper.setIdleTripActive(false);
+                            TrackThat.stopTracking();
+                        }
                     }
                     break;
                 case TRACKING_STATE_CHANGE:
                     if (notificationModel.getTrackingAction() == TrackingAction.END) {
-//                        if (TrackThat.isTracking()) {
-//                            preferencesHelper.setIsTrackingLiveTrip(false);
-//                            TrackThat.stopTracking();
-//                        }
+                        if (TrackThat.isTracking()) {
+                            preferencesHelper.setIsTrackingLiveTrip(false);
+                            TrackThat.stopTracking();
+                        }
                         if (preferencesHelper.getPunchStatus()) {
                             if (!preferencesHelper.getIdleTripActive()) {
                                 Constraints constraints = new Constraints.Builder()
@@ -3168,45 +3176,45 @@ public final class CommonUtils {
                         }
                     } else if (notificationModel.getTrackingAction() == TrackingAction.START) {
                         if (preferencesHelper.getIdleTripActive()) {
-                            //TrackThat.stopTracking();
+                            TrackThat.stopTracking();
                             preferencesHelper.setIdleTripActive(false);
                         }
-//                        if (!TrackThat.isTracking()) {
-//                            preferencesHelper.setIsTrackingLiveTrip(true);
-//                            if (notificationModel.getTaskId() != null)
-//                                TrackThat.startTracking(notificationModel.getTaskId(), true);
-//                        }
+                        if (!TrackThat.isTracking()) {
+                            preferencesHelper.setIsTrackingLiveTrip(true);
+                            if (notificationModel.getTaskId() != null)
+                                TrackThat.startTracking(notificationModel.getTaskId(), true);
+                        }
 
                     }
                     break;
                 case COMPLETED:
-//                    if (TrackThat.isTracking()) {
-//                        //stop tracking
-//                        TrackThat.stopTracking();
-//                    }
-//                    Place destination = new Place();
-//                    if (TrackThat.isLastLocationAvailable() && TrackThat.getLastLocation() != null) {
-//                        TrackthatLocation loc = TrackThat.getLastLocation();
-//                        GeoCoordinates dest = new GeoCoordinates();
-//                        dest.setLatitude(loc.getLatitude());
-//                        dest.setLongitude(loc.getLongitude());
-//
-//                        destination.setLocation(dest);
-//                        destination.setAddress(TrackThat.getAddress(loc.getLatitude(), loc.getLongitude()));
-//                        Log.e(TAG, "End Location is: " + loc.getLatitude() + " "
-//                                + loc.getLongitude() + " " + destination.getAddress());
-//                    }
+                    if (TrackThat.isTracking()) {
+                        //stop tracking
+                        TrackThat.stopTracking();
+                    }
+                    Place destination = new Place();
+                    if (TrackThat.isLastLocationAvailable() && TrackThat.getLastLocation() != null) {
+                        TrackthatLocation loc = TrackThat.getLastLocation();
+                        GeoCoordinates dest = new GeoCoordinates();
+                        dest.setLatitude(loc.getLatitude());
+                        dest.setLongitude(loc.getLongitude());
 
-//                    EndTaskRequest request = new EndTaskRequest(notificationModel.getTaskId(), null,
-//                            DateTimeUtil.getCurrentDateInMillis(), destination);
-//
-//                    ApiEventModel endRequest = new ApiEventModel();
-//                    endRequest.setAction(Action.END_TASK);
-//                    endRequest.setData(request);
-//                    endRequest.setTime(DateTimeUtil.getCurrentDateInMillis());
-//                    endRequest.setAutoEnd(false);
-//                    endRequest.setAutoStart(false);
-//                    alarmDBHelper.addPendingApiEvent(endRequest);
+                        destination.setLocation(dest);
+                        destination.setAddress(TrackThat.getAddress(loc.getLatitude(), loc.getLongitude()));
+                        Log.e(TAG, "End Location is: " + loc.getLatitude() + " "
+                                + loc.getLongitude() + " " + destination.getAddress());
+                    }
+
+                    EndTaskRequest request = new EndTaskRequest(notificationModel.getTaskId(), null,
+                            DateTimeUtil.getCurrentDateInMillis(), destination);
+
+                    ApiEventModel endRequest = new ApiEventModel();
+                    endRequest.setAction(Action.END_TASK);
+                    endRequest.setData(request);
+                    endRequest.setTime(DateTimeUtil.getCurrentDateInMillis());
+                    endRequest.setAutoEnd(false);
+                    endRequest.setAutoStart(false);
+                    alarmDBHelper.addPendingApiEvent(endRequest);
                     break;
             }
 //            start the service if not running

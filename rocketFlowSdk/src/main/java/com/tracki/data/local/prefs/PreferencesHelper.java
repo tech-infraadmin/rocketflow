@@ -26,6 +26,7 @@ import com.tracki.data.model.response.config.WorkFlowCategories;
 //import com.tracki.ui.selectorder.CatalogProduct;
 import com.tracki.ui.addplace.Hub;
 //import com.tracki.ui.selectorder.CatalogProduct;
+import com.tracki.ui.selectorder.CatalogProduct;
 import com.tracki.utils.ApiType;
 import com.tracki.utils.ShiftTime;
 import com.tracki.utils.UserType;
@@ -408,8 +409,8 @@ public interface PreferencesHelper {
 
     List<RoleConfigData> getRoleConfigDataList();
 
-//    void saveProductInCartWRC(Map<String,Map<String, CatalogProduct>> map);
-//
-//    HashMap<String,HashMap<String, CatalogProduct>> getProductInCartWRC();
+    void saveProductInCartWRC(Map<String,Map<String, CatalogProduct>> map);
+
+    HashMap<String,HashMap<String, CatalogProduct>> getProductInCartWRC();
 
 }

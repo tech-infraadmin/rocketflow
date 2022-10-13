@@ -4,16 +4,18 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tracki.R
-import com.tracki.data.model.response.config.OrderData
+import com.tracki.data.model.request.UnitItem
 import com.tracki.data.model.response.config.OrderDetails
+import com.tracki.data.model.response.config.OrderItemsInfo
 import com.tracki.data.model.response.config.OrderStatus
 import com.tracki.databinding.ItemMyEarningEmptyBinding
 import com.tracki.databinding.ItemRowOrderBinding
 import com.tracki.ui.base.BaseViewHolder
+import com.tracki.ui.earnings.MyEarningsEmptyItemViewModel
+import com.tracki.utils.Log
 import com.tracki.utils.TrackiToast
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,6 +30,8 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
 
     private var context: Context? = null
 
+    var onItemClick: ((OrderItemsInfo) -> Unit)? = null
+
 
     companion object {
         private const val VIEW_TYPE_EMPTY = 0
@@ -39,14 +43,14 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
         return when (viewType) {
             VIEW_TYPE_INVENTORY -> {
                 val simpleViewItemBinding: ItemRowOrderBinding =
-                        ItemRowOrderBinding.inflate(
-                                LayoutInflater.from(parent.context), parent, false)
+                    ItemRowOrderBinding.inflate(
+                        LayoutInflater.from(parent.context), parent, false)
                 OrdersViewModel(simpleViewItemBinding)
             }
             else -> {
                 val emptyViewBinding: ItemMyEarningEmptyBinding =
-                        ItemMyEarningEmptyBinding.inflate(
-                                LayoutInflater.from(parent.context), parent, false)
+                    ItemMyEarningEmptyBinding.inflate(
+                        LayoutInflater.from(parent.context), parent, false)
                 EmptyViewHolder(emptyViewBinding)
             }
         }
@@ -74,7 +78,7 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
 
 
     inner class OrdersViewModel(private val mBinding: ItemRowOrderBinding) :
-            BaseViewHolder(mBinding.root) {
+        BaseViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             val lists = mList!![position]
@@ -89,6 +93,7 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
             } catch (e: Exception) {
 
             }
+
             if(lists.approver==null)
                 lists.approver="N/A"
             mBinding.data = lists
@@ -115,12 +120,16 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
             }
             mBinding.tvOrder.text = "Order $count"
             if (lists.orderItemsInfo != null && lists.orderItemsInfo!!.isNotEmpty() ) {
-                var adapter = OrderInventoryListAdapter((lists.orderItemsInfo)!!)
+                val adapter = OrderInventoryListAdapter((lists.orderItemsInfo)!!)
                 mBinding.adapter = adapter
+                adapter.onItemClick = { item ->
+                    // do something with your item
+                    onItemClick?.invoke(item)
+                }
             }
             mBinding.tvOrderBy.setOnClickListener {
                 if( lists.customerName!=null)
-                TrackiToast.Message.showShort(context, lists.customerName!!)
+                    TrackiToast.Message.showShort(context, lists.customerName!!)
             }
             mBinding.executePendingBindings()
         }
@@ -129,11 +138,11 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
     }
 
     inner class EmptyViewHolder(private val mBinding: ItemMyEarningEmptyBinding) :
-            BaseViewHolder(mBinding.root) {
+        BaseViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
-//            val emptyViewModel = MyEarningsEmptyItemViewModel()
-//            mBinding.viewModel = emptyViewModel
+            val emptyViewModel = MyEarningsEmptyItemViewModel()
+            mBinding.viewModel = emptyViewModel
 //            if (context is AdminUserPayoutsActivity) {
 //                mBinding.tvMessage.text = "No Orders"
 //            }
