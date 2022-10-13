@@ -174,7 +174,7 @@ class SelectProductAdapter(var context: Context) :
             var data: CatalogProduct? = mFilteredList[position]
             if (data != null) {
                 binding.tvProductCounter.text = data.noOfProduct.toString()
-                //binding.data = data
+                binding.data = data
                 binding.addProduct.setOnClickListener {
                     if (!data.addInOrder) {
                         data.addInOrder = true

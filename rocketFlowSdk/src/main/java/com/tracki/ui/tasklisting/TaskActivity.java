@@ -41,18 +41,16 @@ import com.tracki.data.network.SyncCallback;
 import com.tracki.databinding.ActivityTaskBinding;
 import com.tracki.factory.TaskViewModelFactory;
 import com.tracki.ui.base.BaseActivity;
-//import com.tracki.ui.buddylisting.BuddyListingActivity;
+import com.tracki.ui.buddylisting.BuddyListingActivity;
 //import com.tracki.ui.chat.ChatActivity;
-//import com.tracki.ui.custom.socket.BaseModel;
-//import com.tracki.ui.custom.socket.ConnectionInfo;
-//import com.tracki.ui.custom.socket.ConnectionResponse;
-//import com.tracki.ui.custom.socket.OpenCreateRoomModel;
+import com.tracki.ui.custom.socket.BaseModel;
+import com.tracki.ui.custom.socket.ConnectionInfo;
+import com.tracki.ui.custom.socket.ConnectionResponse;
+import com.tracki.ui.custom.socket.OpenCreateRoomModel;
 //import com.tracki.ui.custom.socket.WebSocketManager;
-//import com.tracki.ui.fleetlisting.FleetListingActivity;
+import com.tracki.ui.fleetlisting.FleetListingActivity;
 import com.tracki.ui.newcreatetask.NewCreateTaskActivity;
-//import com.tracki.ui.selectorder.SelectOrderActivity;
-import com.tracki.ui.splash.SplashActivity;
-import com.tracki.ui.splash.SplashViewModel;
+import com.tracki.ui.selectorder.SelectOrderActivity;
 import com.tracki.ui.tasklisting.assignedtome.AssignedtoMeFragment;
 import com.tracki.ui.tasklisting.ihaveassigned.IhaveAssignedFragment;
 import com.tracki.ui.tasklisting.ihaveassigned.TabDataClass;
@@ -61,7 +59,6 @@ import com.tracki.utils.CommonUtils;
 import com.tracki.utils.JSONConverter;
 import com.tracki.utils.Log;
 import com.tracki.utils.TrackiToast;
-import com.tracki.utils.rx.SchedulerProvider;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -87,6 +84,7 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
     TaskViewModel mTaskViewModel;
     TaskPagerAdapter mPagerAdapter;
     PreferencesHelper preferencesHelper;
+    HttpManager httpManager;
 
 
     private boolean isTagInventory = false;
@@ -130,7 +128,7 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActivityTaskBinding = getViewDataBinding();
-
+        httpManager = RocketFlyer.Companion.httpManager();
         mPagerAdapter = new TaskPagerAdapter(getSupportFragmentManager());
         mTaskViewModel  = new ViewModelProvider(this, new TaskViewModelFactory(RocketFlyer.Companion.dataManager())).get(TaskViewModel.class);
         mTaskViewModel.setNavigator(this);
@@ -466,8 +464,6 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
                             }
                         }
 
-                    }else{
-
                     }
 
                 }
@@ -487,38 +483,30 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.ivCreateTask) {
-
-            Intent intent = NewCreateTaskActivity.Companion.newIntent(this);
-            intent.putExtra(AppConstants.Extra.FROM, "taskListing");
-            intent.putExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true);
-            if (categoryMap != null)
-                intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES, categoryMap);
-            startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
-
 //            if(preferencesHelper.getIsTrackingLiveTrip()&&categoryId.equals(preferencesHelper.getActiveTaskCategoryId())){
 //                TrackiToast.Message.showShort(this, AppConstants.MSG_ONGOING_TASK_SAME_CATGEORY);
 //            }else {
-//                if (isTagInventory) {
-//                    Intent intent = SelectOrderActivity.Companion.newIntent(this);
-//                    DashBoardBoxItem dashBoardBoxItem = new DashBoardBoxItem();
-//                    dashBoardBoxItem.setCategoryId(categoryId);
-//                    intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES,
-//                            new Gson().toJson(dashBoardBoxItem));
-//                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
-//
-//                } else {
-//                    if (preferencesHelper.getIsFleetAndBuddySHow()) {
-//                        showLoading();
-//                        mTaskViewModel.checkBuddy(RocketFlyer.Companion.httpManager());
-//                    } else {
-//                        Intent intent = NewCreateTaskActivity.Companion.newIntent(this);
-//                        intent.putExtra(AppConstants.Extra.FROM, "taskListing");
-//                        intent.putExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true);
-//                        if (categoryMap != null)
-//                            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES, categoryMap);
-////                        startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
-//                    }
-//                }
+                if (isTagInventory) {
+                    Intent intent = SelectOrderActivity.Companion.newIntent(this);
+                    DashBoardBoxItem dashBoardBoxItem = new DashBoardBoxItem();
+                    dashBoardBoxItem.setCategoryId(categoryId);
+                    intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES,
+                            new Gson().toJson(dashBoardBoxItem));
+                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
+
+                } else {
+                    if (preferencesHelper.getIsFleetAndBuddySHow()) {
+                        showLoading();
+                        mTaskViewModel.checkBuddy(httpManager);
+                    } else {
+                        Intent intent = NewCreateTaskActivity.Companion.newIntent(this);
+                        intent.putExtra(AppConstants.Extra.FROM, "taskListing");
+                        intent.putExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true);
+                        if (categoryMap != null)
+                            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES, categoryMap);
+                        startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
+                    }
+                }
             //}
 
         }
@@ -534,12 +522,12 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
             if (list != null && list.size() > 0) {
                 //categoryId
                 hideLoading();
-//                Intent intent = BuddyListingActivity.newIntent(this);
-//                intent.putExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true);
-//                if (categoryMap != null)
-//                    intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES, categoryMap);
-//                startActivityForResult(intent,
-//                        AppConstants.REQUEST_CODE_CREATE_TASK);
+                Intent intent = BuddyListingActivity.newIntent(this);
+                intent.putExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true);
+                if (categoryMap != null)
+                    intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES, categoryMap);
+                startActivityForResult(intent,
+                        AppConstants.REQUEST_CODE_CREATE_TASK);
             } else {
                 mTaskViewModel.checkFleet(RocketFlyer.Companion.httpManager());
             }
@@ -556,12 +544,12 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
             List<Fleet> list = buddyListResponse.getFleets();
             if (list != null && list.size() > 0) {
                 //categoryId
-//                Intent intent = FleetListingActivity.newIntent(this);
-//                intent.putExtra(EXTRA_FLEET_LIST_CALLING_FROM_DASHBOARD_MENU, true);
-//                if (categoryMap != null)
-//                    intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES, categoryMap);
-//                startActivityForResult(intent,
-//                        AppConstants.REQUEST_CODE_CREATE_TASK);
+                Intent intent = FleetListingActivity.newIntent(this);
+                intent.putExtra(EXTRA_FLEET_LIST_CALLING_FROM_DASHBOARD_MENU, true);
+                if (categoryMap != null)
+                    intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES, categoryMap);
+                startActivityForResult(intent,
+                        AppConstants.REQUEST_CODE_CREATE_TASK);
             } else {
                 Intent intent = NewCreateTaskActivity.Companion.newIntent(this);
                 intent.putExtra(AppConstants.Extra.FROM, "taskListing");
@@ -724,17 +712,17 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
         JSONConverter jsonConverter = new JSONConverter();
         InventoryResponse response = (InventoryResponse) jsonConverter.jsonToObject(result.toString(), InventoryResponse.class);
         if (response.getSuccessful()) {
-//            Intent intent = SelectOrderActivity.Companion.newIntent(this);
-//            DashBoardBoxItem dashBoardBoxItem = new DashBoardBoxItem();
-//            dashBoardBoxItem.setCategoryId(categoryId);
-//            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES,
-//                    new Gson().toJson(dashBoardBoxItem));
-//            startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
+            Intent intent = SelectOrderActivity.Companion.newIntent(this);
+            DashBoardBoxItem dashBoardBoxItem = new DashBoardBoxItem();
+            dashBoardBoxItem.setCategoryId(categoryId);
+            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORIES,
+                    new Gson().toJson(dashBoardBoxItem));
+            startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK);
 
         } else {
             if (preferencesHelper.getIsFleetAndBuddySHow()) {
                 showLoading();
-                mTaskViewModel.checkBuddy(RocketFlyer.Companion.httpManager());
+                mTaskViewModel.checkBuddy(httpManager);
             } else {
                 // Intent intent=CreateTaskActivity.Companion.newIntent(this);
                 Intent intent = NewCreateTaskActivity.Companion.newIntent(this);
