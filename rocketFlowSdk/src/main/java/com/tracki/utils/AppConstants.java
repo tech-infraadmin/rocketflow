@@ -6,6 +6,9 @@ public final class AppConstants {
     public static final String CORE_BASE_URL = "https://api.rocketflow.in/rfapi/";
     public static final String BASE_URL = CORE_BASE_URL+"secure/tracki/";
 
+    public static final String UAT_CORE_BASE_URL = "https://uat.rocketflyer.in/rfapi/";
+    public static final String UAT_BASE_URL = UAT_CORE_BASE_URL+"secure/tracki/";
+
     public static final String TRACKI_ENCRYPT_DECRYPT_IV = "tracki9990731159";
     public static final String TRACKI_ENCRYPT_DECRYPT_SECRET_KEY = "9958054435vikask";
 

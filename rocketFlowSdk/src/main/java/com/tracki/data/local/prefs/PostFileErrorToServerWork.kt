@@ -35,7 +35,7 @@ class PostFileErrorToServerWork(var context: Context, workerParams: WorkerParame
     override fun doWork(): Result {
         preferencesHelper= AppPreferencesHelper(context, AppConstants.PREF_NAME)
 
-        dataManager= AppDataManager(context,null,preferencesHelper,NetworkManagerImpl())
+        dataManager= AppDataManager(context,null,preferencesHelper,NetworkManagerImpl(true))
         httpManager = HttpManager.getInstance(context, preferencesHelper)
         postErrorViewModel= PostFileErrorToServerViewModel(dataManager, AppSchedulerProvider())
 

@@ -56,6 +56,7 @@ import com.tracki.ui.taskdetails.*
 import com.tracki.ui.tasklisting.TaskClickListener
 import com.tracki.ui.tasklisting.assignedtome.TaskAssignToMeViewModel
 import com.tracki.ui.tasklisting.ihaveassigned.IhaveAssignedViewModel
+import com.tracki.ui.userlisting.UserListNewActivity
 import com.tracki.utils.*
 import com.tracki.utils.AppConstants.Extra
 import com.trackthat.lib.TrackThat
@@ -1405,21 +1406,21 @@ class TaskDetailsFragment :
             request.dfId = callToActions!!.dynamicFormId
         if(callToActions!!.targetInfo!!.target == TRAGETINFO.ASSIGN_EXECUTIVE){
             Log.e("assignExec","${callToActions?.targetInfo?.targetValues} - Values")
-
+            hideLoading()
             if (callToActions?.targetInfo?.targetValues != null) {
-//                var rIds = ""
-//                val intent = Intent(context,UserListNewActivity::class.java)
-//                val listIds = callToActions?.targetInfo?.targetValues!!
-//                for (i in 0 until listIds.size) {
-//                    rIds += if (i>0)
-//                        ",${listIds[i]}"
-//                    else
-//                        listIds[i]
-//                }
-//                intent.putExtra("roleIds", rIds)
-//
-//                intent.putExtra("request",request as ExecuteUpdateRequest)
-//                context?.startActivity(intent)
+                var rIds = ""
+                val intent = Intent(context, UserListNewActivity::class.java)
+                val listIds = callToActions?.targetInfo?.targetValues!!
+                for (i in 0 until listIds.size) {
+                    rIds += if (i>0)
+                        ",${listIds[i]}"
+                    else
+                        listIds[i]
+                }
+                intent.putExtra("roleIds", rIds)
+
+                intent.putExtra("request",request as ExecuteUpdateRequest)
+                context?.startActivity(intent)
             }
             else {
                 TrackiToast.Message.showShort(context,"No Id Found")

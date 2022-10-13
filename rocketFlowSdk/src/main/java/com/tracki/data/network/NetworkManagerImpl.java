@@ -52,6 +52,12 @@ import javax.inject.Singleton;
 @Singleton
 public class NetworkManagerImpl implements NetworkManager {
 
+    private boolean testServer;
+
+    public NetworkManagerImpl(boolean testServer) {
+        this.testServer = testServer;
+    }
+
     /**
      * Method used to hit post api.
      *
@@ -109,7 +115,7 @@ public class NetworkManagerImpl implements NetworkManager {
     public void getConfig(HttpManager httpManager, ApiCallback callBack) {
         Api url = new Api();
         url.setName(ApiType.CONFIG);
-        url.setUrl(AppConstants.BASE_URL + "config");
+        url.setUrl(testServer?AppConstants.UAT_BASE_URL+ "config":AppConstants.BASE_URL + "config");
         url.setTimeOut(12);
         url.setCacheable(true);
         url.setVersion("1.0");
@@ -120,7 +126,7 @@ public class NetworkManagerImpl implements NetworkManager {
     public void getSDKLoginToken(String sdkClintId, HttpManager httpManager, ApiCallback callBack) {
         Api url = new Api();
         url.setName(ApiType.SDK_LOGIN_TOKEN);
-        url.setUrl(AppConstants.CORE_BASE_URL + "sdk/token/exchange");
+        url.setUrl(testServer?AppConstants.UAT_CORE_BASE_URL+ "sdk/token/exchange":AppConstants.CORE_BASE_URL + "sdk/token/exchange");
         url.setTimeOut(12);
         url.setCacheable(true);
         url.setVersion("1.0");

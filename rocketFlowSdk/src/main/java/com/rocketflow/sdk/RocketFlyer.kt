@@ -18,9 +18,10 @@ class RocketFlyer private constructor(){
          *  Call this method in onCreate method of Application class
          */
         @JvmStatic
-        fun initializeRocketFlyer(context: Context) {
-            RocketFlyerBuilder.initialize(context)
+        fun initializeRocketFlyer(context: Context,stageServer: Boolean = false) {
+            RocketFlyerBuilder.initialize(context,stageServer)
         }
+
 
         /**
          *  Get RocketFlyer SDK Instance

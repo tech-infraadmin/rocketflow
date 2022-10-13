@@ -20,7 +20,7 @@ internal object  RocketFlyerBuilder {
     private var dataManager: DataManager? = null
     private var networkManager: NetworkManager? = null
 
-    fun initialize(context: Context) {
+    fun initialize(context: Context,testServer: Boolean) {
         if (RocketFlyer.isInitialized()) {
             RFLog.d("RF Already initialized")
             return
@@ -39,7 +39,7 @@ internal object  RocketFlyerBuilder {
         }
 
         if(networkManager ==null){
-            networkManager = NetworkManagerImpl()
+            networkManager = NetworkManagerImpl(testServer)
         }
 
         if(dataManager ==null){

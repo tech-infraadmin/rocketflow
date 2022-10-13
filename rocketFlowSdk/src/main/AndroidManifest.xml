@@ -39,6 +39,16 @@
             android:exported="true"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
 
+        <activity
+            android:name=".ui.userlisting.UserListNewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.dynamicform.DynamicFormActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+
     </application>
 
 </manifest>

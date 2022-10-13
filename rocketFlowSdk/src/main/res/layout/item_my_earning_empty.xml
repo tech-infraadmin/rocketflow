@@ -4,9 +4,9 @@
 
     <data>
 
-<!--        <variable-->
-<!--            name="viewModel"-->
-<!--            type="com.tracki.ui.earnings.MyEarningsEmptyItemViewModel" />-->
+        <variable
+            name="viewModel"
+            type="com.tracki.ui.earnings.MyEarningsEmptyItemViewModel" />
 
     </data>
 
