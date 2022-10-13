@@ -413,4 +413,16 @@ public interface PreferencesHelper {
 
     HashMap<String,HashMap<String, CatalogProduct>> getProductInCartWRC();
 
+    void saveConfigVersion(String configVersion);
+
+    String getConfigVersion();
+
+    void saveRefreshConfig(Boolean refreshConfig);
+
+    boolean getRefreshConfig();
+
+    void saveConfigResponse(String json);
+
+    String getConfigResponse();
+
 }

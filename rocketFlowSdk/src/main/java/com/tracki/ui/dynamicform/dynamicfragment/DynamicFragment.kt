@@ -30,6 +30,7 @@ import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.gson.Gson
+import com.rocketflow.sdk.RocketFlyer
 //import com.iceteck.silicompressorr.SiliCompressor
 import com.tracki.BR
 import com.tracki.BuildConfig
@@ -70,22 +71,15 @@ class DynamicFragment : BaseFragment<FragmentFormListBinding, DynamicViewModel>(
     private lateinit var manager: LinearLayoutManager
     private var imageFilePath: String? = null
 
-    @Inject
-    lateinit var mLayoutManager: LinearLayoutManager
 
-    @Inject
-    lateinit var mViewModelFactory: ViewModelProvider.Factory
-
-    @Inject
     lateinit var preferencesHelper: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
-    @Inject
     lateinit var adapter: DynamicAdapter
 
     lateinit var showDynamicFormDataAdapter: ShowDynamicFormDataAdapter
 
-    @Inject
-    lateinit var httpManager: HttpManager
+
 
     private var mDynamicViewModel: DynamicViewModel? = null
     private var mFragmentFormListBinding: FragmentFormListBinding? = null
@@ -129,8 +123,10 @@ class DynamicFragment : BaseFragment<FragmentFormListBinding, DynamicViewModel>(
     }
 
     override fun getViewModel(): DynamicViewModel {
-        mDynamicViewModel =
-            ViewModelProviders.of(this, mViewModelFactory).get(DynamicViewModel::class.java)
+        val factory = RocketFlyer.dataManager()?.let { DynamicViewModel.Factory(it) } // Factory
+        if (factory != null) {
+            mDynamicViewModel = ViewModelProvider(this, factory)[DynamicViewModel::class.java]
+        }
         return mDynamicViewModel!!
     }
 
@@ -147,6 +143,8 @@ class DynamicFragment : BaseFragment<FragmentFormListBinding, DynamicViewModel>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mFragmentFormListBinding = viewDataBinding
+        httpManager = RocketFlyer.httpManager()!!
+        preferencesHelper = RocketFlyer.preferenceHelper()!!
         setUp()
     }
 
@@ -264,6 +262,7 @@ class DynamicFragment : BaseFragment<FragmentFormListBinding, DynamicViewModel>(
         val rvDynamicForm = mFragmentFormListBinding?.rvDynamicForms
         manager = LinearLayoutManager(baseActivity)
         rvDynamicForm?.layoutManager = manager
+        adapter = DynamicAdapter(ArrayList())
         adapter.setAdapterListener(this)
         adapter.setPreferencesHelper(preferencesHelper)
         if (taskId != null)

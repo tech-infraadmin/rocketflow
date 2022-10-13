@@ -91,8 +91,8 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-//import com.google.android.flexbox.FlexDirection;
-//import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.GoogleMap;
@@ -162,11 +162,22 @@ import com.tracki.ui.base.BaseActivity;
 import com.tracki.ui.common.Base64;
 //import com.tracki.ui.consent.ConsentActivity;
 import com.tracki.ui.custom.socket.PacketInfo;
+//import com.tracki.ui.custom.socket.WebSocketManager;
+//import com.tracki.ui.deviceChange.DeviceChangeActivity;
+//import com.tracki.ui.introscreens.IntroActivity;
+//import com.tracki.ui.login.LoginActivity;
+//import com.tracki.ui.main.MainActivity;
+//import com.tracki.ui.password.ChangePasswordActivity;
+//import com.tracki.ui.receiver.ServiceRestartReceiver;
+//import com.tracki.ui.register.RegisterActivity;
 import com.tracki.ui.selectorder.CatalogProduct;
+//import com.tracki.ui.service.sync.SyncService;
+//import com.tracki.ui.service.transition.TransitionService;
 import com.tracki.ui.splash.SplashActivity;
 import com.tracki.ui.splash.SplashViewModel;
 import com.tracki.ui.tasklisting.CallToActionButtonAdapter;
 import com.tracki.ui.tasklisting.TaskClickListener;
+//import com.tracki.ui.update.AppUpdateScreenActivity;
 import com.trackthat.lib.TrackThat;
 import com.trackthat.lib.internal.common.Trunk;
 import com.trackthat.lib.models.TrackthatLocation;
@@ -1747,19 +1758,19 @@ public final class CommonUtils {
 //        if (configResponse.getDynamicFormConfig() != null) {
 //            TrackiApplication.setDynamicFormConfig(configResponse.getDynamicFormConfig());
 //        }
-//        preferencesHelper.saveRefreshConfig(configResponse.getRefreshConfig());
-//        if (Boolean.FALSE.equals(configResponse.getRefreshConfig())) {
-//            Log.d("Config", "Don't Save");
-//            Gson gson = new Gson();
-//            ConfigResponse config = gson.fromJson(String.valueOf(preferencesHelper.getConfigResponse()), ConfigResponse.class);
-//            saveConfigResponse(config,from,jsonobject,preferencesHelper,context);
-//        }else{
-//            Log.d("Config","Config Save");
-//            Gson gson = new Gson();
-//            String json = gson.toJson(configResponse);
-//            preferencesHelper.saveConfigResponse(json);
-//            saveConfigResponse(configResponse,from,jsonobject,preferencesHelper,context);
-//        }
+        preferencesHelper.saveRefreshConfig(configResponse.getRefreshConfig());
+        if (Boolean.FALSE.equals(configResponse.getRefreshConfig())) {
+            Log.d("Config", "Don't Save");
+            Gson gson = new Gson();
+            ConfigResponse config = gson.fromJson(String.valueOf(preferencesHelper.getConfigResponse()), ConfigResponse.class);
+            saveConfigResponse(config,from,jsonobject,preferencesHelper,context);
+        }else{
+            Log.d("Config","Config Save");
+            Gson gson = new Gson();
+            String json = gson.toJson(configResponse);
+            preferencesHelper.saveConfigResponse(json);
+            saveConfigResponse(configResponse,from,jsonobject,preferencesHelper,context);
+        }
     }
 
     private static void saveConfigResponse(ConfigResponse configResponse, String from, String jsonobject, PreferencesHelper preferencesHelper, Activity context) {
@@ -3354,8 +3365,8 @@ public final class CommonUtils {
                 ArrayList<List<CallToActions>> list = CommonUtils.divideList(userCallToActions);
                 for (int i = 0; i < list.size(); i++) {
 
-//                    FlexboxLayout flexboxLayout = new FlexboxLayout(context);
-//                    flexboxLayout.setFlexDirection(FlexDirection.ROW);
+                    FlexboxLayout flexboxLayout = new FlexboxLayout(context);
+                    flexboxLayout.setFlexDirection(FlexDirection.ROW);
 
 //                    View view = flexboxLayout.getChildAt(0);
 //                    FlexboxLayout.LayoutParams lp = (FlexboxLayout.LayoutParams) view.getLayoutParams();
@@ -3446,9 +3457,9 @@ public final class CommonUtils {
                             mListener.onExecuteUpdates((String) v.getTag(), task);
                         });
                         //add first child of this parent
-                        //flexboxLayout.addView(button);
+                        flexboxLayout.addView(button);
                     }
-                   // llCallToAction.addView(flexboxLayout);
+                    llCallToAction.addView(flexboxLayout);
                 }
             }
         }

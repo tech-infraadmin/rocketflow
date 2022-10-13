@@ -1,5 +1,7 @@
 package com.tracki.ui.dynamicform.dynamicfragment
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.tracki.TrackiApplication
 import com.tracki.data.DataManager
 import com.tracki.data.model.request.OtpRequest
@@ -9,6 +11,7 @@ import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
 import com.tracki.ui.base.BaseViewModel
 import com.tracki.utils.ApiType
+import com.tracki.utils.rx.AppSchedulerProvider
 import com.tracki.utils.rx.SchedulerProvider
 import java.io.File
 import java.net.URLEncoder
@@ -214,5 +217,10 @@ class DynamicViewModel(dataManager: DataManager, schedulerProvider: SchedulerPro
 
     }
 
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return DynamicViewModel(mDataManager, AppSchedulerProvider()) as T
+        }
+    }
 
 }

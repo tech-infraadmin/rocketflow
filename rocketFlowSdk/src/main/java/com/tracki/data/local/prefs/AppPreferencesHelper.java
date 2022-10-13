@@ -76,6 +76,9 @@ public class AppPreferencesHelper implements PreferencesHelper {
     private static final String PREF_KEY_API_MAP = "PREF_KEY_API_MAP";
     private static final String PREF_KEY_AUTO_START_FLAG = "PREF_KEY_AUTO_START_FLAG";
     private static final String PREF_KEY_CHAT_SERVER_URL = "PREF_KEY_CHAT_SERVER_URL";
+    private static final String PREF_KEY_CONFIG_VERSION = "PREF_KEY_CONFIG_VERSION";
+    private static final String PREF_KEY_CONFIG = "PREF_KEY_CONFIG";
+    private static final String PREF_KEY_REFRESH_CONFIG = "PREF_KEY_REFRESH_CONFIG";
     private static final String PREF_KEY_ALLOW_ARRIVAL = "PREF_KEY_ALLOW_ARRIVAL";
     private static final String PREF_KEY_ALLOW_ARRIVAL_ON_GEOFENCE = "PREF_KEY_ALLOW_ARRIVAL_ON_GEOFENCE";
     private static final String PREF_KEY_AUTO_CANCEL_TASK_VALUE = "PREF_KEY_AUTO_CANCEL_TASK_VALUE";
@@ -1347,6 +1350,37 @@ public class AppPreferencesHelper implements PreferencesHelper {
     public void saveWorkFlowCategoriesList(List<WorkFlowCategories> workFlowCategoriesList) {
         mPrefs.edit().putString(PREF_KEY_WORKFLOW_CATEGORIES, new Gson().toJson(workFlowCategoriesList)).apply();
     }
+
+    @Override
+    public void saveConfigVersion(String configVersion) {
+        mPrefs.edit().putString(PREF_KEY_CONFIG_VERSION, configVersion).apply();
+    }
+
+    @Override
+    public String getConfigVersion() {
+        return mPrefs.getString(PREF_KEY_CONFIG_VERSION, null);
+    }
+
+    @Override
+    public void saveRefreshConfig(Boolean refreshConfig) {
+        mPrefs.edit().putBoolean(PREF_KEY_REFRESH_CONFIG, refreshConfig).apply();
+    }
+
+    @Override
+    public boolean getRefreshConfig() {
+        return mPrefs.getBoolean(PREF_KEY_REFRESH_CONFIG, false);
+    }
+
+    @Override
+    public void saveConfigResponse(String json) {
+        mPrefs.edit().putString(PREF_KEY_CONFIG, json).apply();
+    }
+
+    @Override
+    public String getConfigResponse() {
+        return mPrefs.getString(PREF_KEY_CONFIG, null);
+    }
+
 
 
     public enum PreferencesKeys {

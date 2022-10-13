@@ -211,6 +211,10 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 
     }
 
+    public String getGoogleMapKey(){
+        return "AIzaSyATO_5mNZJ8h6V64L6eHeZfiVjk63803ec";
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         performDependencyInjection();

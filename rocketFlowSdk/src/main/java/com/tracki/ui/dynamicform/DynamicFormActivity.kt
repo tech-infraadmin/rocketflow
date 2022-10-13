@@ -11,9 +11,11 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.libraries.places.api.Places
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.rocketflow.sdk.RocketFlyer
 import com.tracki.BR
 import com.tracki.R
 import com.tracki.TrackiApplication
@@ -62,23 +64,24 @@ class DynamicFormActivity : BaseActivity<ActivityDynamicFormBinding, DynamicForm
     private var tcfId: String? = null
     private var mDfdId: String? = null
     private var showToolbar: Boolean = true //it is used for main activity
-    external fun getGoogleMapKey(): String?
 
 
-    @Inject
     lateinit var httpManager: HttpManager
-
-    @Inject
     lateinit var preferencesHelper: PreferencesHelper
 
-    @Inject
     lateinit var mDynamicFormViewModel: DynamicFormViewModel
     private var mActivityDynamicFormBinding: ActivityDynamicFormBinding? = null
     private lateinit var dBHelper: DatabaseHelper
 
-
+    override fun getBindingVariable() = BR.viewModel
     override fun getLayoutId() = R.layout.activity_dynamic_form
-    override fun getViewModel() = mDynamicFormViewModel
+    override fun getViewModel(): DynamicFormViewModel {
+        val factory = RocketFlyer.dataManager()?.let { DynamicFormViewModel.Factory(it) } // Factory
+        if (factory != null) {
+            mDynamicFormViewModel = ViewModelProvider(this, factory)[DynamicFormViewModel::class.java]
+        }
+        return mDynamicFormViewModel!!
+    }
     private var mainMap: HashMap<String, ArrayList<FormData>>? = null
     var taskId: String? = ""
     private var taskAction: String? = null
@@ -113,6 +116,9 @@ class DynamicFormActivity : BaseActivity<ActivityDynamicFormBinding, DynamicForm
         super.onCreate(savedInstanceState)
         mActivityDynamicFormBinding = viewDataBinding
         mDynamicFormViewModel.navigator = this
+
+        httpManager = RocketFlyer.httpManager()!!
+        preferencesHelper = RocketFlyer.preferenceHelper()!!
 
         dBHelper = DatabaseHelper.getInstance(this@DynamicFormActivity)
         handlerThread = ExecutorThread()
@@ -695,7 +701,4 @@ class DynamicFormActivity : BaseActivity<ActivityDynamicFormBinding, DynamicForm
         snackBar = CommonUtils.showNetWorkConnectionIssue(mActivityDynamicFormBinding!!.llMain, getString(R.string.please_check_your_internet_connection))
     }
 
-    override fun getBindingVariable(): Int {
-        TODO("Not yet implemented")
-    }
 }

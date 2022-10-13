@@ -1642,5 +1642,37 @@ public class AppDataManager implements DataManager {
         mPreferencesHelper.saveWorkFlowCategoriesList(workFlowCategoriesList);
     }
 
+    @Override
+    public void saveConfigVersion(String configVersion) {
+        mPreferencesHelper.saveConfigVersion(configVersion);
+    }
+
+    @Override
+    public String getConfigVersion() {
+        return mPreferencesHelper.getConfigVersion();
+    }
+
+    @Override
+    public void saveRefreshConfig(Boolean refreshConfig) {
+        mPreferencesHelper.saveRefreshConfig(refreshConfig);
+    }
+
+    @Override
+    public boolean getRefreshConfig() {
+        return mPreferencesHelper.getRefreshConfig();
+    }
+
+    @Override
+    public void saveConfigResponse(String json) {
+        mPreferencesHelper.saveConfigResponse(json);
+    }
+
+    @Override
+    public String getConfigResponse() {
+        return mPreferencesHelper.getConfigResponse();
+    }
+
+
+
 
 }

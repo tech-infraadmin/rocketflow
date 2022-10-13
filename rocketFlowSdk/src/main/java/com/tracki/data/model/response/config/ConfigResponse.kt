@@ -25,6 +25,7 @@ class ConfigResponse: BaseResponse()  {
 
     //    var dynamicFormConfig: List<DynamicFormConfig>? = null
     var dynamicForms: List<DynamicFormsNew>? = null
+    var refreshConfig: Boolean? = null
 
 }
 

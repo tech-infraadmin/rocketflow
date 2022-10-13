@@ -116,6 +116,8 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.5.10"
 
+    implementation 'com.google.android:flexbox:2.0.1'
+
 
 }
 
