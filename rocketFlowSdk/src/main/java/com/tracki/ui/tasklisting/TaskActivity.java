@@ -146,7 +146,7 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
     }
 
     private void hitLoginSDKToken(String sdkClintId){
-
+        showLoading();
         mTaskViewModel.sdkToken(sdkClintId, RocketFlyer.Companion.httpManager(), new SyncCallback() {
             @Override
             public void hitApi() {
@@ -156,20 +156,22 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
             @Override
             public void onRequestTimeOut(@NonNull ApiCallback callBack) {
                 //SyncCallback.super.onRequestTimeOut(callBack);
+                hideLoading();
             }
 
             @Override
             public void onLogout() {
-
+                hideLoading();
             }
 
             @Override
             public void onNetworkErrorClose() {
-
+                hideLoading();
             }
 
             @Override
             public void onResponse(Object result, @Nullable APIError error) {
+                hideLoading();
                 if (CommonUtils.handleResponse(this, error, result, TaskActivity.this)) {
                     if (result == null) {
                         return;
@@ -194,6 +196,7 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
     }
 
     private void hitConfig(){
+        showLoading();
         mTaskViewModel.hitConfigApi(RocketFlyer.Companion.httpManager(), new SyncCallback() {
             @Override
             public void hitApi() {
@@ -203,20 +206,22 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
             @Override
             public void onRequestTimeOut(@NonNull ApiCallback callBack) {
                 //SyncCallback.super.onRequestTimeOut(callBack);
+                hideLoading();
             }
 
             @Override
             public void onLogout() {
-
+                hideLoading();
             }
 
             @Override
             public void onNetworkErrorClose() {
-
+                hideLoading();
             }
 
             @Override
             public void onResponse(Object result, @Nullable APIError error) {
+                hideLoading();
                 if (CommonUtils.handleResponse(this, error, result, TaskActivity.this)) {
                     if (result == null) {
                         return;
