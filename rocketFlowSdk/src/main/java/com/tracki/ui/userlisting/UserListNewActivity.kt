@@ -106,6 +106,7 @@ class UserListNewActivity : BaseActivity<ActivityUserListNewBinding, UserListNew
                 list.add(dynamicFormData)
                 val taskData = TaskData(request.ctaId,list,request.timestamp)
                 request.taskData = taskData
+                showLoading()
                 mUserListViewModel.executeUpdates(httpManager,request)
 
             }
@@ -191,6 +192,7 @@ class UserListNewActivity : BaseActivity<ActivityUserListNewBinding, UserListNew
         )
         if (responseBasic != null){
             if (responseBasic.successful == true){
+                finish()
                 //startActivity(Intent(this,MainActivity::class.java))
             }
         }

@@ -117,7 +117,7 @@ open class SelectOrderActivity : BaseActivity<ActivitySelectOrderBinding, Select
         binding.btnPlaceOrder.setOnClickListener(this)
         val sharedPreferences = getSharedPreferences("backAlpha",Context.MODE_PRIVATE)
         val check = sharedPreferences.getBoolean("back",false)
-Log.e("backAlpha","$check")
+        Log.e("backAlpha","$check")
         if (check){
             onBackPressed()
             sharedPreferences.edit().putBoolean("back",false).apply()

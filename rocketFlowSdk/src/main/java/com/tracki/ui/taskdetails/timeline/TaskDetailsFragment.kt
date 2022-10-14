@@ -188,8 +188,8 @@ class TaskDetailsFragment :
         sheetBehavior.isFitToContents = true
         sheetBehavior.setPeekHeight(CommonUtils.dpToPixel(activity, 80), true)
         sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        getTaskData()
-        expandCollapse()
+        //getTaskData()
+        //expandCollapse()
 
         showDynamicFormDataAdapter = ShowDynamicFormDataAdapter(ArrayList())
 
@@ -1122,6 +1122,8 @@ class TaskDetailsFragment :
 
     override fun onResume() {
         super.onResume()
+        getTaskData()
+        expandCollapse()
         getCurrentLocation()
         initSocket()
        // connectSocket(this)

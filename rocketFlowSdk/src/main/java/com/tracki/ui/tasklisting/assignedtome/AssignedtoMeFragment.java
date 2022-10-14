@@ -507,7 +507,7 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
                 .registerReceiver(refreshTaskListReceiver, new IntentFilter(AppConstants.ACTION_REFRESH_TASK_LIST));
 
 
-        CommonUtils.showLogMessage("e", "Accessid", TrackThat.getAccessId());
+        //CommonUtils.showLogMessage("e", "Accessid", TrackThat.getAccessId());
 
     }
 
