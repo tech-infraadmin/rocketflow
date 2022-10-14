@@ -43,9 +43,9 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-//import com.google.android.gms.location.LocationCallback;
-//import com.google.android.gms.location.LocationResult;
-//import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.rocketflow.sdk.RocketFlyer;
@@ -78,15 +78,13 @@ import com.tracki.data.network.HttpManager;
 import com.tracki.databinding.FragmentAssignedToMeBinding;
 import com.tracki.ui.addplace.Hub;
 import com.tracki.ui.base.BaseFragment;
-//import com.tracki.ui.common.DoubleButtonDialog;
-//import com.tracki.ui.common.OnClickListener;
-//import com.tracki.ui.dynamicform.DynamicFormActivity;
-//import com.tracki.ui.inventory.InventoryActivity;
-//import com.tracki.ui.main.filter.TaskFilterActivity;
-//import com.tracki.ui.newcreatetask.NewCreateTaskActivity;
-//import com.tracki.ui.receiver.ServiceRestartReceiver;
+import com.tracki.ui.common.DoubleButtonDialog;
+import com.tracki.ui.common.OnClickListener;
 import com.tracki.ui.dynamicform.DynamicFormActivity;
-//import com.tracki.ui.main.filter.TaskFilterActivity;
+//import com.tracki.ui.inventory.InventoryActivity;
+import com.tracki.ui.main.filter.TaskFilterActivity;
+import com.tracki.ui.newcreatetask.NewCreateTaskActivity;
+//import com.tracki.ui.receiver.ServiceRestartReceiver;
 import com.tracki.ui.taskdetails.NewTaskDetailsActivity;
 import com.tracki.ui.tasklisting.PaginationListener;
 import com.tracki.ui.tasklisting.PagingData;
@@ -104,11 +102,11 @@ import com.tracki.utils.Log;
 import com.tracki.utils.NetworkUtils;
 import com.tracki.utils.TaskStatus;
 import com.tracki.utils.TrackiToast;
-//import com.trackthat.lib.TrackThat;
-//import com.trackthat.lib.internal.network.TrackThatCallback;
-//import com.trackthat.lib.models.ErrorResponse;
-//import com.trackthat.lib.models.SuccessResponse;
-//import com.trackthat.lib.models.TrackthatLocation;
+import com.trackthat.lib.TrackThat;
+import com.trackthat.lib.internal.network.TrackThatCallback;
+import com.trackthat.lib.models.ErrorResponse;
+import com.trackthat.lib.models.SuccessResponse;
+import com.trackthat.lib.models.TrackthatLocation;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -162,7 +160,7 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
     private String stateId;
     private String cityId;
     private String hubId;
-    private boolean userGeoReq;
+    private boolean userGeoReq = false;
     private AppCompatSpinner locationSpinner;
     private CardView cardLocation;
 
@@ -299,7 +297,7 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
 //                    CommonUtils.showLogMessage("e", "whole gson", jsonConverter.objectToJson(list));
                     if (list.size() == 1) {
                         if(cvStages!=null)
-                        cvStages.setVisibility(View.GONE);
+                            cvStages.setVisibility(View.GONE);
                         onItemClick(list.get(0));
                     } else {
                         if (stageId == null) {
@@ -373,7 +371,7 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
                 }else{
                     hubId=null;
                     if(cardLocation!=null)
-                    cardLocation.setVisibility(View.GONE);
+                        cardLocation.setVisibility(View.GONE);
                     buddyRequest = new TaskRequest(statusList, BuddyInfo.ASSIGNED_TO_ME, categoryMap);
                 }
             }
@@ -509,7 +507,7 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
                 .registerReceiver(refreshTaskListReceiver, new IntentFilter(AppConstants.ACTION_REFRESH_TASK_LIST));
 
 
-        //CommonUtils.showLogMessage("e", "Accessid", TrackThat.getAccessId());
+        CommonUtils.showLogMessage("e", "Accessid", TrackThat.getAccessId());
 
     }
 
@@ -568,6 +566,7 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
                 showLoading();
                 //buddyRequest.setCategoryId(categoryMap.get("categoryId"));
                 api = TrackiApplication.getApiMap().get(ApiType.TASKS);
+
                 if (api != null) {
                     if(buddyRequest.getLoadBy()!=null) {
                         api.setAppendWithKey(buddyRequest.getLoadBy().name());
@@ -639,8 +638,8 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
                 String address = "";
                 if (hubsList.get(i).getHubLocation() != null && hubsList.get(i).getHubLocation().getLocation() != null && hubsList.get(i).getHubLocation().getLocation().getLatitude() != null
                         && hubsList.get(i).getHubLocation().getLocation().getLongitude() != null) {
-                    //LatLng latLng = new LatLng(hubsList.get(i).getHubLocation().getLocation().getLatitude(), hubsList.get(i).getHubLocation().getLocation().getLongitude());
-                   // address = CommonUtils.getAddress(getBaseActivity(), latLng);
+                    LatLng latLng = new LatLng(hubsList.get(i).getHubLocation().getLocation().getLatitude(), hubsList.get(i).getHubLocation().getLocation().getLongitude());
+                    address = CommonUtils.getAddress(getBaseActivity(), latLng);
                 }
                 if (!address.isEmpty()) {
                     hubsName.add(hubsList.get(i).getName() + " | " + address);
@@ -1056,19 +1055,19 @@ public class AssignedtoMeFragment extends BaseFragment<FragmentAssignedToMeBindi
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_filter) {
-//            Intent intent = TaskFilterActivity.Companion.newIntent(getBaseActivity());
-////                if (regionId != null)
-////                    intent.putExtra("regionId", regionId);
-////                if (hubIdStr != null)
-////                    intent.putExtra("hubIdStr", hubIdStr);
-////                if (stateId != null)
-////                    intent.putExtra("stateId", stateId);
-////                if (cityId != null)
-////                    intent.putExtra("cityId", cityId);
-//            if (categoryId != null)
-//                intent.putExtra("categoryId", categoryId);
-//            intent.putExtra("from", AppConstants.TASK);
-//            startActivityForResult(intent, AppConstants.REQUEST_CODE_FILTER_USER);
+            Intent intent = TaskFilterActivity.Companion.newIntent(getBaseActivity());
+//                if (regionId != null)
+//                    intent.putExtra("regionId", regionId);
+//                if (hubIdStr != null)
+//                    intent.putExtra("hubIdStr", hubIdStr);
+//                if (stateId != null)
+//                    intent.putExtra("stateId", stateId);
+//                if (cityId != null)
+//                    intent.putExtra("cityId", cityId);
+            if (categoryId != null)
+                intent.putExtra("categoryId", categoryId);
+            intent.putExtra("from", AppConstants.TASK);
+            startActivityForResult(intent, AppConstants.REQUEST_CODE_FILTER_USER);
         }
         return super.onOptionsItemSelected(item);
     }

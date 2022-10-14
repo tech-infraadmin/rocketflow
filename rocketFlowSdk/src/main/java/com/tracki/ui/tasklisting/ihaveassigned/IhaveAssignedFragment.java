@@ -29,11 +29,11 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.rocketflow.sdk.RocketFlyer;
 import com.tracki.BR;
-import com.tracki.BuildConfig;
 import com.tracki.R;
 import com.tracki.TrackiApplication;
 import com.tracki.data.local.prefs.PreferencesHelper;
@@ -60,14 +60,12 @@ import com.tracki.data.network.ApiCallback;
 import com.tracki.data.network.HttpManager;
 import com.tracki.databinding.FragmentIHaveAssignedBinding;
 import com.tracki.ui.base.BaseFragment;
-//import com.tracki.ui.common.DoubleButtonDialog;
-//import com.tracki.ui.common.OnClickListener;
-//import com.tracki.ui.dynamicform.DynamicFormActivity;
-//import com.tracki.ui.inventory.InventoryActivity;
-//import com.tracki.ui.main.filter.TaskFilterActivity;
-//import com.tracki.ui.newcreatetask.NewCreateTaskActivity;
+import com.tracki.ui.common.DoubleButtonDialog;
+import com.tracki.ui.common.OnClickListener;
 import com.tracki.ui.dynamicform.DynamicFormActivity;
-//import com.tracki.ui.main.filter.TaskFilterActivity;
+//import com.tracki.ui.inventory.InventoryActivity;
+import com.tracki.ui.main.filter.TaskFilterActivity;
+import com.tracki.ui.newcreatetask.NewCreateTaskActivity;
 import com.tracki.ui.taskdetails.NewTaskDetailsActivity;
 import com.tracki.ui.tasklisting.PaginationListener;
 import com.tracki.ui.tasklisting.PagingData;
@@ -75,7 +73,6 @@ import com.tracki.ui.tasklisting.StageListAdapter;
 import com.tracki.ui.tasklisting.TaskClickListener;
 import com.tracki.ui.tasklisting.TaskItemClickListener;
 import com.tracki.ui.tasklisting.TaskListingAdapter;
-import com.tracki.ui.tasklisting.assignedtome.AssignedToMeViewModel;
 import com.tracki.utils.ApiType;
 import com.tracki.utils.AppConstants;
 import com.tracki.utils.BuddyInfo;
@@ -86,11 +83,11 @@ import com.tracki.utils.Log;
 import com.tracki.utils.NetworkUtils;
 import com.tracki.utils.TaskStatus;
 import com.tracki.utils.TrackiToast;
-//import com.trackthat.lib.TrackThat;
-//import com.trackthat.lib.internal.network.TrackThatCallback;
-//import com.trackthat.lib.models.ErrorResponse;
-//import com.trackthat.lib.models.SuccessResponse;
-//import com.trackthat.lib.models.TrackthatLocation;
+import com.trackthat.lib.TrackThat;
+import com.trackthat.lib.internal.network.TrackThatCallback;
+import com.trackthat.lib.models.ErrorResponse;
+import com.trackthat.lib.models.SuccessResponse;
+import com.trackthat.lib.models.TrackthatLocation;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -302,9 +299,7 @@ public class IhaveAssignedFragment extends BaseFragment<FragmentIHaveAssignedBin
             }
         }
         if (getBaseActivity() != null && getBaseActivity().isNetworkConnected()) {
-            //TODO
             api = TrackiApplication.getApiMap().get(ApiType.TASKS);
-
             if (api != null) {
                 api.setAppendWithKey("ASSIGNED_BY_ME");
             }
@@ -519,26 +514,26 @@ public class IhaveAssignedFragment extends BaseFragment<FragmentIHaveAssignedBin
         mSwipeRefreshLayout.setRefreshing(false);
 
         if (getBaseActivity() != null){
-        if (CommonUtils.handleResponse(callback, error, result, getBaseActivity())) {
-            getBaseActivity().runOnUiThread(() -> {
-                TaskListing taskListing = new Gson().fromJson(String.valueOf(result), TaskListing.class);
+            if (CommonUtils.handleResponse(callback, error, result, getBaseActivity())) {
+                getBaseActivity().runOnUiThread(() -> {
+                    TaskListing taskListing = new Gson().fromJson(String.valueOf(result), TaskListing.class);
 //                stateAdapter.makeAllSelected();
-                List<Task> list = taskListing.getTasks();
-                mIhaveAssignedViewModel.getTaskListLiveData().setValue(list);
-                setRecyclerView();
-                CommonUtils.showLogMessage("e", "adapter total_count =>",
-                        "" + mIhaveAssignedAdapter.getItemCount());
-                CommonUtils.showLogMessage("e", "fetch total_count =>",
-                        "" + taskListing.getPaginationData().getDataCount());
-                if (taskListing.getPaginationData().getDataCount() == mIhaveAssignedAdapter.getItemCount()) {
-                    isLastPage = true;
-                }
-            });
-        } else {
-            if (rvIhaveAssigned != null)
-                rvIhaveAssigned.setVisibility(View.VISIBLE);
+                    List<Task> list = taskListing.getTasks();
+                    mIhaveAssignedViewModel.getTaskListLiveData().setValue(list);
+                    setRecyclerView();
+                    CommonUtils.showLogMessage("e", "adapter total_count =>",
+                            "" + mIhaveAssignedAdapter.getItemCount());
+                    CommonUtils.showLogMessage("e", "fetch total_count =>",
+                            "" + taskListing.getPaginationData().getDataCount());
+                    if (taskListing.getPaginationData().getDataCount() == mIhaveAssignedAdapter.getItemCount()) {
+                        isLastPage = true;
+                    }
+                });
+            } else {
+                if (rvIhaveAssigned != null)
+                    rvIhaveAssigned.setVisibility(View.VISIBLE);
+            }
         }
-    }
     }
 
     @Override
@@ -910,19 +905,19 @@ public class IhaveAssignedFragment extends BaseFragment<FragmentIHaveAssignedBin
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_filter) {
-//            Intent intent = TaskFilterActivity.Companion.newIntent(getBaseActivity());
-//            if (regionId != null)
-//                intent.putExtra("regionId", regionId);
-//            if (hubIdStr != null)
-//                intent.putExtra("hubIdStr", hubIdStr);
-//            if (stateId != null)
-//                intent.putExtra("stateId", stateId);
-//            if (cityId != null)
-//                intent.putExtra("cityId", cityId);
-//            if (categoryId != null)
-//                intent.putExtra("categoryId", categoryId);
-//            intent.putExtra("from", AppConstants.TASK);
-//            startActivityForResult(intent, AppConstants.REQUEST_CODE_FILTER_USER);
+            Intent intent = TaskFilterActivity.Companion.newIntent(getBaseActivity());
+            if (regionId != null)
+                intent.putExtra("regionId", regionId);
+            if (hubIdStr != null)
+                intent.putExtra("hubIdStr", hubIdStr);
+            if (stateId != null)
+                intent.putExtra("stateId", stateId);
+            if (cityId != null)
+                intent.putExtra("cityId", cityId);
+            if (categoryId != null)
+                intent.putExtra("categoryId", categoryId);
+            intent.putExtra("from", AppConstants.TASK);
+            startActivityForResult(intent, AppConstants.REQUEST_CODE_FILTER_USER);
         }
         return super.onOptionsItemSelected(item);
     }

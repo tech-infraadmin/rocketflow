@@ -3173,7 +3173,7 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                                             String targetId = item.getWidgetData().get(i).getTarget();
 
                                             GetDynamicFormListById getDyna = new GetDynamicFormListById();
-                                            ArrayList<FormData> mlist = getDyna.getDynamicFormListById(targetId);
+                                            ArrayList<FormData> mlist = getDyna.getDynamicFormListById(preferencesHelper,targetId);
                                             childDynamicAdapter = new ChildDynamicAdapter(mlist);
                                             childDynamicAdapter.setFormId(targetId);
                                             childDynamicAdapter.setPreferencesHelper(preferencesHelper);

@@ -1,5 +1,7 @@
 package com.tracki.ui.main.filter
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.tracki.TrackiApplication
 import com.tracki.data.DataManager
 import com.tracki.data.model.request.*
@@ -9,6 +11,7 @@ import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
 import com.tracki.ui.base.BaseViewModel
 import com.tracki.utils.*
+import com.tracki.utils.rx.AppSchedulerProvider
 import com.tracki.utils.rx.SchedulerProvider
 
 /**
@@ -172,4 +175,11 @@ open class TaskFilterViewModel(dataManager: DataManager, schedulerProvider: Sche
         override fun onLogout() {
         }
     }
+
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return TaskFilterViewModel(mDataManager, AppSchedulerProvider()) as T
+        }
+    }
+
 }

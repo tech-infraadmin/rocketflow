@@ -1881,9 +1881,9 @@ public final class CommonUtils {
 //                preferencesHelper.setDailyIdleTaskOffEnable(true);
 //                startIdleTrackingOff(context);
 //            }
-            if (preferencesHelper.getIsIdealTrackingEnable()) {
-                startIdleTrackingOff(context);
-            }
+//            if (preferencesHelper.getIsIdealTrackingEnable()) {
+//                startIdleTrackingOff(context);
+//            }
             if (appConfig.getStatus() != null && !appConfig.getStatus().isEmpty()) {
                 if (appConfig.getStatus().equals("OFFLINE")) {
                     preferencesHelper.setStatus("OFFLINE");

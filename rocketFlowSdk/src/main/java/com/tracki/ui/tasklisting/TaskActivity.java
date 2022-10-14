@@ -129,10 +129,11 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
         super.onCreate(savedInstanceState);
         mActivityTaskBinding = getViewDataBinding();
         httpManager = RocketFlyer.Companion.httpManager();
+        preferencesHelper = RocketFlyer.Companion.preferenceHelper();
         mPagerAdapter = new TaskPagerAdapter(getSupportFragmentManager());
         mTaskViewModel  = new ViewModelProvider(this, new TaskViewModelFactory(RocketFlyer.Companion.dataManager())).get(TaskViewModel.class);
         mTaskViewModel.setNavigator(this);
-        preferencesHelper = RocketFlyer.Companion.preferenceHelper();
+
         if(preferencesHelper!=null && preferencesHelper.getLoginToken()!=null
                 && !preferencesHelper.getLoginToken().isEmpty()) {
             hitConfig();

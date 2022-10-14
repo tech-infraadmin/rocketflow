@@ -1,5 +1,7 @@
 package com.tracki.ui.dynamicform
 
+import android.content.Context
+import com.rocketflow.sdk.RocketFlyer
 import com.tracki.TrackiApplication
 import com.tracki.data.local.prefs.AppPreferencesHelper
 import com.tracki.data.local.prefs.PreferencesHelper
@@ -16,11 +18,11 @@ class GetDynamicFormListById {
 //        preferencesHelper= AppPreferencesHelper(TrackiApplication.instance, AppConstants.PREF_NAME);
 //    }
 
-    fun getDynamicFormListById(formId: String): ArrayList<FormData> {
+    fun getDynamicFormListById(preferencesHelper: PreferencesHelper,formId: String): ArrayList<FormData> {
         CommonUtils.showLogMessage("e", "formId", formId)
+        this.preferencesHelper = preferencesHelper;
         var formDataList = ArrayList<FormData>()
         var dynamicFormsNew = CommonUtils.getFormByFormId(formId!!)
-        preferencesHelper = AppPreferencesHelper(TrackiApplication.instance, AppConstants.PREF_NAME);
         if (dynamicFormsNew != null) {
 //                        var jsonConverter= JSONConverter<DynamicFormsNew>()
 //                        var json=jsonConverter.objectToJson(dynamicFormsNew)

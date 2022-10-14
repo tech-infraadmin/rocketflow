@@ -3243,6 +3243,8 @@ open class NewCreateTaskActivity :
     }
 
     private fun setSlots() {
+        if(slotDataResponse.data!!.keys.isEmpty()){ return}
+
         val key = slotDataResponse.data!!.keys.elementAt(timePosition)
         dateFinal = key
         val timeSlots = slotDataResponse.data!!.get(key)

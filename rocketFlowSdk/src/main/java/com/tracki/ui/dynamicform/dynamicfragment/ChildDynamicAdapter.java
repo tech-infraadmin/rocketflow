@@ -2910,7 +2910,7 @@ public class ChildDynamicAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                                             //String targetId = "42f44e86-69cf-4756-a42c-bed1aa60e03a";
 
                                             GetDynamicFormListById getDyna = new GetDynamicFormListById();
-                                            ArrayList<FormData> mlist = getDyna.getDynamicFormListById(targetId);
+                                            ArrayList<FormData> mlist = getDyna.getDynamicFormListById(preferencesHelper,targetId);
                                             if (DynamicAdapter.embdedFormdata != null && !DynamicAdapter.embdedFormdata.isEmpty()) {
                                                 List<TaskData> listData = DynamicAdapter.embdedFormdata.get(targetId);
                                                 if (listData != null && !listData.isEmpty()) {

@@ -37,11 +37,6 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 
-//import com.google.android.gms.location.FusedLocationProviderClient;
-//import com.google.android.gms.location.LocationCallback;
-//import com.google.android.gms.location.LocationRequest;
-//import com.google.android.gms.location.LocationServices;
-//import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -50,39 +45,32 @@ import com.google.android.gms.maps.model.LatLng;
 import com.rocketflow.sdk.RocketFlyer;
 import com.tracki.R;
 import com.tracki.data.local.prefs.AppPreferencesHelper;
-import com.tracki.data.local.prefs.PreferencesHelper;
 import com.tracki.data.network.ApiCallback;
-//import com.tracki.ui.buddylisting.BuddyListingActivity;
-//import com.tracki.ui.changemobile.ChangeMobileActivity;
-//import com.tracki.ui.custom.socket.WebSocketManager;
-//import com.tracki.ui.dynamicform.DynamicFormActivity;
-//import com.tracki.ui.fleetlisting.FleetListingActivity;
-//import com.tracki.ui.geofencing.GeofenceUtil;
-//import com.tracki.ui.login.LoginActivity;
-//import com.tracki.ui.main.MainActivity;
-//import com.tracki.ui.main.filter.BuddyFilterActivity;
-import com.tracki.utils.AnalyticsHelper;
+import com.tracki.ui.buddylisting.BuddyListingActivity;
+import com.tracki.ui.dynamicform.DynamicFormActivity;
+import com.tracki.ui.fleetlisting.FleetListingActivity;
+import com.tracki.ui.geofencing.GeofenceUtil;
+import com.tracki.ui.main.filter.BuddyFilterActivity;
 import com.tracki.utils.AppConstants;
 import com.tracki.utils.CommonUtils;
-//import com.tracki.utils.ErrorScreenHelper;
+import com.tracki.utils.ErrorScreenHelper;
 import com.tracki.utils.Log;
 import com.tracki.utils.NetworkStateReceiver;
 import com.tracki.utils.NetworkStateReceiverListener;
 import com.tracki.utils.NetworkUtils;
 import com.tracki.utils.TrackiToast;
-//import com.trackthat.lib.TrackThat;
+import com.trackthat.lib.TrackThat;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.inject.Inject;
 
 import static com.tracki.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_BOTTOM_SHEET_MENU;
 import static com.tracki.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU;
 import static com.tracki.utils.AppConstants.Extra.EXTRA_FLEET_LIST_CALLING_FROM_DASHBOARD_MENU;
 import static com.tracki.utils.AppConstants.PERMISSIONS_REQUEST_CODE_MULTIPLE;
-//import static com.tracki.utils.ErrorScreenHelper.LOCATION_SERVICE_ERROR;
+import static com.tracki.utils.ErrorScreenHelper.LOCATION_SERVICE_ERROR;
 
 //import android.hardware.Sensor;
 //import android.hardware.SensorEvent;
@@ -101,7 +89,7 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
     public LatLng currentLatLng;
     //@Inject
     //public AnalyticsHelper analyticsHelper;
-    //public GeofenceUtil geofenceUtil;
+    public GeofenceUtil geofenceUtil;
     // protected WebSocketManager webSocketManager = null;
     // private SensorManager mSensorManager;
     private Dialog locationDialog;
@@ -115,7 +103,7 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
     private V mViewModel;
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest locationRequest;
-    //private ErrorScreenHelper mScreenHelper;
+    private ErrorScreenHelper mScreenHelper;
     private float mAccel;
     private float mAccelCurrent;
     private float mAccelLast;
@@ -219,31 +207,27 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         performDependencyInjection();
 //        /*TODO test here for navigation bar color and navigation button color*/
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            if (this instanceof MainActivity ||
-//                    this instanceof ChangeMobileActivity ||
-//                    this instanceof BuddyFilterActivity ||
-//                    this instanceof DynamicFormActivity) {
-//                getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
-//            } else if (this instanceof BuddyListingActivity ||
-//                    this instanceof FleetListingActivity ||
-//                    this instanceof LoginActivity) {
-//                if (getIntent().hasExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU) ||
-//                        getIntent().hasExtra(EXTRA_FLEET_LIST_CALLING_FROM_DASHBOARD_MENU) ||
-//                        getIntent().hasExtra(EXTRA_BUDDY_LIST_CALLING_FROM_BOTTOM_SHEET_MENU) ||
-//                        this instanceof LoginActivity) {
-//                    getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
-//                }
-//            }
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (this instanceof BuddyFilterActivity ||
+                    this instanceof DynamicFormActivity) {
+                getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+            } else if (this instanceof BuddyListingActivity ||
+                    this instanceof FleetListingActivity ) {
+                if (getIntent().hasExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU) ||
+                        getIntent().hasExtra(EXTRA_FLEET_LIST_CALLING_FROM_DASHBOARD_MENU) ||
+                        getIntent().hasExtra(EXTRA_BUDDY_LIST_CALLING_FROM_BOTTOM_SHEET_MENU)) {
+                    getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+                }
+            }
+        }
         super.onCreate(savedInstanceState);
         performDataBinding();
-//        geofenceUtil = new GeofenceUtil(BaseActivity.this);
-//        if (geofenceUtil.getGeofencesAdded()) {
-//            Log.e(TAG, "----> true");
-//        } else {
-//            Log.e(TAG, "----> false");
-//        }
+        geofenceUtil = new GeofenceUtil(BaseActivity.this);
+        if (geofenceUtil.getGeofencesAdded()) {
+            Log.e(TAG, "----> true");
+        } else {
+            Log.e(TAG, "----> false");
+        }
         mobileShakeTask();
         //registerReceiver();
     }
@@ -288,15 +272,15 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 
                 if (isGpsEnabled || isNetworkEnabled) {
                     //location is enabled
-//                    if (mScreenHelper != null) {
-//                        if (mScreenHelper.dialog != null && mScreenHelper.dialog.isShowing())
-//                            mScreenHelper.dialog.dismiss();
-//                    }
+                    if (mScreenHelper != null) {
+                        if (mScreenHelper.dialog != null && mScreenHelper.dialog.isShowing())
+                            mScreenHelper.dialog.dismiss();
+                    }
                 } else {
-//                    if (mScreenHelper == null) {
-//                        mScreenHelper = new ErrorScreenHelper(BaseActivity.this);
-//                    }
-//                    mScreenHelper.displayLocation(LOCATION_SERVICE_ERROR);
+                    if (mScreenHelper == null) {
+                        mScreenHelper = new ErrorScreenHelper(BaseActivity.this);
+                    }
+                    mScreenHelper.displayLocation(LOCATION_SERVICE_ERROR);
                     //location is disabled
                 }
             }
@@ -307,9 +291,9 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(1000);
-        locationRequest.setInterval(5000);
-        locationRequest.setFastestInterval(2000);
-        locationRequest.setSmallestDisplacement(20f);
+//        locationRequest.setInterval(5000);
+//        locationRequest.setFastestInterval(2000);
+//        locationRequest.setSmallestDisplacement(20f);
     }
 
     @SuppressLint("MissingPermission")
@@ -402,9 +386,9 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 
     public void openActivityOnTokenExpire(Intent intent) {
         //stop tracking
-//        if (TrackThat.isTracking()) {
-//            TrackThat.stopTracking();
-//        }
+        if (TrackThat.isTracking()) {
+            TrackThat.stopTracking();
+        }
 //        Intent intent = LoginActivity.newIntent(this);
         setFlags(intent);
         startActivity(intent);
@@ -519,8 +503,8 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
         super.onResume();
         //start listening geofence enter and exit alerts.
         IntentFilter intentFilter = new IntentFilter();
-        //intentFilter.addAction(TrackThat.ACTION_GEOFENCE_ENTER);
-        //intentFilter.addAction(TrackThat.ACTION_GEOFENCE_EXIT);
+        intentFilter.addAction(TrackThat.ACTION_GEOFENCE_ENTER);
+        intentFilter.addAction(TrackThat.ACTION_GEOFENCE_EXIT);
         /*//if user is on main activity of task activity or create task activity then
         if (this instanceof MainActivity || this instanceof TaskActivity || this instanceof CreateTaskActivity) {
             //      Show battery optimization dialog if user disable this feature.

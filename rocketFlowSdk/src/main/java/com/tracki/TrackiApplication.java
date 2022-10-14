@@ -55,7 +55,6 @@ public class TrackiApplication extends Application {
     private static ArrayList<EmergencyContact> emergencyContacts;
     private static List<DynamicFormsNew> dynamicFormsNews;
     private static List<LookUps> lookups;
-    public static TrackiApplication instance;
 
 
 //    @Inject

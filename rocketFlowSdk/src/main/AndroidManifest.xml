@@ -133,6 +133,21 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".ui.main.filter.TaskFilterActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.main.filter.BuddyFilterActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+
+        <receiver
+            android:name=".ui.geofencing.GeofenceBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
     </application>
 
 </manifest>
