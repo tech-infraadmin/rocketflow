@@ -242,9 +242,11 @@ class TaskDetailsFragment :
             Log.d("categoryId", categoryId)
             showLoading()
             api = TrackiApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
-            Log.d("API", api!!.url);
-            if (api != null && ::mNewTaskViewModel.isInitialized)
+
+            if (api != null && ::mNewTaskViewModel.isInitialized) {
+                Log.d("API", api!!.url);
                 mNewTaskViewModel.getTaskById(httpManager, AcceptRejectRequest(taskId!!), api)
+            }
             val startLocationLabel =
                 CommonUtils.getAllowFieldLabelName("START_LOCATION", categoryId, preferencesHelper)
             if (!startLocationLabel.isEmpty()) {
@@ -1356,16 +1358,16 @@ class TaskDetailsFragment :
 
 
 //            if (TrackThat.isTracking()) {
-            if (preferencesHelper.isTrackingLiveTrip) {
-                TrackiToast.Message.showShort(baseActivity, AppConstants.MSG_ONGOING_TASK)
-                return
-            } else {
+//            if (preferencesHelper.isTrackingLiveTrip) {
+//                TrackiToast.Message.showShort(baseActivity, AppConstants.MSG_ONGOING_TASK)
+//                return
+//            } else {
                 TrackThat.startTracking(taskId, true)
                 preferencesHelper.isTrackingLiveTrip = true
                 preferencesHelper.setActiveTaskId(taskId)
                 preferencesHelper.setActiveTaskCategoryId(categoryId)
                 playSoundStartTracking()
-            }
+            //}
         } else if (callToActions!!.tracking === Tracking.END &&  /*TrackThat.isTracking()*/
             preferencesHelper.isTrackingLiveTrip
         ) {

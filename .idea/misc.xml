@@ -142,6 +142,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/item_custom_outcoming_image_message.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_dynamic_form_audio.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_dynamic_form_button.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/item_dynamic_form_camera.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_dynamic_form_rating.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_dynamic_form_signature.xml" value="0.12454710144927536" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_dynamic_form_slot.xml" value="0.1609375" />
@@ -216,6 +217,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/item_time_line.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_user_list.xml" value="0.1279296875" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_user_new.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/item_user_option.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_view_load_more.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/items_layout_likes.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/items_layout_no_media.xml" value="0.1" />

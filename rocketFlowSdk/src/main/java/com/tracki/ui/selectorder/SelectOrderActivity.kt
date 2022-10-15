@@ -45,11 +45,11 @@ import com.tracki.data.network.ApiCallback
 import com.tracki.data.network.HttpManager
 import com.tracki.databinding.ActivitySelectOrderBinding
 import com.tracki.ui.base.BaseActivity
-//import com.tracki.ui.cart.CartActivity
+import com.tracki.ui.cart.CartActivity
 import com.tracki.ui.custom.GlideApp
 import com.tracki.ui.newcreatetask.NewCreateTaskActivity
-//import com.tracki.ui.scanqrcode.ProductScan
-//import com.tracki.ui.scanqrcode.ScanQrAndBarCodeActivity
+import com.tracki.ui.scanqrcode.ProductScan
+import com.tracki.ui.scanqrcode.ScanQrAndBarCodeActivity
 import com.tracki.ui.taskdetails.timeline.ProductMapAdapter
 import com.tracki.ui.tasklisting.PaginationListener
 import com.tracki.utils.*
@@ -566,7 +566,7 @@ open class SelectOrderActivity : BaseActivity<ActivitySelectOrderBinding, Select
                                 linkRequest.createSubTask = true
                                 var subTaskConfig = myCatData.subTaskConfig
                                 if (subTaskConfig != null && subTaskConfig.categories!!.isNotEmpty()) {
-                                   // linkRequest.subCategoryId = subTaskConfig.categories!![0]
+                                    // linkRequest.subCategoryId = subTaskConfig.categories!![0]
                                     linkRequest.subTaskCategory = subTaskConfig.categories!![0]
                                     linkRequest.parentTaskId = taskId
                                 }
@@ -673,23 +673,23 @@ open class SelectOrderActivity : BaseActivity<ActivitySelectOrderBinding, Select
         for (data in savedOrderMap!!.values) {
             map[data.pid!!] = data.noOfProduct
         }
-//        var intent = Intent(this, CartActivity::class.java)
-//
-//        intent.putExtra(AppConstants.DELIVERY_CHARGE, deliveryChargeAmount)
-//        if (taskId != null)
-//            intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
-//        if (target != null)
-//            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET, target)
-//        if (flavourId != null)
-//            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, flavourId)
-//        if (categoryId != null)
-//            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
-//        if (ctaId != null)
-//            intent.putExtra(AppConstants.Extra.EXTRA_CTA_ID, ctaId)
-//        if (deliverMode != null)
-//            intent.putExtra(AppConstants.DELIVERY_MODE, deliverMode)
-//        intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, dynamicPricing)
-//        startActivityForResult(intent, PLACE_ORDER)
+        var intent = Intent(this, CartActivity::class.java)
+
+        intent.putExtra(AppConstants.DELIVERY_CHARGE, deliveryChargeAmount)
+        if (taskId != null)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
+        if (target != null)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET, target)
+        if (flavourId != null)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, flavourId)
+        if (categoryId != null)
+            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
+        if (ctaId != null)
+            intent.putExtra(AppConstants.Extra.EXTRA_CTA_ID, ctaId)
+        if (deliverMode != null)
+            intent.putExtra(AppConstants.DELIVERY_MODE, deliverMode)
+        intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, dynamicPricing)
+        startActivityForResult(intent, PLACE_ORDER)
     }
 
     override fun getBindingVariable(): Int {
@@ -948,7 +948,7 @@ open class SelectOrderActivity : BaseActivity<ActivitySelectOrderBinding, Select
                                 linkRequest.createSubTask = true
                                 var subTaskConfig = myCatData.subTaskConfig
                                 if (subTaskConfig != null && subTaskConfig.categories!!.isNotEmpty()) {
-                                   // linkRequest.subCategoryId = subTaskConfig.categories!![0]
+                                    // linkRequest.subCategoryId = subTaskConfig.categories!![0]
                                     linkRequest.subTaskCategory = subTaskConfig.categories!![0]
                                     linkRequest.parentTaskId = taskId
                                 }
@@ -1236,22 +1236,22 @@ open class SelectOrderActivity : BaseActivity<ActivitySelectOrderBinding, Select
         sharedPreferences.edit().putString("Scan", "Product").apply()
         //list send
         val listDataTemp = selectProductAdapter.getAllList().filter { it.addInOrder }
-//        val intent = ProductScan.newIntent(this, listDataTemp as ArrayList<CatalogProduct>)
-//        intent.putExtra(AppConstants.DELIVERY_CHARGE, deliveryChargeAmount)
-//        if (taskId != null)
-//            intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
-//        if (target != null)
-//            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET, target)
-//        if (flavourId != null)
-//            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, flavourId)
-//        if (categoryId != null)
-//            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
-//        if (ctaId != null)
-//            intent.putExtra(AppConstants.Extra.EXTRA_CTA_ID, ctaId)
-//        if (deliverMode != null)
-//            intent.putExtra(AppConstants.DELIVERY_MODE, deliverMode)
-//        intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, dynamicPricing)
-//        startActivity(intent)
+        val intent = ProductScan.newIntent(this, listDataTemp as ArrayList<CatalogProduct>)
+        intent.putExtra(AppConstants.DELIVERY_CHARGE, deliveryChargeAmount)
+        if (taskId != null)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
+        if (target != null)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET, target)
+        if (flavourId != null)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, flavourId)
+        if (categoryId != null)
+            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
+        if (ctaId != null)
+            intent.putExtra(AppConstants.Extra.EXTRA_CTA_ID, ctaId)
+        if (deliverMode != null)
+            intent.putExtra(AppConstants.DELIVERY_MODE, deliverMode)
+        intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, dynamicPricing)
+        startActivity(intent)
 
     }
 
