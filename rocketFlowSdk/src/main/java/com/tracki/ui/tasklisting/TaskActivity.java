@@ -63,6 +63,8 @@ import com.tracki.utils.TrackiToast;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -259,9 +261,13 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
             }
             if (getIntent().hasExtra(AppConstants.Extra.FROM_DATE)) {
                 fromDate = getIntent().getLongExtra(AppConstants.Extra.FROM_DATE, 0);
+            }else{
+                fromDate = fromDate();
             }
             if (getIntent().hasExtra(AppConstants.Extra.FROM_TO)) {
                 toDate = getIntent().getLongExtra(AppConstants.Extra.FROM_TO, 0);
+            }else{
+                toDate = toDateDateAdd24Hour();
             }
             if (getIntent().hasExtra(AppConstants.Extra.LOAD_BY)) {
                 LOADBY = getIntent().getStringExtra(AppConstants.Extra.LOAD_BY);
@@ -751,5 +757,31 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
     public void networkUnavailable() {
 //        RelativeLayout rlMain=mActivityMainBinding.mainView.findViewById(R.id.rlMain);
         snackBar= CommonUtils.showNetWorkConnectionIssue(  mActivityTaskBinding.coordinatorLayout,getString(R.string.please_check_your_internet_connection));
+    }
+
+
+    private long toDateDateAdd24Hour() {
+        final Calendar cal = Calendar.getInstance();
+        //cal.add(Calendar.DAY_OF_MONTH, preferencesHelper.getMaxDateRange());
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 0);
+        return cal.getTime().getTime();
+    }
+
+
+    private long fromDate(){
+        final Calendar cal = Calendar.getInstance();
+        if (preferencesHelper.getDefDateRange() == 0) {
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+        } else {
+            cal.add(Calendar.DAY_OF_MONTH, -1 * preferencesHelper.getDefDateRange());
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+        }
+       return cal.getTime().getTime();
     }
 }

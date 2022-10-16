@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import com.rocketflow.sdk.util.RFLog
-import com.tracki.TrackiApplication
 import com.tracki.ui.tasklisting.TaskActivity
 import com.tracki.utils.AppConstants
 import java.lang.ref.WeakReference
+import java.util.*
 
 internal class RocketFlyerImp(
     context: Context
@@ -27,11 +27,9 @@ internal class RocketFlyerImp(
         contextRef.get()?.let {
             if (processId.isEmpty()) throw Exception("ProcessId cannot be null")
             RFLog.d("ProcessId : $processId")
-            //showToast(it,"Started : ProcessId : $processId");
 
             val intent = TaskActivity.newIntent(it)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            //intent.putExtra(AppConstants.Extra.TITLE, "RocketFlow Demo")
             intent.putExtra(AppConstants.Extra.EXTRA_STAGEID, processId)
             it.startActivity(intent);
 //            intent.putExtra(
@@ -48,6 +46,23 @@ internal class RocketFlyerImp(
 
         }
     }
+
+    /*class ItemOnClickListener implements View.OnClickListener {
+        private View _parent;
+
+        public ItemOnClickListener(ViewGroup parent) {
+            _parent = parent;
+        }
+
+        @Override
+        public void onClick(View view) {
+            //.......
+            // close the dropdown
+            View root = _parent.getRootView();
+            root.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK));
+            root.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
+        }
+    }*/
 
     override fun terminate() {
         contextRef.get()?.let {
