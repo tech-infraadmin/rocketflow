@@ -83,37 +83,6 @@
     </style>
 
 
-    <style name="SCBSwitch" parent="Theme.AppCompat.Light">
-        <!-- active thumb & track color (30% transparency) -->
-        <item name="colorControlActivated">@color/yellow_punch_btn</item>
-
-        <!-- inactive thumb color -->
-        <item name="colorSwitchThumbNormal">@color/taskCreateIconColor</item>
-
-        <!-- inactive track color (30% transparency) -->
-        <item name="android:colorForeground">#42221f1f</item>
-    </style>
-
-
-    <style name="spinner_style">
-        <item name="android:background">@drawable/bg_spinner</item>
-        <item name="android:layout_marginLeft">10dp</item>
-        <item name="android:layout_marginRight">10dp</item>
-        <item name="android:layout_marginBottom">10dp</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingTop">5dp</item>
-        <item name="android:paddingBottom">5dp</item>
-    </style>
-
-    <style name="SpinnerTheme" parent="android:Widget.Spinner.DropDown">
-        <item name="android:background">@drawable/bg_spinner</item>
-    </style>
-
-
-    <style name="LightGrey" parent="TextViewStyle">
-        <item name="android:textColor">@color/warm_gray</item>
-    </style>
-
     <style name="TextViewItalic" parent="TextViewStyle">
         <item name="android:fontFamily">@font/savoyeletplain</item>
     </style>
@@ -142,21 +111,11 @@
         <item name="android:textSize">@dimen/text_size_14</item>
     </style>
 
-    <style name="EditTextStyle.MaxLength" parent="EditTextStyle">
-        <item name="android:maxLength">10</item>
-    </style>
-
     <style name="MyEditTextTheme">
         <item name="android:textColorHint">@color/white</item>
         <item name="colorControlNormal">#FFFFFF</item>
         <item name="colorControlActivated">#FFFFFF</item>
         <item name="colorControlHighlight">#FFFFFF</item>
-    </style>
-    <style name="LoginEditText">
-        <item name="android:textColorHint">@color/gray</item>
-        <item name="colorControlNormal">#585858</item>
-        <item name="colorControlActivated">#585858</item>
-        <item name="colorControlHighlight">#585858</item>
     </style>
 
     <style name="ButtonStyle" parent="Base.TextAppearance.AppCompat.Widget.Button">
@@ -344,27 +303,11 @@
         <item name="android:singleLine">true</item>
     </style>
 
-    <style name="SwitchButtonStyle" parent="Theme.AppCompat.Light">
-        <item name="thumbTint">@color/switch_color</item>
-        <item name="trackTint">@color/switch_color</item>
-
-    </style>
-
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="DialogZoomOutAnimation">
-        <item name="android:windowEnterAnimation">@anim/zoom_in</item>
-        <item name="android:windowExitAnimation">@anim/zoom_out</item>
-
-
-    </style>
     <style name="NewDialog" parent="Base.Theme.AppCompat.Light.Dialog">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -379,39 +322,12 @@
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:background">@android:color/transparent</item>
     </style>
-    <style name="Widget.BottomNavigationView" parent="Widget.Design.BottomNavigationView">
-        <item name="fontFamily">@font/campton_book</item>
-        <item name="android:textSize">9sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-    <style name="MaterialTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/white</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/white</item>
-        <item name="android:textAppearance">@style/TextAppearance.Text.Regular</item>
-        <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_white_24dp</item>
-       <!-- <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
-        <item name="textInputStyle">@style/CustomFontTextInputLayout</item>-->
-        <!-- <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>-->
-
-
-    </style>
-   <!-- <style name="CustomActivityAnimation" parent="@android:style/Animation.Activity">
+    <!-- <style name="CustomActivityAnimation" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
         <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
         <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
         <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
     </style>-->
-    <style name="MaterialTheme.NoActionBar" parent="MaterialTheme">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="colorControlActivated">@color/text_gray</item>
-        <item name="colorControlHighlight">@color/text_gray</item>
-        <item name="android:windowBackground">@color/white</item>
-        <item name="android:homeAsUpIndicator">@drawable/ic_back_arrow</item>
-    </style>
 
 
     <style name="AppBottomSheetDialogTheme"
