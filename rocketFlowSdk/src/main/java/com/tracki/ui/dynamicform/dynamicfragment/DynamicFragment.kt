@@ -1,5 +1,9 @@
 package com.tracki.ui.dynamicform.dynamicfragment
 
+//import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+//import com.google.android.gms.common.GooglePlayServicesRepairableException
+//import com.iceteck.silicompressorr.SiliCompressor
+//import com.tracki.ui.scanqrcode.ScanQrAndBarCodeActivity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -15,25 +19,17 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-//import com.google.android.gms.common.GooglePlayServicesNotAvailableException
-//import com.google.android.gms.common.GooglePlayServicesRepairableException
-import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.gson.Gson
 import com.rocketflow.sdk.RocketFlyer
-//import com.iceteck.silicompressorr.SiliCompressor
 import com.tracki.BR
-import com.tracki.BuildConfig
 import com.tracki.R
 import com.tracki.data.local.prefs.PreferencesHelper
 import com.tracki.data.model.request.GetTaskDataRequest
@@ -48,7 +44,6 @@ import com.tracki.ui.base.BaseFragment
 import com.tracki.ui.common.DoubleButtonDialog
 import com.tracki.ui.common.OnClickListener
 import com.tracki.ui.dynamicform.DynamicFormActivity
-//import com.tracki.ui.scanqrcode.ScanQrAndBarCodeActivity
 import com.tracki.utils.*
 import com.tracki.utils.image_utility.Compressor
 import com.tracki.utils.image_utility.ImagePicker
@@ -58,9 +53,6 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * Created by Rahul Abrol on 13/7/19.
@@ -708,7 +700,7 @@ class DynamicFragment : BaseFragment<FragmentFormListBinding, DynamicViewModel>(
                 if (file != null && file.exists()) {
                     uri = FileProvider.getUriForFile(
                         baseActivity.applicationContext,
-                        "rf_sdk" + ".provider", file
+                        baseActivity.applicationContext!!.packageName + ".tracki.provider", file
                     )
                     photoIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
                     startActivityForResult(photoIntent, CAMERA_PIC_REQUEST)

@@ -103,7 +103,7 @@ public class ImagePicker {
             try {
                 file = createImageFile();
                 imageUri = FileProvider.getUriForFile(context,
-                        "rf_sdk" + ".provider", file);
+                        context.getPackageName()  + ".tracki.provider", file);
 
                 takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             } catch (IOException e) {

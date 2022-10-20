@@ -326,7 +326,7 @@ public class GeofenceUtil implements OnCompleteListener<Void> {
                                 intent.setAction(
                                         Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                                 Uri uri = Uri.fromParts("package",
-                                        "rf_sdk", null);
+                                        view.getContext().getPackageName(), null);
                                 intent.setData(uri);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 activity.startActivity(intent);

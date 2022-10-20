@@ -194,8 +194,8 @@
             android:exported="true" />
 
         <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="rf_sdk.provider"
+            android:name="com.tracki.RFSDKFileProvider"
+            android:authorities="${applicationId}.tracki.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

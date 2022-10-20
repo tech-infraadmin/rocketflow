@@ -1323,7 +1323,7 @@ public final class CommonUtils {
         // Uri bmpUri = Uri.parse("file://"+path);
         Uri bmpUri = FileProvider.getUriForFile(
                 context,
-                "rf_sdk" + ".provider", //(use your app signature + ".provider" )
+                context.getPackageName() + ".tracki.provider", //(use your app signature + ".provider" )
                 file);
         ;
 //        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
