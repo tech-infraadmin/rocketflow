@@ -1,6 +1,7 @@
 package com.tracki.ui.taskdetails.timeline
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -32,6 +33,7 @@ import com.tracki.R
 import com.tracki.TrackiApplication
 import com.tracki.data.local.prefs.PreferencesHelper
 import com.tracki.data.local.prefs.StartIdealTrackWork
+import com.tracki.data.model.BaseResponse
 import com.tracki.data.model.GeofenceData
 import com.tracki.data.model.request.*
 import com.tracki.data.model.request.TaskData
@@ -63,9 +65,11 @@ import com.tracki.ui.taskdetails.timeline.skuinfopreview.SkuInfoPreviewActivity
 import com.tracki.ui.tasklisting.TaskClickListener
 import com.tracki.ui.tasklisting.assignedtome.TaskAssignToMeViewModel
 import com.tracki.ui.userlisting.UserListNewActivity
+import com.tracki.ui.webview.PaymentViewActivity
 import com.tracki.ui.webview.WebViewActivity
 import com.tracki.utils.*
 import com.tracki.utils.AppConstants.Extra
+import com.tracki.utils.geofence.AddGeoFenceUtil
 //import com.tracki.utils.geofence.AddGeoFenceUtil
 import com.trackthat.lib.TrackThat
 import com.trackthat.lib.internal.network.TrackThatCallback
@@ -79,9 +83,10 @@ import javax.inject.Inject
 
 
 class TaskDetailsFragment :
-    BaseFragment<LayoutFrgmrntTaskDetailsBinding, NewTaskDetailsViewModel>(), TaskAssignToMeViewModel.AssignedtoMeItemViewModelListener,
+    BaseFragment<LayoutFrgmrntTaskDetailsBinding, NewTaskDetailsViewModel>(),
+    TaskAssignToMeViewModel.AssignedtoMeItemViewModelListener,
     TaskClickListener, TaskTimeLineAdapter.PreviousFormListener,
-     TDNavigator, DynamicAdapter.AdapterListener{
+    TDNavigator, DynamicAdapter.AdapterListener {
 
 
     private val REQUEST_CAMERA: Int=101
@@ -105,6 +110,8 @@ class TaskDetailsFragment :
 
     lateinit var rvFields: RecyclerView
 
+    var paymentUrl = ""
+
     var scannerFieldName: String? = null
     var scannerFieldValue: String? = null
     private var dynamicFragment: DynamicFragment? = null
@@ -126,6 +133,8 @@ class TaskDetailsFragment :
     private var task: Task? = null
 
     lateinit var showDynamicFormDataAdapter: ShowDynamicFormDataAdapter
+
+    var addGeoFenceUtil: AddGeoFenceUtil? = null
 
     var taskId: String? = null
     private var api: Api? = null
@@ -188,8 +197,8 @@ class TaskDetailsFragment :
         sheetBehavior.isFitToContents = true
         sheetBehavior.setPeekHeight(CommonUtils.dpToPixel(activity, 80), true)
         sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        //getTaskData()
-        //expandCollapse()
+        getTaskData()
+        expandCollapse()
 
         showDynamicFormDataAdapter = ShowDynamicFormDataAdapter(ArrayList())
 
@@ -203,19 +212,14 @@ class TaskDetailsFragment :
         tvLabelTakeAction!!.setOnClickListener {
             sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
-//        mActivityNewTaskDetailBinding.cvChat.setOnClickListener {
-////            initSocket()
-////            connectSocket(this)
-//            openRoom()
-//        }
     }
 
     companion object {
         fun newInstance(taskId: String?, categoryId: String?, FROM: String?): TaskDetailsFragment? {
             val args = Bundle()
-            args.putString(AppConstants.Extra.EXTRA_TASK_ID, taskId)
-            args.putString(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
-            args.putString(AppConstants.Extra.FROM, FROM)
+            args.putString(Extra.EXTRA_TASK_ID, taskId)
+            args.putString(Extra.EXTRA_CATEGORY_ID, categoryId)
+            args.putString(Extra.FROM, FROM)
             val fragment = TaskDetailsFragment()
             fragment.arguments = args
             return fragment
@@ -227,26 +231,24 @@ class TaskDetailsFragment :
     private fun getTaskData() {
         if (arguments != null) {
 
-            if (requireArguments().getString(AppConstants.Extra.EXTRA_TASK_ID) != null) {
-                taskId = requireArguments().getString(AppConstants.Extra.EXTRA_TASK_ID)
+            if (requireArguments().getString(Extra.EXTRA_TASK_ID) != null) {
+                taskId = requireArguments().getString(Extra.EXTRA_TASK_ID)
 
             }
-            if (requireArguments().getString(AppConstants.Extra.FROM) != null) {
-                FROM = requireArguments().getString(AppConstants.Extra.FROM)
+            if (requireArguments().getString(Extra.FROM) != null) {
+                FROM = requireArguments().getString(Extra.FROM)
 
             }
-            if (requireArguments().getString(AppConstants.Extra.EXTRA_CATEGORY_ID) != null) {
-                categoryId = requireArguments().getString(AppConstants.Extra.EXTRA_CATEGORY_ID)
+            if (requireArguments().getString(Extra.EXTRA_CATEGORY_ID) != null) {
+                categoryId = requireArguments().getString(Extra.EXTRA_CATEGORY_ID)
 
             }
             Log.d("categoryId", categoryId)
             showLoading()
             api = TrackiApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
-
-            if (api != null && ::mNewTaskViewModel.isInitialized) {
-                Log.d("API", api!!.url);
+            Log.d("API", api!!.url);
+            if (api != null && ::mNewTaskViewModel.isInitialized)
                 mNewTaskViewModel.getTaskById(httpManager, AcceptRejectRequest(taskId!!), api)
-            }
             val startLocationLabel =
                 CommonUtils.getAllowFieldLabelName("START_LOCATION", categoryId, preferencesHelper)
             if (!startLocationLabel.isEmpty()) {
@@ -300,12 +302,12 @@ class TaskDetailsFragment :
                     labelEndAt.text = endTime
                 }
                 val assigneeLabel =
-                    CommonUtils.getAssigneeLabel( categoryId, preferencesHelper)
+                    CommonUtils.getAssigneeLabel(categoryId, preferencesHelper)
                 if (!assigneeLabel.isEmpty()) {
                     tvClientsDetails.text = assigneeLabel
                 }
                 val buddyLabel =
-                    CommonUtils.getBuddyLabel( categoryId, preferencesHelper)
+                    CommonUtils.getBuddyLabel(categoryId, preferencesHelper)
                 if (!buddyLabel.isEmpty()) {
                     tvAssignedTolable.text = buddyLabel
                 }
@@ -313,16 +315,16 @@ class TaskDetailsFragment :
 
                 mActivityNewTaskDetailBinding.llQrCode.setOnClickListener {
                     if (qrUrl != "na")
-                        startActivity(Intent(context,OrderCodeActivity::class.java).putExtra("qrUrl",qrUrl))
+                        startActivity(
+                            Intent(
+                                context,
+                                OrderCodeActivity::class.java
+                            ).putExtra("qrUrl", qrUrl)
+                        )
                 }
 
 
-
             }
-
-
-
-
 
 
         }
@@ -346,8 +348,8 @@ class TaskDetailsFragment :
                 if (taskResponse != null) {
 
                     task = taskResponse!!.taskDetail
-                    if(categoryId.isNullOrEmpty())
-                        categoryId=task?.categoryId
+                    if (categoryId.isNullOrEmpty())
+                        categoryId = task?.categoryId
                     val itemViewModel = TaskAssignToMeViewModel(
                         task,
                         this, baseActivity, preferencesHelper, categoryId
@@ -419,12 +421,13 @@ class TaskDetailsFragment :
 
                     }
 
-                    if (task!!.encCodeUrl != null){
+                    Log.e("code", "check => ${task!!.encCodeUrl}")
+                    if (task!!.encCodeUrl != null) {
                         qrUrl = task!!.encCodeUrl.toString()
                         GlideApp.with(baseActivity).load(qrUrl)
                             .into(mActivityNewTaskDetailBinding.ivQrCode)
-                    }
-                    else{
+                    } else {
+
                         mActivityNewTaskDetailBinding.llQrCode.visibility = View.GONE
                     }
                     ivPinEndLocation.setOnClickListener {
@@ -452,7 +455,7 @@ class TaskDetailsFragment :
                             if (FROM.equals(AppConstants.Extra.ASSIGNED_TO_ME)) {
                                 startActivity(
                                     TaskDetailActivity.Companion.newIntent(baseActivity)
-                                        .putExtra(AppConstants.Extra.EXTRA_TASK_ID, task!!.taskId)
+                                        .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
                                 );
                             } else {
                                 if (preferencesHelper.userDetail != null && preferencesHelper.userDetail.userId != null && !preferencesHelper.userDetail!!.userId!!.isEmpty()) {
@@ -476,7 +479,7 @@ class TaskDetailsFragment :
                         if (FROM.equals(AppConstants.Extra.ASSIGNED_TO_ME)) {
                             startActivity(
                                 TaskDetailActivity.Companion.newIntent(baseActivity)
-                                    .putExtra(AppConstants.Extra.EXTRA_TASK_ID, task!!.taskId)
+                                    .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
                             );
                         } else {
                             if (preferencesHelper.userDetail != null && preferencesHelper.userDetail.userId != null && !preferencesHelper.userDetail!!.userId!!.isEmpty()) {
@@ -509,27 +512,17 @@ class TaskDetailsFragment :
                                     data.dfdId = history.dfdId
                                     dynamicFormsNew = CommonUtils.getFormByFormId(formId!!)
                                     if (dynamicFormsNew != null && dynamicFormsNew!!.version != null) {
-                                        data.dfVersion = Integer.valueOf(dynamicFormsNew!!.version!!)
+                                        data.dfVersion =
+                                            Integer.valueOf(dynamicFormsNew!!.version!!)
                                     }
                                     data.taskId = taskId
                                     mNewTaskViewModel.getTaskData(httpManager, data)
 
                                 }
-                                //llDetails.visibility = View.VISIBLE
-                            } else {
-                                //llDetails.visibility = View.GONE
                             }
                         }
 
                         timeLineAdapter.addData(list)
-                        //dataForm = list[list.size - 1]
-                        /*llDetails.setOnClickListener {
-                            if (list.isNotEmpty()) {
-                                openForm(list[list.size - 1])
-                            }
-                        }*/
-                    } else {
-                        //llDetails.visibility = View.GONE
                     }
 
 
@@ -575,21 +568,44 @@ class TaskDetailsFragment :
         }
     }
 
+    override fun handlePaymentUrlResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        hideLoading()
+
+
+        val response = Gson().fromJson<BaseResponse>(
+            result.toString(),
+            BaseResponse::class.java
+        )
+        Log.e("response", "$response")
+        if (response.successful) {
+            if (response.paymentUrl != null) {
+                paymentUrl = response.paymentUrl!!
+                if (paymentUrl.isNotEmpty()) {
+                    val intent = Intent(context, PaymentViewActivity::class.java)
+                    intent.putExtra("url", paymentUrl)
+                    intent.putExtra(Extra.EXTRA_CATEGORY_ID,categoryId)
+                    intent.putExtra(Extra.EXTRA_TASK_ID,taskId)
+                    intent.putExtra(Extra.FROM,FROM)
+                    startActivity(intent)
+                }
+            }
+        }
+
+    }
+
     private fun perFormLocationReminder(task: Task?) {
         if (task != null) {
             if (task.currentStage != null && !task.currentStage!!.terminal!! && task.startTime > System.currentTimeMillis()) {
                 if (task.source != null && task.source!!.location != null) {
                     var taskId = task.taskId + "#" + "Start Location"
 
-//                    task.source!!.location!!.latitude=25.216191
-//                    task.source!!.location!!.longitude=80.925242
-                    //addGeoFenceUtil!!.addGeofence(taskId, task.source!!.location, 500f)
+                    addGeoFenceUtil!!.addGeofence(taskId, task.source!!.location, 500f)
                 }
             }
             if (task.currentStage != null && !task.currentStage!!.terminal!! && task.endTime > System.currentTimeMillis()) {
                 if (task.destination != null && task.destination!!.location != null) {
                     var taskId = task.taskId + "#" + "End Location"
-                    //addGeoFenceUtil!!.addGeofence(taskId, task.destination!!.location, 500f)
+                    addGeoFenceUtil!!.addGeofence(taskId, task.destination!!.location, 500f)
                 }
             }
         }
@@ -771,84 +787,10 @@ class TaskDetailsFragment :
 
     }
 
-    override fun onExecuteUpdates(id: String?, task: Task?) {
-        ctaID = id
-        this.task = task
-        Log.e("checkID","$ctaID")
-        Log.e(TAG, "onExecuteUpdates: $task")
 
 
-        if (task!!.currentStage != null) {
-            val callToActionList = task.currentStage!!.callToActions
-
-
-
-            if (callToActionList != null && callToActionList.size > 0) {
-                for (i in callToActionList.indices) {
-                    if (callToActionList[i].id.equals(id, ignoreCase = true)) {
-                        callToActions = callToActionList[i]
-                        break
-                    }
-                }
-            }
-            if (callToActions != null) {
-
-
-                // if (callToActions.getTargetInfo() != null && callToActions.getTargetInfo().getTarget() == TRAGETINFO.CREATE_TASK)
-                if (callToActions!!.targetInfo != null && callToActions!!.targetInfo!!.target == TRAGETINFO.CREATE_TASK) {
-                    //                    val message = "Are you sure you want to perform ?"
-                    //                    val dialog = DoubleButtonDialog(requireContext(),
-                    //                            true,
-                    //                            null,
-                    //                            message,
-                    //                            getString(R.string.yes),
-                    //                            getString(R.string.no),
-                    //                            object : OnClickListener {
-                    //                                override fun onClickCancel() {}
-                    //                                override fun onClick() {
-                    //                                    val intent = newIntent(baseActivity)
-                    //                                    intent.putExtra(Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, false)
-                    //                                    intent.putExtra(Extra.FROM, "taskListing")
-                    //                                    if (callToActions!!.categoryId != null) {
-                    //                                        val dashBoardBoxItem = DashBoardBoxItem()
-                    //                                        dashBoardBoxItem.categoryId = callToActions!!.categoryId
-                    //                                        val map = Gson().toJson(dashBoardBoxItem)
-                    //                                        intent.putExtra(Extra.EXTRA_CATEGORIES, map)
-                    //                                        intent.putExtra(Extra.EXTRA_PAREN_TASK_ID, task.taskId)
-                    //                                        intent.putExtra(Extra.EXTRA_PARENT_REF_ID, task.referenceId)
-                    //                                    }
-                    //                                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
-                    //                                }
-                    //                            })
-                    //                    dialog.show()
-                    val intent = NewCreateTaskActivity.newIntent(baseActivity)
-                    intent.putExtra(
-                        Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU,
-                        false
-                    )
-                    intent.putExtra(Extra.FROM, "taskListing")
-                    if (callToActions!!.categoryId != null) {
-                        val dashBoardBoxItem = DashBoardBoxItem()
-                        // dashBoardBoxItem.categoryId = callToActions!!.categoryId
-                        if (callToActions!!.targetInfo!!.category != null)
-                            dashBoardBoxItem.categoryId =
-                                callToActions!!.targetInfo!!.category
-                        val map = Gson().toJson(dashBoardBoxItem)
-                        intent.putExtra(Extra.EXTRA_CATEGORIES, map)
-                        intent.putExtra(Extra.EXTRA_PAREN_TASK_ID, task.taskId)
-                        intent.putExtra(Extra.EXTRA_PARENT_REF_ID, task.referenceId)
-                    }
-                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
-                } else {
-                    perFormCtaAction()
-                }
-
-            }
-
-        }
-    }
     fun getInvAction(categoryId: String?): String? {
-        var invAction:String?=null
+        var invAction: String? = null
         var workFlowCategoriesList: List<WorkFlowCategories> =
             preferencesHelper.workFlowCategoriesList
         if (!workFlowCategoriesList.isNullOrEmpty()) {
@@ -856,8 +798,8 @@ class TaskDetailsFragment :
                 if (i.categoryId != null && categoryId != null)
                     if (i.categoryId == categoryId) {
 
-                        if (i.inventoryConfig != null && i.inventoryConfig!!.invAction != null &&  i.inventoryConfig!!.invAction!!.name.isNotEmpty())
-                            invAction=i.inventoryConfig!!.invAction!!.name
+                        if (i.inventoryConfig != null && i.inventoryConfig!!.invAction != null && i.inventoryConfig!!.invAction!!.name.isNotEmpty())
+                            invAction = i.inventoryConfig!!.invAction!!.name
                     }
             }
         }
@@ -866,12 +808,12 @@ class TaskDetailsFragment :
         return invAction
     }
 
-    fun String.getCtaInventoryConfig():CtaInventoryConfig{
-        var ctaInventoryConfig=CtaInventoryConfig()
+    fun String.getCtaInventoryConfig(): CtaInventoryConfig {
+        var ctaInventoryConfig = CtaInventoryConfig()
         try {
-            var jsonConverter=JSONConverter<CtaInventoryConfig>()
-            ctaInventoryConfig=jsonConverter.jsonToObject(this,CtaInventoryConfig::class.java)
-        }catch (e:JsonParseException){
+            var jsonConverter = JSONConverter<CtaInventoryConfig>()
+            ctaInventoryConfig = jsonConverter.jsonToObject(this, CtaInventoryConfig::class.java)
+        } catch (e: JsonParseException) {
             return ctaInventoryConfig
         }
         return ctaInventoryConfig
@@ -884,12 +826,13 @@ class TaskDetailsFragment :
     ) {
         if (requestCode == REQUEST_CAMERA) {
             if (grantResults.isNotEmpty()) {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     openScanActivity()
                 }
             }
         } else super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
     fun getCameraPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (baseActivity.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
@@ -912,11 +855,21 @@ class TaskDetailsFragment :
     }
 
     private fun perFormCtaAction() {
-        Log.e("checkLog","$callToActions")
-        if (callToActions!!.dynamicFormId != null && callToActions!!.dynamicFormId!!.isNotEmpty() ) {
+        Log.e("checkLog", "${callToActions!!.targetInfo!!.target}")
+
+        if (callToActions!!.targetInfo!!.target == TRAGETINFO.PAYMENT) {
+
+            var paymentRequest = PaymentRequest()
+
+            paymentRequest.taskId = taskId
+            paymentRequest.ctaId = ctaID
+
+            mNewTaskViewModel.getPaymentUrl(httpManager, paymentRequest)
+
+        } else if (callToActions!!.dynamicFormId != null && callToActions!!.dynamicFormId!!.isNotEmpty()) {
 
 
-            if(calculateCondition()) {
+            if (calculateCondition()) {
                 foundWidgetItem = CommonUtils.getFormByFormIdContainsWidget(
                     callToActions!!.dynamicFormId,
                     DataType.SCANNER
@@ -935,7 +888,7 @@ class TaskDetailsFragment :
         } else {
             var setDirect = false
             setDirect = callToActions!!.targetInfo!!.target == TRAGETINFO.ASSIGN_EXECUTIVE
-            if (setDirect){
+            if (setDirect) {
                 try {
                     if (callToActions!!.targetInfo != null && callToActions!!.targetInfo!!.target === TRAGETINFO.TAG_INVENTORY) {
                         if (activity != null) {
@@ -949,30 +902,35 @@ class TaskDetailsFragment :
                             )
                             intent.putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
                             intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-                            if(callToActions!!.targetInfo!!.category!=null&&callToActions!!.targetInfo!!.category!!.isNotEmpty())
-                                intent.putExtra(Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, callToActions!!.targetInfo!!.category)
+                            if (callToActions!!.targetInfo!!.category != null && callToActions!!.targetInfo!!.category!!.isNotEmpty())
+                                intent.putExtra(
+                                    Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID,
+                                    callToActions!!.targetInfo!!.category
+                                )
 
 
-                            if(!callToActions!!.targetInfo!!.targetInfo.isNullOrEmpty()){
-                                var ctaInventoryConfig=callToActions!!.targetInfo!!.targetInfo!!.getCtaInventoryConfig()
-                                if(!ctaInventoryConfig.invAction.isNullOrEmpty()) {
+                            if (!callToActions!!.targetInfo!!.targetInfo.isNullOrEmpty()) {
+                                var ctaInventoryConfig =
+                                    callToActions!!.targetInfo!!.targetInfo!!.getCtaInventoryConfig()
+                                if (!ctaInventoryConfig.invAction.isNullOrEmpty()) {
                                     intent.putExtra(
                                         Extra.EXTRA_TASK_TAG_INV_TARGET,
                                         ctaInventoryConfig.invAction
                                     )
-                                }
-                                else{
-                                    var invAction=getInvAction(categoryId)
-                                    if(invAction!=null&&invAction.isNotEmpty())
+                                } else {
+                                    var invAction = getInvAction(categoryId)
+                                    if (invAction != null && invAction.isNotEmpty())
                                         intent.putExtra(Extra.EXTRA_TASK_TAG_INV_TARGET, invAction)
                                 }
-                                if(ctaInventoryConfig.dynamicPricing!=null)
-                                    intent.putExtra(Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, ctaInventoryConfig.dynamicPricing)
+                                if (ctaInventoryConfig.dynamicPricing != null)
+                                    intent.putExtra(
+                                        Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING,
+                                        ctaInventoryConfig.dynamicPricing
+                                    )
 
-                            }
-                            else{
-                                var invAction=getInvAction(categoryId)
-                                if(invAction!=null&&invAction.isNotEmpty())
+                            } else {
+                                var invAction = getInvAction(categoryId)
+                                if (invAction != null && invAction.isNotEmpty())
                                     intent.putExtra(Extra.EXTRA_TASK_TAG_INV_TARGET, invAction)
                             }
                             startActivityForResult(
@@ -988,8 +946,7 @@ class TaskDetailsFragment :
                     Log.e(TAG, "onExecuteUpdates: ${e}")
                     e.printStackTrace()
                 }
-            }
-            else {
+            } else {
                 if (callToActions!!.targetInfo!!.target == TRAGETINFO.UNIT_INFO) {
                     if (activity != null) {
                         val intent = SkuInfoActivity.newIntent(baseActivity)
@@ -1083,26 +1040,26 @@ class TaskDetailsFragment :
         }
     }
 
-    private fun openDynamicFormScreen(id:String?=null) {
-        var dfIntent=DynamicFormActivity.Companion.newIntent(baseActivity)
-            .putExtra(AppConstants.Extra.EXTRA_FORM_TYPE, callToActions!!.name)
-            .putExtra(AppConstants.Extra.EXTRA_FORM_ID, callToActions!!.dynamicFormId)
-            .putExtra(AppConstants.Extra.EXTRA_TASK_ID, task!!.taskId)
-            .putExtra(AppConstants.Extra.EXTRA_CTA_ID, callToActions!!.id)
+    private fun openDynamicFormScreen(id: String? = null) {
+        var dfIntent = DynamicFormActivity.newIntent(baseActivity)
+            .putExtra(Extra.EXTRA_FORM_TYPE, callToActions!!.name)
+            .putExtra(Extra.EXTRA_FORM_ID, callToActions!!.dynamicFormId)
+            .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+            .putExtra(Extra.EXTRA_CTA_ID, callToActions!!.id)
             .putExtra(
-                AppConstants.Extra.EXTRA_IS_EDITABLE,
+                Extra.EXTRA_IS_EDITABLE,
                 callToActions!!.dynamicFormEditable
             )
-        if(::foundWidgetItem.isInitialized&&id!=null){
+        if (::foundWidgetItem.isInitialized && id != null) {
             dfIntent.apply {
-                putExtra(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME,foundWidgetItem.name)
+                putExtra(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME, foundWidgetItem.name)
             }
             dfIntent.apply {
-                putExtra(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE,id)
+                putExtra(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE, id)
             }
         }
         startActivityForResult(
-            dfIntent ,
+            dfIntent,
             AppConstants.REQUEST_CODE_DYNAMIC_FORM
         )
     }
@@ -1112,6 +1069,80 @@ class TaskDetailsFragment :
     }
 
     override fun onCallClick(task: Task?, position: Int) {
+    }
+
+    override fun onExecuteUpdates(id: String?, task: Task?, cta: String?) {
+        ctaID = id
+        this.task = task
+        Log.e("checkID", "$ctaID")
+        Log.e(TAG, "onExecuteUpdates: $task")
+
+
+        if (task!!.currentStage != null) {
+            val callToActionList = task.currentStage!!.callToActions
+
+            if (callToActionList != null && callToActionList.size > 0) {
+                for (i in callToActionList.indices) {
+                    if (callToActionList[i].id.equals(id, ignoreCase = true)) {
+                        callToActions = callToActionList[i]
+                        break
+                    }
+                }
+            }
+            if (callToActions != null) {
+
+
+                // if (callToActions.getTargetInfo() != null && callToActions.getTargetInfo().getTarget() == TRAGETINFO.CREATE_TASK)
+                if (callToActions!!.targetInfo != null && callToActions!!.targetInfo!!.target == TRAGETINFO.CREATE_TASK) {
+                    //                    val message = "Are you sure you want to perform ?"
+                    //                    val dialog = DoubleButtonDialog(requireContext(),
+                    //                            true,
+                    //                            null,
+                    //                            message,
+                    //                            getString(R.string.yes),
+                    //                            getString(R.string.no),
+                    //                            object : OnClickListener {
+                    //                                override fun onClickCancel() {}
+                    //                                override fun onClick() {
+                    //                                    val intent = newIntent(baseActivity)
+                    //                                    intent.putExtra(Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, false)
+                    //                                    intent.putExtra(Extra.FROM, "taskListing")
+                    //                                    if (callToActions!!.categoryId != null) {
+                    //                                        val dashBoardBoxItem = DashBoardBoxItem()
+                    //                                        dashBoardBoxItem.categoryId = callToActions!!.categoryId
+                    //                                        val map = Gson().toJson(dashBoardBoxItem)
+                    //                                        intent.putExtra(Extra.EXTRA_CATEGORIES, map)
+                    //                                        intent.putExtra(Extra.EXTRA_PAREN_TASK_ID, task.taskId)
+                    //                                        intent.putExtra(Extra.EXTRA_PARENT_REF_ID, task.referenceId)
+                    //                                    }
+                    //                                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
+                    //                                }
+                    //                            })
+                    //                    dialog.show()
+                    val intent = NewCreateTaskActivity.newIntent(baseActivity)
+                    intent.putExtra(
+                        Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU,
+                        false
+                    )
+                    intent.putExtra(Extra.FROM, "taskListing")
+                    if (callToActions!!.categoryId != null) {
+                        val dashBoardBoxItem = DashBoardBoxItem()
+                        // dashBoardBoxItem.categoryId = callToActions!!.categoryId
+                        if (callToActions!!.targetInfo!!.category != null)
+                            dashBoardBoxItem.categoryId =
+                                callToActions!!.targetInfo!!.category
+                        val map = Gson().toJson(dashBoardBoxItem)
+                        intent.putExtra(Extra.EXTRA_CATEGORIES, map)
+                        intent.putExtra(Extra.EXTRA_PAREN_TASK_ID, task.taskId)
+                        intent.putExtra(Extra.EXTRA_PARENT_REF_ID, task.referenceId)
+                    }
+                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
+                } else {
+                    perFormCtaAction()
+                }
+
+            }
+        }
     }
 
     override fun onDetailsTaskClick(task: Task?) {
@@ -1124,8 +1155,6 @@ class TaskDetailsFragment :
 
     override fun onResume() {
         super.onResume()
-        getTaskData()
-        expandCollapse()
         getCurrentLocation()
         initSocket()
        // connectSocket(this)
@@ -1145,8 +1174,6 @@ class TaskDetailsFragment :
             }
 
             override fun onError(errorResponse: ErrorResponse) {
-//                if(currentLocation==null)
-//                currentLocation = null
                 Log.e(TAG, "onError: " + errorResponse.errorMessage)
             }
         })
@@ -1349,6 +1376,8 @@ class TaskDetailsFragment :
      */
     private fun manageTracking(taskId: String, formData: TaskData?) {
         //start the tracking if no ongoing task is running
+
+        Log.e("CTA", "${callToActions!!.targetInfo!!.target}")
         if (callToActions!!.tracking === Tracking.START) {
             if (preferencesHelper.idleTripActive) {
                 TrackThat.stopTracking()
@@ -1416,29 +1445,37 @@ class TaskDetailsFragment :
             request.dfdId = dfdId
         if (callToActions!!.dynamicFormId != null)
             request.dfId = callToActions!!.dynamicFormId
-        if(callToActions!!.targetInfo!!.target == TRAGETINFO.ASSIGN_EXECUTIVE){
-            Log.e("assignExec","${callToActions?.targetInfo?.targetValues} - Values")
-            hideLoading()
-            if (callToActions?.targetInfo?.targetValues != null) {
+        if (callToActions!!.targetInfo!!.target == TRAGETINFO.ASSIGN_EXECUTIVE) {
+            Log.e("assignExec", "${callToActions?.targetInfo?.targetValues} - Values")
+
+            val jsonConverter: JSONConverter<SyncInfo> = JSONConverter()
+            var response: SyncInfo = jsonConverter.jsonToObject("${callToActions!!.targetInfo!!.targetInfo}", SyncInfo::class.java) as SyncInfo
+
+            Log.e("assignExec", "check = ${ response.syncInfo.toString() }")
+            if (callToActions?.targetInfo?.targetValues != null && response.syncInfo == true) {
                 var rIds = ""
                 val intent = Intent(context, UserListNewActivity::class.java)
+                intent.putExtra("taskId",taskId)
                 val listIds = callToActions?.targetInfo?.targetValues!!
                 for (i in 0 until listIds.size) {
-                    rIds += if (i>0)
+                    rIds += if (i > 0)
                         ",${listIds[i]}"
                     else
                         listIds[i]
                 }
                 intent.putExtra("roleIds", rIds)
 
-                intent.putExtra("request",request as ExecuteUpdateRequest)
+                intent.putExtra("request", request as ExecuteUpdateRequest)
+
                 context?.startActivity(intent)
-            }
-            else {
-                TrackiToast.Message.showShort(context,"No Id Found")
+                requireActivity().finish()
+
+            } else {
+                hideLoading()
+                TrackiToast.Message.showShort(context, "No Id Found Or Not Synced")
             }
 
-        }else {
+        } else {
             mNewTaskViewModel.executeUpdates(httpManager, request, api!!)
         }
         dfId = null
@@ -1588,19 +1625,22 @@ class TaskDetailsFragment :
             } else if (requestCode == AppConstants.REQUEST_CODE_SCAN) {
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null && data.hasExtra("id")) {
-                        var id=data.getStringExtra("id")
+                        var id = data.getStringExtra("id")
                         openDynamicFormScreen(id)
-                    }else{
+                    } else {
                         openDynamicFormScreen()
                     }
 
-                }else{
+                } else {
                     openDynamicFormScreen()
                 }
             } else
                 if (requestCode == AppConstants.REQUEST_CODE_UNIT_INFO) {
                     if (resultCode == Activity.RESULT_OK) {
-                        Log.d("AppConstants.Extra.EXTRA_CATEGORY_ID", "data!!.getStringExtra(Extra.EXTRA_CATEGORY_ID)")
+                        Log.d(
+                            "AppConstants.Extra.EXTRA_CATEGORY_ID",
+                            "data!!.getStringExtra(Extra.EXTRA_CATEGORY_ID)"
+                        )
                         //  Log.d("AppConstants.Extra.EXTRA_CATEGORY_ID", data!!.getStringExtra(Extra.EXTRA_CATEGORY_ID))
                         //  Log.d("AppConstants.Extra.EXTRA_TASK_ID", data.getStringExtra(Extra.EXTRA_TASK_ID))
                         getTaskData()
@@ -1614,7 +1654,7 @@ class TaskDetailsFragment :
 //        }
         if (callToActions!!.dynamicFormId != null && !callToActions!!.dynamicFormId!!.isEmpty()) {
 
-            if(calculateCondition()) {
+            if (calculateCondition()) {
                 startActivityForResult(
                     newIntent(baseActivity)
                         .putExtra(Extra.EXTRA_FORM_TYPE, callToActions!!.name)
@@ -1648,12 +1688,12 @@ class TaskDetailsFragment :
             //replaceFragment(dynamicFragment!!, formId)*/
             startActivityForResult(
                 DynamicFormActivity.Companion.newIntent(baseActivity)
-                    .putExtra(AppConstants.Extra.EXTRA_FORM_TYPE, dataModel.stage!!.name)
-                    .putExtra(AppConstants.Extra.EXTRA_FORM_ID, dataModel.dfdId)
+                    .putExtra(Extra.EXTRA_FORM_TYPE, dataModel.stage!!.name)
+                    .putExtra(Extra.EXTRA_FORM_ID, dataModel.dfdId)
                     .putExtra(AppConstants.Extra.EXTRA_TCF_ID, dataModel.dfdId)
-                    .putExtra(AppConstants.Extra.EXTRA_TASK_ID, task!!.taskId)
-                    .putExtra(AppConstants.Extra.EXTRA_CTA_ID, dataModel.ctaId)
-                    .putExtra(AppConstants.Extra.EXTRA_IS_EDITABLE, false)
+                    .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+                    .putExtra(Extra.EXTRA_CTA_ID, dataModel.ctaId)
+                    .putExtra(Extra.EXTRA_IS_EDITABLE, false)
                     .putExtra(AppConstants.Extra.HIDE_BUTTON, true),
                 AppConstants.REQUEST_CODE_DYNAMIC_FORM
             )

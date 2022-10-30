@@ -100,7 +100,7 @@ class AddProductViewModel (dataManager: DataManager, schedulerProvider: Schedule
     }
 
     inner class UpdateProfilePic(var data: UpdateFileRequest) : ApiCallback {
-        override fun onResponse(result: Any, error: APIError?) {
+        override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
                 navigator.handleSendImageResponse(this, result, error)
         }

@@ -116,6 +116,14 @@
                         android:textSize="@dimen/text_size_13"
                         tools:text="19 April 2020 ,11:34 AM" />
 
+                    <ImageView
+                        android:id="@+id/imageTracking"
+                        android:layout_width="@dimen/dimen_30"
+                        android:layout_height="@dimen/dimen_30"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="@dimen/dimen_10"
+                        app:srcCompat="@drawable/iv_track_vandor" />
 
                 </RelativeLayout>
 
@@ -185,22 +193,24 @@
                         android:textColor="@color/colorTextGreyPunch"
                         android:textSize="@dimen/text_size_13"
                         tools:text="19 April 2020 ,11:34 AM" />
+
                     <TextView
-                        android:layout_marginRight="@dimen/dimen_20"
-                        android:layout_alignParentRight="true"
                         style="@style/TextViewStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:paddingRight="@dimen/dimen_10"
+                        android:layout_marginLeft="@dimen/dimen_50"
+                        android:layout_marginRight="5dp"
+                        android:layout_toStartOf="@+id/imageTracking"
                         android:paddingLeft="@dimen/dimen_10"
-                        android:paddingBottom="@dimen/dimen_5"
                         android:paddingTop="@dimen/dimen_5"
-                        android:visibility="@{viewModel.highLightExpiry ? View.VISIBLE : View.GONE}"
-                        app:highbackgroundshaped="@{viewModel.validExpiry}"
-                        android:layout_marginLeft="@dimen/dimen_10"
+                        android:paddingRight="@dimen/dimen_10"
+                        android:paddingBottom="@dimen/dimen_5"
                         android:text="@{viewModel.expiryText}"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:visibility="@{viewModel.highLightExpiry ? View.VISIBLE : View.GONE}"
+                        app:highbackgroundshaped="@{viewModel.validExpiry}" />
 
                 </RelativeLayout>
 
@@ -214,8 +224,8 @@
 
                 <ImageView
                     android:id="@+id/imageReffrenceId"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="@dimen/dimen_16"
+                    android:layout_height="@dimen/dimen_16"
                     android:layout_centerVertical="true"
                     android:visibility="visible"
                     android:layout_marginLeft="@dimen/dimen_2"
@@ -288,8 +298,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:visibility="visible"
                         android:onClick="@{()->viewModel.onCallClick()}"
+                        android:visibility="visible"
                         app:srcCompat="@drawable/ic_phone_usage" />
 
                     <RelativeLayout

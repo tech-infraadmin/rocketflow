@@ -1,5 +1,8 @@
 package com.tracki.ui.main;
 
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.tracki.TrackiApplication;
 import com.tracki.data.DataManager;
 import com.tracki.data.model.request.BuddiesRequest;
@@ -17,6 +20,7 @@ import com.tracki.utils.ApiType;
 import com.tracki.utils.BuddyInfo;
 import com.tracki.utils.BuddyStatus;
 import com.tracki.utils.Log;
+import com.tracki.utils.rx.AppSchedulerProvider;
 import com.tracki.utils.rx.SchedulerProvider;
 
 import java.util.ArrayList;
@@ -435,5 +439,19 @@ public class MainViewModel extends BaseViewModel<MainNavigator> {
         }
     }
 
+
+
+    static class Factory implements ViewModelProvider.Factory {
+        private final DataManager mDataManager;
+
+        Factory(DataManager mDataManager) {
+            this.mDataManager = mDataManager;
+        }
+
+        @Override
+        public <T extends ViewModel> T create(Class<T> modelClass) {
+            return (T) new MainViewModel(mDataManager, new AppSchedulerProvider());
+        }
+    }
 
 }

@@ -1194,7 +1194,7 @@ open class NewCreateTaskActivity :
             }
         } else {
             cardViewCategoryId.visibility = View.VISIBLE
-            setToolbar(mActivityCreateTaskBinding.toolbar, getString(R.string.create_task))
+            setToolbar(mActivityCreateTaskBinding.toolbar, "Create " + getLabelName(categoryId))
 
         }
 
@@ -1551,9 +1551,10 @@ open class NewCreateTaskActivity :
         val formName = CommonUtils.getFormByFormId(fragmentName)
         //  CommonUtils.showLogMessage("e", "formid", fragmentName);
         if (formName?.name != null) {
-            mActivityCreateTaskBinding?.toolbar?.title = formName.name
+            setToolbar(mActivityCreateTaskBinding.toolbar, "Create " + getLabelName(categoryId))
         } else {
-            mActivityCreateTaskBinding?.toolbar?.title = ""
+//            mActivityCreateTaskBinding?.toolbar?.title = ""
+            setToolbar(mActivityCreateTaskBinding.toolbar, "Create " + getLabelName(categoryId))
         }
 
         val manager = supportFragmentManager
@@ -3243,22 +3244,25 @@ open class NewCreateTaskActivity :
     }
 
     private fun setSlots() {
-        if(slotDataResponse.data!!.keys.isEmpty()){ return}
+        if (slotDataResponse.data!!.keys.isNotEmpty()) {
+            val size = slotDataResponse.data!!.size
+            if (size > timePosition){
+                val key = slotDataResponse.data!!.keys.elementAt(timePosition)
+                dateFinal = key
+                val timeSlots = slotDataResponse.data!!.get(key)
 
-        val key = slotDataResponse.data!!.keys.elementAt(timePosition)
-        dateFinal = key
-        val timeSlots = slotDataResponse.data!!.get(key)
+                if (timeSlots?.totalAvailableSlots != null) {
+                    if (timeSlots.totalAvailableSlots > 0) {
 
-        if (timeSlots?.totalAvailableSlots != null) {
-            if (timeSlots.totalAvailableSlots > 0) {
+                        val slots = timeSlots.slots as ArrayList<Slot>
 
-                val slots = timeSlots.slots as ArrayList<Slot>
+                        val slotChildAdapter = SlotChildAdapter(slots, this)
+                        rvSlot.adapter = slotChildAdapter
 
-                val slotChildAdapter = SlotChildAdapter(slots,this)
-                rvSlot.adapter = slotChildAdapter
-
-                slotChildAdapter.onItemClick = { timeString ->
-                    selectTimeCall(timeString)
+                        slotChildAdapter.onItemClick = { timeString ->
+                            selectTimeCall(timeString)
+                        }
+                    }
                 }
             }
         }

@@ -203,6 +203,17 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
+        <activity android:name=".ui.webview.PaymentViewActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name=".ui.main.MainSDKActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+
 
     </application>
 

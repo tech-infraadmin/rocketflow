@@ -13,6 +13,8 @@ import com.tracki.BuildConfig;
 import com.tracki.data.model.BaseResponse;
 import com.tracki.data.model.request.AddEmployeeRequest;
 import com.tracki.data.model.request.AddressInfo;
+import com.tracki.data.model.request.EligibleUserRequest;
+import com.tracki.data.model.request.PaymentRequest;
 import com.tracki.data.model.request.PlaceRequest;
 import com.tracki.data.model.request.SKUInfoSpecsRequest;
 import com.tracki.data.model.request.UpdateFileRequest;
@@ -753,6 +755,22 @@ public class NetworkManagerImpl implements NetworkManager {
         postApiCall(apiCallback, httpManager, api, data);
     }
 
+    @Override
+    public void changeStatus(ApiCallback apiCallback, HttpManager httpManager, Api api, Object data) {
+        postApiCall(apiCallback, httpManager, api, data);
+    }
+
+    @Override
+    public void initTaskPayment(ApiCallback apiCallback, PaymentRequest data, HttpManager httpManager, Api api){
+        postApiCall(apiCallback, httpManager, api, data);
+    }
+
+    @Override
+    public void getEligibleUsers(ApiCallback apiCallback, EligibleUserRequest data, HttpManager httpManager, Api api){
+        postApiCall(apiCallback, httpManager, api, data);
+    }
+
+
 
     private enum MethodType {
         GET, POST, DELETE, PUT,DELETE_POST
@@ -902,6 +920,8 @@ public class NetworkManagerImpl implements NetworkManager {
                     case POST: {
                         switch (Objects.requireNonNull(api.getName())) {
                             case LOGIN:
+                            case ASSIGNMENT_ELIGIBLE_USERS:
+                            case INIT_TASK_PAYMENT:
                             case VERIFY_MOBILE:
                             case SIGNUP:
                             case ADD_BUDDY:
@@ -1168,16 +1188,24 @@ public class NetworkManagerImpl implements NetworkManager {
         }
 
         protected void onPostExecute(Object result) {
-            ApiCallback apiCallback = apiCallbackSoftReference.get();
-            if (apiCallback != null) {
-                Log.e("SOFT CALLBACK", "----------->>" + callBack);
-                apiCallback.onResponse(result, apiError);
-            } else {
+            try{
+                ApiCallback apiCallback = apiCallbackSoftReference.get();
+                if (apiCallback != null) {
+                    Log.e("SOFT CALLBACK", "----------->>" + callBack);
+                    apiCallback.onResponse(result, apiError);
+                } else {
+                    if (callBack != null) {
+                        Log.e("Normal CALLBACK", "----------->>" + callBack);
+                        callBack.onResponse(result, apiError);
+                    }
+                }
+            }catch (Exception e){
                 if (callBack != null) {
                     Log.e("Normal CALLBACK", "----------->>" + callBack);
                     callBack.onResponse(result, apiError);
                 }
             }
+
         }
     }
 }

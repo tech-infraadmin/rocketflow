@@ -12,6 +12,6 @@ import com.tracki.ui.base.BaseNavigator;
 interface TaskDashBoardNavigator extends BaseNavigator {
 
     void handleDashboardResponse(ApiCallback apiCallback, Object result, APIError error);
-
+    void handleStatusResponse(ApiCallback apiCallback, Object result, APIError error);
     void handleInsightsResponse(ApiCallback apiCallback, Object result, APIError error);
 }

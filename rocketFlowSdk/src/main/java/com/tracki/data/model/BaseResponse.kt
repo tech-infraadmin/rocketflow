@@ -21,4 +21,6 @@ open class BaseResponse {
     /*This is used for trip sharing purpose inside class @com.tracki.ui.sharetrip.ShareTripActivity*/
     var trackingUrl: String? = null
     var time: String? = null
+    var online: Boolean = false
+    var paymentUrl: String? = null
 }

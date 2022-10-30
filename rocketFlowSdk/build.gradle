@@ -127,6 +127,8 @@ dependencies {
     implementation "com.google.android.gms:play-services-vision:20.1.2"
     //implementation "com.github.siyamed:android-shape-imageview:0.9.3"
 
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
+
 
 }
 

@@ -6,6 +6,7 @@ import com.rocketflow.sdk.RocketFlyer
 class DemoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        RocketFlyer.initializeRocketFlyer(this)
+        RocketFlyer.initializeRocketFlyer(this,true)
+
     }
 }

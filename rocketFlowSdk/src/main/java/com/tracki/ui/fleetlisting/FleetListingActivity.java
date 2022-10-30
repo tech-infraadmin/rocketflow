@@ -132,7 +132,7 @@ public class FleetListingActivity extends BaseActivity<ActivityFleetListingBindi
 
         MenuItem myActionMenuItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) myActionMenuItem.getActionView();
-        TextView textView = (TextView) searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        TextView textView = (TextView) searchView.findViewById(R.id.search_src_text);
         Typeface externalFont = Typeface.createFromAsset(getAssets(), "fonts/campton_book.ttf");
         textView.setTypeface(externalFont);
         textView.setTextColor(Color.BLACK);

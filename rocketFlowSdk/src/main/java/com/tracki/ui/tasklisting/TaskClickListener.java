@@ -10,7 +10,7 @@ public interface TaskClickListener {
 
     void onCallClick(Task task, int position);
 
-    void onExecuteUpdates(String name, Task task);
+    void onExecuteUpdates(String name, Task task, String cta);
 
     void onDetailsTaskClick(Task task);
 

@@ -21,6 +21,7 @@ import com.tracki.data.model.response.config.GeoFenceData;
 import com.tracki.data.model.response.config.IdleTrackingInfo;
 import com.tracki.data.model.response.config.OverstoppingConfig;
 import com.tracki.data.model.response.config.ProfileInfo;
+import com.tracki.data.model.response.config.ProjectCategories;
 import com.tracki.data.model.response.config.RoleConfigData;
 import com.tracki.data.model.response.config.Task;
 import com.tracki.data.model.response.config.WorkFlowCategories;
@@ -58,6 +59,7 @@ import static com.tracki.utils.AppConstants.PREF_KEY_FLAVOUR_MAP;
 
 public class AppPreferencesHelper implements PreferencesHelper {
 
+    public static final String PREF_KEY_ONLINE_STATUS = "PREF_KEY_ONLINE_STATUS";
     public static final String PREF_KEY_GEOFENCE_IDS = "PREF_KEY_GEOFENCE_IDS";
     public static final String PREF_KEY_TASK = "PREF_KEY_TASK";
     private static final String PREF_KEY_LOGIN_TOKEN = "PREF_KEY_LOGIN_TOKEN";
@@ -148,6 +150,8 @@ public class AppPreferencesHelper implements PreferencesHelper {
     public static final String PREF_KEY_SAVED_CART="PREF_KEY_SAVED_CART";
 
     private static final String PREF_KEY_SDK_CLIENT_ID = "PREF_KEY_SDK_CLIENT_ID";
+
+    public static final String PREF_KEY_PROJECT_CATEGORIES="PREF_KEY_PROJECT_CATEGORIES";
 
 
     private final SharedPreferences mPrefs;
@@ -296,6 +300,16 @@ public class AppPreferencesHelper implements PreferencesHelper {
     @Override
     public void setAccessId(String accessId) {
         mPrefs.edit().putString(PREF_KEY_ACCESS_ID, accessId).apply();
+    }
+
+    @Override
+    public Boolean officeOnline() {
+        return mPrefs.getBoolean(PREF_KEY_ONLINE_STATUS,false);
+    }
+
+    @Override
+    public void setOfficeOnline(Boolean value) {
+        mPrefs.edit().putBoolean(PREF_KEY_ONLINE_STATUS, value).apply();
     }
 
     @Override
@@ -1382,6 +1396,20 @@ public class AppPreferencesHelper implements PreferencesHelper {
     }
 
 
+    @Override
+    public void saveProjectCategoriesDataList(ArrayList<ProjectCategories> projectCategories) {
+        mPrefs.edit().putString(PREF_KEY_PROJECT_CATEGORIES, new Gson().toJson(projectCategories)).apply();
+    }
+
+    @Override
+    public ArrayList<ProjectCategories> getProjectCategoriesDataList() {
+        String c = mPrefs.getString(PREF_KEY_PROJECT_CATEGORIES, null);
+        if (c == null) {
+            return null;
+        }
+        return new Gson().fromJson(c, new TypeToken<List<ProjectCategories> >() {
+        }.getType());
+    }
 
     public enum PreferencesKeys {
         VERIFICATION_ID, ALL, NOT_ALL, PREF_KEY_TASK, TASKID, CURRENT_TIME, PUNCH, EDIT_DATA,

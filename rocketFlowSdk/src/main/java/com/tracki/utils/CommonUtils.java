@@ -1190,7 +1190,7 @@ public final class CommonUtils {
 
     public static Snackbar showNetWorkConnectionIssue(@NotNull View view, @NotNull String message) {
         Snackbar snackbar = Snackbar.make(view, (CharSequence) message, Snackbar.LENGTH_INDEFINITE);
-        TextView tv = (TextView) (snackbar.getView()).findViewById(com.google.android.material.R.id.snackbar_text);
+        TextView tv = (TextView) (snackbar.getView()).findViewById(R.id.snackbar_text);
         Typeface font = Typeface.createFromAsset(view.getContext().getAssets(), "fonts/campton_book.ttf");
         tv.setTypeface(font);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -1718,7 +1718,7 @@ public final class CommonUtils {
     }
 
 
-    public static void saveSDKAccessToken(Activity context, SDKToken sdkToken,
+    public static void saveSDKAccessToken(SDKToken sdkToken,
                                          PreferencesHelper preferencesHelper) {
 
         preferencesHelper.setAccessId(sdkToken.getAccessId());
@@ -1734,7 +1734,7 @@ public final class CommonUtils {
      * @param preferencesHelper preferences
      * @param from              1 for splash,2 for otp,3 for main
      */
-    public static void saveConfigDetails(Activity context, ConfigResponse configResponse,
+    public static void saveConfigDetails(Context context, ConfigResponse configResponse,
                                          PreferencesHelper preferencesHelper, String from) {
         saveConfigDetails(context, configResponse, preferencesHelper, from, null);
     }
@@ -1752,7 +1752,7 @@ public final class CommonUtils {
      * @param preferencesHelper preferences
      * @param from              1 for splash,2 for otp,3 for main
      */
-    public static void saveConfigDetails(Activity context, ConfigResponse configResponse,
+    public static void saveConfigDetails(Context context, ConfigResponse configResponse,
                                          PreferencesHelper preferencesHelper, String from, @Nullable String jsonobject) {
 
 //        if (configResponse.getDynamicFormConfig() != null) {
@@ -1773,7 +1773,7 @@ public final class CommonUtils {
         }
     }
 
-    private static void saveConfigResponse(ConfigResponse configResponse, String from, String jsonobject, PreferencesHelper preferencesHelper, Activity context) {
+    private static void saveConfigResponse(ConfigResponse configResponse, String from, String jsonobject, PreferencesHelper preferencesHelper, Context context) {
         preferencesHelper.saveFilterMap(null);
         if (configResponse.getLookups() != null) {
             TrackiApplication.setLookups(configResponse.getLookups());
@@ -1845,6 +1845,9 @@ public final class CommonUtils {
         if (appConfig != null) {
             if (appConfig.getRoles() != null) {
                 preferencesHelper.saveRoleConfigDataList(appConfig.getRoles());
+            }
+            if (appConfig.getProjectCategories() != null) {
+                preferencesHelper.saveProjectCategoriesDataList(appConfig.getProjectCategories());
             }
             preferencesHelper.setLocationRequired(appConfig.getLocationRequired());
             preferencesHelper.setManger(appConfig.getManager());
@@ -1957,7 +1960,8 @@ public final class CommonUtils {
                         //ShiftHandlingUtil.checkAlarms(context, preferencesHelper);
                 }
 
-                DeprecationAndExpiration screen = configResponse.getAppConfig().getAppVersionInfo();
+                //DeprecationAndExpiration screen = configResponse.getAppConfig().getAppVersionInfo();
+                DeprecationAndExpiration screen = configResponse.getAppVersionInfo();
                 if (screen != null) {
                     TrackiApplication.setApiList(appConfig.getApis());
                     //store apis in preferences as well for use inside services
@@ -1971,7 +1975,7 @@ public final class CommonUtils {
 //                                .putExtra(AppConstants.Extra.EXTRA_DEPRICATION_SCREEN, screen.getDeprecated())
 //                                .putExtra(AppConstants.NOTIFICATION_DATA, jsonobject)
 //                        );
-                        context.finish();
+                        //context.finish();
                     } else if (configResponse.getNextScreen() == NextScreen.DEVICE_CHANGE_HARD_POPUP) {
                         if (deviceChangeRequestInitiated) {
 //                            Intent deviceChangeIntent = new Intent(context, DeviceChangeActivity.class);
@@ -2311,7 +2315,7 @@ public final class CommonUtils {
      * @param preferencesHelper preferences helper
      * @param nextScreen        response
      */
-    public static void goToNext(PreferencesHelper preferencesHelper, NextScreen nextScreen, Activity activity, @Nullable String taskDetailsJson) {
+    public static void goToNext(PreferencesHelper preferencesHelper, NextScreen nextScreen, Context context, @Nullable String taskDetailsJson) {
         if (nextScreen == null) {
             return;
         }
@@ -2319,9 +2323,9 @@ public final class CommonUtils {
         if (nextScreen.equals(NextScreen.LOGIN)) {
             if (!preferencesHelper.isIntroFlag()) {
                 preferencesHelper.setIntroFlag(true);
-                openIntroScreenActivity(activity);
+                //openIntroScreenActivity(context);
             } else {
-                openLoginActivity(activity);
+                //openLoginActivity(context);
             }
         } else if (nextScreen.equals(NextScreen.HOME)) {
             //start or stop transition service
@@ -3454,7 +3458,9 @@ public final class CommonUtils {
                         button.setTextSize(14);
                         button.setOnClickListener(v -> {
                             // used to perform the action when view is clicked.
-                            mListener.onExecuteUpdates((String) v.getTag(), task);
+                            Button b = (Button)v;
+                            String buttonText = b.getText().toString();
+                            mListener.onExecuteUpdates((String) v.getTag(),task, buttonText);
                         });
                         //add first child of this parent
                         flexboxLayout.addView(button);

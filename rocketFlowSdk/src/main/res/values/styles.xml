@@ -12,6 +12,12 @@
         <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_white_24dp</item>
     </style>
 
+    <style name="SwitchButtonStyle" parent="Theme.AppCompat.Light">
+        <item name="thumbTint">@color/switch_color</item>
+        <item name="trackTint">@color/switch_color</item>
+
+    </style>
+
     <!--
     for change in navigation but use this line inside v21 or v27
         <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/semi_gray</item>
@@ -338,6 +344,13 @@
     <style name="AppModalStyle"
         parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/bg_diff_shape</item>
+    </style>
+
+    <style name="DialogZoomOutAnimation">
+        <item name="android:windowEnterAnimation">@anim/zoom_in</item>
+        <item name="android:windowExitAnimation">@anim/zoom_out</item>
+
+
     </style>
 
 </resources>

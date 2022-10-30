@@ -12,6 +12,15 @@ public final class AppConstants {
     public static final String TRACKI_ENCRYPT_DECRYPT_IV = "tracki9990731159";
     public static final String TRACKI_ENCRYPT_DECRYPT_SECRET_KEY = "9958054435vikask";
 
+
+    public static final String ONE_HOUR = "1 hour";
+    public static final String TWO_HOUR = "2 hour";
+    public static final String FOUR_HOUR = "4 hour";
+    public static final String SIX_HOUR = "6 hour";
+    public static final String TOMORROW_HOUR = "Tomorrow at same time";
+    public static final String STAY_OFFLINE_UNTIL_CHANGED = "Stay Offline Until Changed";
+
+
     // Algorithm
     public static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
     public static final String KEY_SPEC_ALGORITHM = "AES";

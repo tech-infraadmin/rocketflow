@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
  */
 public interface ApiCallback {
 
-    void onResponse(Object result, @Nullable APIError error);
+    void onResponse(@Nullable Object result, @Nullable APIError error);
 
     void hitApi();
 

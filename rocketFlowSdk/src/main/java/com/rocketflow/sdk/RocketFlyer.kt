@@ -6,6 +6,8 @@ import com.tracki.data.DataManager
 import com.tracki.data.local.prefs.PreferencesHelper
 import com.tracki.data.network.HttpManager
 import com.tracki.data.network.NetworkManager
+import com.tracki.utils.CommonUtils
+import com.trackthat.lib.TrackThat
 
 @Keep
 class RocketFlyer private constructor(){
@@ -19,6 +21,7 @@ class RocketFlyer private constructor(){
          */
         @JvmStatic
         fun initializeRocketFlyer(context: Context,stageServer: Boolean = false) {
+            TrackThat.initialize(context, CommonUtils.getIMEINumber(context))
             RocketFlyerBuilder.initialize(context,stageServer)
         }
 

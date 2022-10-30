@@ -1,13 +1,27 @@
 package com.tracki.ui.main.taskdashboard;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.ObservableArrayList;
+import androidx.databinding.ObservableList;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.tracki.TrackiApplication;
 import com.tracki.data.DataManager;
+import com.tracki.data.model.request.StatusRequest;
+import com.tracki.data.model.request.TaskRequest;
 import com.tracki.data.model.response.config.Api;
+import com.tracki.data.model.response.config.Task;
 import com.tracki.data.network.APIError;
 import com.tracki.data.network.ApiCallback;
 import com.tracki.data.network.HttpManager;
 import com.tracki.ui.base.BaseViewModel;
+import com.tracki.ui.tasklisting.assignedtome.AssignedToMeViewModel;
 import com.tracki.utils.ApiType;
+import com.tracki.utils.Log;
+import com.tracki.utils.rx.AppSchedulerProvider;
 import com.tracki.utils.rx.SchedulerProvider;
 
 import java.util.List;
@@ -19,10 +33,33 @@ import java.util.List;
  */
 class TaskDashBoardViewModel extends BaseViewModel<TaskDashBoardNavigator> {
     private static final String TAG = "MainViewModel";
-    public HttpManager httpManager;
+    private HttpManager httpManager;
+
+    public final ObservableList<Task> taskObservableArrayList = new ObservableArrayList<>();
+
+    private MutableLiveData<List<Task>> taskListLiveData;
+    private Api apiUrl;
+    private DataManager dataManager;
+
+    public MutableLiveData<List<Task>> getTaskListLiveData() {
+        if (taskListLiveData == null) {
+            taskListLiveData = new MutableLiveData<>();
+        }
+        return taskListLiveData;
+    }
+
+    void addItemsToList(@NonNull List<Task> driverList) {
+        taskObservableArrayList.clear();
+        taskObservableArrayList.addAll(driverList);
+    }
+
+    ObservableList<Task> getBuddyObservableArrayList() {
+        return taskObservableArrayList;
+    }
 
     public TaskDashBoardViewModel(DataManager dataManager, SchedulerProvider schedulerProvider) {
         super(dataManager, schedulerProvider);
+        this.dataManager = dataManager;
     }
 
 
@@ -156,6 +193,57 @@ class TaskDashBoardViewModel extends BaseViewModel<TaskDashBoardNavigator> {
         new DashboardAPI(dashBoardRequest).hitApi();
     }
 
+    private class StatusAPI implements ApiCallback {
+
+        private StatusRequest statusRequest;
+
+        StatusAPI(StatusRequest statusRequest){
+            this.statusRequest = statusRequest;
+        }
+
+        @Override
+        public void onResponse(Object result, @Nullable APIError error) {
+            if(getNavigator()!=null) {
+                Log.d("Bloacks", "Dashboard Response Called Model");
+                getNavigator().handleStatusResponse(StatusAPI.this, result, error);
+            }
+        }
+
+        @Override
+        public void hitApi() {
+            if(TrackiApplication.getApiMap().containsKey(ApiType.CHANGE_STATUS)) {
+                Api api = TrackiApplication.getApiMap().get(ApiType.CHANGE_STATUS);
+                if(dataManager!=null)
+                    dataManager.callDashboardApi(StatusAPI.this, httpManager, api, statusRequest);
+            }
+        }
+
+        @Override
+        public boolean isAvailable() {
+            return true;
+        }
+
+        @Override
+        public void onNetworkErrorClose() {
+
+        }
+
+        @Override
+        public void onRequestTimeOut(ApiCallback callBack) {
+            getNavigator().showTimeOutMessage(callBack);
+        }
+
+        @Override
+        public void onLogout() {
+
+        }
+    }
+
+    public void changeStatus(HttpManager httpManager, StatusRequest statusRequest){
+        this.httpManager = httpManager;
+        new StatusAPI(statusRequest).hitApi();
+    }
+
 
     private class DashboardAPI implements ApiCallback {
         private DashBoardRequest dashboardRequest;
@@ -167,16 +255,18 @@ class TaskDashBoardViewModel extends BaseViewModel<TaskDashBoardNavigator> {
         @Override
         public void onResponse(Object result, APIError error) {
             if(getNavigator()!=null) {
+                Log.d("Bloacks", "Dashboard Response Called Model");
                 getNavigator().handleDashboardResponse(DashboardAPI.this, result, error);
             }
         }
 
         @Override
         public void hitApi() {
+            Log.d("Bloacks", "Dashboard Request Called Model");
             if(TrackiApplication.getApiMap().containsKey(ApiType.DASHBOARD_TASKS)) {
                 Api api = TrackiApplication.getApiMap().get(ApiType.DASHBOARD_TASKS);
-                if(getDataManager()!=null)
-                getDataManager().callDashboardApi(DashboardAPI.this, httpManager, api, dashboardRequest);
+                if(dataManager!=null)
+                    dataManager.callDashboardApi(DashboardAPI.this, httpManager, api, dashboardRequest);
             }
         }
 
@@ -217,8 +307,8 @@ class TaskDashBoardViewModel extends BaseViewModel<TaskDashBoardNavigator> {
         public void hitApi() {
             Api api = TrackiApplication.getApiMap().get(ApiType.GET_INSIGHTS);
             if(api!=null) {
-                if(getDataManager()!=null)
-                getDataManager().getInsights(GetInsights.this, httpManager, api);
+                if(dataManager!=null)
+                    dataManager.getInsights(GetInsights.this, httpManager, api);
             }
         }
 
@@ -235,12 +325,72 @@ class TaskDashBoardViewModel extends BaseViewModel<TaskDashBoardNavigator> {
         @Override
         public void onRequestTimeOut(ApiCallback callBack) {
             if(getNavigator()!=null)
-            getNavigator().showTimeOutMessage(callBack);
+                getNavigator().showTimeOutMessage(callBack);
         }
 
         @Override
         public void onLogout() {
 
+        }
+    }
+
+    public void getTaskList(HttpManager httpManager, Api api, TaskRequest buddyRequest) {
+        this.httpManager = httpManager;
+        this.apiUrl = api;
+        new TaskList(buddyRequest).hitApi();
+    }
+
+    class TaskList implements ApiCallback {
+        TaskRequest taskRequest;
+        public TaskList(TaskRequest taskRequest) {
+            this.taskRequest=taskRequest;
+        }
+
+        @Override
+        public void onResponse(Object result, APIError error) {
+            if(getNavigator()!=null)
+                getNavigator().handleResponse(this, result, error);
+        }
+
+        @Override
+        public void hitApi() {
+            if(dataManager!=null)
+                dataManager.getTasksList(this, httpManager, taskRequest, apiUrl);
+        }
+
+        @Override
+        public boolean isAvailable() {
+            return true;
+        }
+
+        @Override
+        public void onNetworkErrorClose() {
+
+        }
+
+        @Override
+        public void onRequestTimeOut(ApiCallback callBack) {
+            if(getNavigator()!=null)
+                getNavigator().showTimeOutMessage(callBack);
+        }
+
+        @Override
+        public void onLogout() {
+
+        }
+    }
+
+
+    static class Factory implements ViewModelProvider.Factory {
+        private final DataManager mDataManager;
+
+        Factory(DataManager mDataManager) {
+            this.mDataManager = mDataManager;
+        }
+
+        @Override
+        public <T extends ViewModel> T create(Class<T> modelClass) {
+            return (T) new TaskDashBoardViewModel(mDataManager, new AppSchedulerProvider());
         }
     }
 

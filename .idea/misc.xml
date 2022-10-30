@@ -7,7 +7,15 @@
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1895" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1895" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/drawable-mdpi/et_rounded_shape.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/drawable-mdpi/gradient_bg_task.xml" value="0.1895" />
+        <entry key="rocketFlowSdk/src/main/res/drawable-mdpi/ic_edit_white.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/drawable-mdpi/ic_green_tick.xml" value="0.1895" />
+        <entry key="rocketFlowSdk/src/main/res/drawable-mdpi/layout_bg_red.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/drawable/bg_diff_shape.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/drawable/curved_shaped.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/drawable/i_cross_red.xml" value="0.1895" />
+        <entry key="rocketFlowSdk/src/main/res/drawable/ic_cross.xml" value="0.1895" />
         <entry key="rocketFlowSdk/src/main/res/drawable/ic_money_credit.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/drawable/ic_money_debit.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/drawable/no_data.xml" value="0.117" />
@@ -46,7 +54,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/activity_leave.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_like_list.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_login.xml" value="0.1" />
-        <entry key="rocketFlowSdk/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_message.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_my_account.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_my_document.xml" value="0.1" />
@@ -59,6 +67,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/activity_notification.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_order_code.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_otp.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/activity_payment_webview.xml" value="0.16530797101449277" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_play_video.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_play_video_vertically.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_product_category_list.xml" value="0.1" />
@@ -69,6 +78,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/activity_ride.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_scan_qr_and_bar_code.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_scan_qr_code.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/activity_sdk_main.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_select_order.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_selection.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/activity_services.xml" value="0.1" />
@@ -99,6 +109,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/bottom_sheet_dashboard.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/bottom_sheet_task_detail.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/bottom_sheet_timeline.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/bsheet_toggle.xml" value="0.11854103343465046" />
         <entry key="rocketFlowSdk/src/main/res/layout/content_feeds.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/content_refer_earn.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/counter_menu_item_layout.xml" value="0.1" />
@@ -106,6 +117,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/date_day_card.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/dialog_device_change.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/dialog_double_button.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/dialog_payment.xml" value="0.16530797101449277" />
         <entry key="rocketFlowSdk/src/main/res/layout/dialog_punching_in_out.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/dialog_rejecting_leave.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/dialog_search_att_leave.xml" value="0.1" />
@@ -213,6 +225,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/item_row_unit.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_show_qr_code.xml" value="0.1609375" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_simple_spinner.xml" value="0.13697916666666668" />
+        <entry key="rocketFlowSdk/src/main/res/layout/item_sub_list.xml" value="0.16530797101449277" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_task_status.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_time_line.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/item_user_list.xml" value="0.1279296875" />
@@ -224,6 +237,7 @@
         <entry key="rocketFlowSdk/src/main/res/layout/layout_add_product_description.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/layout_add_quantity.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/layout_attendance_base_fragment.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/layout_bg.xml" value="0.17028985507246377" />
         <entry key="rocketFlowSdk/src/main/res/layout/layout_camera_gallery.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/layout_change_accessid.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/layout_change_mobile.xml" value="0.1" />
@@ -284,6 +298,8 @@
         <entry key="rocketFlowSdk/src/main/res/layout/product_scan.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/progress_dialog.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/progress_dialog_with_percentage.xml" value="0.1" />
+        <entry key="rocketFlowSdk/src/main/res/layout/single_chapter.xml" value="0.17028985507246377" />
+        <entry key="rocketFlowSdk/src/main/res/layout/single_project.xml" value="0.17028985507246377" />
         <entry key="rocketFlowSdk/src/main/res/layout/something_went_wrong.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/task_details_cta_view.xml" value="0.1" />
         <entry key="rocketFlowSdk/src/main/res/layout/team_attendenace.xml" value="0.1" />

@@ -7,6 +7,7 @@ import com.tracki.TrackiApplication
 import com.tracki.data.DataManager
 import com.tracki.data.model.request.AcceptRejectRequest
 import com.tracki.data.model.request.ExecuteUpdateRequest
+import com.tracki.data.model.request.PaymentRequest
 
 import com.tracki.data.model.response.config.Api
 import com.tracki.data.network.APIError
@@ -135,6 +136,42 @@ class NewTaskDetailsViewModel(dataManager: DataManager, schedulerProvider: Sched
 
     fun expandCollapse(){
         navigator.expandCollapse()
+    }
+
+    fun getPaymentUrl(httpManager: HttpManager, data: PaymentRequest?){
+        this.httpManager = httpManager
+        GetPaymentUrl(data).hitApi()
+    }
+
+    private inner class GetPaymentUrl(var data: PaymentRequest?) : ApiCallback {
+
+        override fun onResponse(result: Any?, error: APIError?) {
+            if(navigator!=null)
+                navigator.handlePaymentUrlResponse(this, result, error)
+        }
+
+        override fun hitApi() {
+            if(TrackiApplication.getApiMap().containsKey(ApiType.INIT_TASK_PAYMENT)) {
+                val api = TrackiApplication.getApiMap()[ApiType.INIT_TASK_PAYMENT]
+                if(dataManager!=null)
+                    dataManager.initTaskPayment(this, data, httpManager, api)
+            }
+        }
+
+        override fun isAvailable(): Boolean {
+            return true
+        }
+
+        override fun onNetworkErrorClose() {
+        }
+
+        override fun onRequestTimeOut(callBack: ApiCallback) {
+            if(navigator!=null)
+                navigator.showTimeOutMessage(callBack)
+        }
+
+        override fun onLogout() {
+        }
     }
 
     fun getTaskData( httpManager: HttpManager, data:Any?) {

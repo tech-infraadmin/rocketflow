@@ -239,7 +239,7 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
 
     inner class GetUserLocations : ApiCallback {
         private val api = TrackiApplication.getApiMap()[ApiType.USER_LOCATIONS]
-        override fun onResponse(result: Any, error: APIError?) {
+        override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleMyPlaceResponse(this@GetUserLocations, result, error)
         }
 

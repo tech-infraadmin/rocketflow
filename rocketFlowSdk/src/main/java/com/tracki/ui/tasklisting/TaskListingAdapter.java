@@ -2,6 +2,7 @@ package com.tracki.ui.tasklisting;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -9,11 +10,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.tracki.data.local.prefs.PreferencesHelper;
+import com.tracki.data.model.response.config.ActionConfig;
+import com.tracki.data.model.response.config.Navigation;
 import com.tracki.data.model.response.config.Task;
 import com.tracki.databinding.ItemAssignedToMeEmptyViewBinding;
 import com.tracki.databinding.ItemRowTaskListBinding;
 import com.tracki.ui.base.BaseViewHolder;
 import com.tracki.ui.tasklisting.assignedtome.AssignedtoMeEmptyItemViewModel;
+import com.tracki.ui.webview.WebViewActivity;
+import com.tracki.utils.AppConstants;
+import com.tracki.utils.Log;
 
 import java.util.List;
 import java.util.Set;
@@ -48,7 +54,7 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         if (mResponseList != null && mResponseList.size() > 0) {
             return mResponseList.size();
         } else {
-            return 1;
+            return 0;
         }
     }
 
@@ -137,7 +143,27 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             AssignTaskViewModel itemViewModel = new AssignTaskViewModel(task,
                     this, context, preferencesHelper, categoryId, assignedToTask);
             mBinding.setViewModel(itemViewModel);
+            if (task.getTrackingUrl() != null) {
+                mBinding.imageTracking.setVisibility(View.VISIBLE);
+                Log.d("Tacking Url", task.getTrackingUrl());
+            } else {
+                mBinding.imageTracking.setVisibility(View.GONE);
+            }
 
+            mBinding.imageTracking.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(task.getTrackingUrl()!=null) {
+                        Navigation navigation = new Navigation();
+                        ActionConfig actionConfig = new ActionConfig();
+                        actionConfig.setActionUrl(task.getTrackingUrl());
+                        navigation.setActionConfig(actionConfig);
+                        navigation.setTitle("Tracking Details");
+                        context.startActivity(WebViewActivity.Companion.newIntent(context)
+                                .putExtra(AppConstants.Extra.EXTRA_WEB_INFO, navigation));
+                    }
+                }
+            });
 
         }
 

@@ -87,4 +87,7 @@
     <color name="select_drop_text_color">#7DA2DB</color>
     <color name="et_stork_color">#A7D4FF</color>
     <color name="selected_file_text_color">#3F4D66</color>
+    <color name="toggleOn">#21B1F3</color>
+    <color name="toggleOff">#F65D5D</color>
+    <color name="green_google_button">#1F7B4A</color>
 </resources>

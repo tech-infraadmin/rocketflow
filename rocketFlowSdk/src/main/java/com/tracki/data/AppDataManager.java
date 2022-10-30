@@ -13,6 +13,8 @@ import com.tracki.data.model.AlarmInfo;
 import com.tracki.data.model.DataObject;
 import com.tracki.data.model.request.AddEmployeeRequest;
 import com.tracki.data.model.request.AddressInfo;
+import com.tracki.data.model.request.EligibleUserRequest;
+import com.tracki.data.model.request.PaymentRequest;
 import com.tracki.data.model.request.PlaceRequest;
 import com.tracki.data.model.request.SKUInfoSpecsRequest;
 import com.tracki.data.model.request.SaveFilterData;
@@ -27,6 +29,7 @@ import com.tracki.data.model.response.config.GeoFenceData;
 import com.tracki.data.model.response.config.IdleTrackingInfo;
 import com.tracki.data.model.response.config.OverstoppingConfig;
 import com.tracki.data.model.response.config.ProfileInfo;
+import com.tracki.data.model.response.config.ProjectCategories;
 import com.tracki.data.model.response.config.RoleConfigData;
 import com.tracki.data.model.response.config.Task;
 import com.tracki.data.model.response.config.WorkFlowCategories;
@@ -1674,5 +1677,41 @@ public class AppDataManager implements DataManager {
 
 
 
+    @Override
+    public Boolean officeOnline() {
+        return mPreferencesHelper.officeOnline();
+    }
+
+    @Override
+    public void setOfficeOnline(Boolean value) {
+        mPreferencesHelper.setOfficeOnline(value);
+    }
+
+    @Override
+    public void changeStatus(ApiCallback apiCallback, HttpManager httpManager, Api api, Object data) {
+        networkManager.changeStatus(apiCallback, httpManager, api, data);
+    }
+
+
+    @Override
+    public void initTaskPayment(ApiCallback apiCallback, PaymentRequest paymentRequest, HttpManager httpManager, Api api) {
+        networkManager.initTaskPayment(apiCallback, paymentRequest, httpManager, api);
+    }
+
+    @Override
+    public void getEligibleUsers(ApiCallback apiCallback, EligibleUserRequest request, HttpManager httpManager, Api api) {
+        networkManager.getEligibleUsers(apiCallback, request, httpManager, api);
+    }
+
+
+    @Override
+    public void saveProjectCategoriesDataList(ArrayList<ProjectCategories> projectCategories) {
+        mPreferencesHelper.saveProjectCategoriesDataList(projectCategories);
+    }
+
+    @Override
+    public ArrayList<ProjectCategories> getProjectCategoriesDataList() {
+        return mPreferencesHelper.getProjectCategoriesDataList();
+    }
 
 }

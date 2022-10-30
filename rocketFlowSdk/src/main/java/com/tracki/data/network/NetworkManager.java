@@ -3,6 +3,8 @@ package com.tracki.data.network;
 
 import com.tracki.data.model.request.AddEmployeeRequest;
 import com.tracki.data.model.request.AddressInfo;
+import com.tracki.data.model.request.EligibleUserRequest;
+import com.tracki.data.model.request.PaymentRequest;
 import com.tracki.data.model.request.PlaceRequest;
 import com.tracki.data.model.request.SKUInfoSpecsRequest;
 import com.tracki.data.model.request.UserGetRequest;
@@ -281,5 +283,10 @@ public interface NetworkManager {
 
     void getUnitInfo(ApiCallback apiCallback, HttpManager httpManager, UnitInfoRequest data, Api api);
 
+    void changeStatus(ApiCallback apiCallback, HttpManager httpManager, Api api, Object data);
+
+    void getEligibleUsers(ApiCallback apiCallback, EligibleUserRequest request, HttpManager httpManager, Api api);
+
+    void initTaskPayment(ApiCallback apiCallback, PaymentRequest paymentRequest, HttpManager httpManager, Api api);
 
 }

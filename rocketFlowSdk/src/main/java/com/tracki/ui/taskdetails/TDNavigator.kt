@@ -9,5 +9,6 @@ interface TDNavigator :BaseNavigator{
 
     fun  handleGetTaskDataResponse(callback: ApiCallback, result: Any?, error: APIError?)
     fun handleExecuteUpdateResponse(apiCallback: ApiCallback?, result: Any?, error: APIError?)
+    fun handlePaymentUrlResponse(callback: ApiCallback, result: Any?, error: APIError?)
     fun expandCollapse()
 }

@@ -72,7 +72,7 @@ class CallToActionButtonAdapter (var context: Context,var mListener:TaskClickLis
             ctaButtonBinding.ctaButton.setOnClickListener {v->
 
                 // used to perform the action when view is clicked.
-                mListener.onExecuteUpdates(v.getTag() as String, task)
+                mListener.onExecuteUpdates(v.getTag() as String, task,dataModel.name)
             }
 
         }

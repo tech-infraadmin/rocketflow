@@ -18,6 +18,7 @@ import com.tracki.data.model.response.config.GeoFenceData;
 import com.tracki.data.model.response.config.IdleTrackingInfo;
 import com.tracki.data.model.response.config.OverstoppingConfig;
 import com.tracki.data.model.response.config.ProfileInfo;
+import com.tracki.data.model.response.config.ProjectCategories;
 import com.tracki.data.model.response.config.RoleConfigData;
 import com.tracki.data.model.response.config.Task;
 import com.tracki.data.model.response.config.WorkFlowCategories;
@@ -69,6 +70,9 @@ public interface PreferencesHelper {
     String getAccessId();
 
     void setAccessId(String accessId);
+
+    Boolean officeOnline();
+    void setOfficeOnline(Boolean value);
 
     ProfileInfo getUserDetail();
 
@@ -424,5 +428,9 @@ public interface PreferencesHelper {
     void saveConfigResponse(String json);
 
     String getConfigResponse();
+
+    void saveProjectCategoriesDataList(ArrayList<ProjectCategories> projectCategories);
+
+    ArrayList<ProjectCategories> getProjectCategoriesDataList();
 
 }

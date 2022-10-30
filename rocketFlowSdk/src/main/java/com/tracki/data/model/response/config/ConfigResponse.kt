@@ -16,7 +16,7 @@ import kotlin.collections.ArrayList
 class ConfigResponse: BaseResponse()  {
     var sdkConfig: SdkConfig? = null
     var appConfig: AppConfig? = null
-
+    var appVersionInfo: DeprecationAndExpiration? = null
     //    var taskCancellationReasons: List<String>? = null
     var userInfo: ProfileInfo? = null
 
@@ -26,7 +26,6 @@ class ConfigResponse: BaseResponse()  {
     //    var dynamicFormConfig: List<DynamicFormConfig>? = null
     var dynamicForms: List<DynamicFormsNew>? = null
     var refreshConfig: Boolean? = null
-
 }
 
 class LookUps {
@@ -76,7 +75,7 @@ class WidgetData : Serializable {
 }
 
 class FormData : Serializable {//here
-    var type: DataType? = null
+var type: DataType? = null
     var `field`: String? = null
     var label: String? = null
     var name: String? = null
@@ -96,7 +95,6 @@ class FormData : Serializable {//here
     var widgetData: List<WidgetData>? = null
     var dynamicSelectLookup: LinkedHashMap<String, FormData>? = null
     var actionConfig: DynamicActionConfig? = null
-
     var enteredValue: String? = null
     var file: ArrayList<File>? = null
     var isChecked = false
@@ -217,10 +215,10 @@ class AppConfig {
     var apis: List<Api>? = null
     var roles: List<RoleConfigData>? = null
     var navigations: List<Navigation>? = null
+    var projectCategories: java.util.ArrayList<ProjectCategories>? = null
     var autoStart: Boolean? = null
     var userGeoFilters: Boolean? = null
     var chatServerUrl: String? = null
-    var appVersionInfo: DeprecationAndExpiration? = null
     var allowArrival = false
     var enableWallet = false
     var allowArrivalOnGeoIn = false
@@ -241,10 +239,23 @@ class AppConfig {
     var defDateRange:Int=0
     var maxDateRange:Int=0
     var maxPastDaysAllowed:Int=0
+    var configVersion: String? = null
 
 
 }
 
+data class ProjectCategories(
+    var projectId: String? = null,
+    var categories: ArrayList<Category>? = null,
+    var icon: String? = null,
+    var name: String? = null,
+)
+
+data class Category(
+    var categoryId: String? = null,
+    var name: String? = null,
+    var icon: String? = null,
+)
 
 data class Flavour(
     @SerializedName("config")
@@ -272,8 +283,8 @@ data class Config(
     var prodLabel: String?,
     @SerializedName("stock")
     var stock: Boolean?,
-  /*  @SerializedName("dynamicPricing")
-    var dynamicPricing: Boolean?,*/
+    /*  @SerializedName("dynamicPricing")
+      var dynamicPricing: Boolean?,*/
     @SerializedName("subCatLabel")
     var subCatLabel: String?,
     @SerializedName("subCategory")
@@ -314,14 +325,14 @@ data class AllowedField(
     }
 }
 data class RoleConfigData(
-        var dfId: String?=null,
-        var fields: List<Field>?=null,
-        var roleId: String?=null,
-        var roleName: String?=null,
-        var type: String?=null,
-        var isSelected:Boolean=false,
-        var enableWallet:Boolean=false,
-        var enableDocument:Boolean=false
+    var dfId: String?=null,
+    var fields: List<Field>?=null,
+    var roleId: String?=null,
+    var roleName: String?=null,
+    var type: String?=null,
+    var isSelected:Boolean=false,
+    var enableWallet:Boolean=false,
+    var enableDocument:Boolean=false
 ){
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -342,27 +353,27 @@ data class RoleConfigData(
 
 
 data class ChannelConfig(
-        var channelSetting: ChannelSetting? = null,
-        var fields: List<Field>? = null,
-        var settingJson: Any? = null
+    var channelSetting: ChannelSetting? = null,
+    var fields: List<Field>? = null,
+    var settingJson: Any? = null
 )
 
 data class ChannelSetting(
-        var allowCreation: Boolean? = false,
-        var creationMode: CreationMode = CreationMode.DIRECT,
-        var allowGoogleLocation: Boolean? = null    ,
-        var allowedFieldFirst: Boolean? = null,
-        var exeLocation: Boolean? = null,
-        var locType: String? = null,
-        var creationConfig: CreationConfig? = null,
+    var allowCreation: Boolean? = false,
+    var creationMode: CreationMode = CreationMode.DIRECT,
+    var allowGoogleLocation: Boolean? = null    ,
+    var allowedFieldFirst: Boolean? = null,
+    var exeLocation: Boolean? = null,
+    var locType: String? = null,
+    var creationConfig: CreationConfig? = null,
 //        var creationTitle: String? = "I have Assigned",
 //        var executionTitle: String? = "Assigned to Me",
-        var creationTitle: String? = null,
-        var executionTitle: String? = null,
-        var selfAllocate: Boolean? = null,
-        var taskExecution: Boolean? = null,
-        var validateLocation: Boolean? = null,
-        var merchantTaskLabel: String? = null
+    var creationTitle: String? = null,
+    var executionTitle: String? = null,
+    var selfAllocate: Boolean? = null,
+    var taskExecution: Boolean? = null,
+    var validateLocation: Boolean? = null,
+    var merchantTaskLabel: String? = null
 
 )
 enum class CreationMode{
@@ -374,15 +385,15 @@ enum class FieldType{
 }
 
 data class Field(
-        var `field`: String? = null,
-        var type: DataType? = null,
-        var errMsg: String? = null,
-        var label: String? = null,
-        var validator: String? = null,
-        var skipVisibilty: Boolean = true,
-        var visible: Boolean = false,
-        var required: Boolean = false,
-        var value: String? = null
+    var `field`: String? = null,
+    var type: DataType? = null,
+    var errMsg: String? = null,
+    var label: String? = null,
+    var validator: String? = null,
+    var skipVisibilty: Boolean = true,
+    var visible: Boolean = false,
+    var required: Boolean = false,
+    var value: String? = null
 ){
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -412,15 +423,15 @@ data class Field(
 //              "assigneeLabel": "Client",
 //              "buddyLabel": null
 data class CreationConfig(
-        var allocation: String? = null,
-        var assignmentType: String? = null,
-        var requestedBy: String? = null,
-        var requestUserType: List<String>? = null,
+    var allocation: String? = null,
+    var assignmentType: String? = null,
+    var requestedBy: String? = null,
+    var requestUserType: List<String>? = null,
 //        var requestUserType: String? = null,
-        var assigneeLabel: String? = null,
-        var buddyLabel: String? = null,
-        var autoAccept: Boolean? = null,
-        var googleAccess: Boolean? = null
+    var assigneeLabel: String? = null,
+    var buddyLabel: String? = null,
+    var autoAccept: Boolean? = null,
+    var googleAccess: Boolean? = null
 )
 
 class IdleTrackingInfo {
@@ -434,7 +445,6 @@ class WorkFlowCategories {
     var categoryId: String? = null
     var name: String? = null
     var dynamicFormId: String? = null
-
     var allowSubTask: Boolean? = null
     var allowGeography: Boolean = false
     var enableExpiry: Boolean = false
@@ -500,7 +510,7 @@ class Navigation : Serializable,Comparable<Navigation> {
     var menuType: MenuType? = null
     var nestedMenu: List<Navigation>? = null
     override fun compareTo(other: Navigation): Int {
-       return this.order-other.order
+        return this.order-other.order
     }
     override fun equals(obj: Any?): Boolean {
 

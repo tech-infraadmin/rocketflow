@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.request.RequestOptions
+import com.google.gson.annotations.SerializedName
 import com.tracki.R
 import com.tracki.data.model.BaseResponse
 import com.tracki.data.model.NotificationResponse
@@ -20,7 +21,7 @@ import com.tracki.data.model.request.Contact
 import com.tracki.data.model.request.Shift
 //import com.tracki.ui.attendance.punchInOut.PunchData
 import com.tracki.ui.custom.GlideApp
-//import com.tracki.ui.products.PackInfo
+import com.tracki.ui.products.PackInfo
 import com.tracki.ui.taskdetails.StageHistoryData
 import com.tracki.ui.tasklisting.PagingData
 import com.tracki.utils.*
@@ -176,20 +177,19 @@ class GoogleActivity : Serializable {
 }
 
 data class PaymentData(
-        var amountBreakup: AmountBreakup? = null,
-        var event: String? = null,
-        var mode: Any? = null,
-        var paymentId: String? = null,
-        var retry: Int? = null,
-        var status: String? = null,
-        var taskId: String? = null
+    var amountBreakup: AmountBreakup? = null,
+    var event: String? = null,
+    var mode: Any? = null,
+    var paymentId: String? = null,
+    var retry: Int? = null,
+    var status: String? = null,
+    var taskId: String? = null
 ) : Serializable
 
 
-
 data class PayoutHistoryResponse(
-        var `data`: List<PayoutData>? = null,
-        var successful: Boolean? = null
+    var `data`: List<PayoutData>? = null,
+    var successful: Boolean? = null
 )
 
 data class SkuResponse(
@@ -198,32 +198,32 @@ data class SkuResponse(
 
 data class PayoutData(
 
-        var dataId: String? = null,
-        var executedDate: String? = null,
-        var executionDate: Long? = null,
-        var executiveId: String? = null,
-        var merchantId: String? = null,
-        var payoutBreakup: PayoutBreakup? = null,
-        var payoutPlan: PayoutPlan? = null,
-        var payoutRefId: String? = null,
-        var status: String? = null,
-        var taskDetail: Task? = null,
-        var taskId: String? = null
+    var dataId: String? = null,
+    var executedDate: String? = null,
+    var executionDate: Long? = null,
+    var executiveId: String? = null,
+    var merchantId: String? = null,
+    var payoutBreakup: PayoutBreakup? = null,
+    var payoutPlan: PayoutPlan? = null,
+    var payoutRefId: String? = null,
+    var status: String? = null,
+    var taskDetail: Task? = null,
+    var taskId: String? = null
 )
 
 data class InventoryDetails(
-        var categoryId: String? = null,
-        var categoryName: String? = null,
-        var gourpId: String? = null,
-        var groupName: String? = null,
-        var inventoryId: String? = null,
-        var manufacturer: Any? = null,
-        var referenceId: String? = null
+    var categoryId: String? = null,
+    var categoryName: String? = null,
+    var gourpId: String? = null,
+    var groupName: String? = null,
+    var inventoryId: String? = null,
+    var manufacturer: Any? = null,
+    var referenceId: String? = null
 ) : Serializable
 
 data class PayoutBreakup(
-        var baseAmountBreakup: BaseAmountBreakup? = null,
-        var totalPayout: Double? = null
+    var baseAmountBreakup: BaseAmountBreakup? = null,
+    var totalPayout: Double? = null
 
 ) : Serializable {
     var basefare = 0.0
@@ -235,34 +235,34 @@ data class PayoutBreakup(
 
 data class PayoutPlan(
 
-        var name: String? = null,
-        var payoutConfig: PayoutConfig? = null,
-        var payoutType: String? = null,
-        var planId: String? = null,
-        var status: String? = null,
-        var version: Int? = null
+    var name: String? = null,
+    var payoutConfig: PayoutConfig? = null,
+    var payoutType: String? = null,
+    var planId: String? = null,
+    var status: String? = null,
+    var version: Int? = null
 ) : Serializable
 
 
 data class BaseAmountBreakup(
-        var amt: Double? = null,
-        var taxBreakup: TaxBreakup? = null,
-        var totalAmt: Double? = null
+    var amt: Double? = null,
+    var taxBreakup: TaxBreakup? = null,
+    var totalAmt: Double? = null
 ) : Serializable
 
 
 data class PayoutConfig(
-        var value: Double? = null
+    var value: Double? = null
 ) : Serializable
 
 data class TaxBreakup(
-        var cgstAmt: Double? = null,
-        var cgstPer: Double? = null,
-        var igstAmt: Double? = null,
-        var igstPer: Double? = null,
-        var sgstAmt: Double? = null,
-        var sgstPer: Double? = null,
-        var totalTaxAmt: Double? = null
+    var cgstAmt: Double? = null,
+    var cgstPer: Double? = null,
+    var igstAmt: Double? = null,
+    var igstPer: Double? = null,
+    var sgstAmt: Double? = null,
+    var sgstPer: Double? = null,
+    var totalTaxAmt: Double? = null
 ) : Serializable
 
 enum class TrackingState {
@@ -274,7 +274,7 @@ class Task : BaseResponse(), Serializable {
     var autoCancel = false
     var fleetId: String? = null
     var tcfId: String? = null
-    var encCodeUrl: String? =null
+    var encCodeUrl: String? = null
     var categoryId: String? = null
     var assigneeDetail: AssigneeDetail? = null
     var buddyDetail: AssigneeDetail? = null
@@ -317,9 +317,10 @@ class Task : BaseResponse(), Serializable {
     var userGroup: UserGroup? = null
     var trackable: Boolean = false
     var invDetails: InventoryDetails? = null
-  /*  var orderDetails: HashMap<String, OrderDetails>? = null*/
-    var orderDetails:ArrayList<OrderDetails>? = null
-    var products:ArrayList<ProductOrder>? = null
+
+    /*  var orderDetails: HashMap<String, OrderDetails>? = null*/
+    var orderDetails: ArrayList<OrderDetails>? = null
+    var products: ArrayList<ProductOrder>? = null
 
     override fun equals(obj: Any?): Boolean {
 
@@ -366,6 +367,7 @@ class Task : BaseResponse(), Serializable {
 
 
 }
+
 data class ProductMap(
     var key: String?,
     var value: String?
@@ -376,9 +378,11 @@ data class FeedDfDataMap(
     var value: String?,
     var type: DataType?
 )
+
 data class DfDataMain(
     var df_data: ArrayList<FeedDfDataMap>?
 )
+
 data class ProductOrder(
     var active: Boolean?,
     var attList: Any?,
@@ -407,14 +411,16 @@ data class ProductOrder(
     var specifications: Any?,
     var unitInfo: Any?,
     var units: Any?,
-    var prodInfoMap: Map<String,String>?,
+    var prodInfoMap: Map<String, String>?,
     var upcNumber: String?
-): Serializable
+) : Serializable
+
 data class ProductStock(
     var minValue: Int?,
     var raiseAlert: Boolean?,
     var value: Int?
-): Serializable
+) : Serializable
+
 data class OrderDetails(
     var amountBreakup: AmountBreakup?,
     var currentStageName: String?,
@@ -431,22 +437,24 @@ data class OrderDetails(
     var refId: String?,
     var storeName: String?,
     var totalAmt: Double?
-): Serializable
+) : Serializable
+
 /*data class AmountBreakup(
         var amt: Double? = null,
         var taxBreakup: TaxBreakup? = null,
         var totalAmt: Double? = null
 ) : Serializable*/
-enum class OrderStatus{
-    PENDING,CONFIRMED,CANCELLED,CLOSED
+enum class OrderStatus {
+    PENDING, CONFIRMED, CANCELLED, CLOSED
 }
+
 data class AmountBreakup(
     var amt: Double?,
     var discountInfo: String?,
     var payableAmt: Double?,
     var totalAmt: Double? = null,
     var taxBreakup: TaxBreakupOrder?
-): Serializable
+) : Serializable
 
 data class OrderItemsInfo(
     var img: String?,
@@ -457,7 +465,7 @@ data class OrderItemsInfo(
     var quantity: Int?,
     var totalAmt: Double?,
     var unitInfo: UnitInfo?
-): Serializable
+) : Serializable
 
 data class UnitInfo(
     var packInfo: PackInfo?,
@@ -489,44 +497,44 @@ data class OrderDetails(
 
 
 data class OrderData(
-        var approvedBy: String? = null,
-        var categoryId: String? = null,
-        var dfdId: String? = null,
-        var fleetId: String? = null,
-        var fleetImg: String? = null,
-        var groupPrice: Int? = null,
-        var inventoryGroupId: String? = null,
-        var inventoryId: String? = null,
-        var orderId: String? = null,
-        var price: Int? = null,
-        var quantity: Int? = null,
-        var status: String? = null,
-        var year: Int? = null
+    var approvedBy: String? = null,
+    var categoryId: String? = null,
+    var dfdId: String? = null,
+    var fleetId: String? = null,
+    var fleetImg: String? = null,
+    var groupPrice: Int? = null,
+    var inventoryGroupId: String? = null,
+    var inventoryId: String? = null,
+    var orderId: String? = null,
+    var price: Int? = null,
+    var quantity: Int? = null,
+    var status: String? = null,
+    var year: Int? = null
 ) : Serializable
 
 data class TaxBreakupOrder(
-        var cgstAmt: Double? = null,
-        var cgstPer: Double? = null,
-        var igstAmt: Double? = null,
-        var igstPer: Double? = null,
-        var sgstAmt: Double? = null,
-        var sgstPer: Double? = null,
-        var totalTaxAmt: Double? = null
+    var cgstAmt: Double? = null,
+    var cgstPer: Double? = null,
+    var igstAmt: Double? = null,
+    var igstPer: Double? = null,
+    var sgstAmt: Double? = null,
+    var sgstPer: Double? = null,
+    var totalTaxAmt: Double? = null
 ) : Serializable
 
 data class UserGroup(
-        var authorised: Boolean? = null,
-        var functionalities: List<String>? = null,
-        var groupId: String? = null,
-        var groupName: String? = null,
-        var groupType: String? = null,
-        var status: String? = null,
-        var users: List<String>? = null
+    var authorised: Boolean? = null,
+    var functionalities: List<String>? = null,
+    var groupId: String? = null,
+    var groupName: String? = null,
+    var groupType: String? = null,
+    var status: String? = null,
+    var users: List<String>? = null
 ) : Serializable
 
 data class SubTaskConfig(
-        var categories: List<String>? = null,
-        var label: String? = null
+    var categories: List<String>? = null,
+    var label: String? = null
 )
 
 class Stage {
@@ -545,10 +553,10 @@ class Stage {
 }
 
 data class GeoFenceData(
-        var circleData: CircleData? = null,
-        var geofenceId: String? = null,
-        var geofenceName: String? = null,
-        var geofenceType: String? = null
+    var circleData: CircleData? = null,
+    var geofenceId: String? = null,
+    var geofenceName: String? = null,
+    var geofenceType: String? = null
 )
 //data class GeoFenceData(
 //        var circleData: CircleData? = null,
@@ -558,14 +566,14 @@ data class GeoFenceData(
 //)
 
 data class CircleData(
-        var geoCoordinates: List<GeoCoordinate>? = null,
-        var radius: Float = 0f
+    var geoCoordinates: List<GeoCoordinate>? = null,
+    var radius: Float = 0f
 )
 
 data class GeoCoordinate(
-        var latitude: Double? = null,
-        var locationId: String? = null,
-        var longitude: Double? = null
+    var latitude: Double? = null,
+    var locationId: String? = null,
+    var longitude: Double? = null
 )
 
 class CallToActions {
@@ -609,11 +617,101 @@ class TargetInfo {
     var targetValues: ArrayList<String>? = null
 }
 
+class SyncInfo {
+    var syncInfo: Boolean? = false
+}
 
-class CtaInventoryConfig(var dynamicPricing:Boolean?=null,var invAction:String?=null)
+class EligibleUsersResponse : BaseResponse() {
+    var count: Int? = 0
+    var data: ArrayList<DataEU> = arrayListOf()
+
+}
+
+class Location1() {
+
+    var coordinates: ArrayList<Double> = arrayListOf()
+    var latitude: Double? = null
+    var locationId: String? = null
+    var longitude: Double? = null
+
+}
+
+class Location0(
+
+    var address: String? = null,
+    var location: Location1? = Location1(),
+    var radius: Int? = null
+
+)
+
+data class Addresses(
+
+    var address: String? = null,
+    var location: Location0? = Location0(),
+    var pincode: String? = null,
+    var placeId: String? = null
+
+)
+
+class NestedData() {}
+
+data class Location2(
+
+    var coordinates: ArrayList<Double> = arrayListOf(),
+    var latitude: Double? = null,
+    var locationId: String? = null,
+    var longitude: Double? = null
+
+)
+
+data class TrackingInfo(
+
+    var distance: String? = null,
+    var lastSync: String? = null,
+    var location: Location2? = Location2()
+)
+
+data class DataEU(
+
+    var addresses: ArrayList<Addresses> = arrayListOf(),
+    var dateOfBirth: String? = null,
+    var dateOfJoining: String? = null,
+    var dfData: ArrayList<DfData> = arrayListOf(),
+    var email: String? = null,
+    var firstName: String? = null,
+    var lastName: String? = null,
+    var middleName: String? = null,
+    var mobile: String? = null,
+    var profileImg: String? = null,
+    var roleId: String? = null,
+    var roleName: String? = null,
+    var status: String? = null,
+    var trackingInfo: TrackingInfo? = TrackingInfo(),
+    var userId: String? = null
+
+)
+
+data class DfData(
+
+    var alias: String? = null,
+    var embeddedDf: Boolean? = null,
+    var embeddedDfId: String? = null,
+    var key: String? = null,
+    var label: String? = null,
+    var nestedData: ArrayList<NestedData> = arrayListOf(),
+    var refField: String? = null,
+    var type: String? = null,
+    var value: String? = null,
+    var weight: Int? = null,
+    var weightType: String? = null
+
+)
+
+
+class CtaInventoryConfig(var dynamicPricing: Boolean? = null, var invAction: String? = null)
 
 enum class TRAGETINFO {
-    TAG_INVENTORY, CREATE_TASK,NONE,ASSIGN_EXECUTIVE,UNIT_INFO
+    TAG_INVENTORY, CREATE_TASK, NONE, ASSIGN_EXECUTIVE, UNIT_INFO, PAYMENT
 }
 
 enum class Tracking {
@@ -638,7 +736,6 @@ class Condition {
                 " }"
     }
 }
-
 
 
 class TrackiTaskData : Serializable {
@@ -680,7 +777,8 @@ class FleetDetail : Serializable {
     var inventoryId: String? = null
 }
 
-class TaskListing(var tasks: List<Task>? = null, var paginationData: PagingData? = null) : BaseResponse(), Serializable
+class TaskListing(var tasks: List<Task>? = null, var paginationData: PagingData? = null) :
+    BaseResponse(), Serializable
 
 class TripsStatistics : Serializable {
     var events: HashMap<String, Int>? = null
@@ -780,22 +878,22 @@ class FleetListResponse : BaseResponse(), Serializable {
     var fleets: List<Fleet>? = null
 }
 
-class SlotDataResponse: BaseResponse(), Serializable {
-    var data: Map<String,SlotData>? = null
+class SlotDataResponse : BaseResponse(), Serializable {
+    var data: Map<String, SlotData>? = null
     var message: String? = null
 }
 
-data class SlotData (
+data class SlotData(
     val slots: List<Slot>,
     val totalAvailableSlots: Long,
     val convertedDate: String? = null
-): Serializable
+) : Serializable
 
-data class Slot (
+data class Slot(
     val time: String,
     val available: Boolean,
     val slotAvailable: Long
-): Serializable
+) : Serializable
 
 class Fleet : Serializable {
     var fleetId: String? = null
@@ -940,24 +1038,24 @@ data class Data(var date: Long = 0L) {
 }
 
 data class PunchAttendanceData(
-        val `data`: Remarks,
-        val location: LocationData? = null,
-        val punchedBy: String,
-        val source: String
+    val `data`: Remarks,
+    val location: LocationData? = null,
+    val punchedBy: String,
+    val source: String
 )
 
 data class Remarks(
-        val remarks: String
+    val remarks: String
 )
 
 @Parcelize
 data class PunchLocationData(
     val address: String?,
     val location: PunchGeoCoordinates?
-):Parcelable
+) : Parcelable
 
 @Parcelize
-class PunchGeoCoordinates :Parcelable {
+class PunchGeoCoordinates : Parcelable {
     var latitude = 0.0
     var longitude = 0.0
     var locationId: String? = null
@@ -967,8 +1065,8 @@ class PunchGeoCoordinates :Parcelable {
 
 
 data class LocationData(
-        val address: String?,
-        val location: GeoCoordinates?
+    val address: String?,
+    val location: GeoCoordinates?
 )
 
 class AttendanceCountMap {
@@ -1012,10 +1110,10 @@ enum class LeaveType {
 
 
 data class LeaveCount(
-        val APPROVED: Int,
-        val CANCELLED: Int,
-        val PENDING: Int,
-        val REJECTED: Int
+    val APPROVED: Int,
+    val CANCELLED: Int,
+    val PENDING: Int,
+    val REJECTED: Int
 )
 
 class LeaveHistory : BaseResponse() {
@@ -1189,23 +1287,23 @@ class EditData {
 }
 
 data class AttendanceMap(
-        var ABSENT: Int = 0,
-        var ALL: Int = 0,
-        var DAY_OFF: Int = 0,
-        var HOLIDAY: Int = 0,
-        var NOT_UPDATED: Int = 0,
-        var ON_LEAVE: Int = 0,
-        var PRESENT: Int = 0
+    var ABSENT: Int = 0,
+    var ALL: Int = 0,
+    var DAY_OFF: Int = 0,
+    var HOLIDAY: Int = 0,
+    var NOT_UPDATED: Int = 0,
+    var ON_LEAVE: Int = 0,
+    var PRESENT: Int = 0
 )
 
 data class DashBoardMapResponse(
-        var taskCountMap: HashMap<String, Int>? = HashMap(),
-        var attendanceStatusMap: AttendanceMap? = null
+    var taskCountMap: HashMap<String, Int>? = HashMap(),
+    var attendanceStatusMap: AttendanceMap? = null
 ) : BaseResponse()
 
 data class TeamAttendanceResponse(
-        var taskCountMap: HashMap<String, Int>? = HashMap(),
-        var attendanceStatusMap: AttendanceMap? = null
+    var taskCountMap: HashMap<String, Int>? = HashMap(),
+    var attendanceStatusMap: AttendanceMap? = null
 ) : BaseResponse()
 
 enum class Action {
@@ -1325,14 +1423,14 @@ data class Contact(var name: String, var mobileNumber: String?) : Parcelable {
 }
 
 data class InventoryResponse(
-        var carModelMap: HashMap<String, String>? = null,
-        var categoryId: String? = null,
-        var filterCategoryMapping: HashMap<String, String>? = null,
-        var inventories: List<Inventory>? = null,
-        var inventoriesRequest: InventoriesRequest? = null,
-        var inventoryConfig: InventoryConfig? = null,
-        var pageTitle: String? = null,
-        var subTask: Boolean? = null
+    var carModelMap: HashMap<String, String>? = null,
+    var categoryId: String? = null,
+    var filterCategoryMapping: HashMap<String, String>? = null,
+    var inventories: List<Inventory>? = null,
+    var inventoriesRequest: InventoriesRequest? = null,
+    var inventoryConfig: InventoryConfig? = null,
+    var pageTitle: String? = null,
+    var subTask: Boolean? = null
 ) : BaseResponse()
 
 enum class InventoryStatus {
@@ -1340,22 +1438,22 @@ enum class InventoryStatus {
 }
 
 class Inventory(
-        var categoryId: String? = null,
-        var dfdId: String? = null,
-        var fleetId: String? = null,
-        var fleetImg: String? = null,
-        var groupPrice: Int? = null,
-        var inventoryGroupId: String? = null,
-        var inventoryGroupName: String? = null,
-        var inventoryId: String? = null,
-        var lastUpdatedAt: String? = null,
-        var modelName: String? = null,
-        var price: Double = 0.0,
-        var quantity: Int = 0,
-        var status: InventoryStatus? = null,
-        var year: Int? = null,
-        var addquantity: Int = 0,
-        var isAdded: Boolean = false
+    var categoryId: String? = null,
+    var dfdId: String? = null,
+    var fleetId: String? = null,
+    var fleetImg: String? = null,
+    var groupPrice: Int? = null,
+    var inventoryGroupId: String? = null,
+    var inventoryGroupName: String? = null,
+    var inventoryId: String? = null,
+    var lastUpdatedAt: String? = null,
+    var modelName: String? = null,
+    var price: Double = 0.0,
+    var quantity: Int = 0,
+    var status: InventoryStatus? = null,
+    var year: Int? = null,
+    var addquantity: Int = 0,
+    var isAdded: Boolean = false
 ) {
 
     override fun equals(obj: Any?): Boolean {
@@ -1386,13 +1484,20 @@ class Inventory(
             if (quantity != null) {
                 if (quantity > 0) {
                     textView.text = "In Stock"
-                    textView.background = ContextCompat.getDrawable(textView.context, R.drawable.status_active)
+                    textView.background =
+                        ContextCompat.getDrawable(textView.context, R.drawable.status_active)
                     textView.setTextColor(ContextCompat.getColor(textView.context, R.color.green))
 
                 } else {
                     textView.text = "Out Of Stock"
-                    textView.background = ContextCompat.getDrawable(textView.context, R.drawable.staus_inactive)
-                    textView.setTextColor(ContextCompat.getColor(textView.context, android.R.color.holo_red_dark))
+                    textView.background =
+                        ContextCompat.getDrawable(textView.context, R.drawable.staus_inactive)
+                    textView.setTextColor(
+                        ContextCompat.getColor(
+                            textView.context,
+                            android.R.color.holo_red_dark
+                        )
+                    )
                 }
             }
 
@@ -1410,59 +1515,64 @@ class Inventory(
 }
 
 data class InventoriesRequest(
-        var at: Int? = null,
-        var category: Any? = null,
-        var categoryId: Any? = null,
-        var categoryIds: List<String>? = null,
-        var cid: Any? = null,
-        var fleetname: Any? = null,
-        var gid: Any? = null,
-        var inventoryGroupId: Any? = null,
-        var inventoryId: Any? = null,
-        var modelId: Any? = null,
-        var modelIds: List<String>? = null,
-        var paginationData: PaginationData? = null,
-        var regNumber: Any? = null
+    var at: Int? = null,
+    var category: Any? = null,
+    var categoryId: Any? = null,
+    var categoryIds: List<String>? = null,
+    var cid: Any? = null,
+    var fleetname: Any? = null,
+    var gid: Any? = null,
+    var inventoryGroupId: Any? = null,
+    var inventoryId: Any? = null,
+    var modelId: Any? = null,
+    var modelIds: List<String>? = null,
+    var paginationData: PaginationData? = null,
+    var regNumber: Any? = null
 )
 
 data class InventoryConfig(
-        var approvalOn: ApprovalOn? = null,
-        var approvalType: ApprovalType? = null,
-        var approvers: List<String>? = null,
-        var availabilityType: String? = null,
-        var categoryId: List<String>? = null,
-        var enableInv: Boolean? = null,
-        var groupIds: List<String>? = null,
-        var mappingOn: MappingOn? = null,
-        var allowOrderDeletion: Boolean?,
-        var allowOrderEditAfterPay: Boolean?,
-        var allowOrderEditing: Boolean?,
-        var editMode: EditMode?,
-        var enableBom: Boolean?,
-        var enablePayment: Boolean?,
-        var flavorId: String?,
-        var invAction: InvAction?,
-        var stockUpdate: Boolean?,
-        var multipleQty: Boolean?,
-        var linkingType: TaggingType?,
-        var linkOption: LinkOptions?,
-        var dynamicPricing: Boolean?,
-        var geoTagging: Boolean?
+    var approvalOn: ApprovalOn? = null,
+    var approvalType: ApprovalType? = null,
+    var approvers: List<String>? = null,
+    var availabilityType: String? = null,
+    var categoryId: List<String>? = null,
+    var enableInv: Boolean? = null,
+    var groupIds: List<String>? = null,
+    var mappingOn: MappingOn? = null,
+    var allowOrderDeletion: Boolean?,
+    var allowOrderEditAfterPay: Boolean?,
+    var allowOrderEditing: Boolean?,
+    var editMode: EditMode?,
+    var enableBom: Boolean?,
+    var enablePayment: Boolean?,
+    var flavorId: String?,
+    var invAction: InvAction?,
+    var stockUpdate: Boolean?,
+    var multipleQty: Boolean?,
+    var linkingType: TaggingType?,
+    var linkOption: LinkOptions?,
+    var dynamicPricing: Boolean?,
+    var geoTagging: Boolean?
 )
+
 enum class LinkOptions {
-    DIRECT,ORDER
+    DIRECT, ORDER
 }
+
 enum class TaggingType {
     SINGLE, MULTIPLE
 }
+
 enum class MappingOn {
     CREATION, EXECUTION
 }
-enum class ApprovalType{
-    MANUAL , AUTO
+
+enum class ApprovalType {
+    MANUAL, AUTO
 }
+
 enum class InvAction {
-    ADD, REMOVE, HOLD,IN,OUT,TRANSFER
+    ADD, REMOVE, HOLD, IN, OUT, TRANSFER
 }
 
 enum class EditMode {
@@ -1476,43 +1586,43 @@ enum class ApprovalOn {
 
 @Parcelize
 data class PaginationData(
-        var dataCount: Int? = null,
-        var datalimit: Int? = null,
-        var email: String? = null,
-        var mobile: String? = null,
-        var pageIndex: Int? = null,
-        var pageNumbers: Int? = null,
-        var pageOffset: Int? = null,
-        var retailname: String? = null
+    var dataCount: Int? = null,
+    var datalimit: Int? = null,
+    var email: String? = null,
+    var mobile: String? = null,
+    var pageIndex: Int? = null,
+    var pageNumbers: Int? = null,
+    var pageOffset: Int? = null,
+    var retailname: String? = null
 ) : Parcelable
 
 data class CategoryGroupResponse(
-        var groupIds: HashMap<String, String>? = null
+    var groupIds: HashMap<String, String>? = null
 ) : BaseResponse()
 
 data class TransactionData(
-        var balance: Double = 0.0,
-        var blockedAmmount: Int? = null,
-        var paginationData: PagingData? = null,
-        var transactions: List<Transaction>? = null
+    var balance: Double = 0.0,
+    var blockedAmmount: Int? = null,
+    var paginationData: PagingData? = null,
+    var transactions: List<Transaction>? = null
 ) : BaseResponse()
 
 
 data class Transaction(
-        var afterTxnAmt: Double? = null,
-        var amount: Int = 0,
-        var beforeTxnAmt: Double? = null,
-        var clientTaskId: String? = null,
-        var date: String? = null,
-        var fromDate: Int? = null,
-        var paginationData: Any? = null,
-        var refId: String? = null,
-        var remark: String? = null,
-        var status: String? = null,
+    var afterTxnAmt: Double? = null,
+    var amount: Int = 0,
+    var beforeTxnAmt: Double? = null,
+    var clientTaskId: String? = null,
+    var date: String? = null,
+    var fromDate: Int? = null,
+    var paginationData: Any? = null,
+    var refId: String? = null,
+    var remark: String? = null,
+    var status: String? = null,
 //        var toDate: Int? = null,
-        var transactionId: String? = null,
-        var txnTypes: Any? = null,
-        var userId: String? = null
+    var transactionId: String? = null,
+    var txnTypes: Any? = null,
+    var userId: String? = null
 ) {
     companion object {
 
@@ -1557,36 +1667,37 @@ data class Transaction(
 }
 
 data class PostResponse(
-        var paginationData: PaginationData? = null,
-        var postList: List<Post>? = null
+    var paginationData: PaginationData? = null,
+    var postList: List<Post>? = null
 ) : BaseResponse()
 
 enum class MEDIATYPE {
     VIDEO, IMAGE, AUDIO
 }
-enum class ContentType{
-    DF_DATA,PLAIN_TEXT
+
+enum class ContentType {
+    DF_DATA, PLAIN_TEXT
 }
 
 
 data class PostDetailsResponse(
-    var data:Post?=null
-): BaseResponse()
+    var data: Post? = null
+) : BaseResponse()
 
 data class Post(
-        var commentCounts: Int = 0,
-        var likeCounts: Int = 0,
-        var message: String? = null,
-        var postId: String? = null,
-        var fileUrl: String? = null,
-        var title: String? = null,
-        var image: String? = null,
-        var createdBy: String? = null,
-        var postedAt: String? = null,
-        var postedUserImage: String? = null,
-        var mediaType: MEDIATYPE? = null,
-        var contentType: ContentType,
-        var loggedInUserLike: Boolean = false
+    var commentCounts: Int = 0,
+    var likeCounts: Int = 0,
+    var message: String? = null,
+    var postId: String? = null,
+    var fileUrl: String? = null,
+    var title: String? = null,
+    var image: String? = null,
+    var createdBy: String? = null,
+    var postedAt: String? = null,
+    var postedUserImage: String? = null,
+    var mediaType: MEDIATYPE? = null,
+    var contentType: ContentType,
+    var loggedInUserLike: Boolean = false
 
 ) {
     companion object {
@@ -1627,13 +1738,16 @@ data class Post(
 
         @JvmStatic
         @BindingAdapter("loadpost")
-        fun loadPost(view: ImageView, url: String?) { // This methods should not have any return type, = declaration would make it return that object declaration.
+        fun loadPost(
+            view: ImageView,
+            url: String?
+        ) { // This methods should not have any return type, = declaration would make it return that object declaration.
             if (url != null && url.isNotEmpty()) {
                 GlideApp.with(view.context)
-                        .load(url)
-                        .placeholder(R.drawable.ic_picture)
-                        .error(R.drawable.ic_picture)
-                        .into(view)
+                    .load(url)
+                    .placeholder(R.drawable.ic_picture)
+                    .error(R.drawable.ic_picture)
+                    .into(view)
             }
         }
 
@@ -1642,25 +1756,25 @@ data class Post(
 }
 
 data class CommentsResponse(
-        var comments: List<Comments>? = null
+    var comments: List<Comments>? = null
 ) : BaseResponse()
 
 data class Comments(
-        var comment: String? = null,
-        var commentedBy: String? = null,
-        var commentedAt: String? = null,
-        var userImage: String? = null
+    var comment: String? = null,
+    var commentedBy: String? = null,
+    var commentedAt: String? = null,
+    var userImage: String? = null
 )
 
 data class LikeResponse(
-        var likes: List<Likes>? = null
+    var likes: List<Likes>? = null
 ) : BaseResponse()
 
 data class Likes(
-        var like: Boolean? = null,
-        var likedAt: String? = null,
-        var likedBy: String? = null,
-        var userImage: String? = null
+    var like: Boolean? = null,
+    var likedAt: String? = null,
+    var likedBy: String? = null,
+    var userImage: String? = null
 )
 
 enum class BuddySelectionType() {
@@ -1669,73 +1783,76 @@ enum class BuddySelectionType() {
 
 @Parcelize
 data class GetSavedServicesResponse(
-        var services: List<Service>? = null
+    var services: List<Service>? = null
 ) : BaseResponse(), Parcelable
 
 @Parcelize
 data class InitiateSignUpResponse(
-        var draftId: String,
-        var merchantId: String,
-        var refreshConfig: Boolean,
-        var services: List<Service>,
-        var userId: String? = null
+    var draftId: String,
+    var merchantId: String,
+    var refreshConfig: Boolean,
+    var services: List<Service>,
+    var userId: String? = null
 ) : BaseResponse(), Parcelable
 
 @Parcelize
 data class Service(
-        var id: String,
-        var img: String?,
-        var title: String,
-        var selected: Boolean = false
+    var id: String,
+    var img: String?,
+    var title: String,
+    var selected: Boolean = false
 ) : Parcelable
 
 data class ClientDataResponse(
-        var userInfo: List<ClientData>?
+    var userInfo: List<ClientData>?
 ) : BaseResponse()
 
 data class ClientData(
-        val address: String?,
-        val designation: String?,
-        val email: String?,
-        val firstName: String?,
-        val lastName: String?,
-        val mobile: String?,
-        val userId: String?,
-        val profileImg: String?
+    val address: String?,
+    val designation: String?,
+    val email: String?,
+    val firstName: String?,
+    val lastName: String?,
+    val mobile: String?,
+    val userId: String?,
+    val profileImg: String?
 
 )
 
 @Parcelize
 data class InsightResponse(
-        val `data`: Insight? = null
+    val `data`: Insight? = null
 ) : BaseResponse(), Parcelable
 
 @Parcelize
 data class Insight(
-        val button: ButtonData? = null,
-        val footer: String? = null,
-        val heading: String? = null,
-        val img: String? = null,
-        val insights: List<ServiceDescr>? = null,
-        val subheading: String? = null
+    val button: ButtonData? = null,
+    val footer: String? = null,
+    val heading: String? = null,
+    val img: String? = null,
+    val insights: List<ServiceDescr>? = null,
+    val subheading: String? = null
 ) : Parcelable
 
 @Parcelize
 data class ServiceDescr(
-        var count: Int,
-        val img: String,
-        val serviceDescr: String
+    var count: Int,
+    val img: String,
+    val serviceDescr: String
 ) : Parcelable {
     companion object {
         @JvmStatic
         @BindingAdapter("serviceDescr")
-        fun serviceDescrImage(view: ImageView, url: String?) { // This methods should not have any return type, = declaration would make it return that object declaration.
+        fun serviceDescrImage(
+            view: ImageView,
+            url: String?
+        ) { // This methods should not have any return type, = declaration would make it return that object declaration.
             if (url != null && url.isNotEmpty()) {
                 GlideApp.with(view.context)
-                        .load(url)
-                        .placeholder(R.drawable.ic_gallery_chooser)
-                        .error(R.drawable.ic_gallery_chooser)
-                        .into(view)
+                    .load(url)
+                    .placeholder(R.drawable.ic_gallery_chooser)
+                    .error(R.drawable.ic_gallery_chooser)
+                    .into(view)
             }
         }
     }
@@ -1743,8 +1860,8 @@ data class ServiceDescr(
 
 @Parcelize
 data class ButtonData(
-        val title: String? = null,
-        val url: String? = null
+    val title: String? = null,
+    val url: String? = null
 ) : Parcelable
 
 class HandlerObject {
@@ -1755,66 +1872,77 @@ class HandlerObject {
 
 @Parcelize
 data class SelectAccountListResponse(
-        val accountsAndOfferings: List<AccountsAndOffering>,
-        val draftId: String,
-        val profileDetail: ProfileDetail
+    val accountsAndOfferings: List<AccountsAndOffering>,
+    val draftId: String,
+    val profileDetail: ProfileDetail
 
 ) : BaseResponse(), Parcelable
 
 @Parcelize
 data class AccountsAndOffering(
-        var accDescr: String? = null,
-        val accTitle: String,
-        val merchantId: String? = null,
-        var disclaimer: String? = null,
-        val offerings: List<Offering>? = null,
-        val signupAs: String? = null
+    var accDescr: String? = null,
+    val accTitle: String,
+    val merchantId: String? = null,
+    var disclaimer: String? = null,
+    val offerings: List<Offering>? = null,
+    val signupAs: String? = null
 ) : Parcelable
 
 @Parcelize
 data class ProfileDetail(
-        val email: String? = null,
-        val mobile: String? = null,
-        val name: String? = null,
-        val profileImg: String? = null,
-        val statistics: String
+    val email: String? = null,
+    val mobile: String? = null,
+    val name: String? = null,
+    val profileImg: String? = null,
+    val statistics: String
 ) : Parcelable
 
 @Parcelize
 data class Offering(
-        val description: String,
-        val id: String,
-        val image: String,
-        val title: String,
-        var selected: Boolean = false
+    val description: String,
+    val id: String,
+    val image: String,
+    val title: String,
+    var selected: Boolean = false
 ) : Parcelable {
     companion object {
 
         @JvmStatic
         @BindingAdapter("taskselectionimage")
-        fun taskSelectionImage(view: ImageView, url: String?) { // This methods should not have any return type, = declaration would make it return that object declaration.
+        fun taskSelectionImage(
+            view: ImageView,
+            url: String?
+        ) { // This methods should not have any return type, = declaration would make it return that object declaration.
             if (url != null && url.isNotEmpty()) {
                 GlideApp.with(view.context)
-                        .load(url)
-                        .placeholder(R.drawable.ic_demo_image)
-                        .error(R.drawable.ic_demo_image)
-                        .into(view)
+                    .load(url)
+                    .placeholder(R.drawable.ic_demo_image)
+                    .error(R.drawable.ic_demo_image)
+                    .into(view)
             }
         }
 
         @JvmStatic
         @BindingAdapter("selectedtask")
-        fun selectedTask(view: LinearLayout, selected: Boolean?) { // This methods should not have any return type, = declaration would make it return that object declaration.
+        fun selectedTask(
+            view: LinearLayout,
+            selected: Boolean?
+        ) { // This methods should not have any return type, = declaration would make it return that object declaration.
             if (selected != null && selected) {
-                view.background = ContextCompat.getDrawable(view.context, R.drawable.account_selection_stroke)
+                view.background =
+                    ContextCompat.getDrawable(view.context, R.drawable.account_selection_stroke)
             } else {
-                view.background = ContextCompat.getDrawable(view.context, R.drawable.account_not_selected)
+                view.background =
+                    ContextCompat.getDrawable(view.context, R.drawable.account_not_selected)
             }
         }
 
         @JvmStatic
         @BindingAdapter("selectediconshow")
-        fun selectedIconShow(view: ImageView, selected: Boolean?) { // This methods should not have any return type, = declaration would make it return that object declaration.
+        fun selectedIconShow(
+            view: ImageView,
+            selected: Boolean?
+        ) { // This methods should not have any return type, = declaration would make it return that object declaration.
             if (selected != null && selected) {
                 view.visibility = View.VISIBLE
             } else {
@@ -1826,34 +1954,34 @@ data class Offering(
 
 @Parcelize
 data class UpdateUserResponse(
-        var `data`: UserData?
+    var `data`: UserData?
 ) : Parcelable, BaseResponse()
 
 @Parcelize
 data class UserListResponse(
-        var `data`: List<UserData>?,
-        var count: Int = 0
+    var `data`: List<UserData>?,
+    var count: Int = 0
 ) : Parcelable, BaseResponse()
 
 
 @Parcelize
 data class UserData(
-        var dateOfBirth: String? = null,
-        var dateOfJoining: String? = null,
-        var email: String? = null,
-        var firstName: String? = null,
-        var lastName: String? = null,
-        var middleName: String? = null,
-        var mobile: String? = null,
-        var profileImg: String? = null,
-        var roleId: String? = null,
-        var roleName: String? = null,
-        var status: String? = null,
-        var password: String? = null,
-        var personId: String? = null,
-        var motherName: String? = null,
-        var fatherName: String? = null,
-        var userId: String? = null
+    var dateOfBirth: String? = null,
+    var dateOfJoining: String? = null,
+    var email: String? = null,
+    var firstName: String? = null,
+    var lastName: String? = null,
+    var middleName: String? = null,
+    var mobile: String? = null,
+    var profileImg: String? = null,
+    var roleId: String? = null,
+    var roleName: String? = null,
+    var status: String? = null,
+    var password: String? = null,
+    var personId: String? = null,
+    var motherName: String? = null,
+    var fatherName: String? = null,
+    var userId: String? = null
 ) : Parcelable {
     override fun equals(obj: Any?): Boolean {
 
@@ -1869,11 +1997,11 @@ data class UserData(
 }
 
 class UpdateResponse(
-        var `data`: AddEmployeeRequest?
+    var `data`: AddEmployeeRequest?
 ) : BaseResponse()
 
 class UserAddressResponse(
-        var `data`: List<AddressInfo>?
+    var `data`: List<AddressInfo>?
 
 ) : BaseResponse()
 

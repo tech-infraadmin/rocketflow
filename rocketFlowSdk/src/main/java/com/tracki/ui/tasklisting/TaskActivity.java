@@ -136,116 +136,120 @@ public class TaskActivity extends BaseActivity<ActivityTaskBinding, TaskViewMode
         mTaskViewModel  = new ViewModelProvider(this, new TaskViewModelFactory(RocketFlyer.Companion.dataManager())).get(TaskViewModel.class);
         mTaskViewModel.setNavigator(this);
 
-        if(preferencesHelper!=null && preferencesHelper.getLoginToken()!=null
-                && !preferencesHelper.getLoginToken().isEmpty()) {
-            hitConfig();
-        }else{
-            String sdkClintId = preferencesHelper!=null
-                    && preferencesHelper.getSDKClientID()!=null
-                    && !preferencesHelper.getSDKClientID().isEmpty()?preferencesHelper.getSDKClientID():"sahshahsss";
-            hitLoginSDKToken(sdkClintId);
-        }
+        mActivityTaskBinding.coordinatorLayout.setVisibility(View.VISIBLE);
+        setUp();
+
+
+//        if(preferencesHelper!=null && preferencesHelper.getLoginToken()!=null
+//                && !preferencesHelper.getLoginToken().isEmpty()) {
+//            hitConfig();
+//        }else{
+//            String sdkClintId = preferencesHelper!=null
+//                    && preferencesHelper.getSDKClientID()!=null
+//                    && !preferencesHelper.getSDKClientID().isEmpty()?preferencesHelper.getSDKClientID():"sahshahsss";
+//            hitLoginSDKToken(sdkClintId);
+//        }
     }
 
-    private void hitLoginSDKToken(String sdkClintId){
-        showLoading();
-        mTaskViewModel.sdkToken(sdkClintId, RocketFlyer.Companion.httpManager(), new SyncCallback() {
-            @Override
-            public void hitApi() {
-                //SyncCallback.super.hitApi();z
-            }
-
-            @Override
-            public void onRequestTimeOut(@NonNull ApiCallback callBack) {
-                //SyncCallback.super.onRequestTimeOut(callBack);
-                hideLoading();
-            }
-
-            @Override
-            public void onLogout() {
-                hideLoading();
-            }
-
-            @Override
-            public void onNetworkErrorClose() {
-                hideLoading();
-            }
-
-            @Override
-            public void onResponse(Object result, @Nullable APIError error) {
-                hideLoading();
-                if (CommonUtils.handleResponse(this, error, result, TaskActivity.this)) {
-                    if (result == null) {
-                        return;
-                    }
-                    Gson gson = new Gson();
-                    SDKToken token = gson.fromJson(String.valueOf(result), SDKToken.class);
-                    if(token!=null){
-                        CommonUtils.saveSDKAccessToken(TaskActivity.this, token, preferencesHelper);
-                    }
-                     hitConfig();
-
-                }else{
-                    //CommonUtils.showPermanentSnackBar(findViewById(R.id.rlMain), AppConstants.ALERT_TRY_AGAIN,mSplashViewModel);
-                }
-            }
-
-            @Override
-            public boolean isAvailable() {
-                return true;
-            }
-        });
-    }
-
-    private void hitConfig(){
-        showLoading();
-        mTaskViewModel.hitConfigApi(RocketFlyer.Companion.httpManager(), new SyncCallback() {
-            @Override
-            public void hitApi() {
-                //SyncCallback.super.hitApi();
-            }
-
-            @Override
-            public void onRequestTimeOut(@NonNull ApiCallback callBack) {
-                //SyncCallback.super.onRequestTimeOut(callBack);
-                hideLoading();
-            }
-
-            @Override
-            public void onLogout() {
-                hideLoading();
-            }
-
-            @Override
-            public void onNetworkErrorClose() {
-                hideLoading();
-            }
-
-            @Override
-            public void onResponse(Object result, @Nullable APIError error) {
-                hideLoading();
-                if (CommonUtils.handleResponse(this, error, result, TaskActivity.this)) {
-                    if (result == null) {
-                        return;
-                    }
-                    Gson gson = new Gson();
-                    ConfigResponse configResponse = gson.fromJson(String.valueOf(result), ConfigResponse.class);
-
-                    CommonUtils.saveConfigDetails(TaskActivity.this, configResponse, preferencesHelper, "1");
-                    mActivityTaskBinding.coordinatorLayout.setVisibility(View.VISIBLE);
-                    setUp();
-
-                }else{
-                    //CommonUtils.showPermanentSnackBar(findViewById(R.id.rlMain), AppConstants.ALERT_TRY_AGAIN,mSplashViewModel);
-                }
-            }
-
-            @Override
-            public boolean isAvailable() {
-                return true;
-            }
-        });
-    }
+//    private void hitLoginSDKToken(String sdkClintId){
+//        showLoading();
+//        mTaskViewModel.sdkToken(sdkClintId, RocketFlyer.Companion.httpManager(), new SyncCallback() {
+//            @Override
+//            public void hitApi() {
+//                //SyncCallback.super.hitApi();z
+//            }
+//
+//            @Override
+//            public void onRequestTimeOut(@NonNull ApiCallback callBack) {
+//                //SyncCallback.super.onRequestTimeOut(callBack);
+//                hideLoading();
+//            }
+//
+//            @Override
+//            public void onLogout() {
+//                hideLoading();
+//            }
+//
+//            @Override
+//            public void onNetworkErrorClose() {
+//                hideLoading();
+//            }
+//
+//            @Override
+//            public void onResponse(Object result, @Nullable APIError error) {
+//                hideLoading();
+//                if (CommonUtils.handleResponse(this, error, result, TaskActivity.this)) {
+//                    if (result == null) {
+//                        return;
+//                    }
+//                    Gson gson = new Gson();
+//                    SDKToken token = gson.fromJson(String.valueOf(result), SDKToken.class);
+//                    if(token!=null){
+//                        CommonUtils.saveSDKAccessToken( token, preferencesHelper);
+//                    }
+//                     hitConfig();
+//
+//                }else{
+//                    //CommonUtils.showPermanentSnackBar(findViewById(R.id.rlMain), AppConstants.ALERT_TRY_AGAIN,mSplashViewModel);
+//                }
+//            }
+//
+//            @Override
+//            public boolean isAvailable() {
+//                return true;
+//            }
+//        });
+//    }
+//
+//    private void hitConfig(){
+//        showLoading();
+//        mTaskViewModel.hitConfigApi(RocketFlyer.Companion.httpManager(), new SyncCallback() {
+//            @Override
+//            public void hitApi() {
+//                //SyncCallback.super.hitApi();
+//            }
+//
+//            @Override
+//            public void onRequestTimeOut(@NonNull ApiCallback callBack) {
+//                //SyncCallback.super.onRequestTimeOut(callBack);
+//                hideLoading();
+//            }
+//
+//            @Override
+//            public void onLogout() {
+//                hideLoading();
+//            }
+//
+//            @Override
+//            public void onNetworkErrorClose() {
+//                hideLoading();
+//            }
+//
+//            @Override
+//            public void onResponse(Object result, @Nullable APIError error) {
+//                hideLoading();
+//                if (CommonUtils.handleResponse(this, error, result, TaskActivity.this)) {
+//                    if (result == null) {
+//                        return;
+//                    }
+//                    Gson gson = new Gson();
+//                    ConfigResponse configResponse = gson.fromJson(String.valueOf(result), ConfigResponse.class);
+//
+//                    CommonUtils.saveConfigDetails(TaskActivity.this, configResponse, preferencesHelper, "1");
+//                    mActivityTaskBinding.coordinatorLayout.setVisibility(View.VISIBLE);
+//                    setUp();
+//
+//                }else{
+//                    //CommonUtils.showPermanentSnackBar(findViewById(R.id.rlMain), AppConstants.ALERT_TRY_AGAIN,mSplashViewModel);
+//                }
+//            }
+//
+//            @Override
+//            public boolean isAvailable() {
+//                return true;
+//            }
+//        });
+//    }
 
     @SuppressLint("RestrictedApi")
     private void setUp() {
