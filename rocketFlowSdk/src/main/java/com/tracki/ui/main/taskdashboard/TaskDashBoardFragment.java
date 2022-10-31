@@ -322,6 +322,7 @@ public class TaskDashBoardFragment extends BaseFragment<LayoutTaskStageDashBoard
         }else {
             mockSetup();
         }
+
     }
 
     private void setToggle(LabeledSwitch switchToggle) {

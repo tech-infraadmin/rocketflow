@@ -37,23 +37,40 @@ internal class RocketFlyerImp(
     override fun start(processId: String, taskId: String?) {
         contextRef.get()?.let {
 
-            val listCategory: List<WorkFlowCategories> =
-                RocketFlyerBuilder.getDataManagerInstance()?.workFlowCategoriesList ?: ArrayList()
+            try{
 
-            val pref = RocketFlyerBuilder.getPrefInstance()
+                val listCategory: List<WorkFlowCategories> =
+                    RocketFlyerBuilder.getDataManagerInstance()?.workFlowCategoriesList ?: ArrayList()
 
-            if(pref==null
-                || pref.loginToken==null
-                || pref.loginToken.isEmpty()
-                || listCategory.isEmpty()){
+                val pref = RocketFlyerBuilder.getPrefInstance()
 
-                showToast(it,"Call init before start method")
-                return
+                if(pref==null
+                    || pref.loginToken==null
+                    || pref.loginToken.isEmpty()
+                    || listCategory.isEmpty()){
+
+                    showToast(it,"Call init before start method")
+                    return
+                }
+
+                val configResponse = Gson().fromJson(
+                    pref.configResponse.toString(),
+                    ConfigResponse::class.java
+                )
+                CommonUtils.saveConfigDetails(
+                    it,
+                    configResponse,
+                    RocketFlyer.preferenceHelper(),
+                    "1")
+
+                val intent = MainSDKActivity.newIntent(it)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                it.startActivity(intent);
+
+            }catch (e : Exception){
+                showToast(it, "Call init before start method :$e")
             }
 
-            val intent = MainSDKActivity.newIntent(it)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            it.startActivity(intent);
 
 //            if (processId.isEmpty()) throw Exception("ProcessId cannot be null")
 //            RFLog.d("ProcessId : $processId")
