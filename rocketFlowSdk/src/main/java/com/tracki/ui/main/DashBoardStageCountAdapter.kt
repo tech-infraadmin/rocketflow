@@ -39,14 +39,14 @@ class DashBoardStageCountAdapter(private var mList: ArrayList<DashBoardBoxItem>?
             VIEW_TYPE_NOTIFICATION_SIMPLE -> {
 
                 val simpleViewItemBinding: ItemCardWorkFlowBinding =
-                        ItemCardWorkFlowBinding.inflate(
-                                LayoutInflater.from(parent.context), parent, false)
+                    ItemCardWorkFlowBinding.inflate(
+                        LayoutInflater.from(parent.context), parent, false)
                 SimpleViewHolder(simpleViewItemBinding)
             }
             else -> {
                 val emptyViewBinding: ItemLayoutEmptyDashBoardBindingBinding =
-                        ItemLayoutEmptyDashBoardBindingBinding.inflate(
-                                LayoutInflater.from(parent.context), parent, false)
+                    ItemLayoutEmptyDashBoardBindingBinding.inflate(
+                        LayoutInflater.from(parent.context), parent, false)
                 EmptyViewHolder(emptyViewBinding)
             }
         }
@@ -95,17 +95,12 @@ class DashBoardStageCountAdapter(private var mList: ArrayList<DashBoardBoxItem>?
     }
 
     inner class SimpleViewHolder(private val mBinding: ItemCardWorkFlowBinding) :
-            BaseViewHolder(mBinding.root) {
+        BaseViewHolder(mBinding.root) {
 
 
         override fun onBind(position: Int) {
             val lists = mList!![position]
             mBinding.data = lists
-            if (cellwidthWillbe != 0) {
-                CommonUtils.showLogMessage("e", "cellwidthWillbe", "" + cellwidthWillbe)
-                mBinding.cardMain.setLayoutParams(FrameLayout.LayoutParams(
-                        cellwidthWillbe - 20, CommonUtils.dpToPixel(context, 85)))
-            }
             mBinding.cardMain.setOnClickListener(View.OnClickListener {
                 if (listener != null)
                     listener!!.onItemClick(lists)
@@ -120,7 +115,7 @@ class DashBoardStageCountAdapter(private var mList: ArrayList<DashBoardBoxItem>?
     }
 
     inner class EmptyViewHolder(private val mBinding: ItemLayoutEmptyDashBoardBindingBinding) :
-            BaseViewHolder(mBinding.root) {
+        BaseViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
         }

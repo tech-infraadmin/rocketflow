@@ -323,6 +323,8 @@ public class TaskDashBoardFragment extends BaseFragment<LayoutTaskStageDashBoard
             mockSetup();
         }
 
+        //taskStageDashBoardBinding.toolLayout.setVisibility(View.GONE);
+
     }
 
     private void setToggle(LabeledSwitch switchToggle) {
@@ -402,28 +404,30 @@ public class TaskDashBoardFragment extends BaseFragment<LayoutTaskStageDashBoard
     }
 
     private void setTopColor(Integer colorId) {
-        Window window = getActivity().getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.setStatusBarColor(ContextCompat.getColor(requireActivity(), colorId));
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.getDecorView().getWindowInsetsController().setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
-        }
-        else{
-            window.getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-
-        }
-
-
         LinearLayout topBar = taskStageDashBoardBinding.toolLayout.findViewById(R.id.ll_topbar);
-        topBar.setBackgroundColor(getResources().getColor(colorId));
+        topBar.setVisibility(View.GONE);
+//        Window window = getActivity().getWindow();
+//        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            window.setStatusBarColor(ContextCompat.getColor(requireActivity(), colorId));
+//        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            window.getDecorView().getWindowInsetsController().setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+//        }
+//        else{
+//            window.getDecorView().setSystemUiVisibility(
+//                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+//
+//        }
+//
+//
+//        LinearLayout topBar = taskStageDashBoardBinding.toolLayout.findViewById(R.id.ll_topbar);
+//        topBar.setBackgroundColor(getResources().getColor(colorId));
     }
 
     private void getInsights() {
