@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="data"
+            type="taskmodule.data.model.response.config.Slot" />
+    </data>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_time"
+            android:layout_marginEnd="@dimen/dimen_6"
+            app:cardElevation="@dimen/dimen_2"
+            app:cardUseCompatPadding="true"
+            android:layout_width="@dimen/dimen_100"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:padding="@dimen/dimen_10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    style="@style/TextViewStyle"
+                    android:textSize="@dimen/text_size_12"
+                    android:id="@+id/tv_day"
+                    android:text="@{data.time}"
+                    android:textColor="@color/black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="11:00 - 12:00" />
+
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</layout>

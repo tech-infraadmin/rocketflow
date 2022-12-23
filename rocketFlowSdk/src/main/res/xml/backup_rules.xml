@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <exclude domain="file" path="rocketflyer" />
+    <exclude domain="file" path="rocketflyer_cache" />
+    <exclude domain="external" path="rocketflyer_cache" />
+    <exclude domain="database" path="vrocketflyer_db" />
+    <exclude domain="sharedpref" path="com.rocketflyer.sdk.xml" />
+</full-backup-content>

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="taskmodule">
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+
+            <data android:scheme="https" />
+        </intent>
+        <!-- Camera -->
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+        <!-- Gallery -->
+        <intent>
+            <action android:name="android.intent.action.GET_CONTENT" />
+
+            <data android:mimeType="image/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.PICK" />
+
+            <data android:mimeType="image/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.CHOOSER" />
+        </intent>
+    </queries>
+
+    <application
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:targetApi="31">
+
+        <activity
+            android:name="taskmodule.ui.tasklisting.TaskActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name=".ui.taskdetails.TaskDetailActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name=".ui.newcreatetask.NewCreateTaskActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name=".ui.taskdetails.NewTaskDetailsActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name=".ui.userlisting.UserListNewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.dynamicform.DynamicFormActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+
+        <activity
+            android:name=".ui.webview.WebViewActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:exported="false"
+            android:name=".ordercode.OrderCodeActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name=".ui.category.AddProductCategoryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.category.ProductCategoryListActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.products.AddProductActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.taskdetails.timeline.skuinfo.SkuInfoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.taskdetails.timeline.skuinfopreview.SkuInfoPreviewActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name="taskmodule.ui.fleetlisting.FleetListingActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name="taskmodule.ui.addfleet.AddFleetActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name="taskmodule.ui.buddylisting.BuddyListingActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"
+                android:value=".ui.buddylisting.BuddyListingActivity" />
+        </activity>
+
+        <activity
+            android:name="taskmodule.ui.addbuddy.ContactListActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name="taskmodule.ui.addbuddy.AddBuddyActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name="taskmodule.ui.buddyprofile.BuddyProfileActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name=".ui.selectorder.SelectOrderActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.main.filter.TaskFilterActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.main.filter.BuddyFilterActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+        <activity
+            android:name=".ui.cart.CartActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.scanqrcode.ScanQrAndBarCodeActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.scanqrcode.ProductScan"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.scanqrcode.ScanQrCodeActivity"
+            android:screenOrientation="portrait" />
+
+        <receiver
+            android:name="taskmodule.ui.geofencing.GeofenceBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
+        <provider
+            android:name="taskmodule.RFSDKFileProvider"
+            android:authorities="${applicationId}.tracki.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <activity android:name=".ui.webview.PaymentViewActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name="taskmodule.ui.main.MainSDKActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+
+
+
+    </application>
+
+</manifest>

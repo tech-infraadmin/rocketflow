@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparent">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="@dimen/dimen_5"
+                android:layout_marginTop="@dimen/dimen_10"
+                android:layout_marginEnd="@dimen/dimen_5"
+                android:layout_marginBottom="@dimen/dimen_0"
+                android:elevation="@dimen/dimen_8"
+                app:cardBackgroundColor="@color/white"
+                app:cardUseCompatPadding="true"
+                app:contentPadding="@dimen/dimen_4"
+                tools:ignore="UnusedAttribute">
+
+                <LinearLayout
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/dimen_6">
+
+                    <ImageView
+                        android:id="@+id/btnClose"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:src="@drawable/ic_cross"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:id="@+id/titlePop"
+                        style="@style/TextViewStyleBold"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_size_18"
+                        android:textAlignment="center"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dimen_20"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:id="@+id/dd_title"
+                            style="@style/TextViewStyleBold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.4"
+                            android:text="@string/select_geography"
+                            android:textSize="@dimen/text_size_12"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/dd_hubs"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dimen_10"
+                            android:layout_weight="1.6"
+                            android:entries="@array/Places"
+                            android:spinnerMode="dropdown"
+                            android:textSize="@dimen/text_size_12" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ll_slots"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <TextView
+                            style="@style/TextViewStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/dimen_20"
+                            android:text="@string/select_preferred_date"
+                            android:textSize="@dimen/text_size_14"
+                            android:textStyle="bold" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_date"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/dimen_5"
+                            android:orientation="horizontal"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:itemCount="10"
+                            tools:listitem="@layout/date_day_card_sdk"
+                            tools:manager="LinearLayoutManager" />
+
+                        <TextView
+                            style="@style/TextViewStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/dimen_20"
+                            android:text="@string/select_time_slot"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_14"
+                            android:textStyle="bold" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/gv_slot"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginTop="@dimen/dimen_5"
+                            android:horizontalSpacing="@dimen/dimen_3"
+                            android:scrollbars="none"
+                            android:verticalSpacing="@dimen/dimen_2"
+                            tools:itemCount="9"
+                            tools:listitem="@layout/time_card_sdk" />
+
+                        <ImageView
+                            android:id="@+id/slotImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/norecord"
+                            android:visibility="gone" />
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btn_done"
+                            style="@style/ButtonBlueStyle"
+                            android:layout_width="wrap_content"
+                            android:textSize="@dimen/text_size_12"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="@dimen/dimen_20"
+                            android:text="@string/proceed" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/iv_no_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/no_data"
+                        android:visibility="gone"
+                        tools:ignore="ContentDescription" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</layout>

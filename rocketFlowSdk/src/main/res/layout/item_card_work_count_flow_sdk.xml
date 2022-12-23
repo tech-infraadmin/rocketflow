@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data class="DashboardCountBinding">
+        <variable
+            name="data"
+            type="taskmodule.data.model.response.config.DashBoardBoxItem" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardMain"
+        android:layout_width="100dp"
+        android:layout_height="85dp"
+        app:cardUseCompatPadding="true"
+        android:clipChildren="false"
+        app:cardCornerRadius="@dimen/dimen_5">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextViewStyle"
+                    android:id="@+id/tvNumber"
+                    android:textSize="18sp"
+                    android:textColor="@color/blue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:fontFamily="@font/campton_semi_bold"
+                    android:text="@{``+data.count}"
+                    tools:text="0"/>
+
+                <TextView
+                    style="@style/TextViewStyle"
+                    android:id="@+id/tvTitle"
+                    android:fontFamily="@font/campton_light"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="@dimen/dimen_8"
+                    android:layout_marginBottom="@dimen/dimen_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="11sp"
+                    android:paddingRight="@dimen/dimen_3"
+                    android:paddingLeft="@dimen/dimen_3"
+                    android:text="@{data.stageName}" />
+            </LinearLayout>
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>

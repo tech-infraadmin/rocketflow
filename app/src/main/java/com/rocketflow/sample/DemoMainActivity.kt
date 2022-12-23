@@ -19,8 +19,7 @@ class DemoMainActivity : AppCompatActivity() {
 
     fun start(view: View) {
         //RocketFlyer.start("05bc0d97-2119-43a9-8b63-7aa1fa51f3e7") //ProcessId - 2.0.4
-        RocketFlyer.start("35a7b1f2-839a-4446-958a-cd2c218f6174") //ProcessId - 2.0.5
-
+        RocketFlyer.start("35a7b1f2-839a-4446-958a-cd2c218f6174",true) //ProcessId - 2.0.5
     }
     fun terminate(view: View) {
         RocketFlyer.terminate() // terminate
