@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="taskmodule.ui.profile.MyProfileActivity">
+    tools:context=" com.rf.taskmodule.ui.profile.MyProfileActivity">
 
     <data>
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.main.filter.BuddyFilterViewModel" />
+            type="com.rf.taskmodule.ui.main.filter.BuddyFilterViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

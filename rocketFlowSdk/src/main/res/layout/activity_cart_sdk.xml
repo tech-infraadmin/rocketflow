@@ -7,7 +7,7 @@
 
         <variable
             name="adapter"
-            type="taskmodule.ui.cart.CartItemAdapter" />
+            type="com.rf.taskmodule.ui.cart.CartItemAdapter" />
 
 
         <import type="android.view.View" />

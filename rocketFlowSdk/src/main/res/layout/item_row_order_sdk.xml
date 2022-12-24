@@ -9,11 +9,11 @@
         <import type="android.text.TextUtils" />
         <variable
             name="data"
-            type="taskmodule.data.model.response.config.OrderDetails" />
+            type="com.rf.taskmodule.data.model.response.config.OrderDetails" />
 
         <variable
             name="adapter"
-            type="taskmodule.ui.taskdetails.timeline.OrderInventoryListAdapter" />
+            type="com.rf.taskmodule.ui.taskdetails.timeline.OrderInventoryListAdapter" />
     </data>
 
     <androidx.cardview.widget.CardView

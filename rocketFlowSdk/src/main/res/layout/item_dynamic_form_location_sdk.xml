@@ -8,7 +8,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.FormLocationViewModel" />
+             type="com.rf.taskmodule.ui.dynamicform.FormLocationViewModel" />
 
     </data>
 

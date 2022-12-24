@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.dynamicfragment.FormTextViewModel" />
+             type="com.rf.taskmodule.ui.dynamicform.dynamicfragment.FormTextViewModel" />
 
     </data>
     <androidx.cardview.widget.CardView

@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.FormRadioViewModel" />
+            type="com.rf.taskmodule.ui.dynamicform.FormRadioViewModel" />
 
     </data>
 

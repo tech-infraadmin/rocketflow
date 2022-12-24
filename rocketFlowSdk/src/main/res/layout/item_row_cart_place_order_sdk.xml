@@ -9,7 +9,7 @@
 
         <variable
             name="data"
-            type="taskmodule.ui.selectorder.CatalogProduct" />
+             type="com.rf.taskmodule.ui.selectorder.CatalogProduct" />
 
     </data>
 

@@ -9,15 +9,15 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.taskdetails.NewTaskDetailsViewModel" />
+             type="com.rf.taskmodule.ui.taskdetails.NewTaskDetailsViewModel" />
 
         <variable
             name="data"
-            type="taskmodule.ui.tasklisting.assignedtome.TaskAssignToMeViewModel" />
+            type="com.rf.taskmodule.ui.tasklisting.assignedtome.TaskAssignToMeViewModel" />
 
         <variable
             name="timeLineAdapter"
-            type="taskmodule.ui.taskdetails.TaskTimeLineAdapter" />
+             type="com.rf.taskmodule.ui.taskdetails.TaskTimeLineAdapter" />
     </data>
 
     <RelativeLayout

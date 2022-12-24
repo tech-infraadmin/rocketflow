@@ -6,7 +6,7 @@
     <data class="DashboardBinding">
         <variable
             name="data"
-            type="taskmodule.ui.main.taskdashboard.TaskDashBoardViewModel" />
+            type="com.rf.taskmodule.ui.main.taskdashboard.TaskDashBoardViewModel" />
     </data>
 
     <RelativeLayout

@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.fleetlisting.FleetListingEmptyItemViewModel" />
+            type="com.rf.taskmodule.ui.fleetlisting.FleetListingEmptyItemViewModel" />
 
     </data>
 

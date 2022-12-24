@@ -4,7 +4,7 @@
     <data>
         <variable
             name="data"
-            type="taskmodule.data.model.response.config.DashBoardBoxItem" />
+             type="com.rf.taskmodule.data.model.response.config.DashBoardBoxItem" />
     </data>
 
     <RelativeLayout

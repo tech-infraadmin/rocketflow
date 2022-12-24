@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.FormDateRangeViewModel" />
+             type="com.rf.taskmodule.ui.dynamicform.FormDateRangeViewModel" />
 
     </data>
     <androidx.cardview.widget.CardView

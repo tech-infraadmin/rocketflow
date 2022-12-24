@@ -10,7 +10,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.newcreatetask.NewCreateTaskViewModel" />
+             type="com.rf.taskmodule.ui.newcreatetask.NewCreateTaskViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -141,7 +141,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content">
 
-                                <taskmodule.widget.DelayAutoCompleteTextView
+                                <com.rf.taskmodule.widget.DelayAutoCompleteTextView
                                     android:id="@+id/et_user"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
@@ -846,7 +846,7 @@
                                         tools:text="Rahul Abrol" />
 
 
-                                    <taskmodule.utils.toggle.widget.LabeledSwitch
+                                    <com.rf.taskmodule.utils.toggle.widget.LabeledSwitch
                                         android:id="@+id/enableStartLocation"
                                         android:layout_width="@dimen/labeled_default_width"
                                         android:layout_height="@dimen/labeled_default_height"
@@ -1077,7 +1077,7 @@
                                         android:textSize="@dimen/text_size_11"
                                         tools:text="Rahul Abrol" />
 
-                                    <taskmodule.utils.toggle.widget.LabeledSwitch
+                                    <com.rf.taskmodule.utils.toggle.widget.LabeledSwitch
                                         android:id="@+id/enableEndLocation"
                                         android:layout_width="@dimen/labeled_default_width"
                                         android:layout_height="@dimen/labeled_default_height"

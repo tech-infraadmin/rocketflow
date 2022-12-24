@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="taskmodule.ui.selectorder.CataLogProductCategory" />
+             type="com.rf.taskmodule.ui.selectorder.CataLogProductCategory" />
     </data>
 
     <androidx.cardview.widget.CardView

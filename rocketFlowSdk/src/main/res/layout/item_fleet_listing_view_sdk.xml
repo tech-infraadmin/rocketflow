@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.fleetlisting.FleetListingItemViewModel" />
+            type="com.rf.taskmodule.ui.fleetlisting.FleetListingItemViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView

@@ -6,7 +6,7 @@
     <data>
         <variable
             name="data"
-            type="taskmodule.data.model.response.config.Slot" />
+            type="com.rf.taskmodule.data.model.response.config.Slot" />
     </data>
 
     <LinearLayout

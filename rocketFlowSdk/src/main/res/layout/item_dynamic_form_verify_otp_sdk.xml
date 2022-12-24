@@ -8,7 +8,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.FormVerifyMobileViewModel" />
+             type="com.rf.taskmodule.ui.dynamicform.FormVerifyMobileViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView

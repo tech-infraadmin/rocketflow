@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.earnings.MyEarningsEmptyItemViewModel" />
+            type="com.rf.taskmodule.ui.earnings.MyEarningsEmptyItemViewModel" />
 
     </data>
 

@@ -9,7 +9,7 @@
 
         <variable
             name="data"
-            type="taskmodule.data.model.response.config.ServiceDescr" />
+            type="com.rf.taskmodule.data.model.response.config.ServiceDescr" />
     </data>
 <androidx.cardview.widget.CardView
     android:id="@+id/cardViewMain"

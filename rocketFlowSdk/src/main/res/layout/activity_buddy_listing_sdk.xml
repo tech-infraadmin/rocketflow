@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="taskmodule.taskmodule.ui.buddylisting.BuddyListingActivity">
+    tools:context=" com.rf.taskmodule.taskmodule.ui.buddylisting.BuddyListingActivity">
 
     <data>
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.buddylisting.BuddyListingViewModel" />
+            type="com.rf.taskmodule.ui.buddylisting.BuddyListingViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

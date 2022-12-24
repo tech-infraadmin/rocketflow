@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.dynamicfragment.DynamicViewModel" />
+            type="com.rf.taskmodule.ui.dynamicform.dynamicfragment.DynamicViewModel" />
 
     </data>
 

@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         >
-        <taskmodule.ui.custom.RoundImageView
+        <com.rf.taskmodule.ui.custom.RoundImageView
             android:layout_gravity="start"
             android:id="@+id/ivUserProfile"
             android:layout_width="0dp"

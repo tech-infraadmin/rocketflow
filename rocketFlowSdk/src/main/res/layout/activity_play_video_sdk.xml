@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="taskmodule.ui.dynamicform.dynamicfragment.PlayVideoActivity">
+    tools:context=" com.rf.taskmodule.ui.dynamicform.dynamicfragment.PlayVideoActivity">
 
-    <taskmodule.utils.MyVideoView
+    <com.rf.taskmodule.utils.MyVideoView
         android:id="@+id/videoView"
         android:layout_width="match_parent"
        android:layout_centerInParent="true"

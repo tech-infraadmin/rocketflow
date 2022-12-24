@@ -10,7 +10,7 @@
 
         <variable
             name="data"
-            type="taskmodule.data.model.response.config.UserData" />
+            type="com.rf.taskmodule.data.model.response.config.UserData" />
 
     </data>
 

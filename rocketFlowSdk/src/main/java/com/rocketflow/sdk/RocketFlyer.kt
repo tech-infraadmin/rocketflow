@@ -2,13 +2,13 @@ package com.rocketflow.sdk
 
 import android.content.Context
 import androidx.annotation.Keep
-import taskmodule.data.DataManager
-import taskmodule.data.local.prefs.PreferencesHelper
-import taskmodule.data.network.HttpManager
-import taskmodule.data.network.NetworkManager
-import taskmodule.utils.CommonUtils
+import com.rf.taskmodule.data.DataManager
+import com.rf.taskmodule.data.local.prefs.PreferencesHelper
+import com.rf.taskmodule.data.network.HttpManager
+import com.rf.taskmodule.data.network.NetworkManager
+import com.rf.taskmodule.utils.CommonUtils
 import com.trackthat.lib.TrackThat
-import taskmodule.TrackiSdkApplication
+import com.rf.taskmodule.TrackiSdkApplication
 
 @Keep
 class RocketFlyer private constructor(){
@@ -22,7 +22,7 @@ class RocketFlyer private constructor(){
          */
         @JvmStatic
         fun initializeRocketFlyer(context: Context,stageServer: Boolean = false) {
-            TrackThat.initialize(context, CommonUtils.getIMEINumber(context))
+            TrackThat.initialize(context, com.rf.taskmodule.utils.CommonUtils.getIMEINumber(context))
             RocketFlyerBuilder.initialize(context,stageServer)
         }
 
@@ -62,19 +62,19 @@ class RocketFlyer private constructor(){
             RocketFlyerBuilder.getRFInstance()!!.terminate()
         }
 
-        fun preferenceHelper() : PreferencesHelper? {
+        fun preferenceHelper() : com.rf.taskmodule.data.local.prefs.PreferencesHelper? {
             return RocketFlyerBuilder.getPrefInstance()
         }
 
-        fun httpManager() : HttpManager? {
+        fun httpManager() : com.rf.taskmodule.data.network.HttpManager? {
             return RocketFlyerBuilder.getHttpManagerInstance()
         }
 
-        fun dataManager() : DataManager? {
+        fun dataManager() : com.rf.taskmodule.data.DataManager? {
             return RocketFlyerBuilder.getDataManagerInstance()
         }
 
-        fun networkManager() : NetworkManager? {
+        fun networkManager() : com.rf.taskmodule.data.network.NetworkManager? {
             return RocketFlyerBuilder.getNetworkManagerInstance()
         }
 

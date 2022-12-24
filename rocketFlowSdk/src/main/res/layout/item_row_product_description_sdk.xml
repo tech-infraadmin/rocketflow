@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="taskmodule.ui.category.ProductDescription" />
+             type="com.rf.taskmodule.ui.category.ProductDescription" />
 
     </data>
 

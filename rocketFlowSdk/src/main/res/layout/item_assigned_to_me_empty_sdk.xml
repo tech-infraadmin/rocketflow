@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.tasklisting.assignedtome.AssignedtoMeEmptyItemViewModel" />
+            type="com.rf.taskmodule.ui.tasklisting.assignedtome.AssignedtoMeEmptyItemViewModel" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"

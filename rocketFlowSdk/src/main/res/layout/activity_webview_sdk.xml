@@ -10,7 +10,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.webview.WebViewModel" />
+            type="com.rf.taskmodule.ui.webview.WebViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

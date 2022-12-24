@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="taskmodule.ui.taskdetails.TaskDetailActivity">
+    tools:context=" com.rf.taskmodule.ui.taskdetails.TaskDetailActivity">
 
     <data>
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.taskdetails.TaskDetailViewModel" />
+            type="com.rf.taskmodule.ui.taskdetails.TaskDetailViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

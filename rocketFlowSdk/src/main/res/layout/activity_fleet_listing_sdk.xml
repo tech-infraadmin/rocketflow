@@ -8,7 +8,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.fleetlisting.FleetListingViewModel" />
+            type="com.rf.taskmodule.ui.fleetlisting.FleetListingViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

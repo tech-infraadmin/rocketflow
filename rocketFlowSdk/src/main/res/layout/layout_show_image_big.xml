@@ -7,7 +7,7 @@
     >
 
 
-    <taskmodule.utils.ZoomableImageView
+    <com.rf.taskmodule.utils.ZoomableImageView
         android:id="@+id/ivImages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

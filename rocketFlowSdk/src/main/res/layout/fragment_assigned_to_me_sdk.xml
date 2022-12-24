@@ -7,11 +7,11 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.tasklisting.assignedtome.AssignedToMeViewModel" />
+            type="com.rf.taskmodule.ui.tasklisting.assignedtome.AssignedToMeViewModel" />
 
         <variable
             name="adapter"
-            type="taskmodule.ui.tasklisting.TaskListingAdapter" />
+            type="com.rf.taskmodule.ui.tasklisting.TaskListingAdapter" />
     </data>
 
     <LinearLayout

@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="taskmodule.ui.taskdetails.StageHistoryData" />
+            type="com.rf.taskmodule.ui.taskdetails.StageHistoryData" />
     </data>
 
     <RelativeLayout

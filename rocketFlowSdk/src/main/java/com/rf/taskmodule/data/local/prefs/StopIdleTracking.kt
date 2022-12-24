@@ -1,0 +1,31 @@
+package com.rf.taskmodule.data.local.prefs
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import com.rf.taskmodule.utils.AppConstants
+import com.trackthat.lib.TrackThat
+
+
+/**
+ * Created by Vikas Kesharvani on 25/08/20.
+ * rocketflyer technology pvt. ltd
+ * vikas.kesharvani@rocketflyer.in
+ */
+class StopIdleTracking: BroadcastReceiver() {
+    var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper? = null
+    override fun onReceive(context: Context?, intent: Intent?) {
+     //   TrackiToast.Message.showShort(context!!,"Stop Tracking")
+        preferencesHelper =
+            com.rf.taskmodule.data.local.prefs.AppPreferencesHelper(
+                context,
+                com.rf.taskmodule.utils.AppConstants.PREF_NAME
+            )
+        if (preferencesHelper!!.idleTripActive ) {
+            preferencesHelper!!.idleTripActive = false
+            TrackThat.stopTracking()
+
+
+        }
+    }
+}

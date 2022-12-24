@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="taskmodule.data.model.response.config.OrderItemsInfo" />
+            type="com.rf.taskmodule.data.model.response.config.OrderItemsInfo" />
     </data>
 
     <androidx.cardview.widget.CardView

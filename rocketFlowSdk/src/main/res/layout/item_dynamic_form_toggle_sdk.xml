@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.FormToggleViewModel" />
+             type="com.rf.taskmodule.ui.dynamicform.FormToggleViewModel" />
 
     </data>
 
@@ -47,7 +47,7 @@
                 tools:text="@string/app_name" />
 
 
-            <taskmodule.utils.toggle.widget.LabeledSwitch
+            <com.rf.taskmodule.utils.toggle.widget.LabeledSwitch
                 android:id="@+id/mSwitch"
                 android:layout_width="@dimen/labeled_default_width"
                 android:layout_height="@dimen/labeled_default_height"

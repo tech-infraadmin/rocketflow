@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.FormConditionalDDViewModel" />
+             type="com.rf.taskmodule.ui.dynamicform.FormConditionalDDViewModel" />
 
     </data>
     <androidx.cardview.widget.CardView

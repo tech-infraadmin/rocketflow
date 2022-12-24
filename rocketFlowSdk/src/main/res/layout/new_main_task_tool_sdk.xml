@@ -134,7 +134,7 @@
                 android:layout_marginRight="@dimen/dimen_8"
                 android:gravity="end">
 
-                <taskmodule.utils.toggle.widget.LabeledSwitch
+                <com.rf.taskmodule.utils.toggle.widget.LabeledSwitch
                     android:id="@+id/switch_toggle_dash"
                     android:layout_width="@dimen/dimen_60"
                     android:layout_height="@dimen/dimen_30"/>

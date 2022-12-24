@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.FormCheckBoxViewModel" />
+             type="com.rf.taskmodule.ui.dynamicform.FormCheckBoxViewModel" />
 
     </data>
 

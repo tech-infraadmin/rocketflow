@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.FormCameraViewModel" />
+             type="com.rf.taskmodule.ui.dynamicform.FormCameraViewModel" />
 
     </data>
 

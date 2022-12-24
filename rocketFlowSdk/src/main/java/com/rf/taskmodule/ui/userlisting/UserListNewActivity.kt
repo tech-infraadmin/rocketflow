@@ -1,0 +1,206 @@
+package com.rf.taskmodule.ui.userlisting
+
+import android.os.Bundle
+import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.rocketflow.sdk.RocketFlyer
+import com.rf.taskmodule.BR
+import com.rf.taskmodule.R
+import com.rf.taskmodule.data.local.prefs.PreferencesHelper
+import com.rf.taskmodule.data.model.ResponseBasic2
+import com.rf.taskmodule.data.model.request.ExecuteUpdateRequest
+import com.rf.taskmodule.data.model.request.TaskData
+import com.rf.taskmodule.data.model.response.config.DynamicFormData
+import com.rf.taskmodule.data.model.response.config.UserData
+import com.rf.taskmodule.data.model.response.config.UserListResponse
+import com.rf.taskmodule.data.network.APIError
+import com.rf.taskmodule.data.network.ApiCallback
+import com.rf.taskmodule.data.network.HttpManager
+import com.rf.taskmodule.databinding.ActivityUserListNewSdkBinding
+import com.rf.taskmodule.ui.base.BaseSdkActivity
+import com.rf.taskmodule.utils.CommonUtils
+import com.rf.taskmodule.utils.JSONConverter
+import com.rf.taskmodule.utils.Log
+import com.rf.taskmodule.utils.TrackiToast
+import kotlin.collections.ArrayList
+
+class UserListNewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityUserListNewSdkBinding, UserListNewViewModel>(), UserListNewNavigator, UserListNewAdapter.onUserSelected{
+
+    lateinit var mUserListViewModel: UserListNewViewModel
+
+    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
+    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+
+    lateinit var adapter: UserListNewAdapter
+
+    lateinit var searchView: SearchView
+    
+    var listSelectedUsers = ArrayList<String>()
+
+    private var mLayoutManager: LinearLayoutManager? = null
+
+    lateinit var binding: ActivityUserListNewSdkBinding
+    var roleIds: String = "na"
+    var users: String = ""
+    lateinit var request: ExecuteUpdateRequest
+    lateinit var usersList: ArrayList<UserData>
+
+    private var rvUserList: RecyclerView? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = viewDataBinding
+        usersList = ArrayList()
+        httpManager = RocketFlyer.httpManager()!!
+        preferencesHelper = RocketFlyer.preferenceHelper()!!
+        searchView = binding.svSearchUsers
+        adapter = UserListNewAdapter(ArrayList())
+        setRecyclerView()
+        adapter.setListener(this)
+
+        mUserListViewModel.navigator = this
+        
+        if (intent.hasExtra("roleIds"))
+        {
+            roleIds = intent.getStringExtra("roleIds").toString()
+            getUsers()
+            request = intent.getSerializableExtra("request") as ExecuteUpdateRequest
+        }
+        
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null || newText != "")
+                    adapter.addFilter(newText.toString())
+                else
+                    adapter.addFilter("")
+                return true
+            }
+        })
+        binding.btnUsersSubmit.setOnClickListener {
+
+            if (listSelectedUsers.size > 0){
+                for (i in 0 until listSelectedUsers.size){
+                    users += if (i > 0)
+                        ",${listSelectedUsers[i]}"
+                    else
+                        listSelectedUsers[i]
+                }
+                var dynamicFormData = DynamicFormData()
+                dynamicFormData.key = "SELECT_BUDDY"
+                dynamicFormData.value = users
+                var list = ArrayList<DynamicFormData>()
+                list.add(dynamicFormData)
+                val taskData = TaskData(request.ctaId,list,request.timestamp)
+                request.taskData = taskData
+                showLoading()
+                mUserListViewModel.executeUpdates(httpManager,request)
+
+            }
+            else{
+                TrackiToast.Message.showShort(this,"Please select atleast one user")
+            }
+        }
+
+
+    }
+
+    private fun getUsers(){
+        com.rf.taskmodule.utils.Log.e("getUsers","$roleIds")
+        mUserListViewModel.getUserList(httpManager,roleIds,null,null,true)
+    }
+
+    private fun setRecyclerView() {
+        if (rvUserList == null) {
+            rvUserList = binding.rvUserList
+            //  mLayoutManager= (LinearLayoutManager) rvAttendance.getLayoutManager();
+            try {
+                mLayoutManager = LinearLayoutManager(this)
+                mLayoutManager!!.orientation = RecyclerView.VERTICAL
+                rvUserList!!.layoutManager = mLayoutManager
+                rvUserList!!.itemAnimator = DefaultItemAnimator()
+
+            } catch (e: Exception) {
+            }
+        }
+        rvUserList!!.adapter = adapter
+    }
+
+    override fun getBindingVariable(): Int {
+        return BR.viewModel
+    }
+
+    override fun getLayoutId(): Int {
+        return R.layout.activity_user_list_new_sdk
+    }
+
+    override fun getViewModel(): UserListNewViewModel {
+        val factory = RocketFlyer.dataManager()?.let { UserListNewViewModel.Factory(it) } // Factory
+        if (factory != null) {
+            mUserListViewModel = ViewModelProvider(this, factory)[UserListNewViewModel::class.java]
+        }
+        return mUserListViewModel!!
+    }
+
+
+
+
+    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+        hideLoading()
+        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@UserListNewActivity)) {
+            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<UserListResponse> =
+                com.rf.taskmodule.utils.JSONConverter()
+            var response: UserListResponse = jsonConverter.jsonToObject(result.toString(), UserListResponse::class.java) as UserListResponse
+            if (response.data != null) {
+                setRecyclerView()
+                val userList = response.data as ArrayList<UserData>
+                com.rf.taskmodule.utils.Log.e("listUserList","$userList")
+                usersList = response.data as ArrayList<UserData>
+                adapter.addItems(usersList)
+            } else {
+                setRecyclerView()
+                adapter.addItems(ArrayList())
+            }
+        } else {
+            setRecyclerView()
+            adapter.addItems(ArrayList())
+        }
+    }
+
+    override fun handleExecuteUpdateResponse(
+        apiCallback: com.rf.taskmodule.data.network.ApiCallback?,
+        result: Any?,
+        error: APIError?
+    ) {
+        hideLoading()
+        val gson = Gson()
+        val responseBasic = gson.fromJson(
+            result.toString(),
+            ResponseBasic2::class.java
+        )
+        if (responseBasic != null){
+            if (responseBasic.successful == true){
+                finish()
+                //startActivity(Intent(this,MainActivity::class.java))
+            }
+        }
+        else{
+            TrackiToast.Message.showShort(this,"Problem in Server Please try later")
+        }
+    }
+
+    override fun addUser(userId: String) {
+        listSelectedUsers.add(userId)
+    }
+
+    override fun removeUser(userId: String) {
+        listSelectedUsers.remove(userId)
+    }
+}

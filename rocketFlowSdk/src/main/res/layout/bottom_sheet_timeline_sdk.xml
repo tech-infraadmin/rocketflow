@@ -10,7 +10,7 @@
     app:behavior_peekHeight="@dimen/dimen_350"
     app:behavior_hideable="false"
     app:layout_behavior="@string/bottom_sheet_behavior"
-    tools:context="taskmodule.ui.taskdetails.TaskDetailActivity"
+    tools:context=" com.rf.taskmodule.ui.taskdetails.TaskDetailActivity"
     tools:showIn="@layout/activity_task_detail_sdk">
 
     <RelativeLayout

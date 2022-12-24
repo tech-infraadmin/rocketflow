@@ -11,7 +11,7 @@
 
         <variable
             name="data"
-            type="taskmodule.data.model.response.config.ProductOrder" />
+            type="com.rf.taskmodule.data.model.response.config.ProductOrder" />
     </data>
 
     <androidx.cardview.widget.CardView

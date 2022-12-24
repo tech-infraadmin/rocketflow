@@ -6,10 +6,10 @@ import android.content.Intent
 import android.widget.Toast
 import com.google.gson.Gson
 import com.rocketflow.sdk.util.RFLog
-import taskmodule.data.model.response.config.ConfigResponse
-import taskmodule.data.model.response.config.SDKToken
-import taskmodule.data.model.response.config.WorkFlowCategories
-import taskmodule.data.network.APIError
+import com.rf.taskmodule.data.model.response.config.ConfigResponse
+import com.rf.taskmodule.data.model.response.config.SDKToken
+import com.rf.taskmodule.data.model.response.config.WorkFlowCategories
+import com.rf.taskmodule.data.network.APIError
 import java.lang.ref.WeakReference
 
 internal class RocketFlyerImp(
@@ -58,14 +58,14 @@ internal class RocketFlyerImp(
                     ConfigResponse::class.java
                 )
 
-                taskmodule.utils.CommonUtils.saveConfigDetails(
+                com.rf.taskmodule.utils.CommonUtils.saveConfigDetails(
                     it,
                     configResponse,
                     RocketFlyer.preferenceHelper(),
                     "1")
 
                 if (startActivity) {
-                    val intent = taskmodule.ui.main.MainSDKActivity.newIntent(it)
+                    val intent = com.rf.taskmodule.ui.main.MainSDKActivity.newIntent(it)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     it.startActivity(intent)
                 }
@@ -133,13 +133,13 @@ internal class RocketFlyerImp(
 
         RocketFlyerBuilder.getDataManagerInstance()
             ?.getSDKLoginToken(sdkClintId,RocketFlyerBuilder.getHttpManagerInstance(), object :
-                taskmodule.data.network.ApiCallback {
+                com.rf.taskmodule.data.network.ApiCallback {
             override fun hitApi() {
                 //SyncCallback.super.hitApi();z
                 RFLog.d("hitLoginSDKToken : hitApi")
             }
 
-            override fun onRequestTimeOut(callBack: taskmodule.data.network.ApiCallback) {
+            override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
                 //SyncCallback.super.onRequestTimeOut(callBack);
                 RFLog.d("hitLoginSDKToken : onRequestTimeOut")
             }
@@ -156,11 +156,11 @@ internal class RocketFlyerImp(
                 if(result==null) return
                 RFLog.d("hitLoginSDKToken : onResponse")
                 contextRef.get()?.let {
-                    if (taskmodule.utils.CommonUtils.handleResponse(this, error, result, it)) {
+                    if (com.rf.taskmodule.utils.CommonUtils.handleResponse(this, error, result, it)) {
                         val gson = Gson()
                         val token = gson.fromJson(result.toString(), SDKToken::class.java)
                         if (token != null) {
-                            taskmodule.utils.CommonUtils.saveSDKAccessToken(token, RocketFlyer.preferenceHelper())
+                            com.rf.taskmodule.utils.CommonUtils.saveSDKAccessToken(token, RocketFlyer.preferenceHelper())
                         }
                         hitConfig()
                     } else {
@@ -179,12 +179,12 @@ internal class RocketFlyerImp(
     private fun hitConfig() {
         RocketFlyerBuilder.getDataManagerInstance()
             ?.getConfig(RocketFlyerBuilder.getHttpManagerInstance(), object :
-                taskmodule.data.network.ApiCallback {
+                com.rf.taskmodule.data.network.ApiCallback {
                 override fun hitApi() {
                     //SyncCallback.super.hitApi();
                 }
 
-                override fun onRequestTimeOut(callBack: taskmodule.data.network.ApiCallback) {
+                override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
                     //SyncCallback.super.onRequestTimeOut(callBack);
                 }
 
@@ -199,13 +199,13 @@ internal class RocketFlyerImp(
                 override fun onResponse(result: Any?, error: APIError?) {
                     if (result == null) return
                     contextRef.get()?.let {
-                        if (taskmodule.utils.CommonUtils.handleResponse(this, error, result, it)) {
+                        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(this, error, result, it)) {
                             val gson = Gson()
                             val configResponse = gson.fromJson(
                                 result.toString(),
                                 ConfigResponse::class.java
                             )
-                            taskmodule.utils.CommonUtils.saveConfigDetails(
+                            com.rf.taskmodule.utils.CommonUtils.saveConfigDetails(
                                 it,
                                 configResponse,
                                 RocketFlyer.preferenceHelper(),

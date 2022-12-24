@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.tasklisting.assignedtome.TaskAssignToMeViewModel" />
+            type="com.rf.taskmodule.ui.tasklisting.assignedtome.TaskAssignToMeViewModel" />
 
     </data>
 

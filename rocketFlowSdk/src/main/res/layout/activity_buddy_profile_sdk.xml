@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="taskmodule.ui.register.RegisterActivity">
+    tools:context=" com.rf.taskmodule.ui.register.RegisterActivity">
 
     <data>
 
@@ -10,7 +10,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.buddyprofile.BuddyProfileViewModel" />
+            type="com.rf.taskmodule.ui.buddyprofile.BuddyProfileViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

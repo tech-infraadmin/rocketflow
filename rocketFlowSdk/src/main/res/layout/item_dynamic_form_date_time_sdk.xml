@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.dynamicform.FormDateTimeViewModel" />
+             type="com.rf.taskmodule.ui.dynamicform.FormDateTimeViewModel" />
 
     </data>
 

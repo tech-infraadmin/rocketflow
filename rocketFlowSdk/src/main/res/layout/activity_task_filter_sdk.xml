@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="taskmodule.ui.main.filter.TaskFilterViewModel" />
+            type="com.rf.taskmodule.ui.main.filter.TaskFilterViewModel" />
 
     </data>
 
@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="taskmodule.ui.main.filter.TaskFilterActivity">
+        tools:context=" com.rf.taskmodule.ui.main.filter.TaskFilterActivity">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"

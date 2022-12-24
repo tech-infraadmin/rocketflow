@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="taskmodule.ui.buddylisting.BuddyListingItemViewModel" />
+            type="com.rf.taskmodule.ui.buddylisting.BuddyListingItemViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView

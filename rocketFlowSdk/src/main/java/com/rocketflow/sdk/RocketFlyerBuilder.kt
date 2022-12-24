@@ -7,10 +7,10 @@ import com.rocketflow.sdk.util.RFLog
 internal object  RocketFlyerBuilder {
 
     private var iRocketFlyer: IRocketFlyer? = null
-    private var preferencesHelper: taskmodule.data.local.prefs.PreferencesHelper? = null
-    private var httpManager: taskmodule.data.network.HttpManager? = null
-    private var dataManager: taskmodule.data.DataManager? = null
-    private var networkManager: taskmodule.data.network.NetworkManager? = null
+    private var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper? = null
+    private var httpManager: com.rf.taskmodule.data.network.HttpManager? = null
+    private var dataManager: com.rf.taskmodule.data.DataManager? = null
+    private var networkManager: com.rf.taskmodule.data.network.NetworkManager? = null
 
     fun initialize(context: Context,testServer: Boolean) {
         if (RocketFlyer.isInitialized()) {
@@ -24,14 +24,14 @@ internal object  RocketFlyerBuilder {
 
         if(preferencesHelper ==null){
             preferencesHelper =
-                taskmodule.data.local.prefs.AppPreferencesHelper(
+                com.rf.taskmodule.data.local.prefs.AppPreferencesHelper(
                     context,
-                    taskmodule.utils.AppConstants.PREF_NAME
+                    com.rf.taskmodule.utils.AppConstants.PREF_NAME
                 )
         }
 
         if(httpManager ==null){
-            httpManager = taskmodule.data.network.HttpManager(
+            httpManager = com.rf.taskmodule.data.network.HttpManager(
                 context,
                 preferencesHelper
             )
@@ -39,11 +39,11 @@ internal object  RocketFlyerBuilder {
 
         if(networkManager ==null){
             networkManager =
-                taskmodule.data.network.NetworkManagerImpl(testServer)
+                com.rf.taskmodule.data.network.NetworkManagerImpl(testServer)
         }
 
         if(dataManager ==null){
-            dataManager = taskmodule.data.AppDataManager(
+            dataManager = com.rf.taskmodule.data.AppDataManager(
                 context,
                 GsonBuilder().excludeFieldsWithoutExposeAnnotation().create(), preferencesHelper,
                 networkManager
@@ -52,9 +52,9 @@ internal object  RocketFlyerBuilder {
     }
 
     fun getRFInstance(): IRocketFlyer? = iRocketFlyer
-    fun getPrefInstance(): taskmodule.data.local.prefs.PreferencesHelper? = preferencesHelper
-    fun getHttpManagerInstance(): taskmodule.data.network.HttpManager? = httpManager
-    fun getNetworkManagerInstance(): taskmodule.data.network.NetworkManager? = networkManager
-    fun getDataManagerInstance(): taskmodule.data.DataManager? = dataManager
+    fun getPrefInstance(): com.rf.taskmodule.data.local.prefs.PreferencesHelper? = preferencesHelper
+    fun getHttpManagerInstance(): com.rf.taskmodule.data.network.HttpManager? = httpManager
+    fun getNetworkManagerInstance(): com.rf.taskmodule.data.network.NetworkManager? = networkManager
+    fun getDataManagerInstance(): com.rf.taskmodule.data.DataManager? = dataManager
 
 }
