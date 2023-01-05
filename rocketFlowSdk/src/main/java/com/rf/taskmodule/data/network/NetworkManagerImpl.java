@@ -136,10 +136,10 @@ public class NetworkManagerImpl implements NetworkManager {
         Api url = new Api();
         url.setName(CONFIG);
         if(configVersion != null) {
-            url.setUrl(testServer? AppConstants.UAT_BASE_URL+ "config":AppConstants.BASE_URL + "config" + "config?version=" + configVersion);
+            url.setUrl(testServer? AppConstants.UAT_BASE_URL+ "config":AppConstants.BASE_URL + "config?version=" + configVersion);
             Log.d("config",url.getUrl());
         } else {
-            url.setUrl(testServer?AppConstants.UAT_BASE_URL+ "config":AppConstants.BASE_URL + "config" + "config");
+            url.setUrl(testServer?AppConstants.UAT_BASE_URL+ "config":AppConstants.BASE_URL + "config");
             Log.d("config",url.getUrl());
         }
         url.setTimeOut(12);
