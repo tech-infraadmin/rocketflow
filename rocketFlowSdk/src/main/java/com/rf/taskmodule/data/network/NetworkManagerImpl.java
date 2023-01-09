@@ -1,7 +1,5 @@
 package com.rf.taskmodule.data.network;
 
-import static com.rf.taskmodule.utils.ApiType.*;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ParseException;
@@ -11,13 +9,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
-import com.rf.taskmodule.data.model.BaseResponse;
-import com.rf.taskmodule.data.model.response.config.Api;
-import com.rf.taskmodule.ui.selectorder.CataLogProductCategory;
-import com.rf.taskmodule.ui.taskdetails.timeline.skuinfopreview.UnitInfoRequest;
 import com.rf.taskmodule.utils.ApiType;
 import com.rf.taskmodule.utils.AppConstants;
-import com.rf.taskmodule.utils.CommonUtils;
 import com.rf.taskmodule.utils.JSONConverter;
 import com.rf.taskmodule.utils.NetworkUtils;
 
@@ -134,7 +127,7 @@ public class NetworkManagerImpl implements NetworkManager {
     @Override
     public void getConfig(HttpManager httpManager, ApiCallback callBack, String configVersion) {
         Api url = new Api();
-        url.setName(CONFIG);
+        url.setName(ApiType.CONFIG);
         if(configVersion != null) {
             url.setUrl(testServer? AppConstants.UAT_BASE_URL+ "config":AppConstants.BASE_URL + "config?version=" + configVersion);
             Log.d("config",url.getUrl());
@@ -151,7 +144,7 @@ public class NetworkManagerImpl implements NetworkManager {
     @Override
     public void getSDKLoginToken(String sdkClintId, HttpManager httpManager, ApiCallback callBack) {
         Api url = new Api();
-        url.setName(SDK_LOGIN_TOKEN);
+        url.setName(ApiType.SDK_LOGIN_TOKEN);
         url.setUrl(testServer?AppConstants.UAT_CORE_BASE_URL+ "sdk/token/exchange":AppConstants.CORE_BASE_URL + "sdk/token/exchange");
         url.setTimeOut(12);
         url.setCacheable(true);
@@ -1113,7 +1106,7 @@ public class NetworkManagerImpl implements NetworkManager {
                                 break;
                             case UPDATE_PROFILE:
                                 if (NetworkUtils.isNetworkConnected(context)) {
-                                    if (Objects.requireNonNull(api.getName()) == UPDATE_PROFILE) {
+                                    if (Objects.requireNonNull(api.getName()) == ApiType.UPDATE_PROFILE) {
                                         response = httpManager.putURL(gson.toJson(postData), api);
                                     } else {
                                         Log.e(TAG, "doInBackground PUT REQUEST: ApiType not found " + api.getName());
@@ -1125,7 +1118,7 @@ public class NetworkManagerImpl implements NetworkManager {
                                 break;
                             case UPDATE_DOCUMENT:
                                 if (NetworkUtils.isNetworkConnected(context)) {
-                                    if (Objects.requireNonNull(api.getName()) == UPDATE_DOCUMENT) {
+                                    if (Objects.requireNonNull(api.getName()) == ApiType.UPDATE_DOCUMENT) {
                                         response = httpManager.putURL(gson.toJson(postData), api);
                                     } else {
                                         Log.e(TAG, "doInBackground PUT REQUEST: ApiType not found " + api.getName());
@@ -1138,7 +1131,7 @@ public class NetworkManagerImpl implements NetworkManager {
 
                             case USER_ADDRESS_UPDATE:
                                 if (NetworkUtils.isNetworkConnected(context)) {
-                                    if (Objects.requireNonNull(api.getName()) == USER_ADDRESS_UPDATE) {
+                                    if (Objects.requireNonNull(api.getName()) == ApiType.USER_ADDRESS_UPDATE) {
                                         response = httpManager.putURL(gson.toJson(postData), api);
                                     } else {
                                         Log.e(TAG, "doInBackground PUT REQUEST: ApiType not found " + api.getName());

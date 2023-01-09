@@ -17,21 +17,21 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 
-class SlotAdapter(val context: Context) : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+class SlotAdapter(val context: Context) : RecyclerView.Adapter<BaseSdkViewHolder>() {
     var list: LinkedHashMap<String, SlotData> = LinkedHashMap()
     var index = 0
     var onItemClick: ((String,Int, ArrayList<SlotData>, ArrayList<String>) -> Unit)? = null
     var listKey: ArrayList<String> = ArrayList()
     var listValues: ArrayList<SlotData> = ArrayList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         val binding: DateDayCardSdkBinding = DateDayCardSdkBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
 
         return SlotViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) {
         holder.onBind(position)
     }
 
@@ -61,7 +61,7 @@ class SlotAdapter(val context: Context) : RecyclerView.Adapter<com.rf.taskmodule
         return if (list != null) list.size else 0
     }
 
-    inner class SlotViewHolder(mBinding: DateDayCardSdkBinding) : com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+    inner class SlotViewHolder(mBinding: DateDayCardSdkBinding) : BaseSdkViewHolder(mBinding.root) {
         var binding = mBinding
         @SuppressLint("NotifyDataSetChanged")
         @RequiresApi(Build.VERSION_CODES.M)
@@ -99,7 +99,7 @@ class SlotAdapter(val context: Context) : RecyclerView.Adapter<com.rf.taskmodule
         val cal = Calendar.getInstance()
         cal.time = date
         val dateString = checkDigit(cal.get(Calendar.DATE)).toString()
-        com.rf.taskmodule.utils.Log.e("appLog",dateString)
+        Log.e("appLog",dateString)
         return dateString
     }
 
@@ -111,7 +111,7 @@ class SlotAdapter(val context: Context) : RecyclerView.Adapter<com.rf.taskmodule
         val locale = Locale.getDefault()
         val outFormat = SimpleDateFormat("EEE",locale)
         val dayString = outFormat.format(date)
-        com.rf.taskmodule.utils.Log.e("appLog",dayString)
+        Log.e("appLog",dayString)
         return dayString
     }
 }

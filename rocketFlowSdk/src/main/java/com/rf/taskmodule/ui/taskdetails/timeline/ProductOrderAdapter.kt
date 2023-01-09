@@ -26,7 +26,7 @@ import com.rf.taskmodule.ui.base.BaseSdkViewHolder
 import com.rf.taskmodule.ui.custom.GlideApp
 
 class ProductOrderAdapter(private var mList: ArrayList<ProductOrder>?) :
-    RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+    RecyclerView.Adapter<BaseSdkViewHolder>() {
 
     private var context: Context? = null
 
@@ -35,7 +35,7 @@ class ProductOrderAdapter(private var mList: ArrayList<ProductOrder>?) :
         private const val VIEW_TYPE_INVENTORY = 1
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         context = parent.context
         return when (viewType) {
             VIEW_TYPE_INVENTORY -> {
@@ -69,7 +69,7 @@ class ProductOrderAdapter(private var mList: ArrayList<ProductOrder>?) :
         VIEW_TYPE_EMPTY
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) = holder.onBind(position)
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) = holder.onBind(position)
 
     fun addItems(list: ArrayList<ProductOrder>) {
         mList = list
@@ -77,7 +77,7 @@ class ProductOrderAdapter(private var mList: ArrayList<ProductOrder>?) :
 
 
     inner class ProductOrdersListViewModel(private val mBinding: ItemRowProductSdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+        BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             val lists = mList!![position]
@@ -139,7 +139,7 @@ class ProductOrderAdapter(private var mList: ArrayList<ProductOrder>?) :
     }
 
     inner class EmptyViewHolder(private val mBinding: ItemMyEarningEmptySdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+        BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
 //            val emptyViewModel = MyEarningsEmptyItemViewModel()

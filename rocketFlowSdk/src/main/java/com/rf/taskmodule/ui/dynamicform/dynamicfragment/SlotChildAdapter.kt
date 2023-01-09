@@ -14,19 +14,20 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class SlotChildAdapter(var list: ArrayList<Slot>, var context: Context) : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+class SlotChildAdapter(var list: ArrayList<Slot>, var context: Context) :
+    RecyclerView.Adapter<BaseSdkViewHolder>() {
 
     var onItemClick: ((String) -> Unit)? = null
     var index = -1
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         val binding: TimeCardSdkBinding = TimeCardSdkBinding
             .inflate(LayoutInflater.from(parent.context), parent, false)
 
         return SlotViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) {
         holder.onBind(position)
     }
 
@@ -38,29 +39,42 @@ class SlotChildAdapter(var list: ArrayList<Slot>, var context: Context) : Recycl
         return SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).parse(this)!!
     }
 
-    inner class SlotViewHolder(mBinding: TimeCardSdkBinding) : com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+    inner class SlotViewHolder(mBinding: TimeCardSdkBinding) : BaseSdkViewHolder(mBinding.root) {
         var binding = mBinding
+
         @RequiresApi(Build.VERSION_CODES.M)
         override fun onBind(position: Int) {
             val data = list.get(position)
+
+
+            if (!data.available) {
+                binding.cvTime.setCardBackgroundColor(context.getColor(R.color.light_gray))
+            } else {
+                binding.cvTime.setCardBackgroundColor(context.getColor(R.color.white))
+            }
+
             binding.data = data
 
-            binding.cvTime.setCardBackgroundColor(context.getColor(R.color.white))
-            if(index == position){
-                binding.cvTime.setCardBackgroundColor(context.getColor(R.color.light_blue))
-            }
-            else {
+            if (index == position) {
+                if (!data.available) {
+                    binding.cvTime.setCardBackgroundColor(context.getColor(R.color.light_gray))
+                } else {
+                    binding.cvTime.setCardBackgroundColor(context.getColor(R.color.light_blue))
+                }
+            } else {
 
-                if (!data.available){
+                if (!data.available) {
                     binding.cvTime.setCardBackgroundColor(context.getColor(R.color.light_gray))
                 }
             }
 
             binding.cvTime.setOnClickListener {
-                onItemClick?.invoke(data.time)
-                index = position
-                notifyItemChanged(position)
-                notifyDataSetChanged()
+                if (data.available) {
+                    onItemClick?.invoke(data.time)
+                    index = position
+                    notifyItemChanged(position)
+                    notifyDataSetChanged()
+                }
             }
         }
     }

@@ -58,7 +58,7 @@ import kotlinx.android.synthetic.main.activity_new_create_task_sdk.*
 import java.util.concurrent.ConcurrentHashMap
 
 
-class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAddProductSdkBinding, AddProductViewModel>(),
+class AddProductActivity : BaseSdkActivity<ActivityAddProductSdkBinding, AddProductViewModel>(),
     AddProductNavigator, View.OnClickListener, FormSubmitListener, ProductDescriptionAdapter.OnProductDescriptionListener {
 
     enum class PRODUCT_FILED(var label: String) {
@@ -77,8 +77,8 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
     lateinit var addProductViewModel: AddProductViewModel
 
 
-    lateinit var mPref: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var mPref: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
     private var action: String? = null
     private var imageUrl: String? = null
@@ -136,9 +136,9 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
         setToolbar(binding.toolbar, "Add Product")
         adapter = ProductDescriptionAdapter(this)
         binding.rvDescriptions.adapter = adapter
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)) {
-            var categoryMap = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "categoryMap", categoryMap)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORIES)) {
+            var categoryMap = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORIES)
+            CommonUtils.showLogMessage("e", "categoryMap", categoryMap)
             mMapCategory = Gson().fromJson<Map<String, String>>(
                 categoryMap,
                 object : TypeToken<HashMap<String?, String?>?>() {}.type
@@ -150,17 +150,17 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                     if (intent.hasExtra("action")) {
                         action = intent.getStringExtra("action")
                         if (action.equals("Add")) {
-                            var config = com.rf.taskmodule.utils.CommonUtils.getFlavourConfigFromFlavourId(flavorId, mPref)
+                            var config = CommonUtils.getFlavourConfigFromFlavourId(flavorId, mPref)
                             if (config != null && !config.prodLabel.isNullOrEmpty()) {
                                 setToolbar(binding.toolbar, "Add ${config.prodLabel}")
                             } else {
                                 setToolbar(binding.toolbar, "Add Product")
                             }
                             performUiTask(flavorId)
-                            dfId = com.rf.taskmodule.utils.CommonUtils.getDfIdFromFlavourId(flavorId, mPref)
+                            dfId = CommonUtils.getDfIdFromFlavourId(flavorId, mPref)
                             showDynamicForm(dfId, ArrayList())
                         } else {
-                            var config = com.rf.taskmodule.utils.CommonUtils.getFlavourConfigFromFlavourId(flavorId, mPref)
+                            var config = CommonUtils.getFlavourConfigFromFlavourId(flavorId, mPref)
                             if (config != null && !config.prodLabel.isNullOrEmpty()) {
                                 setToolbar(binding.toolbar, "Update ${config.prodLabel}")
                             } else {
@@ -170,7 +170,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                                 product = intent.getParcelableExtra<CatalogProduct>("data")
                             }
                             performUiTask(flavorId)
-                            dfId = com.rf.taskmodule.utils.CommonUtils.getDfIdFromFlavourId(flavorId, mPref)
+                            dfId = CommonUtils.getDfIdFromFlavourId(flavorId, mPref)
                             if (product != null && product!!.pid != null && dfId != null) {
                                 showLoading()
                                 addProductViewModel.getProductDetails(httpManager, product!!.pid)
@@ -194,7 +194,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
 
         }
         if (mPref.units == null)
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_UNITS)) {
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_UNITS)) {
                 addProductViewModel.getUnits(httpManager);
             }
     }
@@ -345,7 +345,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
 
         if (flavorId == null)
             return
-        IMAGES = com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.IMAGES.name, mPref)
+        IMAGES = CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.IMAGES.name, mPref)
         if (IMAGES != null) {
             binding.llAddProductImage.visibility = if (IMAGES!!.visible) View.VISIBLE else View.GONE
             binding.tvProductImage.text =
@@ -360,7 +360,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
             binding.llAddProductImage.visibility = View.GONE
         }
         INVENTORY_NAME =
-            com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.INVENTORY_NAME.name, mPref)
+            CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.INVENTORY_NAME.name, mPref)
         if (INVENTORY_NAME != null) {
             binding.tilProductName.visibility =
                 if (INVENTORY_NAME!!.visible) View.VISIBLE else View.GONE
@@ -374,9 +374,9 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
             binding.tilProductName.visibility = View.GONE
         }
 
-        MRP = com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.MSP.name, mPref)
+        MRP = CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.MSP.name, mPref)
         SELLING_PRICE =
-            com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.SELLING_PRICE.name, mPref)
+            CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.SELLING_PRICE.name, mPref)
         if (MRP != null && SELLING_PRICE != null) {
             binding.tilMrpUnit.visibility = if (MRP!!.visible) View.VISIBLE else View.GONE
             binding.tilSellingPrice.visibility =
@@ -440,9 +440,9 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
             binding.tilSellingPrice.visibility = View.GONE
         }
 
-        QUANTITY = com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.QUANTITY.name, mPref)
+        QUANTITY = CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.QUANTITY.name, mPref)
         UNIT =
-            com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.UNIT.name, mPref)
+            CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.UNIT.name, mPref)
         if (QUANTITY != null && UNIT != null) {
             binding.tilQuantity.visibility = if (QUANTITY!!.visible) View.VISIBLE else View.GONE
             binding.tilUnit.visibility =
@@ -558,9 +558,9 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
 
 
         MAX_ORDER_LIMIT =
-            com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.MAX_ORDER_LIMIT.name, mPref)
+            CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.MAX_ORDER_LIMIT.name, mPref)
         MIN_STOCK_QUANTITY =
-            com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.MIN_STOCK_QUANTITY.name, mPref)
+            CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.MIN_STOCK_QUANTITY.name, mPref)
         if (MAX_ORDER_LIMIT != null && MIN_STOCK_QUANTITY != null) {
             binding.llMaxOrderLimitMinQuantity.visibility = View.VISIBLE
             binding.tilMaxOrderLimit.visibility =
@@ -623,7 +623,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
         }
 
         REFERENCE_NUMBER =
-            com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.REFERENCE_NUMBER.name, mPref)
+            CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.REFERENCE_NUMBER.name, mPref)
         if (REFERENCE_NUMBER != null) {
             binding.tilReffNumber.visibility =
                 if (REFERENCE_NUMBER!!.visible) View.VISIBLE else View.GONE
@@ -638,7 +638,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
         }
 
         SPECIFICATION =
-            com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.SPECIFICATION.name, mPref)
+            CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.SPECIFICATION.name, mPref)
         if (SPECIFICATION != null) {
             binding.tilProductSpecs.visibility =
                 if (SPECIFICATION!!.visible) View.VISIBLE else View.GONE
@@ -653,7 +653,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
         }
 
         DESCRIPTION =
-            com.rf.taskmodule.utils.CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.DESCRIPTION.name, mPref)
+            CommonUtils.getFlavourField(flavorId, PRODUCT_FILED.DESCRIPTION.name, mPref)
         if (DESCRIPTION != null) {
             binding.tilProductDescription.visibility =
                 if (DESCRIPTION!!.visible) View.VISIBLE else View.GONE
@@ -737,13 +737,13 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
 
             hideKeyboard()
             //showLoading()
-            var json = com.rf.taskmodule.utils.JSONConverter<AddProductRequest>()
+            var json = JSONConverter<AddProductRequest>()
                 .objectToJson(addProdrequest)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "jsondata", json)
+            CommonUtils.showLogMessage("e", "jsondata", json)
 
             var bundle = Bundle();
             bundle.putParcelable("ADD_PRODUCT_REQUEST", addProdrequest);
-            com.rf.taskmodule.utils.Log.e(TAG, "config type----> ${dynamicActionConfig?.action} ")
+            Log.e(TAG, "config type----> ${dynamicActionConfig?.action} ")
             if (mainMap == null) {
                 mainMap = HashMap()
             }
@@ -751,14 +751,14 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
             if (list.isNotEmpty()) {
                 mainMap?.set(currentFormId!!, list)
                 var jsonConverter =
-                    com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<FormData>>>()
+                    JSONConverter<HashMap<String, ArrayList<FormData>>>()
                 var data = jsonConverter.objectToJson(mainMap!!)
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "allowed field", data.toString())
+                CommonUtils.showLogMessage("e", "allowed field", data.toString())
 
             }
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<ArrayList<FormData>>();
-            com.rf.taskmodule.utils.Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(list))
+                JSONConverter<ArrayList<FormData>>();
+            Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(list))
             if (dynamicActionConfig?.action == Type.DISPOSE) {
 
                 mainData = ArrayList()
@@ -775,7 +775,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                         if (v != null && v.isNotEmpty()) {
 
                             if (mainData!![i].type == DataType.CAMERA && v[0].path.equals(
-                                    com.rf.taskmodule.utils.AppConstants.ADD_MORE,
+                                    AppConstants.ADD_MORE,
                                     ignoreCase = true
                                 )
                             ) {
@@ -783,7 +783,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                                 v.removeAt(0)
                             }
                             if (mainData!![i].type == DataType.CAMERA && v.size > 0 && v[v.size - 1].path.equals(
-                                    com.rf.taskmodule.utils.AppConstants.ADD_MORE,
+                                    AppConstants.ADD_MORE,
                                     ignoreCase = true
                                 )
                             ) {
@@ -803,15 +803,15 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                                 hashMapFileRequest[key] = v
                             }
                         }
-                        com.rf.taskmodule.utils.Log.e(
+                        Log.e(
                             "NewCreateTaskActivity", mainData!![i].name + "<------->"
                                     + mainData!![i].enteredValue
                         )
                     }
                     var jsonConverter =
-                        com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<File>>>();
-                    com.rf.taskmodule.utils.Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(hashMapFileRequest))
-                    com.rf.taskmodule.utils.Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
+                        JSONConverter<HashMap<String, ArrayList<File>>>();
+                    Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(hashMapFileRequest))
+                    Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
                     if (hashMapFileRequest.isNotEmpty()) {
 
 
@@ -819,11 +819,11 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
 
                             if (NetworkUtils.isConnectedFast(this@AddProductActivity)) {
                                 count = 0
-                                com.rf.taskmodule.utils.Log.e(TAG, "worker thread open")
+                                Log.e(TAG, "worker thread open")
                                 // showLoading()
                                 binding.btnAddNow.visibility = View.GONE
                                 binding.viewProgress.visibility = View.VISIBLE
-                                com.rf.taskmodule.utils.CommonUtils.makeScreenDisable(this)
+                                CommonUtils.makeScreenDisable(this)
                                 nestedScrollView.postDelayed(
                                     { nestedScrollView.fullScroll(View.FOCUS_DOWN) },
                                     200
@@ -843,10 +843,10 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                                 //start thread
                                 handlerThread?.start()
                             } else {
-                                com.rf.taskmodule.utils.CommonUtils.showSnakbarForNetworkSettings(
+                                CommonUtils.showSnakbarForNetworkSettings(
                                     this@AddProductActivity,
                                     nestedScrollView,
-                                    com.rf.taskmodule.utils.AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE
+                                    AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE
                                 )
                             }
 
@@ -889,15 +889,15 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
         return addProductViewModel!!
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<BaseResponse> =
-                com.rf.taskmodule.utils.JSONConverter()
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
+            val jsonConverter: JSONConverter<BaseResponse> =
+                JSONConverter()
             var response: BaseResponse =
                 jsonConverter.jsonToObject(result.toString(), BaseResponse::class.java)
             if (mPref.formDataMap != null && mPref.formDataMap.isNotEmpty()) {
-                mPref.clear(com.rf.taskmodule.data.local.prefs.AppPreferencesHelper.PreferencesKeys.PREF_KEY_IS_FORM_DATA_MAP);
+                mPref.clear(AppPreferencesHelper.PreferencesKeys.PREF_KEY_IS_FORM_DATA_MAP);
             }
             onSuccess()
         }
@@ -917,23 +917,23 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
         finish()
     }
 
-    override fun handleUpdateResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleUpdateResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<BaseResponse> =
-                com.rf.taskmodule.utils.JSONConverter()
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
+            val jsonConverter: JSONConverter<BaseResponse> =
+                JSONConverter()
             var response: BaseResponse =
                 jsonConverter.jsonToObject(result.toString(), BaseResponse::class.java)
             if (mPref.formDataMap != null && mPref.formDataMap.isNotEmpty()) {
-                mPref.clear(com.rf.taskmodule.data.local.prefs.AppPreferencesHelper.PreferencesKeys.PREF_KEY_IS_FORM_DATA_MAP);
+                mPref.clear(AppPreferencesHelper.PreferencesKeys.PREF_KEY_IS_FORM_DATA_MAP);
             }
             onSuccess()
         }
     }
 
-    override fun handleSendImageResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleSendImageResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val profileResponse = Gson().fromJson(result.toString(), ProfileResponse::class.java)
             if (profileResponse != null) {
                 imageUrl = profileResponse.imageUrl
@@ -942,9 +942,9 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
 
     }
 
-    override fun handleUnitsResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleUnitsResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val unitsResponse = Gson().fromJson(result.toString(), UnitsResponse::class.java)
             if (unitsResponse != null && unitsResponse.successful) {
                 mPref.setUnits(unitsResponse.data!!.UNIT!!)
@@ -955,14 +955,14 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
     }
 
     override fun handleProductDetailsResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<ProductDetailsResponse> =
-                com.rf.taskmodule.utils.JSONConverter()
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
+            val jsonConverter: JSONConverter<ProductDetailsResponse> =
+                JSONConverter()
             var response: ProductDetailsResponse =
                 jsonConverter.jsonToObject(result.toString(), ProductDetailsResponse::class.java)
             if (response.data != null && response.data!!.dfdId != null) {
@@ -998,10 +998,10 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                 }
             }*/
             if (response.data != null && response.data!!.dfData != null) {
-                dfId = com.rf.taskmodule.utils.CommonUtils.getDfIdFromFlavourId(flavorId, mPref)
+                dfId = CommonUtils.getDfIdFromFlavourId(flavorId, mPref)
                 showDynamicForm(dfId, response.data!!.dfData!!)
             } else {
-                dfId = com.rf.taskmodule.utils.CommonUtils.getDfIdFromFlavourId(flavorId, mPref)
+                dfId = CommonUtils.getDfIdFromFlavourId(flavorId, mPref)
                 showDynamicForm(dfId, ArrayList())
             }
 
@@ -1034,7 +1034,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
     }
 
     private fun proceedToImagePicking() {
-        val chooseImageIntent: Intent = com.rf.taskmodule.utils.image_utility.ImagePicker.getPickImageIntent(this)
+        val chooseImageIntent: Intent = ImagePicker.getPickImageIntent(this)
         startActivityForResult(
             chooseImageIntent,
             PICK_IMAGE_FILE_ID
@@ -1063,7 +1063,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
         } else {
 
 
-            com.rf.taskmodule.utils.image_utility.Compressor(this)
+            Compressor(this)
                 .compressToFileAsFlowable(actualImage)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1074,7 +1074,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                     binding.ivActImage.setImageURI(Uri.fromFile(compressedImage))
                     val updateFileRequest =
                         UpdateFileRequest(compressedImage!!, FileType.USER_PROFILE, "")
-                    if (com.rf.taskmodule.TrackiSdkApplication.getApiMap()
+                    if (TrackiSdkApplication.getApiMap()
                             .containsKey(ApiType.UPLOAD_FILE_AGAINEST_ENTITY)
                     ) {
                         showLoading()
@@ -1094,7 +1094,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_FILE_ID) {
-            actualImage = com.rf.taskmodule.utils.image_utility.ImagePicker.getImageFileToUpload(this, resultCode, data)
+            actualImage = ImagePicker.getImageFileToUpload(this, resultCode, data)
             compressImage()
         }
     }
@@ -1198,8 +1198,8 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
             adapter.setListener(object : UnitModelAdapter.OnUnitListener {
                 override fun onUnitSelected(data: UnitModel) {
                     packUnit = data.key.toString()
-                    com.rf.taskmodule.utils.Log.e("packunit", packUnit)
-                    com.rf.taskmodule.utils.Log.e("tag", data.key.toString())
+                    Log.e("packunit", packUnit)
+                    Log.e("tag", data.key.toString())
                     binding.edPackUnit.setText(data.value)
                     bottomSheetDialog.dismiss()
                 }
@@ -1240,8 +1240,8 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
         chip.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
                 packUnit = buttonView.tag.toString()
-                com.rf.taskmodule.utils.Log.e("packunit", packUnit)
-                com.rf.taskmodule.utils.Log.e("tag", buttonView.tag.toString())
+                Log.e("packunit", packUnit)
+                Log.e("tag", buttonView.tag.toString())
                 binding.edPackUnit.setText(text)
                 bottomSheetDialog.dismiss()
             } else {
@@ -1362,7 +1362,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
     }
 
     private fun replaceFragment(fragment: Fragment, dfId: String?) {
-        val formName = com.rf.taskmodule.utils.CommonUtils.getFormByFormId(dfId)
+        val formName = CommonUtils.getFormByFormId(dfId)
         /* if (formName?.name != null) {
              binding?.toolbar?.title = formName.name
          } else {
@@ -1390,7 +1390,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
             formadata
         )
         replaceFragment(dynamicFragment!!, dfId)
-        dynamicFormsNew = com.rf.taskmodule.utils.CommonUtils.getFormByFormId(dfId)
+        dynamicFormsNew = CommonUtils.getFormByFormId(dfId)
         if (dynamicFormsNew != null && dynamicFormsNew!!.fields != null && dynamicFormsNew!!.fields!!.isNotEmpty()) {
             try {
                 var formData: FormData? =
@@ -1429,8 +1429,8 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                     fileUploadCounter += obj.chunkSize
                     var progressUploadText = "${fileUploadCounter}/${obj.totalSize}"
                     var percentage = ((fileUploadCounter * 100 / obj.totalSize))
-                    com.rf.taskmodule.utils.Log.e(AddProductActivity.TAG, "progressUploadText=> " + progressUploadText)
-                    com.rf.taskmodule.utils.Log.e(AddProductActivity.TAG, "percentage=> " + percentage.toString())
+                    Log.e(AddProductActivity.TAG, "progressUploadText=> " + progressUploadText)
+                    Log.e(AddProductActivity.TAG, "percentage=> " + percentage.toString())
                     runOnUiThread {
                         progressBar!!.progress = percentage
                         percentageText!!.text = "$percentage %"
@@ -1442,7 +1442,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                 }
                 /*For Success */0 -> {
 
-                if (com.rf.taskmodule.utils.CommonUtils.stringListHashMap.isNotEmpty()) {
+                if (CommonUtils.stringListHashMap.isNotEmpty()) {
 
                     //get hashMap from adapter and match the name with key of maps
                     // if found then replace entered value with url of image
@@ -1457,11 +1457,11 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                         for (i in mainData?.indices!!) {
                             try {
                                 if (mainData!![i].type != DataType.BUTTON) {
-                                    if (com.rf.taskmodule.utils.CommonUtils.stringListHashMap?.containsKey(mainData!![i].name)!!) {
+                                    if (CommonUtils.stringListHashMap?.containsKey(mainData!![i].name)!!) {
                                         //Log.e("Upload Form List--->", mainData!![i].name!!)
                                         mainData!![i].enteredValue =
-                                            com.rf.taskmodule.utils.CommonUtils.getCommaSeparatedList(
-                                                com.rf.taskmodule.utils.CommonUtils.stringListHashMap[mainData!![i].name])
+                                            CommonUtils.getCommaSeparatedList(
+                                                CommonUtils.stringListHashMap[mainData!![i].name])
                                     }
                                     finalMap[mainData!![i].name!!] = mainData!![i].enteredValue!!
                                 }
@@ -1471,16 +1471,16 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                         }
                         //assign empty object to map again
 
-                        com.rf.taskmodule.utils.CommonUtils.stringListHashMap = ConcurrentHashMap()
+                        CommonUtils.stringListHashMap = ConcurrentHashMap()
                         if (actionConfig?.action == Type.DISPOSE) {
                             perFormCreateTask()
                         }
                     }
                 } else {
-                    com.rf.taskmodule.utils.Log.e(TAG, "Map is empty...Try Again")
+                    Log.e(TAG, "Map is empty...Try Again")
                     handlerThread?.interrupt()
                     hideLoading()
-                    com.rf.taskmodule.utils.CommonUtils.stringListHashMap = ConcurrentHashMap()
+                    CommonUtils.stringListHashMap = ConcurrentHashMap()
                     if (actionConfig?.action == Type.DISPOSE) {
                         perFormCreateTask()
                     }
@@ -1491,7 +1491,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
                     runOnUiThread {
                         binding.btnAddNow.visibility = View.VISIBLE
                         binding.viewProgress.visibility = View.GONE
-                        com.rf.taskmodule.utils.CommonUtils.makeScreenClickable(this@AddProductActivity)
+                        CommonUtils.makeScreenClickable(this@AddProductActivity)
                     }
                     count++
 
@@ -1499,7 +1499,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
 
                     TrackiToast.Message.showShort(
                         this@AddProductActivity,
-                        com.rf.taskmodule.utils.AppConstants.UNABLE_TO_PROCESS_REQUEST
+                        AppConstants.UNABLE_TO_PROCESS_REQUEST
                     )
                     //after getting error form the thread we interrupt the thread
                     handlerThread?.interrupt()
@@ -1516,11 +1516,11 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
 
     private fun perFormCreateTask() {
         if (dynamicFormsNew != null) {
-            var dynamicFormMainData = com.rf.taskmodule.utils.CommonUtils.createFormData(
+            var dynamicFormMainData = CommonUtils.createFormData(
                 mainData, "", "", dynamicFormsNew!!.formId,
                 dynamicFormsNew!!.version
             )
-            com.rf.taskmodule.utils.Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
+            Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
 
             var taskData = dynamicFormMainData!!.taskData
             if (!taskData.taskData?.isEmpty()!!) {
@@ -1533,12 +1533,12 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
 
 
         var jsonConverter =
-            com.rf.taskmodule.utils.JSONConverter<AddProductRequest>()
+            JSONConverter<AddProductRequest>()
         var json = jsonConverter.objectToJson(addProdrequest)
-        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "task data", json)
+        CommonUtils.showLogMessage("e", "task data", json)
         if (action != null && action.equals("Add")) {
             if (NetworkUtils.isNetworkConnected(this@AddProductActivity)) {
-                if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.ADD_PRODUCT)) {
+                if (TrackiSdkApplication.getApiMap().containsKey(ApiType.ADD_PRODUCT)) {
                     addProductViewModel.addProduct(httpManager, addProdrequest!!)
                 }
             } else {
@@ -1556,7 +1556,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
             if (product!=null&&product!!.cid!=null)
                 addProdrequest!!.cid = product!!.cid
             if (NetworkUtils.isNetworkConnected(this@AddProductActivity)) {
-                if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.UPDATE_PRODUCT)) {
+                if (TrackiSdkApplication.getApiMap().containsKey(ApiType.UPDATE_PRODUCT)) {
                     addProductViewModel.updateProduct(httpManager, addProdrequest!!)
                 }
             } else {
@@ -1577,7 +1577,7 @@ class AddProductActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAdd
     }
 
     override fun networkUnavailable() {
-        snackBar = com.rf.taskmodule.utils.CommonUtils.showNetWorkConnectionIssue(
+        snackBar = CommonUtils.showNetWorkConnectionIssue(
             binding.llMain,
             getString(R.string.please_check_your_internet_connection)
         )

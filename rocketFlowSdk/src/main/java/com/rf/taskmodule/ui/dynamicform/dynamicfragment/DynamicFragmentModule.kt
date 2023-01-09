@@ -3,7 +3,7 @@
 //
 //import androidx.lifecycle.ViewModelProvider
 //import androidx.recyclerview.widget.LinearLayoutManager
-//import com.rf.taskmodule.ViewModelProviderFactory
+//import com.rf.taskmodule.ui.ViewModelProviderFactory
 //import com.rf.taskmodule.data.DataManager
 //import com.rf.taskmodule.utils.rx.SchedulerProvider
 //import dagger.Module

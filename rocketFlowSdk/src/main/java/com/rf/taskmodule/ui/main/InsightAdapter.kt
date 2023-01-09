@@ -10,14 +10,14 @@ import com.rf.taskmodule.databinding.LayoutItemInsightsSdkBinding
 import com.rf.taskmodule.ui.base.BaseSdkViewHolder
 import com.rf.taskmodule.utils.CommonUtils
 
-class InsightAdapter(private var mList: ArrayList<ServiceDescr?>?) : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+class InsightAdapter(private var mList: ArrayList<ServiceDescr?>?) : RecyclerView.Adapter<BaseSdkViewHolder>() {
 
     private var context: Context? = null
     private var cellwidthWillbe: Int = 0
     fun cellWidth(cellwidthWillbe: Int) {
         this.cellwidthWillbe = cellwidthWillbe;
     }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         context = parent.context
         val simpleViewItemBinding: LayoutItemInsightsSdkBinding =
                 LayoutItemInsightsSdkBinding.inflate(
@@ -43,7 +43,7 @@ class InsightAdapter(private var mList: ArrayList<ServiceDescr?>?) : RecyclerVie
     }
 
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) = holder.onBind(position)
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) = holder.onBind(position)
 
     fun addItems(list: ArrayList<ServiceDescr?>) {
         mList = list
@@ -52,16 +52,16 @@ class InsightAdapter(private var mList: ArrayList<ServiceDescr?>?) : RecyclerVie
 
 
     inner class SimpleViewHolder(private val mBinding: LayoutItemInsightsSdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             if(mList!=null) {
                 val lists: ServiceDescr? = mList!![position]
                 if (lists != null) {
                     if (cellwidthWillbe != 0) {
-                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "cellwidthWillbe", "" + cellwidthWillbe)
+                        CommonUtils.showLogMessage("e", "cellwidthWillbe", "" + cellwidthWillbe)
                         mBinding.cardViewMain.layoutParams = FrameLayout.LayoutParams(
-                                cellwidthWillbe - 20, com.rf.taskmodule.utils.CommonUtils.dpToPixel(context, 85))
+                                cellwidthWillbe - 20, CommonUtils.dpToPixel(context, 85))
                     }
                     mBinding.data = lists
                     mBinding.executePendingBindings()

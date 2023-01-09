@@ -1,7 +1,6 @@
 package com.rf.taskmodule.ui.tasklisting.ihaveassigned;
 
 import com.rf.taskmodule.ui.base.BaseSdkFragment;
-import com.rf.taskmodule.ui.base.BaseSdkFragment;
 
 /**
  * Created by Vikas Kesharvani on 08/07/20.

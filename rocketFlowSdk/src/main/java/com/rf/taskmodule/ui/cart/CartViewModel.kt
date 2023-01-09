@@ -16,19 +16,19 @@ import com.rf.taskmodule.utils.CommonUtils
 import com.rf.taskmodule.utils.rx.AppSchedulerProvider
 import com.rf.taskmodule.utils.rx.SchedulerProvider
 
-class CartViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-        com.rf.taskmodule.ui.base.BaseSdkViewModel<CartNavigator>(dataManager, schedulerProvider) {
+class CartViewModel (dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+        BaseSdkViewModel<CartNavigator>(dataManager, schedulerProvider) {
 
-    private lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    private lateinit var httpManager: HttpManager
 
 
-    fun getCart(httpManager: com.rf.taskmodule.data.network.HttpManager, request: CartRequest) {
+    fun getCart(httpManager: HttpManager, request: CartRequest) {
         this.httpManager = httpManager
         GetCart(request).hitApi()
     }
 
     inner class GetCart(var request: CartRequest) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -36,8 +36,8 @@ class CartViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerP
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.VIEW_CART)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.VIEW_CART]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.VIEW_CART)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.VIEW_CART]!!
                /* var apiUrl = Api()
                 apiUrl.url = oldApi.url
                 apiUrl.name = ApiType.VIEW_CART
@@ -63,7 +63,7 @@ class CartViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerP
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -72,13 +72,13 @@ class CartViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerP
         }
     }
 
-    fun applyCoupon(httpManager: com.rf.taskmodule.data.network.HttpManager, request: ApplyCouponRequest?) {
+    fun applyCoupon(httpManager: HttpManager, request: ApplyCouponRequest?) {
         this.httpManager = httpManager
         ApplyCoupon(request).hitApi()
     }
 
     inner class ApplyCoupon( var request: ApplyCouponRequest?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -86,14 +86,14 @@ class CartViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerP
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.VALIDATE_COUPON)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.VALIDATE_COUPON]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.VALIDATE_COUPON)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.VALIDATE_COUPON]!!
                 var apiUrl = Api()
                 apiUrl.url = oldApi.url
                 apiUrl.name = ApiType.VALIDATE_COUPON
                 apiUrl.timeOut = oldApi.timeOut
 
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "URL==", apiUrl.url)
+                CommonUtils.showLogMessage("e", "URL==", apiUrl.url)
                 if (dataManager != null)
                     dataManager.applyCoupon(this, httpManager,request, apiUrl)
             } /*else {
@@ -116,7 +116,7 @@ class CartViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerP
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -177,13 +177,13 @@ class CartViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerP
         }
     }*/
 
-    fun linkInventory(httpManager: com.rf.taskmodule.data.network.HttpManager, request: LinkInventoryRequest) {
+    fun linkInventory(httpManager: HttpManager, request: LinkInventoryRequest) {
         this.httpManager = httpManager
         LinkInventory(request).hitApi()
     }
 
     inner class LinkInventory(private var data: LinkInventoryRequest) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.linkInventoryResponse(this, result, error)
@@ -191,8 +191,8 @@ class CartViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerP
 
         @SuppressLint("SuspiciousIndentation")
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.LINK_INVENTORY)) {
-                val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.LINK_INVENTORY]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.LINK_INVENTORY)) {
+                val api = TrackiSdkApplication.getApiMap()[ApiType.LINK_INVENTORY]!!
 //            val api = Api()
 //            api.url = "https://qa2.rocketflyer.in/rfapi/secure/tracki/linkInventory"
 //            api.name = ApiType.LINK_INVENTORY
@@ -209,7 +209,7 @@ class CartViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerP
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -217,10 +217,10 @@ class CartViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerP
         }
     }
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return CartViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

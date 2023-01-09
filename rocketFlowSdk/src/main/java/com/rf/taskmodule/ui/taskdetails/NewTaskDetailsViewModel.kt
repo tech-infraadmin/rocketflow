@@ -16,14 +16,14 @@ import com.rf.taskmodule.utils.ApiType
 import com.rf.taskmodule.utils.rx.AppSchedulerProvider
 import com.rf.taskmodule.utils.rx.SchedulerProvider
 
-class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-    com.rf.taskmodule.ui.base.BaseSdkViewModel<TDNavigator>(dataManager, schedulerProvider),
-    com.rf.taskmodule.data.network.ApiCallback {
+class NewTaskDetailsViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+    BaseSdkViewModel<TDNavigator>(dataManager, schedulerProvider),
+    ApiCallback {
 
 
     private val tag = "TaskDetailViewModel"
 
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var httpManager: HttpManager
     lateinit var request: AcceptRejectRequest
     lateinit var api: Api
     var geoId: String = ""
@@ -35,7 +35,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
 
 
     private inner class GetTaskData(var data: Any?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -43,8 +43,8 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_TASK_DATA)) {
-                val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_DATA]
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_TASK_DATA)) {
+                val api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_DATA]
                 if (dataManager != null)
                     dataManager.taskData(this, httpManager, data, api)
             }
@@ -57,7 +57,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -67,7 +67,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
     }
 
     fun getSlotAvailability(
-        httpManager: com.rf.taskmodule.data.network.HttpManager,
+        httpManager: HttpManager,
         api: Api,
         geoId: String,
         date: String,
@@ -87,9 +87,9 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         SlotDataAPI().hitApi()
     }
 
-    inner class SlotDataAPI : com.rf.taskmodule.data.network.ApiCallback {
+    inner class SlotDataAPI : ApiCallback {
 
-        var api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!
+        var api = TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null) {
@@ -98,7 +98,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         }
 
         override fun hitApi() {
-            val apiMain = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!
+            val apiMain = TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!
             val api = Api()
             api.name = ApiType.GET_TIME_SLOTS
             api.timeOut = apiMain.timeOut
@@ -121,7 +121,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback?) {
+        override fun onRequestTimeOut(callBack: ApiCallback?) {
             if (navigator != null) {
                 if (callBack != null) {
                     navigator.showTimeOutMessage(callBack)
@@ -134,21 +134,21 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
 
     }
 
-    fun bookSlots(httpManager: com.rf.taskmodule.data.network.HttpManager, bookSlotRequest: BookSlotRequest) {
+    fun bookSlots(httpManager: HttpManager, bookSlotRequest: BookSlotRequest) {
         this.httpManager = httpManager
         this.bookSlotRequest = bookSlotRequest
         BookSlot().hitApi()
     }
 
-    inner class BookSlot : com.rf.taskmodule.data.network.ApiCallback {
+    inner class BookSlot : ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleSlotResponse(this@BookSlot, result, error)
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.BOOK_TIME_SLOT)) {
-                api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.BOOK_TIME_SLOT]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.BOOK_TIME_SLOT)) {
+                api = TrackiSdkApplication.getApiMap()[ApiType.BOOK_TIME_SLOT]!!
 
                 if (api != null) {
                     dataManager.bookSlot(
@@ -173,7 +173,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
 
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback?) {
+        override fun onRequestTimeOut(callBack: ApiCallback?) {
             navigator.showTimeOutMessage(callBack!!)
         }
 
@@ -183,13 +183,13 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
 
     }
 
-    fun getUserLocations(httpManager: com.rf.taskmodule.data.network.HttpManager) {
+    fun getUserLocations(httpManager: HttpManager) {
         this.httpManager = httpManager
         GetUserLocations().hitApi()
     }
 
-    inner class GetUserLocations : com.rf.taskmodule.data.network.ApiCallback {
-        private val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.USER_LOCATIONS]
+    inner class GetUserLocations : ApiCallback {
+        private val api = TrackiSdkApplication.getApiMap()[ApiType.USER_LOCATIONS]
 
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleMyPlaceResponse(this@GetUserLocations, result, error)
@@ -210,7 +210,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         }
 
         override fun onNetworkErrorClose() {}
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -218,14 +218,14 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
     }
 
     private inner class SendCtaOtp(var data: SendCtaOtpRequest?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleSendCtaOtpResponse(this, result, error)
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.CTA_SEND_OTP)) {
-                val apiC = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.CTA_SEND_OTP]
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.CTA_SEND_OTP)) {
+                val apiC = TrackiSdkApplication.getApiMap()[ApiType.CTA_SEND_OTP]
                 if (dataManager != null)
                     dataManager.sendCtaOtp(this, httpManager, data, apiC)
             }
@@ -239,7 +239,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
 
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback?) {
+        override fun onRequestTimeOut(callBack: ApiCallback?) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack!!)
         }
@@ -251,14 +251,14 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
     }
 
     private inner class VerifyCtaOtp(var data: VerifyCtaOtpRequest?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleVerifyCtaOtpResponse(this, result, error)
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.CTA_VERIFY_OTP)) {
-                val apiC = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.CTA_VERIFY_OTP]
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.CTA_VERIFY_OTP)) {
+                val apiC = TrackiSdkApplication.getApiMap()[ApiType.CTA_VERIFY_OTP]
                 if (dataManager != null)
                     dataManager.verifyCtaOtp(this, httpManager, data, apiC)
             }
@@ -272,7 +272,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
 
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback?) {
+        override fun onRequestTimeOut(callBack: ApiCallback?) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack!!)
         }
@@ -356,12 +356,12 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
          }
      }*/
 
-    fun sendCtaOtp(httpManager: com.rf.taskmodule.data.network.HttpManager, request: SendCtaOtpRequest) {
+    fun sendCtaOtp(httpManager: HttpManager, request: SendCtaOtpRequest) {
         this.httpManager = httpManager
         SendCtaOtp(request).hitApi()
     }
 
-    fun verifyCtaOtp(httpManager: com.rf.taskmodule.data.network.HttpManager, request: VerifyCtaOtpRequest) {
+    fun verifyCtaOtp(httpManager: HttpManager, request: VerifyCtaOtpRequest) {
         this.httpManager = httpManager
         VerifyCtaOtp(request).hitApi()
     }
@@ -370,13 +370,13 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         navigator.expandCollapse()
     }
 
-    fun getPaymentUrl(httpManager: com.rf.taskmodule.data.network.HttpManager, data: PaymentRequest?) {
+    fun getPaymentUrl(httpManager: HttpManager, data: PaymentRequest?) {
         this.httpManager = httpManager
         GetPaymentUrl(data).hitApi()
     }
 
     private inner class GetPaymentUrl(var data: PaymentRequest?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -384,8 +384,8 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.INIT_TASK_PAYMENT)) {
-                val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.INIT_TASK_PAYMENT]
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.INIT_TASK_PAYMENT)) {
+                val api = TrackiSdkApplication.getApiMap()[ApiType.INIT_TASK_PAYMENT]
                 if (dataManager != null)
                     dataManager.initTaskPayment(this, data, httpManager, api)
             }
@@ -398,7 +398,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -407,13 +407,13 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         }
     }
 
-    fun getTaskData(httpManager: com.rf.taskmodule.data.network.HttpManager, data: Any?) {
+    fun getTaskData(httpManager: HttpManager, data: Any?) {
         this.httpManager = httpManager
         GetTaskData(data).hitApi()
     }
 
 
-    fun getTaskById(httpManager: com.rf.taskmodule.data.network.HttpManager, request: AcceptRejectRequest, api: Api?) {
+    fun getTaskById(httpManager: HttpManager, request: AcceptRejectRequest, api: Api?) {
         this.httpManager = httpManager
         this.request = request
         this.api = api!!
@@ -425,7 +425,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
     }
 
     override fun hitApi() {
-        api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]!!
+        api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]!!
         dataManager.getTaskById(this, httpManager, request, api)
     }
 
@@ -435,7 +435,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
 
     }
 
-    override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+    override fun onRequestTimeOut(callBack: ApiCallback) {
         navigator.showTimeOutMessage(callBack)
     }
 
@@ -470,15 +470,15 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
     //        new ArriveReachTask(request).hitApi();
     //
     //    }
-    fun executeUpdates(httpManager: com.rf.taskmodule.data.network.HttpManager?, request: ExecuteUpdateRequest?, api: Api?) {
+    fun executeUpdates(httpManager: HttpManager?, request: ExecuteUpdateRequest?, api: Api?) {
         this.httpManager = httpManager!!
 
-        this.api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.EXECUTE_UPDATE]!!
+        this.api = TrackiSdkApplication.getApiMap()[ApiType.EXECUTE_UPDATE]!!
         ExecuteUpdateTask(request).hitApi()
     }
 
     inner class ExecuteUpdateTask(var request: ExecuteUpdateRequest?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleExecuteUpdateResponse(this, result, error)
         }
@@ -492,7 +492,7 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
         }
 
         override fun onNetworkErrorClose() {}
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -501,10 +501,10 @@ class NewTaskDetailsViewModel(dataManager: com.rf.taskmodule.data.DataManager, s
     }
 
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return NewTaskDetailsViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

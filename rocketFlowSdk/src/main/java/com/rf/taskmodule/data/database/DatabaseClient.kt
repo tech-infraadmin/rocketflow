@@ -8,13 +8,13 @@ class DatabaseClient private constructor(  mCtx: Context) {
     private val DB_NAME = "rocketflowcontact.db"
 
     //our app database object
-    val appDatabase: com.rf.taskmodule.data.database.ContactDatabase
+    val appDatabase: ContactDatabase
 
     init {
 
         //creating the app database with Room database builder
         //MyToDos is the name of the database
-        appDatabase = Room.databaseBuilder(mCtx, com.rf.taskmodule.data.database.ContactDatabase::class.java, DB_NAME).allowMainThreadQueries().fallbackToDestructiveMigration().build()
+        appDatabase = Room.databaseBuilder(mCtx, ContactDatabase::class.java, DB_NAME).allowMainThreadQueries().fallbackToDestructiveMigration().build()
     }
 
     companion object {

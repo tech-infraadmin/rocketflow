@@ -25,7 +25,7 @@ class PunchInOutDialog(context: Context) : Dialog(context, R.style.DialogTheme) 
     private var onClickListenerDialog: OnClickViews? = null
     private var data: String? = null
     private var event: PunchInOut? = null
-    private var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper? = null
+    private var preferencesHelper: PreferencesHelper? = null
     private var myContext: Context? = null
     lateinit var ivAddSelfie: ImageView
     lateinit var btnAddSelfie: LinearLayout
@@ -62,7 +62,7 @@ class PunchInOutDialog(context: Context) : Dialog(context, R.style.DialogTheme) 
 
         btnSubmit.setOnClickListener {
             dismiss()
-            com.rf.taskmodule.utils.CommonUtils.preventTwoClick(btnSubmit)
+            CommonUtils.preventTwoClick(btnSubmit)
             onClickListenerDialog?.onClickSubmit(event!!, edComments.text.toString())
 
         }
@@ -88,7 +88,7 @@ class PunchInOutDialog(context: Context) : Dialog(context, R.style.DialogTheme) 
 
     }
 
-    constructor(context: Context, preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper, titleDialog: String?,
+    constructor(context: Context, preferencesHelper: PreferencesHelper, titleDialog: String?,
                 messageDialog: String, buttonDialog: String, event: PunchInOut,
                 onClickListenerDialog: OnClickViews) : this(context) {
         this.titleDialog = titleDialog

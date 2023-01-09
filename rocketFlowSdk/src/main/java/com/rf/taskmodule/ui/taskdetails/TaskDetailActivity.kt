@@ -69,7 +69,7 @@ import java.util.function.Predicate
  *<p>
  * Class used to handle the details of live and completed tasks.
  */
-class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDetailViewModel>(),
+class TaskDetailActivity : BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDetailViewModel>(),
         TaskDetailNavigator, OnMapReadyCallback, LocationObserver,
         GoogleMap.OnMarkerClickListener, Runnable, TaskAlterEventAdapter.OnAlertClick, View.OnClickListener {
 
@@ -81,14 +81,14 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
     //@Inject
     lateinit var mTaskDetailViewModel: TaskDetailViewModel
     //@Inject
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var httpManager: HttpManager
     //@Inject
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
+    lateinit var preferencesHelper: PreferencesHelper
 
     var distinationMarker = false;
 
     private var mobile: String? = null
-    private var eventDialog: com.rf.taskmodule.ui.custom.EventDialogFragment? = null
+    private var eventDialog: EventDialogFragment? = null
     private val tag = TaskDetailActivity::class.java.simpleName
     private var api: Api? = null
     private var polyLine: Polyline? = null
@@ -149,7 +149,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
     }
 
     override fun networkUnavailable() {
-        snackBar = com.rf.taskmodule.utils.CommonUtils.showNetWorkConnectionIssue(mActivityTaskDetailSdkBinding.llMain, getString(R.string.please_check_your_internet_connection))
+        snackBar = CommonUtils.showNetWorkConnectionIssue(mActivityTaskDetailSdkBinding.llMain, getString(R.string.please_check_your_internet_connection))
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -199,8 +199,8 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
         //initSocket();
         //connectSocket(this)
         if (intent != null) {
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)) {
-                taskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_ID)) {
+                taskId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
                 if (taskId == "") {
                     finish()
                 }
@@ -215,12 +215,12 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                 getLiveEvent()
                 var tripStatsCurrent = TrackThat.getCurrentTripStatistics()
                 var jsonConverter =
-                    com.rf.taskmodule.utils.JSONConverter<com.trackthat.lib.models.TripsStatistics>();
+                    JSONConverter<com.trackthat.lib.models.TripsStatistics>();
 
                 var jsonConverter2 =
-                    com.rf.taskmodule.utils.JSONConverter<TripsStatistics>();
+                    JSONConverter<TripsStatistics>();
                 var tripStatsStr = jsonConverter.objectToJson(tripStatsCurrent)
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "trip_data", tripStatsCurrent.toString())
+                CommonUtils.showLogMessage("e", "trip_data", tripStatsCurrent.toString())
                 var tripStats: TripsStatistics = jsonConverter2.jsonToObject(tripStatsStr, TripsStatistics::class.java)
                 setStats(tripStats.distanceInMeter / 1000, tripStats.tripDurationInMinute, tripStats.maxSpeed)
             }
@@ -232,13 +232,13 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
     private fun getTaskByApi() {
 
         showLoading()
-        api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
+        api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
         mTaskDetailViewModel.getTaskById(httpManager, AcceptRejectRequest(taskId!!), api)
     }
 
     private fun getLiveEvent() {
         if (TrackThat.getCurrentTrackingId() != null && taskId == TrackThat.getCurrentTrackingId()) {
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "getLiveEvent call", "" + TrackThat.checkTripIsComplete(taskId!!))
+            CommonUtils.showLogMessage("e", "getLiveEvent call", "" + TrackThat.checkTripIsComplete(taskId!!))
             //  TrackiToast.Message.showShort(this,"getLiveEvent call")
 
             if (!TrackThat.checkTripIsComplete(taskId!!)) {
@@ -254,7 +254,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                         var sortedLocationList = detail.sortedBy { data -> data.time }
                         var maxSpeedEvent = sortedLocationList.maxByOrNull { data -> data.speed }
                         if (maxSpeedEvent != null)
-                            tripStats.maxSpeed = com.rf.taskmodule.utils.CommonUtils.metersPerSecToKmPerHr(maxSpeedEvent.speed)
+                            tripStats.maxSpeed = CommonUtils.metersPerSecToKmPerHr(maxSpeedEvent.speed)
                         if (sortedLocationList.size > 1) {
 
                             tripStats.distance = calculateDistance(sortedLocationList)
@@ -269,7 +269,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                         var initlatlong = LatLng(detail[0].geoCoordinates?.latitude!!, detail[0].geoCoordinates?.longitude!!)
                         builder.include(initlatlong)
                         var startPlace = Place()
-                        startPlace.address = com.rf.taskmodule.utils.CommonUtils.getAddress(this@TaskDetailActivity, LatLng(detail[0].geoCoordinates?.latitude!!, detail[0].geoCoordinates?.longitude!!))
+                        startPlace.address = CommonUtils.getAddress(this@TaskDetailActivity, LatLng(detail[0].geoCoordinates?.latitude!!, detail[0].geoCoordinates?.longitude!!))
                         var startGetCoards = GeoCoordinates()
                         startGetCoards.latitude = detail[0].geoCoordinates?.latitude!!
                         startGetCoards.longitude = detail[0].geoCoordinates?.longitude!!
@@ -278,7 +278,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                         var finnallatlong = LatLng(detail[detail.size - 1].geoCoordinates?.latitude!!, detail[detail.size - 1].geoCoordinates?.longitude!!)
                         builder.include(finnallatlong)
                         var endPlace = Place()
-                        endPlace.address = com.rf.taskmodule.utils.CommonUtils.getAddress(this@TaskDetailActivity, LatLng(detail[detail.size - 1].geoCoordinates?.latitude!!, detail[detail.size - 1].geoCoordinates?.longitude!!))
+                        endPlace.address = CommonUtils.getAddress(this@TaskDetailActivity, LatLng(detail[detail.size - 1].geoCoordinates?.latitude!!, detail[detail.size - 1].geoCoordinates?.longitude!!))
                         var endGetCoards = GeoCoordinates()
                         endGetCoards.latitude = detail[detail.size - 1].geoCoordinates?.latitude!!
                         endGetCoards.longitude = detail[detail.size - 1].geoCoordinates?.longitude!!
@@ -322,7 +322,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                                 for (event in allOverStoppingList) {
                                     var diff = event.endTime - event.startTime
                                     var overStoppingMinute = TimeUnit.MILLISECONDS.toMinutes(diff).toInt()
-                                    var isPointOutSide = com.rf.taskmodule.utils.CommonUtils.isPointOutSideCircle(overstoppingConfig.distanceinMeter, event.startCoordinates.latitude, event.startCoordinates.longitude,
+                                    var isPointOutSide = CommonUtils.isPointOutSideCircle(overstoppingConfig.distanceinMeter, event.startCoordinates.latitude, event.startCoordinates.longitude,
                                             event.endCoordinates.latitude, event.endCoordinates.longitude)
                                     if (overStoppingMinute >= overstoppingConfig.timeInMinute && !isPointOutSide) {
                                         overStopping.add(event)
@@ -352,9 +352,9 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                                 var completedEventList = allEventList.filter { data -> data.tripState.name == TripState.COMPLETED.name }
                                 var latestCompleted = completedEventList.sortedByDescending { data -> data.startTime }
                                 var jsonConvertor =
-                                    com.rf.taskmodule.utils.JSONConverter<List<Events>>()
+                                    JSONConverter<List<Events>>()
                                 var json = jsonConvertor.objectToJson(latestCompleted);
-                                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "event list ", "" + json)
+                                CommonUtils.showLogMessage("e", "event list ", "" + json)
                                 if (latestCompleted.isNotEmpty())
                                     secondTime = latestCompleted[0].startTime
                                 else {
@@ -514,14 +514,14 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception Inside onDestroy(): $e")
+            Log.e(TAG, "Exception Inside onDestroy(): $e")
         }
        // webSocketManager = null
     }
 
     override fun onMapReady(mapboxMap: GoogleMap?) {
         this.mMap = mapboxMap!!
-        com.rf.taskmodule.utils.CommonUtils.changeGoogleLogoPosition(mapFragment!!, resources.getDimension(R.dimen.dimen_120).toInt(), mMap)
+        CommonUtils.changeGoogleLogoPosition(mapFragment!!, resources.getDimension(R.dimen.dimen_120).toInt(), mMap)
         //this is for max zoom in
 //        this.mMap.setMaxZoomPreference(5f)
         //this is for max zoom out
@@ -556,17 +556,17 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
         return false
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
 
         try {
             hideLoading()
-            if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+            if (CommonUtils.handleResponse(callback, error, result, this)) {
                 taskResponse = Gson().fromJson("$result", TaskResponse::class.java)
                 setTaskDetails()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception Inside handleResponse(): $e")
+            Log.e(TAG, "Exception Inside handleResponse(): $e")
         }
     }
 
@@ -615,7 +615,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
 
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception Inside setUp(): ${e.message}")
+            Log.e(TAG, "Exception Inside setUp(): ${e.message}")
         }
     }
 
@@ -795,7 +795,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                 tvDriverShortCode.text = "${detail.buddyDetail?.shortCode}"
             }
             tvShortCode.text = "${detail.assigneeDetail?.shortCode}"
-            val mess: String = if (intent != null && intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FROM_IHAVE)) {
+            val mess: String = if (intent != null && intent.hasExtra(AppConstants.Extra.EXTRA_FROM_IHAVE)) {
                 "You have assigned a task to " + detail.buddyDetail?.name
             } else {
                 detail.assigneeDetail?.name + " has assign you a task"
@@ -803,7 +803,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
             tvTaskAssignee.text = mess
             tvTaskCreatedDate.text = time
             val s = "Task Name: ${detail.taskName}"
-            tvTaskName.text = com.rf.taskmodule.utils.CommonUtils.setCustomFontTypeSpan(this, s, 12, s.length, R.font.campton_semi_bold)
+            tvTaskName.text = CommonUtils.setCustomFontTypeSpan(this, s, 12, s.length, R.font.campton_semi_bold)
             tvTaskStartTime.text = time
             tvTaskEndTime.text = "${DateTimeUtil.getParsedDate(detail.endTime)} at" + " ${DateTimeUtil.getParsedTime(detail.endTime)}"
             tvTaskStartLocation.text = detail.source?.address
@@ -816,11 +816,11 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
             if (taskResponse != null &&
                     detail.status == TaskStatus.LIVE &&
                     (taskResponse?.taskDetail?.taskId!! == TrackThat.getCurrentTrackingId())) {
-                com.rf.taskmodule.utils.Log.i(tag, "My trip (${taskResponse?.taskDetail?.taskId}) is: LIVE")
+                Log.i(tag, "My trip (${taskResponse?.taskDetail?.taskId}) is: LIVE")
                 setLiveTripData()
                 mTaskDetailViewModel.registerLocationObserver()
             } else {
-                com.rf.taskmodule.utils.Log.i(tag, "TripId (${taskResponse?.taskDetail?.taskId}) is: LIVE")
+                Log.i(tag, "TripId (${taskResponse?.taskDetail?.taskId}) is: LIVE")
             }
 //            if(detail.currentStage!=null){
 //                if(detail.currentStage!!.terminal!!){
@@ -850,14 +850,14 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
             if (detail.payoutEligible && detail.taskStateUpdated && detail.status == TaskStatus.COMPLETED) {
                 mTaskDetailViewModel.isPayoutEligible.set(detail.payoutEligible)
                 detail.taskstats?.let { stats ->
-                    mTaskDetailViewModel.extraKm.set("${stats.distance} " + com.rf.taskmodule.utils.AppConstants.KM)
-                    mTaskDetailViewModel.waitingTime.set("${stats.waitingtime} " + com.rf.taskmodule.utils.AppConstants.MIN)
-                    mTaskDetailViewModel.overtime.set("${stats.tripDuration} " + com.rf.taskmodule.utils.AppConstants.MIN)
+                    mTaskDetailViewModel.extraKm.set("${stats.distance} " + AppConstants.KM)
+                    mTaskDetailViewModel.waitingTime.set("${stats.waitingtime} " + AppConstants.MIN)
+                    mTaskDetailViewModel.overtime.set("${stats.tripDuration} " + AppConstants.MIN)
                 }
                 detail.driverPayoutBreakUps?.let { driverPayout ->
                     mTaskDetailViewModel.estimatedEarnings.set(
-                        com.rf.taskmodule.utils.AppConstants.ESTIMATE_EARNINGS + " " +
-                            com.rf.taskmodule.utils.AppConstants.INR + " " + driverPayout.totalPayout)
+                        AppConstants.ESTIMATE_EARNINGS + " " +
+                            AppConstants.INR + " " + driverPayout.totalPayout)
                     mTaskDetailViewModel.nightCharges.set("${driverPayout.nightCharge}")
                     mTaskDetailViewModel.baseFare.set("${driverPayout.basefare}")
                     mTaskDetailViewModel.extraKmCharges.set("${driverPayout.extraKmCharge}")
@@ -978,7 +978,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception Inside setStats(): $e")
+            Log.e(TAG, "Exception Inside setStats(): $e")
         }
     }
 
@@ -997,7 +997,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                         MarkerOptions()
                                 .position(srcLatLng)
                                 .title(srcAddress)
-                                .icon(com.rf.taskmodule.utils.CommonUtils.bitmapDescriptorFromVector(this, R.drawable.source_marker))
+                                .icon(CommonUtils.bitmapDescriptorFromVector(this, R.drawable.source_marker))
                 )
                 srcMarker?.tag = MARKER_TAG
                 builder.include(srcMarker.position)
@@ -1015,7 +1015,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                                     .position(destLatLng)
                                     .title(destAddress)
                                     .icon(
-                                        com.rf.taskmodule.utils.CommonUtils.bitmapDescriptorFromVector(this,
+                                        CommonUtils.bitmapDescriptorFromVector(this,
                                             R.drawable.destination_marker)))
                     destMarker?.tag = MARKER_TAG
                     builder.include(destMarker.position)
@@ -1037,7 +1037,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception Inside setMarkers(): $e")
+            Log.e(TAG, "Exception Inside setMarkers(): $e")
         }
     }
 
@@ -1047,7 +1047,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
         try {
             val locationList = mTaskDetailViewModel.getLiveTrip(lastTimeStamp)
             if (locationList != null && locationList.isNotEmpty()) {
-                com.rf.taskmodule.utils.Log.e(tag, "inside setLiveTripData():  location size : ${locationList.size}")
+                Log.e(tag, "inside setLiveTripData():  location size : ${locationList.size}")
                 lastTimeStamp = locationList[locationList.size - 1].time
                 if (polyLine == null) {
                     polyLine = mMap.addPolyline(mTaskDetailViewModel.drawPolyline(locationList))
@@ -1058,7 +1058,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception Inside setLiveTripData(): $e")
+            Log.e(TAG, "Exception Inside setLiveTripData(): $e")
         }
     }
 
@@ -1074,7 +1074,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
         } catch (e: Exception) {
             e.printStackTrace()
 
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception Inside updateCameraBearing(): $e")
+            Log.e(TAG, "Exception Inside updateCameraBearing(): $e")
         }
     }
 
@@ -1084,11 +1084,11 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
         if (TrackThat.getCurrentTrackingId() != null && taskId == TrackThat.getCurrentTrackingId()) {
             var tripStatsCurrent = TrackThat.getCurrentTripStatistics(taskId)
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<com.trackthat.lib.models.TripsStatistics>()
+                JSONConverter<com.trackthat.lib.models.TripsStatistics>()
             var jsonConverter2 =
-                com.rf.taskmodule.utils.JSONConverter<TripsStatistics>()
+                JSONConverter<TripsStatistics>()
             var tripStatsStr = jsonConverter.objectToJson(tripStatsCurrent)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+            CommonUtils.showLogMessage(
                     "e",
                     "trip_data",
                     tripStatsCurrent.toString()
@@ -1149,21 +1149,21 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
 
             setLiveTripData()
             if (location != null) {
-                com.rf.taskmodule.utils.Log.e(tag, "inside requestCurrentLocation() currentLocation: ${location.latitude}, ${location.longitude}")
+                Log.e(tag, "inside requestCurrentLocation() currentLocation: ${location.latitude}, ${location.longitude}")
                 val latLng = LatLng(location.latitude, location.longitude)
                 //add moving marker here
                 if (movingMarker == null) {
                     movingMarker = mMap.addMarker(
                             MarkerOptions()
                                     .position(latLng)
-                                    .icon(com.rf.taskmodule.utils.CommonUtils.bitmapDescriptorFromVector(this, R.drawable.ic_location_marker)))
+                                    .icon(CommonUtils.bitmapDescriptorFromVector(this, R.drawable.ic_location_marker)))
                 } else {
                     movingMarker!!.position = latLng
                 }
                 //   updateCameraBearing(location.bearing, latLng)
             }
         } catch (e: Exception) {
-            com.rf.taskmodule.utils.Log.e(tag, "Inside Current Location ${e.message}")
+            Log.e(tag, "Inside Current Location ${e.message}")
         }
     }
 
@@ -1273,7 +1273,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception Inside setEvents(): $e")
+            Log.e(TAG, "Exception Inside setEvents(): $e")
         }
     }
 
@@ -1283,14 +1283,14 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                 if (eventDialog != null) {
                     eventDialog!!.dismiss()
                 }
-                eventDialog = com.rf.taskmodule.ui.custom.EventDialogFragment.getInstance(eventName)
+                eventDialog = EventDialogFragment.getInstance(eventName)
                 eventDialog!!.show(supportFragmentManager, "dialog")
             } else {
                 TrackiToast.Message.showLong(this@TaskDetailActivity, eventName)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception Inside showEventDialog(): $e")
+            Log.e(TAG, "Exception Inside showEventDialog(): $e")
         }
     }
 
@@ -1311,7 +1311,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception Inside run(): $e")
+            Log.e(TAG, "Exception Inside run(): $e")
         }
     }
 
@@ -1330,7 +1330,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
 //            }
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TAG, "Exception inside showPolyLineAndMarkers(): $e")
+            Log.e(TAG, "Exception inside showPolyLineAndMarkers(): $e")
         }
     }
 
@@ -1352,7 +1352,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
 
     override fun onCallClick() {
         if (mobile != null) {
-            com.rf.taskmodule.utils.CommonUtils.openDialer(this, mobile)
+            CommonUtils.openDialer(this, mobile)
         }
     }
 
@@ -1529,7 +1529,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
         url.delete(url.length - 1, url.length)
         url.append("&interpolate=true")
         url.append(String.format("&key=%s", "AIzaSyATO_5mNZJ8h6V64L6eHeZfiVjk63803ec"))
-        com.rf.taskmodule.utils.Log.e("url",url.toString())
+        Log.e("url",url.toString())
         return url.toString()
     }
 
@@ -1573,7 +1573,7 @@ class TaskDetailActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                     jsonStringBuilder.append(line)
                     jsonStringBuilder.append("\n")
                 }
-                com.rf.taskmodule.utils.Log.e("response",jsonStringBuilder.toString())
+                Log.e("response",jsonStringBuilder.toString())
                 val jsonObject = JSONObject(jsonStringBuilder.toString())
                 val snappedPointsArr = jsonObject.getJSONArray("snappedPoints")
                 for (i in 0 until snappedPointsArr.length()) {

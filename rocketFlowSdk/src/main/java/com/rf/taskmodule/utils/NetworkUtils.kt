@@ -116,7 +116,7 @@ object NetworkUtils {
         return if (type == ConnectivityManager.TYPE_WIFI) {
             true
         } else if (type == ConnectivityManager.TYPE_MOBILE) {
-            com.rf.taskmodule.utils.Log.e("subType", "" + subType)
+            Log.e("subType", "" + subType)
             when (subType) {
                 TelephonyManager.NETWORK_TYPE_1xRTT -> false // ~ 50-100 kbps
                 TelephonyManager.NETWORK_TYPE_CDMA -> false // ~ 14-64 kbps

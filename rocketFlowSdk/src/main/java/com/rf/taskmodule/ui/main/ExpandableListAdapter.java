@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.request.RequestOptions;
 import com.rf.taskmodule.data.model.response.config.Navigation;
 import com.rf.taskmodule.ui.custom.AnimatedExpandableListView;
-import com.rf.taskmodule.utils.CommonUtils;
 
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.data.model.response.config.Navigation;

@@ -16,7 +16,7 @@ import com.rf.taskmodule.ui.base.BaseSdkViewHolder
  * rocketflyer technology pvt. ltd
  * vikas.kesharvani@rocketflyer.in
  */
-class DashBoardStageCountAdapter(private var mList: ArrayList<DashBoardBoxItem>?) : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+class DashBoardStageCountAdapter(private var mList: ArrayList<DashBoardBoxItem>?) : RecyclerView.Adapter<BaseSdkViewHolder>() {
 
     private var cellwidthWillbe: Int = 0
     private var listener: DashBoardListener? = null
@@ -31,7 +31,7 @@ class DashBoardStageCountAdapter(private var mList: ArrayList<DashBoardBoxItem>?
         this.listener = listener
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         context = parent.context
         return when (viewType) {
             VIEW_TYPE_NOTIFICATION_SIMPLE -> {
@@ -76,7 +76,7 @@ class DashBoardStageCountAdapter(private var mList: ArrayList<DashBoardBoxItem>?
         VIEW_TYPE_EMPTY
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) = holder.onBind(position)
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) = holder.onBind(position)
 
     fun addItems(list: ArrayList<DashBoardBoxItem>) {
         mList = list
@@ -92,7 +92,7 @@ class DashBoardStageCountAdapter(private var mList: ArrayList<DashBoardBoxItem>?
     }
 
     inner class SimpleViewHolder(private val mBinding: DashboardCountBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+        BaseSdkViewHolder(mBinding.root) {
 
 
         override fun onBind(position: Int) {
@@ -112,7 +112,7 @@ class DashBoardStageCountAdapter(private var mList: ArrayList<DashBoardBoxItem>?
     }
 
     inner class EmptyViewHolder(private val mBinding: ItemSdkLayoutEmptyDashBoardBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+        BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
 

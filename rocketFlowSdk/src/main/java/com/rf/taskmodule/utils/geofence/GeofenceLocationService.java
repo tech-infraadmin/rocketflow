@@ -38,7 +38,7 @@ public class GeofenceLocationService extends Service {
             message = intent.getStringExtra("message");
         }
 
-        Notification notification = new NotificationCompat.Builder(this, GeoFenceBroadCastReceiver.CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Location Alarm")
                 .setContentText("You " + message + " the location.")
                 .setSmallIcon(R.mipmap.ic_launcher)

@@ -8,8 +8,16 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.rf.taskmodule.data.DataManager;
+import com.rf.taskmodule.data.model.request.ChangeFleetStatusApiRequest;
+import com.rf.taskmodule.data.model.request.DeleteFleetRequest;
+import com.rf.taskmodule.data.model.request.FleetRequest;
 import com.rf.taskmodule.data.model.response.config.Api;
+import com.rf.taskmodule.data.model.response.config.Fleet;
 import com.rf.taskmodule.data.network.APIError;
+import com.rf.taskmodule.data.network.ApiCallback;
+import com.rf.taskmodule.data.network.HttpManager;
+import com.rf.taskmodule.utils.rx.AppSchedulerProvider;
+import com.rf.taskmodule.utils.rx.SchedulerProvider;
 import com.rf.taskmodule.data.DataManager;
 import com.rf.taskmodule.data.model.request.ChangeFleetStatusApiRequest;
 import com.rf.taskmodule.data.model.request.DeleteFleetRequest;

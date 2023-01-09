@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +20,7 @@ import android.net.ParseException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.TypedValue;
@@ -43,7 +45,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.VideoView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -53,20 +54,10 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.gcacace.signaturepad.views.SignaturePad;
-import com.rf.taskmodule.TrackiSdkApplication;
-import com.rf.taskmodule.data.network.APIError;
-import com.rf.taskmodule.utils.AppConstants;
-import com.rf.taskmodule.utils.CommonUtils;
-import com.rf.taskmodule.utils.DateTimeUtil;
-import com.rf.taskmodule.utils.JSONConverter;
-import com.rf.taskmodule.utils.NetworkUtils;
-//import com.google.android.gms.maps.model.LatLng;
-//import com.iceteck.silicompressorr.SiliCompressor;
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.TrackiSdkApplication;
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
@@ -115,7 +106,7 @@ import com.rf.taskmodule.databinding.ItemDynamicFormVerifyOtpSdkBinding;
 import com.rf.taskmodule.databinding.ItemDynamicFormVideoSdkBinding;
 //import com.rf.taskmodule.ui.addfleet.AddFleetActivity;
 import com.rf.taskmodule.ui.base.BaseSdkViewHolder;
-//import com.rf.taskmodule.ui.chat.PlayVideoVerticallyActivity;
+import taskmodule.ui.PlayVideoVerticallyActivity;
 //import com.rf.taskmodule.ui.custom.GlideApp;
 import com.rf.taskmodule.ui.custom.MultiSelectSpinner;
 import com.rf.taskmodule.ui.dynamicform.DynamicFormActivity;
@@ -633,9 +624,9 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
             ivVideo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    Intent intent = new Intent(context, PlayVideoVerticallyActivity.class);
-//                    intent.putExtra("url", file1.getAbsolutePath());
-//                    context.startActivity(intent);
+                    Intent intent = new Intent(context, PlayVideoVerticallyActivity.class);
+                    intent.putExtra("url", file1.getAbsolutePath());
+                    context.startActivity(intent);
                 }
             });
             formDataList.get(position).setFile(fileArrayList);
@@ -1337,6 +1328,7 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
             ItemDynamicFormVideoSdkBinding.executePendingBindings();
             if (formData.getEnteredValue() != null && !formData.getEnteredValue().isEmpty()) {
                 ivVideo.setVisibility(View.VISIBLE);
+                ivPlay.setVisibility(View.VISIBLE);
                 if (formData.getEnteredValue().startsWith("https") || formData.getEnteredValue().startsWith("http")) {
                     ivDelete.setVisibility(View.GONE);
                 } else {
@@ -1348,6 +1340,7 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
                     public void onClick(View v) {
                         ivDelete.setVisibility(View.GONE);
                         ivVideo.setVisibility(View.GONE);
+                        ivPlay.setVisibility(View.GONE);
                         formData.setFile(null);
                         formData.setValue(null);
                         formData.setEnteredValue(null);
@@ -1360,14 +1353,15 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
                     @Override
                     public void onClick(View view) {
                         if (formData.getEnteredValue() != null) {
-//                            Intent intent = new Intent(context, PlayVideoVerticallyActivity.class);
-//                            intent.putExtra("url", formData.getEnteredValue());
-//                            context.startActivity(intent);
+                            Intent intent = new Intent(context, PlayVideoVerticallyActivity.class);
+                            intent.putExtra("url", formData.getEnteredValue());
+                            context.startActivity(intent);
                         }
                     }
                 });
             } else {
                 ivDelete.setVisibility(View.GONE);
+                ivPlay.setVisibility(View.GONE);
             }
 //                GlideApp.with(context).load(formData.getValue()).into(mBinding.cameraView);
 
@@ -1378,13 +1372,10 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
                 @Override
                 public void onClick(View v) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                                != PackageManager.PERMISSION_GRANTED
-                                || context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
-
+                        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
                                 || context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions((Activity) context, new String[]
-                                            {Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                            {
                                                     Manifest.permission.RECORD_AUDIO,
                                                     Manifest.permission.CAMERA},
                                     MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
@@ -1500,13 +1491,11 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
                 public void onClick(View v) {
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                                != PackageManager.PERMISSION_GRANTED
-                                || context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
+                        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
 
                                 || context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions((Activity) context, new String[]
-                                            {Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                            {
                                                     Manifest.permission.RECORD_AUDIO,
                                                     Manifest.permission.CAMERA},
                                     MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
@@ -4069,6 +4058,7 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
             locationBinding.edLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    Log.e("checkLog","adapter1 geo");
                     if (adapterListener != null)
                         adapterListener.openPlacePicker(getAdapterPosition(), formData);
 

@@ -26,20 +26,20 @@ import kotlinx.android.synthetic.main.layout_fragment_subtasklist_sdk.*
  * rocketflyer technology pvt. ltd
  * vikas.kesharvani@rocketflyer.in
  */
-class SubTaskFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<LayoutFragmentSubtasklistSdkBinding, SubTaskViewModel>() {
+class SubTaskFragment : BaseSdkFragment<LayoutFragmentSubtasklistSdkBinding, SubTaskViewModel>() {
 
     lateinit var mSubTaskViewModel: SubTaskViewModel
-    lateinit var mPagerAdapter: com.rf.taskmodule.ui.tasklisting.TaskPagerAdapter
+    lateinit var mPagerAdapter: TaskPagerAdapter
 
     private lateinit var mBinding: LayoutFragmentSubtasklistSdkBinding
     private var fromDate: Long = 0
     private var toDate: Long = 0
     private var allowSubTask:Boolean=false
     private var subTaskCategoryId : ArrayList<String>?=null
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
+    lateinit var httpManager: HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
 
-    private val fragments: MutableList<com.rf.taskmodule.ui.tasklisting.ihaveassigned.TabDataClass> = ArrayList()
+    private val fragments: MutableList<TabDataClass> = ArrayList()
 
     var taskId: String? = null
     private var referenceId:String?=null
@@ -48,13 +48,13 @@ class SubTaskFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<LayoutFragment
         //allowSubTask,subTaskCategoryId
         fun newInstance(allowSubTask: Boolean, subTaskCategoryId: ArrayList<String>?, categoryId: String?, fromDate: Long, toDate: Long, taskId: String?, referenceId: String?): SubTaskFragment? {
             val args = Bundle()
-            args.putBoolean(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, allowSubTask)
-            args.putStringArrayList(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID, subTaskCategoryId)
-            args.putString(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
-            args.putString(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PAREN_TASK_ID, taskId)
-            args.putString(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PARENT_REF_ID, referenceId)
-            args.putLong(com.rf.taskmodule.utils.AppConstants.Extra.FROM_DATE, fromDate)
-            args.putLong(com.rf.taskmodule.utils.AppConstants.Extra.FROM_TO, toDate)
+            args.putBoolean(AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, allowSubTask)
+            args.putStringArrayList(AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID, subTaskCategoryId)
+            args.putString(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
+            args.putString(AppConstants.Extra.EXTRA_PAREN_TASK_ID, taskId)
+            args.putString(AppConstants.Extra.EXTRA_PARENT_REF_ID, referenceId)
+            args.putLong(AppConstants.Extra.FROM_DATE, fromDate)
+            args.putLong(AppConstants.Extra.FROM_TO, toDate)
             val fragment = SubTaskFragment()
             fragment.arguments = args
             return fragment
@@ -86,7 +86,7 @@ class SubTaskFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<LayoutFragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding = viewDataBinding
-        mPagerAdapter = com.rf.taskmodule.ui.tasklisting.TaskPagerAdapter(
+        mPagerAdapter = TaskPagerAdapter(
             childFragmentManager
         )
         httpManager = RocketFlyer.httpManager()!!
@@ -96,16 +96,16 @@ class SubTaskFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<LayoutFragment
 
     private fun getTaskData() {
         if (arguments != null) {
-            var categoryId = requireArguments().getString(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID)
-             taskId = requireArguments()!!.getString(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PAREN_TASK_ID)
-             referenceId = requireArguments().getString(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PARENT_REF_ID)
-            allowSubTask = requireArguments().getBoolean(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_ALLOW_SUB_TASK,false)
-            subTaskCategoryId = requireArguments().getStringArrayList(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID)
-            if (requireArguments().getLong(com.rf.taskmodule.utils.AppConstants.Extra.FROM_DATE) != 0L) {
-                fromDate = requireArguments().getLong(com.rf.taskmodule.utils.AppConstants.Extra.FROM_DATE, 0)
+            var categoryId = requireArguments().getString(AppConstants.Extra.EXTRA_CATEGORY_ID)
+             taskId = requireArguments()!!.getString(AppConstants.Extra.EXTRA_PAREN_TASK_ID)
+             referenceId = requireArguments().getString(AppConstants.Extra.EXTRA_PARENT_REF_ID)
+            allowSubTask = requireArguments().getBoolean(AppConstants.Extra.EXTRA_ALLOW_SUB_TASK,false)
+            subTaskCategoryId = requireArguments().getStringArrayList(AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID)
+            if (requireArguments().getLong(AppConstants.Extra.FROM_DATE) != 0L) {
+                fromDate = requireArguments().getLong(AppConstants.Extra.FROM_DATE, 0)
             }
-            if (requireArguments().getLong(com.rf.taskmodule.utils.AppConstants.Extra.FROM_TO) != 0L) {
-                toDate = requireArguments().getLong(com.rf.taskmodule.utils.AppConstants.Extra.FROM_TO, 0)
+            if (requireArguments().getLong(AppConstants.Extra.FROM_TO) != 0L) {
+                toDate = requireArguments().getLong(AppConstants.Extra.FROM_TO, 0)
             }
             if (subTaskCategoryId != null && subTaskCategoryId!!.size > 0) {
                 for (data in subTaskCategoryId!!) {
@@ -114,7 +114,7 @@ class SubTaskFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<LayoutFragment
                     dashBoardBoxItem.loadBy = "SUB_TASKS"
                     var map = Gson().toJson(dashBoardBoxItem)
                     fragments.add(
-                        com.rf.taskmodule.ui.tasklisting.ihaveassigned.TabDataClass(
+                        TabDataClass(
                             AssignedtoMeFragment.newInstance(
                                 map,
                                 fromDate,

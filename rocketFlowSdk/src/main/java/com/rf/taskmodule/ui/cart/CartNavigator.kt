@@ -6,9 +6,9 @@ import com.rf.taskmodule.ui.base.BaseSdkNavigator
 
 interface CartNavigator : BaseSdkNavigator {
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
-    fun handleCartResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
-    fun handleCreateOrderResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
-    fun handleApplyCouponResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
-    fun linkInventoryResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?)
+    fun handleCartResponse(callback: ApiCallback, result: Any?, error: APIError?)
+    fun handleCreateOrderResponse(callback: ApiCallback, result: Any?, error: APIError?)
+    fun handleApplyCouponResponse(callback: ApiCallback, result: Any?, error: APIError?)
+    fun linkInventoryResponse(callback: ApiCallback, result: Any?, error: APIError?)
 }

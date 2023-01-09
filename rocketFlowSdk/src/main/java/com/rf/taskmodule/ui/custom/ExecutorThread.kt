@@ -18,7 +18,7 @@ import java.util.concurrent.*
 
 class ExecutorThread : HandlerThread(ExecutorThread::class.java.name) {
     private var hashMapFileRequest: HashMap<String, ArrayList<File>>? = null
-    private var httpManager: com.rf.taskmodule.data.network.HttpManager? = null
+    private var httpManager: HttpManager? = null
     private var isException = false
     private var api: Api? = null
 
@@ -31,7 +31,7 @@ class ExecutorThread : HandlerThread(ExecutorThread::class.java.name) {
             val mHandler = WorkerHandler(executorService)
 
             if (api == null) {
-                api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.UPLOAD_FILE]
+                api = TrackiSdkApplication.getApiMap()[ApiType.UPLOAD_FILE]
             }
 
             val futureList = ArrayList<Future<FileUrlsResponse>>()
@@ -43,10 +43,10 @@ class ExecutorThread : HandlerThread(ExecutorThread::class.java.name) {
                 val key = entryMap.key
                 //create a batch list
                 //change batch size 2 to 1
-                val chunkedList = com.rf.taskmodule.utils.CommonUtils.chunkArrayList(entryMap.value, 1)
+                val chunkedList = CommonUtils.chunkArrayList(entryMap.value, 1)
                 Log.e("ExecutorThread","File Size =>"+chunkedList.size)
                 var jsonConverter=
-                    com.rf.taskmodule.utils.JSONConverter<ArrayList<List<File>>>()
+                    JSONConverter<ArrayList<List<File>>>()
                 var fileStr=jsonConverter.objectToJson(chunkedList)
                   Log.e("ExecutorThread",fileStr)
                 for (j in chunkedList.indices) {
@@ -115,7 +115,7 @@ class ExecutorThread : HandlerThread(ExecutorThread::class.java.name) {
 
     fun setRequestParams(mDynamicHandler: Handler,
                          hashMapFileRequest: HashMap<String, ArrayList<File>>,
-                         httpManager: com.rf.taskmodule.data.network.HttpManager,
+                         httpManager: HttpManager,
                          api: Api?) {
         this.mDynamicHandler = mDynamicHandler
         this.hashMapFileRequest = hashMapFileRequest
@@ -130,7 +130,7 @@ class ExecutorThread : HandlerThread(ExecutorThread::class.java.name) {
             executorService.shutdownNow()
             executorService.shutdown()
             //make map empty again
-            com.rf.taskmodule.utils.CommonUtils.stringListHashMap = ConcurrentHashMap()
+            CommonUtils.stringListHashMap = ConcurrentHashMap()
             val message = obtainMessage()
             message.what = msg?.what!!
             message.obj = msg.obj

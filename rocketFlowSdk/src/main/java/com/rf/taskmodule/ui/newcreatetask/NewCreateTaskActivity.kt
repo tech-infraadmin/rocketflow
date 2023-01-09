@@ -1,11 +1,16 @@
 package com.rf.taskmodule.ui.newcreatetask
 
+//import com.rf.taskmodule.ui.addcustomer.AddCustomerActivity
+//import com.rf.taskmodule.ui.main.MainActivity
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
@@ -35,7 +40,6 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.rocketflow.sdk.RocketFlyer
 import com.rf.taskmodule.BR
 import com.rf.taskmodule.R
 import com.rf.taskmodule.TrackiSdkApplication
@@ -49,7 +53,6 @@ import com.rf.taskmodule.data.network.APIError
 import com.rf.taskmodule.data.network.ApiCallback
 import com.rf.taskmodule.data.network.HttpManager
 import com.rf.taskmodule.databinding.ActivityNewCreateTaskSdkBinding
-//import com.rf.taskmodule.ui.addcustomer.AddCustomerActivity
 import com.rf.taskmodule.ui.addplace.Hub
 import com.rf.taskmodule.ui.addplace.LocationListResponse
 import com.rf.taskmodule.ui.base.BaseSdkActivity
@@ -58,38 +61,43 @@ import com.rf.taskmodule.ui.custom.ExecutorThread
 import com.rf.taskmodule.ui.custom.GlideApp
 import com.rf.taskmodule.ui.dynamicform.DynamicFormActivity
 import com.rf.taskmodule.ui.dynamicform.dynamicfragment.FormSubmitListener
-//import com.rf.taskmodule.ui.main.MainActivity
+import com.rf.taskmodule.ui.dynamicform.dynamicfragment.SlotAdapter
+import com.rf.taskmodule.ui.dynamicform.dynamicfragment.SlotChildAdapter
 import com.rf.taskmodule.ui.newdynamicform.NewDynamicFormFragment
+import com.rf.taskmodule.ui.scanqrcode.ScanQrAndBarCodeActivity
+import com.rf.taskmodule.ui.taskdetails.NewTaskDetailsActivity
 import com.rf.taskmodule.utils.*
+import com.rocketflow.sdk.RocketFlyer
 import com.trackthat.lib.TrackThat
 import com.trackthat.lib.internal.network.TrackThatCallback
 import com.trackthat.lib.models.ErrorResponse
 import com.trackthat.lib.models.SuccessResponse
 import com.trackthat.lib.models.TrackthatLocation
 import kotlinx.android.synthetic.main.activity_new_create_task_sdk.*
-import com.rf.taskmodule.ui.dynamicform.dynamicfragment.SlotAdapter
-import com.rf.taskmodule.ui.dynamicform.dynamicfragment.SlotChildAdapter
+import kotlinx.android.synthetic.main.item_dynamic_form_time_sdk.*
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashMap
+import kotlin.collections.ArrayList
 
 
 open class NewCreateTaskActivity :
-    com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityNewCreateTaskSdkBinding, NewCreateTaskViewModel>(),
+    BaseSdkActivity<ActivityNewCreateTaskSdkBinding, NewCreateTaskViewModel>(),
     NewCreateTaskNavigator, FormSubmitListener,
-    com.rf.taskmodule.ui.newcreatetask.BaseAutocompleteAdapter.OnItemSelectedAUtoComplete {
+    BaseAutocompleteAdapter.OnItemSelectedAUtoComplete {
 //    init {
 //        System.loadLibrary("keys")
 //    }
 
-
+    private val SCAN_REFERENCE = 12
+    private val REQUEST_CAMERA = 3
     private var snackBar: Snackbar? = null
     private lateinit var selectedUserId: String
     private lateinit var selectedUsername: String
     private var allowGeography: Boolean = false
     private var currentLocation: GeoCoordinates? = null
     private var categoryId: String? = null
+    lateinit var slotAdapter: SlotAdapter
     private var parentTaskId: String? = null
     private var parentReffId: String? = null
 
@@ -106,6 +114,7 @@ open class NewCreateTaskActivity :
     private var date = ""
     private var timeFinal = ""
     private var hubIdFinal = ""
+    private var listRef: kotlin.collections.ArrayList<String> = ArrayList()
     private var hubs: List<Hub> = ArrayList()
     private var hub: Hub? = null
     private lateinit var etSlot: EditText
@@ -122,8 +131,8 @@ open class NewCreateTaskActivity :
     //@Inject
     lateinit var mGetSuggetionViewModel: GetUserSuggestionListViewModel
 
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
     var lookUps: List<LookUps>? = null
     lateinit var view: View
@@ -133,6 +142,8 @@ open class NewCreateTaskActivity :
     private lateinit var mActivityCreateTaskBinding: ActivityNewCreateTaskSdkBinding
     private var startTime = 0L
     private var endTime = 0L
+
+    private var searchRequest: TaskRequest? = null
 
     private var startYear = 0
     private var startMonth = 0
@@ -171,6 +182,7 @@ open class NewCreateTaskActivity :
     private var spinnerVal: String? = null
     private var createTaskRequest: CreateTaskRequest? = null
     private var mCategoryId: MutableLiveData<String> = MutableLiveData()
+    private var category: WorkFlowCategories = WorkFlowCategories()
     private var mainMap: HashMap<String, ArrayList<FormData>>? = null
     private var dynamicFormsNew: DynamicFormsNew? = null
     private var isEditable: Boolean = true
@@ -184,6 +196,9 @@ open class NewCreateTaskActivity :
     var rlProgress: RelativeLayout? = null
     var rlSubmittingData: RelativeLayout? = null
 
+    private var categoryMap: Map<String, String>? = null
+    lateinit var etScanner: EditText
+
     var listSlots: kotlin.collections.ArrayList<SlotData> = ArrayList()
     var listKeys: kotlin.collections.ArrayList<String> = ArrayList()
 
@@ -192,7 +207,7 @@ open class NewCreateTaskActivity :
 
     enum class FIELD {
         START_LOCATION, END_LOCATION, SELECT_BUDDY, SELECT_CLIENT, START_TIME, END_TIME, POINT_OF_CONTACT, TASK_NAME,
-        TASK_TYPE, DESCRIPTION, SELECT_FLEET, SELECT_CITY, TASK_ID, REFERENCE_ID, GOOGLE_OR_MANUAL_SOURCE, GOOGLE_OR_MANUAL_DESTINATION, SYSTEM_LOCATION, FIELD1, FIELD2, FIELD3, FIELD4, FIELD5, FIELD6, FIELD7, FIELD8, FIELD9, FIELD10, FIELD11, FIELD12, FIELD13, FIELD14, FIELD15, TIME_SLOT,
+        TASK_TYPE, DESCRIPTION, SELECT_FLEET, SELECT_CITY, TASK_ID, REFERENCE_ID, GOOGLE_OR_MANUAL_SOURCE, GOOGLE_OR_MANUAL_DESTINATION, SYSTEM_LOCATION, SEARCH_REFERENCED_TASK, FIELD1, FIELD2, FIELD3, FIELD4, FIELD5, FIELD6, FIELD7, FIELD8, FIELD9, FIELD10, FIELD11, FIELD12, FIELD13, FIELD14, FIELD15, TIME_SLOT,
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -202,12 +217,20 @@ open class NewCreateTaskActivity :
         handlerThread = ExecutorThread()
         httpManager = RocketFlyer.httpManager()!!
         preferencesHelper = RocketFlyer.preferenceHelper()!!
+        val statusList: List<TaskStatus> = ArrayList()
+        categoryMap = Gson().fromJson<Map<String, String>>(
+            "",
+            object : TypeToken<HashMap<String?, String?>?>() {}.type
+        )
+        searchRequest =
+            TaskRequest(statusList as MutableList<out TaskStatus>, BuddyInfo.ASSIGNED_TO_ME, categoryMap)
+        slotAdapter = SlotAdapter(this)
 
         mGetSuggetionViewModel = getUserSuggestionListViewModel()
 
         setUp()
         getCurrentLocation()
-        com.rf.taskmodule.utils.Log.d("NewCreateTaskActivity", "NewCreateTaskActivity")
+        Log.d("NewCreateTaskActivity", "NewCreateTaskActivity")
     }
 
 
@@ -227,11 +250,11 @@ open class NewCreateTaskActivity :
         val datePickerDialog = DatePickerDialog(this, { _, year, monthOfYear, dayOfMonth ->
             val selectedDate = dayOfMonth.toString() + "-" + (monthOfYear + 1) + "-" + year
 
-            com.rf.taskmodule.utils.CommonUtils.openTimePicker(this, mHour, mMin) { _, hourOfDay, minute ->
+            CommonUtils.openTimePicker(this, mHour, mMin) { _, hourOfDay, minute ->
                 c.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 c.set(Calendar.MINUTE, minute)
                 val formattedTime = DateTimeUtil.getFormattedTime(c.time)
-                com.rf.taskmodule.utils.Log.e(TAG, "${c.time}")
+                Log.e(TAG, "${c.time}")
                 val cal = Calendar.getInstance()
                 when (v.id) {
                     R.id.edStartDateTime -> {
@@ -275,10 +298,10 @@ open class NewCreateTaskActivity :
 
     override fun openMainActivity(taskId: String) {
         val intent = Intent()
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_ID, buddyId)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FLEET_ID, fleetId)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_NAME, buddyName)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID, taskId)
+        intent.putExtra(AppConstants.Extra.EXTRA_BUDDY_ID, buddyId)
+        intent.putExtra(AppConstants.Extra.EXTRA_FLEET_ID, fleetId)
+        intent.putExtra(AppConstants.Extra.EXTRA_BUDDY_NAME, buddyName)
+        intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
         intent.putExtra("backAlpha", true)
         setResult(Activity.RESULT_OK, intent)
         val sharedPreferences = getSharedPreferences("backAlpha", Context.MODE_PRIVATE)
@@ -290,6 +313,29 @@ open class NewCreateTaskActivity :
         super.onBackPressed()
         setResult(Activity.RESULT_CANCELED)
         finish()
+    }
+
+    fun getCameraPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                openScanActivity()
+            } else {
+                requestPermissions(
+                    arrayOf(Manifest.permission.CAMERA),
+                    REQUEST_CAMERA
+                )
+            }
+        } else {
+            openScanActivity()
+        }
+    }
+
+    private fun openScanActivity() {
+        val sharedPreferences: SharedPreferences =
+            getSharedPreferences("Scan", MODE_PRIVATE)
+        sharedPreferences.edit().putString("Scan", "Task").apply()
+        sharedPreferences.edit().putBoolean("newTask", true).apply()
+        startActivityForResult(Intent(this, ScanQrAndBarCodeActivity::class.java), SCAN_REFERENCE)
     }
 
 
@@ -312,7 +358,7 @@ open class NewCreateTaskActivity :
                 currentLocation!!.longitude = loc.longitude
                 currentLatLng = LatLng(loc.latitude, loc.longitude)
                 startLatLng = currentLatLng
-                var placeName = com.rf.taskmodule.utils.CommonUtils.getAddress(this@NewCreateTaskActivity, currentLatLng)
+                var placeName = CommonUtils.getAddress(this@NewCreateTaskActivity, currentLatLng)
                 edEnterStartLocation.setText(placeName)
                 edEnterEndLocation.setText(placeName)
 
@@ -335,15 +381,15 @@ open class NewCreateTaskActivity :
                 Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields).build(this)
             startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
         } catch (e: GooglePlayServicesRepairableException) {
-            com.rf.taskmodule.utils.Log.e(NewCreateTaskActivity.TAG, e.message)
+            Log.e(NewCreateTaskActivity.TAG, e.message)
         } catch (e: GooglePlayServicesNotAvailableException) {
-            com.rf.taskmodule.utils.Log.e(NewCreateTaskActivity.TAG, e.message)
+            Log.e(NewCreateTaskActivity.TAG, e.message)
         }
     }
 
-    override fun handleUpdateResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleUpdateResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             finish()
         }
     }
@@ -352,8 +398,8 @@ open class NewCreateTaskActivity :
 
     }
 
-    override fun checkBuddyResponse(callback: com.rf.taskmodule.data.network.ApiCallback?, result: Any?, error: APIError?) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+    override fun checkBuddyResponse(callback: ApiCallback?, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val buddyListResponse =
                 Gson().fromJson(result.toString(), BuddyListResponse::class.java)
             val list = buddyListResponse.buddies
@@ -404,7 +450,7 @@ open class NewCreateTaskActivity :
                         id: Long
                     ) {
                         buddyId = list[position].buddyId
-                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "buddyId", buddyId);
+                        CommonUtils.showLogMessage("e", "buddyId", buddyId);
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>) {
@@ -418,8 +464,8 @@ open class NewCreateTaskActivity :
         }
     }
 
-    override fun checkFleetResponse(callback: com.rf.taskmodule.data.network.ApiCallback?, result: Any?, error: APIError?) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+    override fun checkFleetResponse(callback: ApiCallback?, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val buddyListResponse =
                 Gson().fromJson(result.toString(), FleetListResponse::class.java)
             val list = buddyListResponse.fleets
@@ -476,7 +522,7 @@ open class NewCreateTaskActivity :
                     ) {
                         val selectedItem = parent.getItemAtPosition(position).toString()
                         fleetId = list[position].fleetId
-                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "fleetId", fleetId);
+                        CommonUtils.showLogMessage("e", "fleetId", fleetId);
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>) {
@@ -512,6 +558,7 @@ open class NewCreateTaskActivity :
         var id: String? = null
 
         for (i in workFlowCategoriesList) {
+            Log.d("categoryId", i.categoryId);
             if (i.categoryId != null)
                 if (i.categoryId == categoryId) {
                     if (i.dynamicFormId != null)
@@ -519,6 +566,18 @@ open class NewCreateTaskActivity :
                 }
         }
         return id
+    }
+
+
+    fun checkIfExistes(list: List<Field>?, name: Field): Boolean {
+        if (list != null) {
+            for (item in list) {
+                if (item.field.equals(name.field)) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     fun getAllowedFields(categoryId: String?): List<Field> {
@@ -559,19 +618,32 @@ open class NewCreateTaskActivity :
         return allowedFieldsList!!
     }
 
+    private fun addAllToList(list: List<Field>): ArrayList<DynamicFormData> {
+        val allowedFieldsList: ArrayList<DynamicFormData> = ArrayList()
+        for (item in list) {
+            val dynamicFormData = DynamicFormData();
+            dynamicFormData.apply {
+                type = item.type
+                value = item.value
+                label = item.label
+            }
+            allowedFieldsList.add(dynamicFormData)
+        }
+        return allowedFieldsList
+    }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     private fun setUp() {
 
         etSlot = mActivityCreateTaskBinding.etVisitTime
 
-        Places.initialize(this@NewCreateTaskActivity, getGoogleMapKey()!!)
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PAREN_TASK_ID)) {
-            parentTaskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PAREN_TASK_ID)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "parentTaskId", parentTaskId)
+        Places.initialize(this@NewCreateTaskActivity, googleMapKey!!)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_PAREN_TASK_ID)) {
+            parentTaskId = intent.getStringExtra(AppConstants.Extra.EXTRA_PAREN_TASK_ID)
+            CommonUtils.showLogMessage("e", "parentTaskId", parentTaskId)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PARENT_REF_ID)) {
-            parentReffId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PARENT_REF_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_PARENT_REF_ID)) {
+            parentReffId = intent.getStringExtra(AppConstants.Extra.EXTRA_PARENT_REF_ID)
         }
         enableStartLocation.setOnToggledListener { toggleableView, isChecked ->
             if (isChecked) {
@@ -646,6 +718,23 @@ open class NewCreateTaskActivity :
             }
 
         }
+
+        etScanner = mActivityCreateTaskBinding.etScanner
+        etScanner.setOnTouchListener { v, event ->
+            var DRAWABLE_LEFT = 0
+            var DRAWABLE_TOP = 1
+            var DRAWABLE_RIGHT = 2
+            var DRAWABLE_BOTTOM = 3
+
+            if (event.action == MotionEvent.ACTION_UP) {
+                if (event.rawX >= (etScanner.right - etScanner.compoundDrawables[DRAWABLE_RIGHT].bounds.width())) {
+                    //open scanner here
+                    getCameraPermission()
+                }
+            }
+            false
+        }
+
         mActivityCreateTaskBinding.edReference.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(arg0: CharSequence?, arg1: Int, arg2: Int, arg3: Int) {}
             override fun beforeTextChanged(
@@ -696,9 +785,10 @@ open class NewCreateTaskActivity :
             if (categoryId != null) {
                 var llallowedFields: List<Field>? = getAllowedFields(categoryId)
                 var jsonConverter =
-                    com.rf.taskmodule.utils.JSONConverter<List<Field>>()
+                    JSONConverter<List<Field>>()
                 var data = jsonConverter.objectToJson(llallowedFields!!)
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "allowed field", data.toString())
+                CommonUtils.showLogMessage("e", "allowed field", data.toString())
+                CommonUtils.showLogMessage("e", "allowed field", llallowedFields.toString())
                 if (requestedBy != null && requestedBy.equals("OTHERS")) {
                     cardViewClientList.visibility = View.VISIBLE
                     performSearchWidgetTask()
@@ -707,7 +797,11 @@ open class NewCreateTaskActivity :
                 }
                 if (!llallowedFields.isNullOrEmpty()) {
                     var START_LOCATION = Field(field = FIELD.START_LOCATION.name)
-                    if (llallowedFields.contains(START_LOCATION)) {
+                    if (llallowedFields.contains(START_LOCATION) || checkIfExistes(
+                            llallowedFields,
+                            START_LOCATION
+                        )
+                    ) {
                         var position = llallowedFields.indexOf(START_LOCATION)
                         if (position != -1 && !llallowedFields[position].skipVisibilty) {
                             mActivityCreateTaskBinding.tilStartLocation.visibility = View.VISIBLE
@@ -722,6 +816,35 @@ open class NewCreateTaskActivity :
                         mActivityCreateTaskBinding.tilStartLocation.visibility = View.GONE
 
                     }
+                    if (category.taskReferencingEnabled == true) {
+                        mActivityCreateTaskBinding.cvScanner.visibility = View.VISIBLE
+                        mActivityCreateTaskBinding.etScanner.addTextChangedListener(object: TextWatcher {
+                            override fun beforeTextChanged(
+                                p0: CharSequence?,
+                                p1: Int,
+                                p2: Int,
+                                p3: Int
+                            ) {
+
+                            }
+
+                            override fun onTextChanged(
+                                p0: CharSequence?,
+                                p1: Int,
+                                p2: Int,
+                                p3: Int
+                            ) {
+
+                            }
+
+                            override fun afterTextChanged(text: Editable?) {
+                                searchRefTask(text.toString())
+                            }
+                        })
+                    } else {
+                        mActivityCreateTaskBinding.cvScanner.visibility = View.GONE
+                    }
+
                     var END_LOCATION = Field(field = FIELD.END_LOCATION.name)
                     if (llallowedFields.contains(END_LOCATION)) {
                         var position = llallowedFields.indexOf(END_LOCATION)
@@ -1092,9 +1215,512 @@ open class NewCreateTaskActivity :
                         mActivityCreateTaskBinding.tilReference.visibility = View.GONE
                     }
 
+
+                    //here we add other fields field1 to field15
+
+                    //start
+
+                    // FIELD1
+                    val FIELD1 = Field(field = FIELD.FIELD1.name)
+                    if (llallowedFields.contains(FIELD1)) {
+                        val position = llallowedFields.indexOf(FIELD1)
+                        if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                            val fieldData = llallowedFields[position]
+                            when (fieldData.type) {
+                                DataType.TEXT -> {
+                                    mActivityCreateTaskBinding.field1text.visibility = View.VISIBLE
+                                    mActivityCreateTaskBinding.tvfield1text.text = fieldData.label
+                                }
+                                DataType.NUMBER -> {
+                                    mActivityCreateTaskBinding.tvfield1number.text = fieldData.label
+                                    mActivityCreateTaskBinding.field1number.visibility =
+                                        View.VISIBLE
+                                }
+                                DataType.DROPDOWN -> {
+                                    mActivityCreateTaskBinding.tvfield1spinner.text =
+                                        fieldData.label
+                                    mActivityCreateTaskBinding.field1spinner.visibility =
+                                        View.VISIBLE
+                                    val adapter = ArrayAdapter(
+                                        this,
+                                        android.R.layout.simple_spinner_item,
+                                        fieldData.value!!.split(",").toTypedArray()
+                                    )
+                                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    mActivityCreateTaskBinding.spinnerfield1spinner.adapter =
+                                        adapter
+                                    mActivityCreateTaskBinding.spinnerfield1spinner.setSelection(0)
+                                }
+                                DataType.RADIO -> {
+                                    mActivityCreateTaskBinding.tvfield1radio.text = fieldData.label
+                                    mActivityCreateTaskBinding.field1radio.visibility = View.VISIBLE
+                                    val data = fieldData.value!!.split(",").toTypedArray()
+                                    for (item in data) {
+                                        val radioButton = RadioButton(this)
+                                        radioButton.tag = position
+                                        radioButton.setButtonDrawable(R.drawable.custom_radio_button)
+                                        radioButton.id = View.generateViewId()
+                                        radioButton.setPadding(
+                                            radioButton.paddingLeft + 20,
+                                            radioButton.paddingTop,
+                                            radioButton.paddingRight,
+                                            radioButton.paddingBottom
+                                        )
+                                        radioButton.setText(item)
+                                        val params = LinearLayout.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                                            1f
+                                        )
+                                        params.setMargins(0, 0, 0, 10)
+                                        radioButton.layoutParams = params
+                                        mActivityCreateTaskBinding.radio1Group.addView(radioButton)
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+
+                    // FIELD2
+                    val FIELD2 = Field(field = FIELD.FIELD2.name)
+                    if (llallowedFields.contains(FIELD2)) {
+                        val position = llallowedFields.indexOf(FIELD2)
+                        if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                            val fieldData = llallowedFields[position]
+                            when (fieldData.type) {
+                                DataType.TEXT -> {
+                                    mActivityCreateTaskBinding.field2text.visibility = View.VISIBLE
+                                    mActivityCreateTaskBinding.tvfield2text.text = fieldData.label
+                                }
+                                DataType.NUMBER -> {
+                                    mActivityCreateTaskBinding.tvfield2number.text = fieldData.label
+                                    mActivityCreateTaskBinding.field2number.visibility =
+                                        View.VISIBLE
+                                }
+                                DataType.DROPDOWN -> {
+                                    mActivityCreateTaskBinding.tvfield2spinner.text =
+                                        fieldData.label
+                                    mActivityCreateTaskBinding.field2spinner.visibility =
+                                        View.VISIBLE
+                                    val adapter = ArrayAdapter(
+                                        this,
+                                        android.R.layout.simple_spinner_item,
+                                        fieldData.value!!.split(",").toTypedArray()
+                                    )
+                                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    mActivityCreateTaskBinding.spinnerfield2spinner.adapter =
+                                        adapter
+                                    mActivityCreateTaskBinding.spinnerfield2spinner.setSelection(0)
+                                }
+                                DataType.RADIO -> {
+                                    mActivityCreateTaskBinding.tvfield2radio.text = fieldData.label
+                                    mActivityCreateTaskBinding.field2radio.visibility = View.VISIBLE
+                                    val data = fieldData.value!!.split(",").toTypedArray()
+                                    for (item in data) {
+                                        val radioButton = RadioButton(this)
+                                        radioButton.tag = position
+                                        radioButton.setButtonDrawable(R.drawable.custom_radio_button)
+                                        radioButton.id = View.generateViewId()
+                                        radioButton.setPadding(
+                                            radioButton.paddingLeft + 20,
+                                            radioButton.paddingTop,
+                                            radioButton.paddingRight,
+                                            radioButton.paddingBottom
+                                        )
+                                        radioButton.setText(item)
+                                        val params = LinearLayout.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                                            1f
+                                        )
+                                        params.setMargins(0, 0, 0, 10)
+                                        radioButton.layoutParams = params
+                                        mActivityCreateTaskBinding.radio2Group.addView(radioButton)
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+
+                    // FIELD3
+                    val FIELD3 = Field(field = FIELD.FIELD3.name)
+                    if (llallowedFields.contains(FIELD3)) {
+                        val position = llallowedFields.indexOf(FIELD3)
+                        if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                            val fieldData = llallowedFields[position]
+                            when (fieldData.type) {
+                                DataType.TEXT -> {
+                                    mActivityCreateTaskBinding.field3text.visibility = View.VISIBLE
+                                    mActivityCreateTaskBinding.tvfield3text.text = fieldData.label
+                                }
+                                DataType.NUMBER -> {
+                                    mActivityCreateTaskBinding.tvfield3number.text = fieldData.label
+                                    mActivityCreateTaskBinding.field3number.visibility =
+                                        View.VISIBLE
+                                }
+                                DataType.DROPDOWN -> {
+                                    mActivityCreateTaskBinding.tvfield3spinner.text =
+                                        fieldData.label
+                                    mActivityCreateTaskBinding.field3spinner.visibility =
+                                        View.VISIBLE
+                                    val adapter = ArrayAdapter(
+                                        this,
+                                        android.R.layout.simple_spinner_item,
+                                        fieldData.value!!.split(",").toTypedArray()
+                                    )
+                                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    mActivityCreateTaskBinding.spinnerfield3spinner.adapter =
+                                        adapter
+                                    mActivityCreateTaskBinding.spinnerfield3spinner.setSelection(0)
+                                }
+                                DataType.RADIO -> {
+                                    mActivityCreateTaskBinding.tvfield3radio.text = fieldData.label
+                                    mActivityCreateTaskBinding.field3radio.visibility = View.VISIBLE
+                                    val data = fieldData.value!!.split(",").toTypedArray()
+                                    for (item in data) {
+                                        val radioButton = RadioButton(this)
+                                        radioButton.tag = position
+                                        radioButton.setButtonDrawable(R.drawable.custom_radio_button)
+                                        radioButton.id = View.generateViewId()
+                                        radioButton.setPadding(
+                                            radioButton.paddingLeft + 20,
+                                            radioButton.paddingTop,
+                                            radioButton.paddingRight,
+                                            radioButton.paddingBottom
+                                        )
+                                        radioButton.setText(item)
+                                        val params = LinearLayout.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                                            1f
+                                        )
+                                        params.setMargins(0, 0, 0, 10)
+                                        radioButton.layoutParams = params
+                                        mActivityCreateTaskBinding.radio3Group.addView(radioButton)
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+
+                    // FIELD4
+                    val FIELD4 = Field(field = FIELD.FIELD4.name)
+                    if (llallowedFields.contains(FIELD4)) {
+                        val position = llallowedFields.indexOf(FIELD4)
+                        if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                            val fieldData = llallowedFields[position]
+                            when (fieldData.type) {
+                                DataType.TEXT -> {
+                                    mActivityCreateTaskBinding.field4text.visibility = View.VISIBLE
+                                    mActivityCreateTaskBinding.tvfield4text.text = fieldData.label
+                                }
+                                DataType.NUMBER -> {
+                                    mActivityCreateTaskBinding.tvfield4number.text = fieldData.label
+                                    mActivityCreateTaskBinding.field4number.visibility =
+                                        View.VISIBLE
+                                }
+                                DataType.DROPDOWN -> {
+                                    mActivityCreateTaskBinding.tvfield4spinner.text =
+                                        fieldData.label
+                                    mActivityCreateTaskBinding.field4spinner.visibility =
+                                        View.VISIBLE
+                                    val adapter = ArrayAdapter(
+                                        this,
+                                        android.R.layout.simple_spinner_item,
+                                        fieldData.value!!.split(",").toTypedArray()
+                                    )
+                                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    mActivityCreateTaskBinding.spinnerfield4spinner.adapter =
+                                        adapter
+                                    mActivityCreateTaskBinding.spinnerfield4spinner.setSelection(0)
+                                }
+                                DataType.RADIO -> {
+                                    mActivityCreateTaskBinding.tvfield4radio.text = fieldData.label
+                                    mActivityCreateTaskBinding.field4radio.visibility = View.VISIBLE
+                                    val data = fieldData.value!!.split(",").toTypedArray()
+                                    for (item in data) {
+                                        val radioButton = RadioButton(this)
+                                        radioButton.tag = position
+                                        radioButton.setButtonDrawable(R.drawable.custom_radio_button)
+                                        radioButton.id = View.generateViewId()
+                                        radioButton.setPadding(
+                                            radioButton.paddingLeft + 20,
+                                            radioButton.paddingTop,
+                                            radioButton.paddingRight,
+                                            radioButton.paddingBottom
+                                        )
+                                        radioButton.setText(item)
+                                        val params = LinearLayout.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                                            1f
+                                        )
+                                        params.setMargins(0, 0, 0, 10)
+                                        radioButton.layoutParams = params
+                                        mActivityCreateTaskBinding.radio4Group.addView(radioButton)
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+
+                    // FIELD5
+                    val FIELD5 = Field(field = FIELD.FIELD5.name)
+                    if (llallowedFields.contains(FIELD5)) {
+                        val position = llallowedFields.indexOf(FIELD5)
+                        if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                            val fieldData = llallowedFields[position]
+                            when (fieldData.type) {
+                                DataType.TEXT -> {
+                                    mActivityCreateTaskBinding.field5text.visibility = View.VISIBLE
+                                    mActivityCreateTaskBinding.tvfield5text.text = fieldData.label
+                                }
+                                DataType.NUMBER -> {
+                                    mActivityCreateTaskBinding.tvfield5number.text = fieldData.label
+                                    mActivityCreateTaskBinding.field5number.visibility =
+                                        View.VISIBLE
+                                }
+                                DataType.DROPDOWN -> {
+                                    mActivityCreateTaskBinding.tvfield5spinner.text =
+                                        fieldData.label
+                                    mActivityCreateTaskBinding.field1spinner.visibility =
+                                        View.VISIBLE
+                                    val adapter = ArrayAdapter(
+                                        this,
+                                        android.R.layout.simple_spinner_item,
+                                        fieldData.value!!.split(",").toTypedArray()
+                                    )
+                                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    mActivityCreateTaskBinding.spinnerfield5spinner.adapter =
+                                        adapter
+                                    mActivityCreateTaskBinding.spinnerfield5spinner.setSelection(0)
+                                }
+                                DataType.RADIO -> {
+                                    mActivityCreateTaskBinding.tvfield5radio.text = fieldData.label
+                                    mActivityCreateTaskBinding.field5radio.visibility = View.VISIBLE
+                                    val data = fieldData.value!!.split(",").toTypedArray()
+                                    for (item in data) {
+                                        val radioButton = RadioButton(this)
+                                        radioButton.tag = position
+                                        radioButton.setButtonDrawable(R.drawable.custom_radio_button)
+                                        radioButton.id = View.generateViewId()
+                                        radioButton.setPadding(
+                                            radioButton.paddingLeft + 20,
+                                            radioButton.paddingTop,
+                                            radioButton.paddingRight,
+                                            radioButton.paddingBottom
+                                        )
+                                        radioButton.setText(item)
+                                        val params = LinearLayout.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                                            1f
+                                        )
+                                        params.setMargins(0, 0, 0, 10)
+                                        radioButton.layoutParams = params
+                                        mActivityCreateTaskBinding.radio5Group.addView(radioButton)
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+
+                    // FIELD6
+                    val FIELD6 = Field(field = FIELD.FIELD6.name)
+                    if (llallowedFields.contains(FIELD6)) {
+                        val position = llallowedFields.indexOf(FIELD6)
+                        if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                            val fieldData = llallowedFields[position]
+                            when (fieldData.type) {
+                                DataType.TEXT -> {
+                                    mActivityCreateTaskBinding.field6text.visibility = View.VISIBLE
+                                    mActivityCreateTaskBinding.tvfield6text.text = fieldData.label
+                                }
+                                DataType.NUMBER -> {
+                                    mActivityCreateTaskBinding.tvfield6number.text = fieldData.label
+                                    mActivityCreateTaskBinding.field6number.visibility =
+                                        View.VISIBLE
+                                }
+                                DataType.DROPDOWN -> {
+                                    mActivityCreateTaskBinding.tvfield6spinner.text =
+                                        fieldData.label
+                                    mActivityCreateTaskBinding.field6spinner.visibility =
+                                        View.VISIBLE
+                                    val adapter = ArrayAdapter(
+                                        this,
+                                        android.R.layout.simple_spinner_item,
+                                        fieldData.value!!.split(",").toTypedArray()
+                                    )
+                                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    mActivityCreateTaskBinding.spinnerfield6spinner.adapter =
+                                        adapter
+                                    mActivityCreateTaskBinding.spinnerfield6spinner.setSelection(0)
+                                }
+                                DataType.RADIO -> {
+                                    mActivityCreateTaskBinding.tvfield6radio.text = fieldData.label
+                                    mActivityCreateTaskBinding.field6radio.visibility = View.VISIBLE
+                                    val data = fieldData.value!!.split(",").toTypedArray()
+                                    for (item in data) {
+                                        val radioButton = RadioButton(this)
+                                        radioButton.tag = position
+                                        radioButton.setButtonDrawable(R.drawable.custom_radio_button)
+                                        radioButton.id = View.generateViewId()
+                                        radioButton.setPadding(
+                                            radioButton.paddingLeft + 20,
+                                            radioButton.paddingTop,
+                                            radioButton.paddingRight,
+                                            radioButton.paddingBottom
+                                        )
+                                        radioButton.setText(item)
+                                        val params = LinearLayout.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                                            1f
+                                        )
+                                        params.setMargins(0, 0, 0, 10)
+                                        radioButton.layoutParams = params
+                                        mActivityCreateTaskBinding.radio6Group.addView(radioButton)
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+
+                    // FIELD7
+                    val FIELD7 = Field(field = FIELD.FIELD7.name)
+                    if (llallowedFields.contains(FIELD7)) {
+                        val position = llallowedFields.indexOf(FIELD7)
+                        if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                            val fieldData = llallowedFields[position]
+                            when (fieldData.type) {
+                                DataType.TEXT -> {
+                                    mActivityCreateTaskBinding.field7text.visibility = View.VISIBLE
+                                    mActivityCreateTaskBinding.tvfield7text.text = fieldData.label
+                                }
+                                DataType.NUMBER -> {
+                                    mActivityCreateTaskBinding.tvfield7number.text = fieldData.label
+                                    mActivityCreateTaskBinding.field7number.visibility =
+                                        View.VISIBLE
+                                }
+                                DataType.DROPDOWN -> {
+                                    mActivityCreateTaskBinding.tvfield7spinner.text =
+                                        fieldData.label
+                                    mActivityCreateTaskBinding.field7spinner.visibility =
+                                        View.VISIBLE
+                                    val adapter = ArrayAdapter(
+                                        this,
+                                        android.R.layout.simple_spinner_item,
+                                        fieldData.value!!.split(",").toTypedArray()
+                                    )
+                                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    mActivityCreateTaskBinding.spinnerfield7spinner.adapter =
+                                        adapter
+                                    mActivityCreateTaskBinding.spinnerfield7spinner.setSelection(0)
+                                }
+                                DataType.RADIO -> {
+                                    mActivityCreateTaskBinding.tvfield7radio.text = fieldData.label
+                                    mActivityCreateTaskBinding.field7radio.visibility = View.VISIBLE
+                                    val data = fieldData.value!!.split(",").toTypedArray()
+                                    for (item in data) {
+                                        val radioButton = RadioButton(this)
+                                        radioButton.tag = position
+                                        radioButton.setButtonDrawable(R.drawable.custom_radio_button)
+                                        radioButton.id = View.generateViewId()
+                                        radioButton.setPadding(
+                                            radioButton.paddingLeft + 20,
+                                            radioButton.paddingTop,
+                                            radioButton.paddingRight,
+                                            radioButton.paddingBottom
+                                        )
+                                        radioButton.setText(item)
+                                        val params = LinearLayout.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                                            1f
+                                        )
+                                        params.setMargins(0, 0, 0, 10)
+                                        radioButton.layoutParams = params
+                                        mActivityCreateTaskBinding.radio7Group.addView(radioButton)
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+
+                    // FIELD8
+                    val FIELD8 = Field(field = FIELD.FIELD8.name)
+                    if (llallowedFields.contains(FIELD8)) {
+                        val position = llallowedFields.indexOf(FIELD8)
+                        if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                            val fieldData = llallowedFields[position]
+                            when (fieldData.type) {
+                                DataType.TEXT -> {
+                                    mActivityCreateTaskBinding.field8text.visibility = View.VISIBLE
+                                    mActivityCreateTaskBinding.tvfield8text.text = fieldData.label
+                                }
+                                DataType.NUMBER -> {
+                                    mActivityCreateTaskBinding.tvfield8number.text = fieldData.label
+                                    mActivityCreateTaskBinding.field8number.visibility =
+                                        View.VISIBLE
+                                }
+                                DataType.DROPDOWN -> {
+                                    mActivityCreateTaskBinding.tvfield8spinner.text =
+                                        fieldData.label
+                                    mActivityCreateTaskBinding.field8spinner.visibility =
+                                        View.VISIBLE
+                                    val adapter = ArrayAdapter(
+                                        this,
+                                        android.R.layout.simple_spinner_item,
+                                        fieldData.value!!.split(",").toTypedArray()
+                                    )
+                                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    mActivityCreateTaskBinding.spinnerfield8spinner.adapter =
+                                        adapter
+                                    mActivityCreateTaskBinding.spinnerfield8spinner.setSelection(0)
+                                }
+                                DataType.RADIO -> {
+                                    mActivityCreateTaskBinding.tvfield8radio.text = fieldData.label
+                                    mActivityCreateTaskBinding.field8radio.visibility = View.VISIBLE
+                                    val data = fieldData.value!!.split(",").toTypedArray()
+                                    for (item in data) {
+                                        val radioButton = RadioButton(this)
+                                        radioButton.tag = position
+                                        radioButton.setButtonDrawable(R.drawable.custom_radio_button)
+                                        radioButton.id = View.generateViewId()
+                                        radioButton.setPadding(
+                                            radioButton.paddingLeft + 20,
+                                            radioButton.paddingTop,
+                                            radioButton.paddingRight,
+                                            radioButton.paddingBottom
+                                        )
+                                        radioButton.setText(item)
+                                        val params = LinearLayout.LayoutParams(
+                                            ViewGroup.LayoutParams.MATCH_PARENT,
+                                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                                            1f
+                                        )
+                                        params.setMargins(0, 0, 0, 10)
+                                        radioButton.layoutParams = params
+                                        mActivityCreateTaskBinding.radio8Group.addView(radioButton)
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
+                    }
+                    //end
                 }
 
-                if (getDynamicFormId(categoryId) != null) {
+                if (getDynamicFormId(categoryId) != null && getDynamicFormId(categoryId)!!.isNotEmpty()) {
+                    Log.d("here", "Three$categoryId")
+                    Log.d("here", "Three" + getDynamicFormId(categoryId))
                     dynamicFragment = NewDynamicFormFragment.getInstance(
                         getDynamicFormId(categoryId),
                         categoryId,
@@ -1103,7 +1729,7 @@ open class NewCreateTaskActivity :
                     )
                     replaceFragment(dynamicFragment!!, getDynamicFormId(categoryId))
                 }
-                dynamicFormsNew = com.rf.taskmodule.utils.CommonUtils.getFormByFormId(getDynamicFormId(categoryId))
+                dynamicFormsNew = CommonUtils.getFormByFormId(getDynamicFormId(categoryId))
                 if (dynamicFormsNew != null && dynamicFormsNew!!.fields != null && dynamicFormsNew!!.fields!!.isNotEmpty()) {
                     try {
                         var formData: FormData? =
@@ -1151,9 +1777,9 @@ open class NewCreateTaskActivity :
             }
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spnCategory!!.adapter = arrayAdapter
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)) {
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORIES)) {
             var categoryMap: Map<String, String>? = null
-            val str: String = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)!!
+            val str: String = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORIES)!!
             categoryMap =
                 Gson().fromJson(str, object : TypeToken<HashMap<String?, String?>?>() {}.type)
             if (categoryMap != null && categoryMap!!.containsKey("categoryId")) {
@@ -1182,6 +1808,7 @@ open class NewCreateTaskActivity :
                         val position = listCategory.indexOf(workFlowCategories)
                         if (position != -1) {
                             val myCatData = listCategory[position]
+                            category = myCatData
                             allowGeography = myCatData.allowGeography
                         }
                     }
@@ -1206,6 +1833,7 @@ open class NewCreateTaskActivity :
             ) {
                 // val selectedItem = parent.getItemAtPosition(position).toString()
                 categoryId = list[position].categoryId
+                category = list[position]
                 selItem = list[position].name!!
                 mCategoryId.value = categoryId
                 val listCategory = preferencesHelper.workFlowCategoriesList
@@ -1220,7 +1848,7 @@ open class NewCreateTaskActivity :
                         }
                     }
                 }
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "categoryId", categoryId);
+                CommonUtils.showLogMessage("e", "categoryId", categoryId);
 
 
             }
@@ -1232,14 +1860,14 @@ open class NewCreateTaskActivity :
 
 
         val taskActions: Array<String?>
-        lookUps = com.rf.taskmodule.TrackiSdkApplication.getLookups()
+        lookUps = TrackiSdkApplication.getLookups()
         if (lookUps != null && lookUps?.isNotEmpty()!!) {
             taskActions = Array(lookUps!!.size) { null }
 //            taskActions[0] = "Select Task Type"
             for (i in lookUps?.indices!!) {
                 taskActions[i] = lookUps!![i].value!!
             }
-            com.rf.taskmodule.utils.Log.e(NewCreateTaskActivity.TAG, "array items---->> $taskActions")
+            Log.e(NewCreateTaskActivity.TAG, "array items---->> $taskActions")
             try {
                 val aa = ArrayAdapter(this, R.layout.item_simple_spinner_sdk, taskActions)
                 aa.setDropDownViewResource(R.layout.item_simple_spinner_dropdown)
@@ -1264,16 +1892,16 @@ open class NewCreateTaskActivity :
 
 
         if (intent != null) {
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_EDIT_TASK)) {
-                task = intent.getSerializableExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_EDIT_TASK) as Task
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_EDIT_TASK)) {
+                task = intent.getSerializableExtra(AppConstants.Extra.EXTRA_EDIT_TASK) as Task
 
                 val contact = task.contact
                 if (contact != null) {
                     if (contact.name != null) {
                         edContactName.setText(contact.name)
                     }
-                    if (contact.mobile != null) {
-                        edMobileNumber.setText(contact.mobile)
+                    if (contact.mobileNumber != null) {
+                        edMobileNumber.setText(contact.mobileNumber)
                     }
                 }
                 edTaskName.setText(task.taskName)
@@ -1333,23 +1961,23 @@ open class NewCreateTaskActivity :
                 taskId = task.taskId!!
 
             }
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.SELECTED_BUDDY_LIST_EXTRA) &&
-                intent.getSerializableExtra(com.rf.taskmodule.utils.AppConstants.Extra.SELECTED_BUDDY_LIST_EXTRA) != null
+            if (intent.hasExtra(AppConstants.Extra.SELECTED_BUDDY_LIST_EXTRA) &&
+                intent.getSerializableExtra(AppConstants.Extra.SELECTED_BUDDY_LIST_EXTRA) != null
             ) {
                 @Suppress("UNCHECKED_CAST")
                 val list =
-                    intent.getSerializableExtra(com.rf.taskmodule.utils.AppConstants.Extra.SELECTED_BUDDY_LIST_EXTRA) as ArrayList<Buddy>
+                    intent.getSerializableExtra(AppConstants.Extra.SELECTED_BUDDY_LIST_EXTRA) as ArrayList<Buddy>
                 if (list.size > 0) {
                     buddyId = list[0].buddyId!!
                     buddyName = list[0].name!!
                 }
             }
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.SELECTED_FLEET_LIST_EXTRA) &&
-                intent.getSerializableExtra(com.rf.taskmodule.utils.AppConstants.Extra.SELECTED_FLEET_LIST_EXTRA) != null
+            if (intent.hasExtra(AppConstants.Extra.SELECTED_FLEET_LIST_EXTRA) &&
+                intent.getSerializableExtra(AppConstants.Extra.SELECTED_FLEET_LIST_EXTRA) != null
             ) {
                 @Suppress("UNCHECKED_CAST")
                 val list =
-                    intent.getSerializableExtra(com.rf.taskmodule.utils.AppConstants.Extra.SELECTED_FLEET_LIST_EXTRA) as ArrayList<Fleet>
+                    intent.getSerializableExtra(AppConstants.Extra.SELECTED_FLEET_LIST_EXTRA) as ArrayList<Fleet>
                 if (list.size > 0) {
                     fleetId = list[0].fleetId!!
                 }
@@ -1357,12 +1985,22 @@ open class NewCreateTaskActivity :
         }
     }
 
+    private fun searchRefTask(item: String? = ""){
+        val api = TrackiSdkApplication.getApiMap()[ApiType.TASKS]!!
+        searchRequest?.categoryId = ""
+        searchRequest?.stageId = ""
+        val arrayList = kotlin.collections.ArrayList<String>()
+        arrayList.add(item!!)
+        searchRequest!!.catIds = arrayList
+        mCreateTaskViewModel.getTaskList(httpManager,api,searchRequest)
+    }
+
     private fun callSlotApi(ddHubs: Spinner) {
         var list = ArrayList<Hub>()
         var listNames = kotlin.collections.ArrayList<String>()
 
         hubs = preferencesHelper.userHubList!!
-        com.rf.taskmodule.utils.Log.e("hubs", "$hubs")
+        Log.e("hubs", "$hubs")
         if (hubs.isNotEmpty() && hubs != null) {
             if (hubs.size > 1) {
                 for (hub in hubs) {
@@ -1388,7 +2026,7 @@ open class NewCreateTaskActivity :
                         hubIdFinal = list[timePosition].hubId.toString()
                         mCreateTaskViewModel.getSlotAvailability(
                             httpManager,
-                            com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
+                            TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
                             hubIdFinal,
                             date
                         )
@@ -1409,13 +2047,17 @@ open class NewCreateTaskActivity :
 
             mCreateTaskViewModel.getSlotAvailability(
                 httpManager,
-                com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
+                TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
                 "${list[timePosition].hubId}",
                 date
             )
         } else {
             TrackiToast.Message.showShort(this, "No Hub Found")
         }
+    }
+
+    private fun searchReferTasks() {
+
     }
 
     private fun performSearchWidgetTask() {
@@ -1430,14 +2072,14 @@ open class NewCreateTaskActivity :
         selectedUserId = ""
         mActivityCreateTaskBinding.etUser.threshold = 2
         var suggestionAdapter =
-            com.rf.taskmodule.ui.newcreatetask.BaseAutocompleteAdapter(this)
+            BaseAutocompleteAdapter(this)
         suggestionAdapter.setViewModel(mGetSuggetionViewModel)
         suggestionAdapter.setHttpManager(httpManager)
         if (requestUserType != null)
             suggestionAdapter.setUserType(requestUserType!!)
 
-        if (com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_SEARCH_USER] != null) {
-            val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_SEARCH_USER]
+        if (TrackiSdkApplication.getApiMap()[ApiType.GET_SEARCH_USER] != null) {
+            val api = TrackiSdkApplication.getApiMap()[ApiType.GET_SEARCH_USER]
             suggestionAdapter.setApi(api)
         }
         mActivityCreateTaskBinding.etUser.setAdapter(suggestionAdapter)
@@ -1459,7 +2101,7 @@ open class NewCreateTaskActivity :
         selectedUsername = name
         if (dataUser.userId != null) {
             selectedUserId = dataUser.userId
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "selectedUserId", dataUser.userId)
+            CommonUtils.showLogMessage("e", "selectedUserId", dataUser.userId)
         }
 
         mActivityCreateTaskBinding.etUser.setText("")
@@ -1477,7 +2119,7 @@ open class NewCreateTaskActivity :
                 .load(dataUser.profileImg)
                 .apply(
                     RequestOptions()
-                        .transform(com.rf.taskmodule.ui.custom.CircleTransform())
+                        .transform(CircleTransform())
                         .placeholder(R.drawable.ic_my_profile)
                 )
                 .error(R.drawable.ic_my_profile)
@@ -1530,6 +2172,13 @@ open class NewCreateTaskActivity :
 
     @SuppressLint("SuspiciousIndentation")
     fun addUserScreen() {
+        val intent = Intent("com.rocketflow.sdk.CreateCustomer")
+        if (!requestUserType.isNullOrEmpty())
+            intent.putStringArrayListExtra(
+                AppConstants.REQUESTED_USER_TYPES,
+                requestUserType as java.util.ArrayList<String>?
+            )
+        sendBroadcast(intent)
 //        var intent = Intent(this, AddCustomerActivity::class.java)
 //        intent.putExtra("from", AppConstants.EMPLOYEES)
 //        intent.putExtra("action", "add")
@@ -1548,7 +2197,7 @@ open class NewCreateTaskActivity :
      * @param fragment fragment that needs to be added/replaced.
      */
     private fun replaceFragment(fragment: Fragment, fragmentName: String?) {
-        val formName = com.rf.taskmodule.utils.CommonUtils.getFormByFormId(fragmentName)
+        val formName = CommonUtils.getFormByFormId(fragmentName)
         //  CommonUtils.showLogMessage("e", "formid", fragmentName);
         if (formName?.name != null) {
             setToolbar(mActivityCreateTaskBinding.toolbar, "Create " + getLabelName(categoryId))
@@ -1561,7 +2210,7 @@ open class NewCreateTaskActivity :
 
         val ft = manager.beginTransaction()
         if (allowedFieldFirst != null && !allowedFieldFirst!!) {
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "allowedFieldFirst", "false");
+            CommonUtils.showLogMessage("e", "allowedFieldFirst", "false");
             container.visibility = View.GONE
             ft.replace(R.id.container_second, fragment, fragmentName)
             container_second.visibility = View.VISIBLE
@@ -1576,7 +2225,7 @@ open class NewCreateTaskActivity :
 
 
         } else {
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "allowedFieldFirst", "true");
+            CommonUtils.showLogMessage("e", "allowedFieldFirst", "true");
             container_second.visibility = View.GONE
             ft.replace(R.id.container, fragment, fragmentName)
             container.visibility = View.VISIBLE
@@ -1587,13 +2236,14 @@ open class NewCreateTaskActivity :
         ft.commit()
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == AUTOCOMPLETE_REQUEST_CODE) {
             when (resultCode) {
                 Activity.RESULT_OK -> {
                     val place = Autocomplete.getPlaceFromIntent(data!!)
-                    com.rf.taskmodule.utils.Log.e(TAG, "Place: " + place.name + ", " + place.id)
+                    Log.e(TAG, "Place: " + place.name + ", " + place.id)
                     if (view.id == R.id.edStartLocation) {
                         startLatLng = place.latLng!!
                         mActivityCreateTaskBinding.edStartLocation.setText(place.name)
@@ -1610,27 +2260,91 @@ open class NewCreateTaskActivity :
                 }
                 AutocompleteActivity.RESULT_ERROR -> {
                     val status = Autocomplete.getStatusFromIntent(data!!)
-                    com.rf.taskmodule.utils.Log.i(TAG, status.statusMessage)
+                    Log.i(TAG, status.statusMessage)
                     TrackiToast.Message.showShort(this, status.statusMessage!!)
                 }
                 Activity.RESULT_CANCELED -> // The user canceled the operation.
                     TrackiToast.Message.showShort(this, "operation cancelled.")
             }
         }
+
+        if (requestCode == SCAN_REFERENCE) {
+            when (resultCode) {
+                Activity.RESULT_OK -> {
+                    val gson = Gson()
+                    val task = gson.fromJson(data!!.getStringExtra("result"), Task::class.java)
+                    if (task.clientTaskId != null) {
+                        mActivityCreateTaskBinding.rlReference.visibility = View.VISIBLE
+                        mActivityCreateTaskBinding.tvClientTaskId.text = task.clientTaskId
+                        mActivityCreateTaskBinding.etScanner.setText(task.clientTaskId)
+                        listRef.clear()
+                        listRef.add(task.taskId.toString())
+                        mActivityCreateTaskBinding.tvReferenceCreatedBy.text = task.contact?.name
+                        mActivityCreateTaskBinding.rlReference.setOnClickListener {
+                            val intent = Intent(
+                                this@NewCreateTaskActivity,
+                                NewTaskDetailsActivity::class.java
+                            )
+                            intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, task.taskId)
+                            intent.putExtra(
+                                AppConstants.Extra.EXTRA_ALLOW_SUB_TASK,
+                                task.allowSubTask
+                            )
+                            intent.putExtra(
+                                AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID,
+                                task.subCategoryIds
+                            )
+                            intent.putExtra(
+                                AppConstants.Extra.EXTRA_PARENT_REF_ID,
+                                task.referenceId
+                            )
+                            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, task.categoryId)
+                            intent.putExtra(
+                                AppConstants.Extra.FROM,
+                                AppConstants.Extra.ASSIGNED_TO_ME
+                            )
+                            startActivity(intent)
+                        }
+                    } else {
+                        mActivityCreateTaskBinding.rlReference.visibility = View.GONE
+                    }
+                }
+            }
+        }
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<BaseResponse> =
-                com.rf.taskmodule.utils.JSONConverter()
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
+            val jsonConverter: JSONConverter<BaseResponse> =
+                JSONConverter()
             var response: BaseResponse =
                 jsonConverter.jsonToObject(result.toString(), BaseResponse::class.java)
             if (preferencesHelper.formDataMap != null && preferencesHelper.formDataMap.isNotEmpty()) {
-                preferencesHelper.clear(com.rf.taskmodule.data.local.prefs.AppPreferencesHelper.PreferencesKeys.PREF_KEY_IS_FORM_DATA_MAP);
+                preferencesHelper.clear(AppPreferencesHelper.PreferencesKeys.PREF_KEY_IS_FORM_DATA_MAP);
             }
             if (response.taskId != null)
                 openMainActivity(response.taskId!!)
+        }
+    }
+
+    override fun handleTaskResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
+            if (null != this) {
+                this.runOnUiThread(Runnable {
+                    val taskListing =
+                        Gson().fromJson(
+                            result.toString(),
+                            TaskListing::class.java
+                        )
+                    if (taskListing.paginationData != null) {
+                        val list =
+                            taskListing.tasks
+
+                        Log.e("taskSearch","${list?.get(0)?.taskName}")
+                    }
+                })
+            }
         }
     }
 
@@ -1645,7 +2359,7 @@ open class NewCreateTaskActivity :
                     startLatLng = LatLng(location.latitude, location.longitude)
                     endLatLng = LatLng(location.latitude, location.longitude)
                     var stringAddress =
-                        com.rf.taskmodule.utils.CommonUtils.getAddress(this@NewCreateTaskActivity, startLatLng)
+                        CommonUtils.getAddress(this@NewCreateTaskActivity, startLatLng)
                     stringAddress?.let {
                         mActivityCreateTaskBinding.edStartLocation.setText(it)
                         mActivityCreateTaskBinding.edEnterStartLocation.setText(it)
@@ -1704,21 +2418,120 @@ open class NewCreateTaskActivity :
         val pocMobile = edMobileNumber.text.toString().trim()
         val taskName = edTaskName.text.toString().trim()
         val referenceId = edReference.text.toString().trim()
+
+        //    field1
+        var field1 = ""
+        var field2 = ""
+        var field3 = ""
+        var field4 = ""
+        var field5 = ""
+        var field6 = ""
+        var field7 = ""
+        var field8 = ""
+
+        // field1
+        if (field1text.visibility == View.VISIBLE) {
+            field1 = etfield1text.text.toString().trim()
+        } else if (field1spinner.visibility == View.VISIBLE) {
+            field1 = spinnerfield1spinner.selectedItem.toString().trim()
+        } else if (field1number.visibility == View.VISIBLE) {
+            field1 = etfield1number.text.toString().trim()
+        } else if (field1radio.visibility == View.VISIBLE) {
+
+        }
+
+        // field2
+        if (field2text.visibility == View.VISIBLE) {
+            field2 = etfield2text.text.toString().trim()
+        } else if (field2spinner.visibility == View.VISIBLE) {
+            field2 = spinnerfield2spinner.selectedItem.toString().trim()
+        } else if (field2number.visibility == View.VISIBLE) {
+            field2 = etfield2number.text.toString().trim()
+        } else if (field2radio.visibility == View.VISIBLE) {
+
+        }
+
+        // field3
+        if (field3text.visibility == View.VISIBLE) {
+            field3 = etfield3text.text.toString().trim()
+        } else if (field3spinner.visibility == View.VISIBLE) {
+            field3 = spinnerfield3spinner.selectedItem.toString().trim()
+        } else if (field3number.visibility == View.VISIBLE) {
+            field3 = etfield3number.text.toString().trim()
+        } else if (field3radio.visibility == View.VISIBLE) {
+
+        }
+
+        // field4
+        if (field4text.visibility == View.VISIBLE) {
+            field4 = etfield4text.text.toString().trim()
+        } else if (field4spinner.visibility == View.VISIBLE) {
+            field4 = spinnerfield4spinner.selectedItem.toString().trim()
+        } else if (field4number.visibility == View.VISIBLE) {
+            field4 = etfield4number.text.toString().trim()
+        } else if (field4radio.visibility == View.VISIBLE) {
+
+        }
+
+        // field5
+        if (field5text.visibility == View.VISIBLE) {
+            field5 = etfield5text.text.toString().trim()
+        } else if (field5spinner.visibility == View.VISIBLE) {
+            field5 = spinnerfield5spinner.selectedItem.toString().trim()
+        } else if (field5number.visibility == View.VISIBLE) {
+            field5 = etfield5number.text.toString().trim()
+        } else if (field5radio.visibility == View.VISIBLE) {
+
+        }
+
+        // field6
+        if (field6text.visibility == View.VISIBLE) {
+            field6 = etfield6text.text.toString().trim()
+        } else if (field6spinner.visibility == View.VISIBLE) {
+            field6 = spinnerfield6spinner.selectedItem.toString().trim()
+        } else if (field6number.visibility == View.VISIBLE) {
+            field6 = etfield6number.text.toString().trim()
+        } else if (field6radio.visibility == View.VISIBLE) {
+
+        }
+
+        // field7
+        if (field7text.visibility == View.VISIBLE) {
+            field7 = etfield7text.text.toString().trim()
+        } else if (field7spinner.visibility == View.VISIBLE) {
+            field7 = spinnerfield7spinner.selectedItem.toString().trim()
+        } else if (field7number.visibility == View.VISIBLE) {
+            field7 = etfield7number.text.toString().trim()
+        } else if (field7radio.visibility == View.VISIBLE) {
+
+        }
+
+        // field8
+        if (field8text.visibility == View.VISIBLE) {
+            field8 = etfield8text.text.toString().trim()
+        } else if (field8spinner.visibility == View.VISIBLE) {
+            field8 = spinnerfield8spinner.selectedItem.toString().trim()
+        } else if (field7number.visibility == View.VISIBLE) {
+            field8 = etfield8number.text.toString().trim()
+        } else if (field8radio.visibility == View.VISIBLE) {
+
+        }
+
         taskId = edTaskId.text.toString().trim()
         val description = edDescription.text.toString().trim()
 //        val fleet = spnFleet.selectedItem.toString().trim()
-        var GOOGLE_OR_MANUAL_SOURCE = com.rf.taskmodule.utils.CommonUtils.getTaskAllowedField(
+        var GOOGLE_OR_MANUAL_SOURCE = CommonUtils.getTaskAllowedField(
             categoryId,
             "GOOGLE_OR_MANUAL_SOURCE",
             preferencesHelper
         )
-        var GOOGLE_OR_MANUAL_DESTINATION = com.rf.taskmodule.utils.CommonUtils.getTaskAllowedField(
+        var GOOGLE_OR_MANUAL_DESTINATION = CommonUtils.getTaskAllowedField(
             categoryId,
             "GOOGLE_OR_MANUAL_DESTINATION",
             preferencesHelper
         )
         var SYSTEM_LOCATION =
-            com.rf.taskmodule.utils.CommonUtils.getTaskAllowedField(categoryId, "SYSTEM_LOCATION", preferencesHelper)
+            CommonUtils.getTaskAllowedField(categoryId, "SYSTEM_LOCATION", preferencesHelper)
 //        val city = spnCity.selectedItem.toString().trim()
 
         if (GOOGLE_OR_MANUAL_SOURCE != null && GOOGLE_OR_MANUAL_SOURCE.visible && GOOGLE_OR_MANUAL_SOURCE.required && regionId == null) {
@@ -1898,12 +2711,12 @@ open class NewCreateTaskActivity :
 
             var source: com.rf.taskmodule.data.model.response.config.Place? =
                 com.rf.taskmodule.data.model.response.config.Place()
-            var isCategoryContainsStartLocation = com.rf.taskmodule.utils.CommonUtils.isCategoryContainsFiled(
+            var isCategoryContainsStartLocation = CommonUtils.isCategoryContainsFiled(
                 FIELD.START_LOCATION.name,
                 categoryId,
                 preferencesHelper
             )
-            var isCategoryContainsEndLocation = com.rf.taskmodule.utils.CommonUtils.isCategoryContainsFiled(
+            var isCategoryContainsEndLocation = CommonUtils.isCategoryContainsFiled(
                 FIELD.END_LOCATION.name,
                 categoryId,
                 preferencesHelper
@@ -1993,8 +2806,19 @@ open class NewCreateTaskActivity :
                 taskId,
                 endTime,
                 Contact(pocName, pocMobile),
-                spinnerVal
+                spinnerVal,
+                field1,
+                field2,
+                field3,
+                field4,
+                field5,
+                field6,
+                field7,
+                field8,
             )
+            if (listRef.isNotEmpty()) {
+                createTaskRequest!!.multiReferedTask = listRef
+            }
             if (intent.hasExtra("directMapping")) {
                 createTaskRequest!!.directMapping = intent.getBooleanExtra("directMapping", false)
             }
@@ -2025,13 +2849,13 @@ open class NewCreateTaskActivity :
                 createTaskRequest!!.categoryId = categoryId
             hideKeyboard()
             //showLoading()
-            var json = com.rf.taskmodule.utils.JSONConverter<CreateTaskRequest>()
+            var json = JSONConverter<CreateTaskRequest>()
                 .objectToJson(createTaskRequest)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "jsondata", json)
+            CommonUtils.showLogMessage("e", "jsondata", json)
 
             var bundle = Bundle();
             bundle.putSerializable("CREATE_TASK_REQUEST", createTaskRequest);
-            com.rf.taskmodule.utils.Log.e(TAG, "config type----> ${dynamicActionConfig?.action} ")
+            Log.e(TAG, "config type----> ${dynamicActionConfig?.action} ")
             if (mainMap == null) {
                 mainMap = HashMap()
             }
@@ -2039,9 +2863,9 @@ open class NewCreateTaskActivity :
             if (list.isNotEmpty()) {
                 mainMap?.set(currentFormId!!, list)
                 var jsonConverter =
-                    com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<FormData>>>()
+                    JSONConverter<HashMap<String, ArrayList<FormData>>>()
                 var data = jsonConverter.objectToJson(mainMap!!)
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "allowed field", data.toString())
+                CommonUtils.showLogMessage("e", "allowed field", data.toString())
 
 
 //                if (mainMap == null) {
@@ -2051,11 +2875,12 @@ open class NewCreateTaskActivity :
 //                mainMap?.set(currentFormId!!, list)
             }
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<ArrayList<FormData>>();
-            com.rf.taskmodule.utils.Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(list))
+                JSONConverter<ArrayList<FormData>>();
+            Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(list))
             // replace a new fragment to the container
             if (dynamicActionConfig?.action == Type.FORM) {
                 showLoading()
+                Log.d("Here", "one")
                 //make the back button visible if user click on next form
                 replaceFragment(
                     NewDynamicFormFragment.getInstance(
@@ -2068,6 +2893,7 @@ open class NewCreateTaskActivity :
                 hideLoading()
             } else if (dynamicActionConfig?.action == Type.API) {
                 mainData = ArrayList()
+                Log.d("Here", "two")
                 //add all the values of map to the hashMap and go to all
                 // elements to get the required data
                 for ((_, value) in mainMap!!) {
@@ -2084,7 +2910,7 @@ open class NewCreateTaskActivity :
                             //remove last element only if type is camera else
                             // SIGNATURE OR FILE always contains single image
                             if (mainData!![i].type == DataType.CAMERA && v[0].path.equals(
-                                    com.rf.taskmodule.utils.AppConstants.ADD_MORE,
+                                    AppConstants.ADD_MORE,
                                     ignoreCase = true
                                 )
                             ) {
@@ -2092,7 +2918,7 @@ open class NewCreateTaskActivity :
                                 v.removeAt(0)
                             }
                             if (mainData!![i].type == DataType.CAMERA && v.size > 0 && v[v.size - 1].path.equals(
-                                    com.rf.taskmodule.utils.AppConstants.ADD_MORE,
+                                    AppConstants.ADD_MORE,
                                     ignoreCase = true
                                 )
                             ) {
@@ -2113,15 +2939,15 @@ open class NewCreateTaskActivity :
                             }
 
                         }
-                        com.rf.taskmodule.utils.Log.e(
+                        Log.e(
                             "NewCreateTaskActivity", mainData!![i].name + "<------->"
                                     + mainData!![i].enteredValue
                         )
                     }
                     var jsonConverter =
-                        com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<File>>>();
-                    com.rf.taskmodule.utils.Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(hashMapFileRequest))
-                    com.rf.taskmodule.utils.Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
+                        JSONConverter<HashMap<String, ArrayList<File>>>();
+                    Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(hashMapFileRequest))
+                    Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
                     if (hashMapFileRequest.isNotEmpty()) {
 
 
@@ -2131,7 +2957,7 @@ open class NewCreateTaskActivity :
                             if (NetworkUtils.isConnectedFast(this@NewCreateTaskActivity)) {
                                 mActivityCreateTaskBinding.btnCLick.visibility = View.GONE
                                 mActivityCreateTaskBinding.viewProgress.visibility = View.VISIBLE
-                                com.rf.taskmodule.utils.CommonUtils.makeScreenDisable(this)
+                                CommonUtils.makeScreenDisable(this)
                                 fileUploadCounter = 0
                                 nestedScrollView.postDelayed(
                                     { nestedScrollView.fullScroll(View.FOCUS_DOWN) },
@@ -2152,10 +2978,10 @@ open class NewCreateTaskActivity :
                                 //start thread
                                 handlerThread?.start()
                             } else {
-                                com.rf.taskmodule.utils.CommonUtils.showSnakbarForNetworkSettings(
+                                CommonUtils.showSnakbarForNetworkSettings(
                                     this@NewCreateTaskActivity,
                                     nestedScrollView,
-                                    com.rf.taskmodule.utils.AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE
+                                    AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE
                                 )
                             }
 
@@ -2185,7 +3011,7 @@ open class NewCreateTaskActivity :
                             //remove last element only if type is camera else
                             // SIGNATURE OR FILE always contains single image
                             if (mainData!![i].type == DataType.CAMERA && v[0].path.equals(
-                                    com.rf.taskmodule.utils.AppConstants.ADD_MORE,
+                                    AppConstants.ADD_MORE,
                                     ignoreCase = true
                                 )
                             ) {
@@ -2194,7 +3020,7 @@ open class NewCreateTaskActivity :
                                 v.removeAt(0)
                             }
                             if (mainData!![i].type == DataType.CAMERA && v.size > 0 && v[v.size - 1].path.equals(
-                                    com.rf.taskmodule.utils.AppConstants.ADD_MORE,
+                                    AppConstants.ADD_MORE,
                                     ignoreCase = true
                                 )
                             ) {
@@ -2217,15 +3043,15 @@ open class NewCreateTaskActivity :
                                 hashMapFileRequest[key] = v
                             }
                         }
-                        com.rf.taskmodule.utils.Log.e(
+                        Log.e(
                             "NewCreateTaskActivity", mainData!![i].name + "<------->"
                                     + mainData!![i].enteredValue
                         )
                     }
                     var jsonConverter =
-                        com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<File>>>();
-                    com.rf.taskmodule.utils.Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(hashMapFileRequest))
-                    com.rf.taskmodule.utils.Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
+                        JSONConverter<HashMap<String, ArrayList<File>>>();
+                    Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(hashMapFileRequest))
+                    Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
                     if (hashMapFileRequest.isNotEmpty()) {
 
 
@@ -2236,11 +3062,11 @@ open class NewCreateTaskActivity :
 
                             if (NetworkUtils.isConnectedFast(this@NewCreateTaskActivity)) {
                                 count = 0
-                                com.rf.taskmodule.utils.Log.e(TAG, "worker thread open")
+                                Log.e(TAG, "worker thread open")
                                 // showLoading()
                                 mActivityCreateTaskBinding.btnCLick.visibility = View.GONE
                                 mActivityCreateTaskBinding.viewProgress.visibility = View.VISIBLE
-                                com.rf.taskmodule.utils.CommonUtils.makeScreenDisable(this)
+                                CommonUtils.makeScreenDisable(this)
                                 nestedScrollView.postDelayed(
                                     { nestedScrollView.fullScroll(View.FOCUS_DOWN) },
                                     200
@@ -2260,10 +3086,10 @@ open class NewCreateTaskActivity :
                                 //start thread
                                 handlerThread?.start()
                             } else {
-                                com.rf.taskmodule.utils.CommonUtils.showSnakbarForNetworkSettings(
+                                CommonUtils.showSnakbarForNetworkSettings(
                                     this@NewCreateTaskActivity,
                                     nestedScrollView,
-                                    com.rf.taskmodule.utils.AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE
+                                    AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE
                                 )
                             }
 
@@ -2289,11 +3115,11 @@ open class NewCreateTaskActivity :
 
     private fun perFormCreateTask() {
         if (dynamicFormsNew != null) {
-            var dynamicFormMainData = com.rf.taskmodule.utils.CommonUtils.createFormData(
+            var dynamicFormMainData = CommonUtils.createFormData(
                 mainData, selItem, taskId!!, dynamicFormsNew!!.formId,
                 dynamicFormsNew!!.version
             )
-            com.rf.taskmodule.utils.Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
+            Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
 
             var taskData = dynamicFormMainData!!.taskData
             createTaskRequest!!.taskData = taskData
@@ -2323,12 +3149,12 @@ open class NewCreateTaskActivity :
         }
 
         var jsonConverter =
-            com.rf.taskmodule.utils.JSONConverter<CreateTaskRequest>()
+            JSONConverter<CreateTaskRequest>()
         var json = jsonConverter.objectToJson(createTaskRequest)
-        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "task data", json)
+        CommonUtils.showLogMessage("e", "task data", json)
         if (NetworkUtils.isNetworkConnected(this@NewCreateTaskActivity)) {
             var apiType = ApiType.CREATE_TASK
-            var api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[apiType]
+            var api = TrackiSdkApplication.getApiMap()[apiType]
             mCreateTaskViewModel.createTaskApi(httpManager, createTaskRequest!!, api!!)
         } else {
             hideLoading()
@@ -2342,15 +3168,15 @@ open class NewCreateTaskActivity :
 
     private fun finalApiHit() {
 
-        var dynamicFormMainData = com.rf.taskmodule.utils.CommonUtils.createFormData(
+        var dynamicFormMainData = CommonUtils.createFormData(
             mainData, selItem, taskId!!, dynamicFormsNew!!.formId,
             dynamicFormsNew!!.version
         )
-        com.rf.taskmodule.utils.Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
+        Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
 
         if (NetworkUtils.isNetworkConnected(this@NewCreateTaskActivity)) {
             showLoading()
-            val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.UPDATE_TASK_DATA]
+            val api = TrackiSdkApplication.getApiMap()[ApiType.UPDATE_TASK_DATA]
             mCreateTaskViewModel.uploadTaskData(dynamicFormMainData, httpManager, api)
         } else {
             hideLoading()
@@ -2361,9 +3187,9 @@ open class NewCreateTaskActivity :
         }
     }
 
-    override fun upLoadFileApiResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun upLoadFileApiResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@NewCreateTaskActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@NewCreateTaskActivity)) {
             val fileUrlsResponse = Gson().fromJson(result.toString(), FileUrlsResponse::class.java)
             val fileResponseMap = fileUrlsResponse.filesUrl
             if (mainData != null) {
@@ -2386,11 +3212,11 @@ open class NewCreateTaskActivity :
     }
 
     override fun upLoadFileDisposeApiResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@NewCreateTaskActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@NewCreateTaskActivity)) {
             val fileUrlsResponse = Gson().fromJson(result.toString(), FileUrlsResponse::class.java)
             val fileResponseMap = fileUrlsResponse.filesUrl
             if (mainData != null) {
@@ -2412,12 +3238,12 @@ open class NewCreateTaskActivity :
     }
 
     override fun handleRegionListResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?,
         isStart: Boolean
     ) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val executive = Gson().fromJson<GetUserManualLocationData>(
                 result.toString(),
                 GetUserManualLocationData::class.java
@@ -2481,7 +3307,7 @@ open class NewCreateTaskActivity :
 //                            CommonUtils.hideViewWithAnimation(tvLabelSelectStartArea)
 //                            CommonUtils.hideViewWithAnimation(spnCategoryStartArea)
                             regionId = list[0].id
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "regionId", regionId);
+                            CommonUtils.showLogMessage("e", "regionId", regionId);
                             var getUserManualLocationData = GetManualLocationRequest()
                             getUserManualLocationData.regionId = regionId
                             getUserManualLocationData.userGeoReq = allowGeography
@@ -2508,7 +3334,7 @@ open class NewCreateTaskActivity :
                                         val selectedItem =
                                             parent.getItemAtPosition(position).toString()
                                         regionId = list[position].id
-                                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "regionId", regionId);
+                                        CommonUtils.showLogMessage("e", "regionId", regionId);
                                         var getUserManualLocationData = GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionId
                                         getUserManualLocationData.userGeoReq = allowGeography
@@ -2537,7 +3363,7 @@ open class NewCreateTaskActivity :
 //                            CommonUtils.hideViewWithAnimation(spnCategoryEndArea)
 //                            CommonUtils.hideViewWithAnimation(tvLabelSelectEndArea)
                             regionIdEnd = list[0].id
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "regionIdEnd", regionIdEnd);
+                            CommonUtils.showLogMessage("e", "regionIdEnd", regionIdEnd);
                             var getUserManualLocationData = GetManualLocationRequest()
                             getUserManualLocationData.regionId = regionIdEnd
                             spnCategoryEndState.adapter = null
@@ -2563,7 +3389,7 @@ open class NewCreateTaskActivity :
                                         val selectedItem =
                                             parent.getItemAtPosition(position).toString()
                                         regionIdEnd = list[position].id
-                                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "regionIdEnd", regionIdEnd);
+                                        CommonUtils.showLogMessage("e", "regionIdEnd", regionIdEnd);
                                         var getUserManualLocationData = GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionIdEnd
                                         spnCategoryEndState.adapter = null
@@ -2609,12 +3435,12 @@ open class NewCreateTaskActivity :
     }
 
     override fun handleStateListResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?,
         isStart: Boolean
     ) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val executive = Gson().fromJson<GetUserManualLocationData>(
                 result.toString(),
                 GetUserManualLocationData::class.java
@@ -2679,7 +3505,7 @@ open class NewCreateTaskActivity :
 //                            CommonUtils.hideViewWithAnimation(spnCategoryStartState)
 //                            CommonUtils.hideViewWithAnimation(tvLabelSelectStartState)
                             stateId = list[0].id
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "stateId", stateId);
+                            CommonUtils.showLogMessage("e", "stateId", stateId);
                             var getUserManualLocationData = GetManualLocationRequest()
                             getUserManualLocationData.regionId = regionId
                             getUserManualLocationData.stateId = stateId
@@ -2708,7 +3534,7 @@ open class NewCreateTaskActivity :
                                         val selectedItem =
                                             parent.getItemAtPosition(position).toString()
                                         stateId = list[position].id
-                                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "stateId", stateId);
+                                        CommonUtils.showLogMessage("e", "stateId", stateId);
                                         var getUserManualLocationData = GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionId
                                         getUserManualLocationData.stateId = stateId
@@ -2737,7 +3563,7 @@ open class NewCreateTaskActivity :
 //                            CommonUtils.hideViewWithAnimation(spnCategoryEndState)
 //                            CommonUtils.hideViewWithAnimation(tvLabelSelectEndState)
                             stateIdEnd = list[0].id
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "stateIdEnd", stateIdEnd);
+                            CommonUtils.showLogMessage("e", "stateIdEnd", stateIdEnd);
                             var getUserManualLocationData = GetManualLocationRequest()
                             getUserManualLocationData.regionId = regionIdEnd
                             getUserManualLocationData.stateId = stateIdEnd
@@ -2765,7 +3591,7 @@ open class NewCreateTaskActivity :
                                         val selectedItem =
                                             parent.getItemAtPosition(position).toString()
                                         stateIdEnd = list[position].id
-                                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "stateIdEnd", stateIdEnd);
+                                        CommonUtils.showLogMessage("e", "stateIdEnd", stateIdEnd);
                                         var getUserManualLocationData = GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionIdEnd
                                         getUserManualLocationData.stateId = stateIdEnd
@@ -2813,12 +3639,12 @@ open class NewCreateTaskActivity :
     }
 
     override fun handleCityListResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?,
         isStart: Boolean
     ) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val executive = Gson().fromJson<GetUserManualLocationData>(
                 result.toString(),
                 GetUserManualLocationData::class.java
@@ -2882,7 +3708,7 @@ open class NewCreateTaskActivity :
 //                            CommonUtils.hideViewWithAnimation(spnCategoryStartCity)
 //                            CommonUtils.hideViewWithAnimation(tvLabelSelectStartCity)
                             cityId = list[0].id
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "cityId", cityId);
+                            CommonUtils.showLogMessage("e", "cityId", cityId);
                             var getUserManualLocationData = GetManualLocationRequest()
                             getUserManualLocationData.regionId = regionId
                             getUserManualLocationData.stateId = stateId
@@ -2911,7 +3737,7 @@ open class NewCreateTaskActivity :
                                         val selectedItem =
                                             parent.getItemAtPosition(position).toString()
                                         cityId = list[position].id
-                                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "cityId", cityId);
+                                        CommonUtils.showLogMessage("e", "cityId", cityId);
                                         var getUserManualLocationData = GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionId
                                         getUserManualLocationData.stateId = stateId
@@ -2941,7 +3767,7 @@ open class NewCreateTaskActivity :
 //                            CommonUtils.hideViewWithAnimation(spnCategoryEndCity)
 //                            CommonUtils.hideViewWithAnimation(tvLabelSelectEndCity)
                             cityIdEnd = list[0].id
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "cityIdEnd", cityIdEnd);
+                            CommonUtils.showLogMessage("e", "cityIdEnd", cityIdEnd);
                             var getUserManualLocationData = GetManualLocationRequest()
                             getUserManualLocationData.regionId = regionIdEnd
                             getUserManualLocationData.stateId = stateIdEnd
@@ -2971,7 +3797,7 @@ open class NewCreateTaskActivity :
                                         val selectedItem =
                                             parent.getItemAtPosition(position).toString()
                                         cityIdEnd = list[position].id
-                                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "cityIdEnd", cityIdEnd);
+                                        CommonUtils.showLogMessage("e", "cityIdEnd", cityIdEnd);
                                         var getUserManualLocationData = GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionIdEnd
                                         getUserManualLocationData.stateId = stateIdEnd
@@ -3045,13 +3871,13 @@ open class NewCreateTaskActivity :
     }
 
     override fun handleHubListResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?,
         isStart: Boolean
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val executive = Gson().fromJson<GetUserManualLocationData>(
                 result.toString(),
                 GetUserManualLocationData::class.java
@@ -3114,7 +3940,7 @@ open class NewCreateTaskActivity :
                             tvLabelSelectStartHubs.visibility = View.GONE
                             hubId = list[0].id
                             //cardManualStartLocation.visibility = View.GONE
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "hubId", hubId);
+                            CommonUtils.showLogMessage("e", "hubId", hubId);
                         } else {
                             spnCategoryStartHub.visibility = View.VISIBLE
                             cvspnCategoryStartHub.visibility = View.VISIBLE
@@ -3131,7 +3957,7 @@ open class NewCreateTaskActivity :
                                         val selectedItem =
                                             parent.getItemAtPosition(position).toString()
                                         hubId = list[position].id
-                                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "hubId", hubId);
+                                        CommonUtils.showLogMessage("e", "hubId", hubId);
 
 
                                     }
@@ -3151,7 +3977,7 @@ open class NewCreateTaskActivity :
 //                            CommonUtils.hideViewWithAnimation(tvLabelSelectEndHubs)
 //                            CommonUtils.hideViewWithAnimation(cardManualEndLocation)
                             hubIdEnd = list[0].id
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "hubIdEnd", hubIdEnd);
+                            CommonUtils.showLogMessage("e", "hubIdEnd", hubIdEnd);
                         } else {
                             spnCategoryEndHub.visibility = View.VISIBLE
                             cvspnCategoryEndHub.visibility = View.VISIBLE
@@ -3169,7 +3995,7 @@ open class NewCreateTaskActivity :
                                         val selectedItem =
                                             parent.getItemAtPosition(position).toString()
                                         hubIdEnd = list[position].id
-                                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "hubIdEnd", hubIdEnd);
+                                        CommonUtils.showLogMessage("e", "hubIdEnd", hubIdEnd);
 
 
                                     }
@@ -3225,10 +4051,10 @@ open class NewCreateTaskActivity :
         }
     }
 
-    override fun getSlotDataResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun getSlotDataResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         val slotDataResponse1 =
             Gson().fromJson(result.toString(), SlotDataResponse::class.java)
-        val slotAdapter = SlotAdapter(this)
+
         rvDate.adapter = slotAdapter
         slotAdapter.clearAll()
         if (slotDataResponse1.successful) {
@@ -3258,33 +4084,25 @@ open class NewCreateTaskActivity :
     private fun setSlots() {
         if (slotDataResponse.data!!.keys.isNotEmpty()) {
             val size = slotDataResponse.data!!.size
-            if (size > timePosition) {
-                val key = slotDataResponse.data!!.keys.elementAt(timePosition)
+            if (size > dayPosition) {
+                val key = slotDataResponse.data!!.keys.elementAt(dayPosition)
                 dateFinal = key
-                val timeSlots = slotDataResponse.data!!.get(key)
+                val timeSlots = slotDataResponse.data!![key]
 
-                if (timeSlots?.totalAvailableSlots != null) {
-                    if (timeSlots.slots != null) {
-                        if (timeSlots.slots.size > 0) {
+                if (timeSlots?.slots != null && timeSlots?.slots!!.isNotEmpty()) {
+                    rvSlot.visibility = View.VISIBLE
+                    slotImg.visibility = View.GONE
+                    val slots = timeSlots.slots as ArrayList<Slot>
 
-                            val slots = timeSlots.slots as ArrayList<Slot>
-
-                            val slotChildAdapter = SlotChildAdapter(slots, this)
-                            rvSlot.adapter = slotChildAdapter
-
-                            slotChildAdapter.onItemClick = { timeString ->
-                                selectTimeCall(timeString)
-                            }
-                        }
-                        else{
-                            rvSlot.visibility = View.GONE
-                            slotImg.visibility = View.VISIBLE
-                        }
+                    val slotChildAdapter = SlotChildAdapter(slots, this)
+                    rvSlot.adapter = slotChildAdapter
+                    Log.e("slotCheck", "$key and Pos = $dayPosition")
+                    slotChildAdapter.onItemClick = { timeString ->
+                        selectTimeCall(timeString)
                     }
-                    else{
-                        rvSlot.visibility = View.GONE
-                        slotImg.visibility = View.VISIBLE
-                    }
+                } else {
+                    rvSlot.visibility = View.GONE
+                    slotImg.visibility = View.VISIBLE
                 }
             }
         }
@@ -3295,18 +4113,18 @@ open class NewCreateTaskActivity :
     }
 
     private fun selectDayCall(position: Int) {
-        timePosition = position
+        dayPosition = position
         setSlots()
     }
 
-    override fun handleMyPlaceResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<*> =
-                com.rf.taskmodule.utils.JSONConverter<Any?>()
+    override fun handleMyPlaceResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
+            val jsonConverter: JSONConverter<*> =
+                JSONConverter<Any?>()
             val response: LocationListResponse =
                 Gson().fromJson(result.toString(), LocationListResponse::class.java)
             if (response.successful!!) {
-                com.rf.taskmodule.utils.Log.e("appLog1", "" + response.hubs)
+                Log.e("appLog1", "" + response.hubs)
                 if (response.hubs != null && !response.hubs!!.isEmpty()) {
                     preferencesHelper.saveUserHubList(response.hubs)
                 } else {
@@ -3333,8 +4151,8 @@ open class NewCreateTaskActivity :
                     fileUploadCounter += obj.chunkSize
                     var progressUploadText = "${fileUploadCounter}/${obj.totalSize}"
                     var percentage = ((fileUploadCounter * 100 / obj.totalSize))
-                    com.rf.taskmodule.utils.Log.e(TAG, "progressUploadText=> " + progressUploadText)
-                    com.rf.taskmodule.utils.Log.e(TAG, "percentage=> " + percentage.toString())
+                    Log.e(TAG, "progressUploadText=> " + progressUploadText)
+                    Log.e(TAG, "percentage=> " + percentage.toString())
                     runOnUiThread {
                         progressBar!!.progress = percentage
                         percentageText!!.text = "$percentage %"
@@ -3346,7 +4164,7 @@ open class NewCreateTaskActivity :
                 }
                 /*For Success */0 -> {
 
-                if (com.rf.taskmodule.utils.CommonUtils.stringListHashMap.isNotEmpty()) {
+                if (CommonUtils.stringListHashMap.isNotEmpty()) {
 
                     //get hashMap from adapter and match the name with key of maps
                     // if found then replace entered value with url of image
@@ -3361,11 +4179,12 @@ open class NewCreateTaskActivity :
                         for (i in mainData?.indices!!) {
                             try {
                                 if (mainData!![i].type != DataType.BUTTON) {
-                                    if (com.rf.taskmodule.utils.CommonUtils.stringListHashMap?.containsKey(mainData!![i].name)!!) {
+                                    if (CommonUtils.stringListHashMap?.containsKey(mainData!![i].name)!!) {
                                         //Log.e("Upload Form List--->", mainData!![i].name!!)
                                         mainData!![i].enteredValue =
-                                            com.rf.taskmodule.utils.CommonUtils.getCommaSeparatedList(
-                                                com.rf.taskmodule.utils.CommonUtils.stringListHashMap[mainData!![i].name])
+                                            CommonUtils.getCommaSeparatedList(
+                                                CommonUtils.stringListHashMap[mainData!![i].name]
+                                            )
                                     }
                                     finalMap[mainData!![i].name!!] = mainData!![i].enteredValue!!
                                 }
@@ -3375,7 +4194,7 @@ open class NewCreateTaskActivity :
                         }
                         //assign empty object to map again
 
-                        com.rf.taskmodule.utils.CommonUtils.stringListHashMap = ConcurrentHashMap()
+                        CommonUtils.stringListHashMap = ConcurrentHashMap()
                         if (actionConfig?.action == Type.API)
                             finalApiHit()
                         else if (actionConfig?.action == Type.DISPOSE) {
@@ -3383,10 +4202,10 @@ open class NewCreateTaskActivity :
                         }
                     }
                 } else {
-                    com.rf.taskmodule.utils.Log.e(TAG, "Map is empty...Try Again")
+                    Log.e(TAG, "Map is empty...Try Again")
                     handlerThread?.interrupt()
                     hideLoading()
-                    com.rf.taskmodule.utils.CommonUtils.stringListHashMap = ConcurrentHashMap()
+                    CommonUtils.stringListHashMap = ConcurrentHashMap()
                     if (actionConfig?.action == Type.API)
                         finalApiHit()
                     else if (actionConfig?.action == Type.DISPOSE) {
@@ -3399,7 +4218,7 @@ open class NewCreateTaskActivity :
                     runOnUiThread {
                         mActivityCreateTaskBinding.btnCLick.visibility = View.VISIBLE
                         mActivityCreateTaskBinding.viewProgress.visibility = View.GONE
-                        com.rf.taskmodule.utils.CommonUtils.makeScreenClickable(this@NewCreateTaskActivity)
+                        CommonUtils.makeScreenClickable(this@NewCreateTaskActivity)
                     }
                     count++
 
@@ -3429,7 +4248,7 @@ open class NewCreateTaskActivity :
 */
                     TrackiToast.Message.showShort(
                         this@NewCreateTaskActivity,
-                        com.rf.taskmodule.utils.AppConstants.UNABLE_TO_PROCESS_REQUEST
+                        AppConstants.UNABLE_TO_PROCESS_REQUEST
                     )
                     //after getting error form the thread we interrupt the thread
                     handlerThread?.interrupt()
@@ -3447,7 +4266,7 @@ open class NewCreateTaskActivity :
     }
 
     override fun networkUnavailable() {
-        snackBar = com.rf.taskmodule.utils.CommonUtils.showNetWorkConnectionIssue(
+        snackBar = CommonUtils.showNetWorkConnectionIssue(
             mActivityCreateTaskBinding.coordinatorLayout,
             getString(R.string.please_check_your_internet_connection)
         )

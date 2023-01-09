@@ -9,8 +9,8 @@ import com.rf.taskmodule.utils.rx.AppSchedulerProvider
 import com.rf.taskmodule.utils.rx.SchedulerProvider
 
 
-class PaymentViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-    com.rf.taskmodule.ui.base.BaseSdkViewModel<PaymentNavigator>(dataManager, schedulerProvider) {
+class PaymentViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+    BaseSdkViewModel<PaymentNavigator>(dataManager, schedulerProvider) {
 
     private val mIsLoading = ObservableBoolean(false)
 
@@ -23,10 +23,10 @@ class PaymentViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
     }
 
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return PaymentViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

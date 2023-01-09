@@ -15,6 +15,14 @@ import com.rf.taskmodule.data.model.response.config.Navigation;
 import com.rf.taskmodule.utils.ApiType;
 import com.rf.taskmodule.utils.CommonUtils;
 import com.rf.taskmodule.utils.JSONConverter;
+import com.rf.taskmodule.data.model.response.config.Api;
+import com.rf.taskmodule.data.model.response.config.DynamicFormsNew;
+import com.rf.taskmodule.data.model.response.config.EmergencyContact;
+import com.rf.taskmodule.data.model.response.config.LookUps;
+import com.rf.taskmodule.data.model.response.config.Navigation;
+import com.rf.taskmodule.utils.ApiType;
+import com.rf.taskmodule.utils.CommonUtils;
+import com.rf.taskmodule.utils.JSONConverter;
 import com.trackthat.lib.TrackThat;
 
 import org.jetbrains.annotations.NotNull;
@@ -190,7 +198,7 @@ public class TrackiSdkApplication extends Application {
         //Fabric.with(this, new Crashlytics());
         //initialize tracking SDK
         try {
-            TrackThat.initialize(this,CommonUtils.getIMEINumber(this));
+            TrackThat.initialize(this, CommonUtils.getIMEINumber(this));
         }catch (Exception e){
 
         }

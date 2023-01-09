@@ -6,18 +6,16 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.http.SslError
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.webkit.*
-import androidx.annotation.RequiresApi
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.rocketflow.sdk.RocketFlyer
 import com.rf.taskmodule.BR
-//import com.rf.taskmodule.Config
+//import com.rf.taskmodule.ui.Config
 import com.rf.taskmodule.R
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper
 import com.rf.taskmodule.data.model.response.config.ConfigResponse
@@ -32,20 +30,19 @@ import com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_WEB_INFO
 import com.rf.taskmodule.utils.CommonUtils
 import com.rf.taskmodule.utils.Log
 import com.rf.taskmodule.utils.NextScreen
-import javax.inject.Inject
 
 
 /**
  * Created by rahul on 22/10/18
  */
-class WebViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityWebviewSdkBinding, WebViewModel>(), WebViewNavigator
+class WebViewActivity : BaseSdkActivity<ActivityWebviewSdkBinding, WebViewModel>(), WebViewNavigator
 {
 
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var httpManager: HttpManager
 
     lateinit var mWebViewModel: WebViewModel
 
-    lateinit var prefsHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
+    lateinit var prefsHelper: PreferencesHelper
 
     private var mActivityWebviewBinding: ActivityWebviewSdkBinding? = null
 
@@ -78,7 +75,7 @@ class WebViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityWebvie
     }
 
     override fun networkUnavailable() {
-        snackBar = com.rf.taskmodule.utils.CommonUtils.showNetWorkConnectionIssue(mActivityWebviewBinding!!.coordinatorLayout, getString(R.string.please_check_your_internet_connection))
+        snackBar = CommonUtils.showNetWorkConnectionIssue(mActivityWebviewBinding!!.coordinatorLayout, getString(R.string.please_check_your_internet_connection))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,7 +90,7 @@ class WebViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityWebvie
             init()
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.d("WebView", "Error Inside OnCreate(): $e")
+            Log.d("WebView", "Error Inside OnCreate(): $e")
         }
     }
 
@@ -141,9 +138,9 @@ class WebViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityWebvie
 //        setting.allowContentAccess = true
 
         if (webviewUrl != null){
-            val headers = com.rf.taskmodule.utils.CommonUtils.buildWebViewHeader(this@WebViewActivity)
-            com.rf.taskmodule.utils.Log.e("headers","$headers")
-            com.rf.taskmodule.utils.Log.e("urlNew","$webviewUrl")
+            val headers = CommonUtils.buildWebViewHeader(this@WebViewActivity)
+            Log.e("headers","$headers")
+            Log.e("urlNew","$webviewUrl")
             webView.loadUrl(webviewUrl!!,headers)
         }
         else {
@@ -155,9 +152,9 @@ class WebViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityWebvie
 //        navigation?.actionConfig?.actionUrl.let {
 
         if (navigation?.actionConfig?.actionUrl != null) {
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e","url",navigation?.actionConfig?.actionUrl)
+            CommonUtils.showLogMessage("e","url",navigation?.actionConfig?.actionUrl)
             webView.loadUrl(navigation?.actionConfig?.actionUrl!!,
-                com.rf.taskmodule.utils.CommonUtils.buildWebViewHeader(this@WebViewActivity))
+                CommonUtils.buildWebViewHeader(this@WebViewActivity))
         }
 //        }
     }
@@ -169,13 +166,13 @@ class WebViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityWebvie
      */
     private fun showInternetDialog() {
         AlertDialog.Builder(context)
-            .setMessage(com.rf.taskmodule.utils.AppConstants.ALERT_NO_CONNECTION)
-            .setTitle(com.rf.taskmodule.utils.AppConstants.CONNECTION_ERROR)
+            .setMessage(AppConstants.ALERT_NO_CONNECTION)
+            .setTitle(AppConstants.CONNECTION_ERROR)
             .setCancelable(false)
-            .setPositiveButton(com.rf.taskmodule.utils.AppConstants.RETRY) { dialog, _ ->
+            .setPositiveButton(AppConstants.RETRY) { dialog, _ ->
                 dialog.dismiss()
                 //    callBack.hitApi();
-            }.setNegativeButton(com.rf.taskmodule.utils.AppConstants.CLOSE) { dialog, _ ->
+            }.setNegativeButton(AppConstants.CLOSE) { dialog, _ ->
                 dialog.dismiss()
                 //callBack.onNetworkErrorClose();
             }
@@ -211,7 +208,7 @@ class WebViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityWebvie
                     loginToken = url1[3]
                     prefsHelper.accessId = accessId
                     prefsHelper.loginToken = loginToken
-                    com.rf.taskmodule.utils.Log.e("urlNew","accessId => $accessId \n token => $loginToken")
+                    Log.e("urlNew","accessId => $accessId \n token => $loginToken")
                     mWebViewModel.getConfig(httpManager, "")
                     view!!.stopLoading()
                 }
@@ -228,28 +225,28 @@ class WebViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityWebvie
 //            super.onReceivedSslError(view, handler, error)
             val builder = AlertDialog.Builder(this@WebViewActivity)
             builder.setMessage(R.string.notification_error_ssl_cert_invalid)
-            builder.setPositiveButton(com.rf.taskmodule.utils.AppConstants.CONTINUE) { _, _ -> handler!!.proceed() }
-            builder.setNegativeButton(com.rf.taskmodule.utils.AppConstants.CANCEL) { _, _ -> handler!!.cancel() }
+            builder.setPositiveButton(AppConstants.CONTINUE) { _, _ -> handler!!.proceed() }
+            builder.setNegativeButton(AppConstants.CANCEL) { _, _ -> handler!!.cancel() }
             val dialog = builder.create()
             dialog.show()
         }
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
 
             if (result != null) {
                 val gson = Gson()
                 val configResponse = gson.fromJson(result.toString(), ConfigResponse::class.java)
                 configResponse.refreshConfig = true
-                com.rf.taskmodule.utils.CommonUtils.saveConfigDetails(this@WebViewActivity, configResponse, prefsHelper, "2", mobile)
+                CommonUtils.saveConfigDetails(this@WebViewActivity, configResponse, prefsHelper, "2", mobile)
                 prefsHelper.loginToken = loginToken
                 prefsHelper.accessId = accessId
                 if (configResponse.appConfig != null) {
-                    com.rf.taskmodule.utils.CommonUtils.otpgoToNext(this, redirectionScreen, mobile)
+                    CommonUtils.otpgoToNext(this, redirectionScreen, mobile)
 
                 } else {
-                    com.rf.taskmodule.utils.CommonUtils.otpgoToNext(this, redirectionScreen, mobile)
+                    CommonUtils.otpgoToNext(this, redirectionScreen, mobile)
                 }
             }
         }

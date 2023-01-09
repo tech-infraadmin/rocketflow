@@ -23,7 +23,7 @@ import com.rf.taskmodule.utils.TrackiToast
 import java.util.ArrayList
 
 class ProductScanAdapter(var context: Context) :
-    RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>(), Filterable {
+    RecyclerView.Adapter<BaseSdkViewHolder>(), Filterable {
     var mFilteredList: ArrayList<CatalogProduct> = ArrayList()
     var mList: ArrayList<CatalogProduct> = ArrayList()
     var mListener: OnProductAddListener? = null
@@ -41,7 +41,7 @@ class ProductScanAdapter(var context: Context) :
         this.linkOption = linkOption
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         return if (viewType == VIEW_TYPE_NORMAL) {
             val simpleViewItemBinding: ItemRowSelectOrderSdkBinding =
                 ItemRowSelectOrderSdkBinding.inflate(
@@ -117,7 +117,7 @@ class ProductScanAdapter(var context: Context) :
     }
 
     inner class StoreOrderItemViewHolder(var binding: ItemRowProductOrderSdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(binding.root) {
+        BaseSdkViewHolder(binding.root) {
         override fun onBind(position: Int) {
             var data: CatalogProduct? = mFilteredList[position]
             if (data != null) {
@@ -147,12 +147,12 @@ class ProductScanAdapter(var context: Context) :
 
                 binding.llImage.setOnClickListener {
                     if (mListener != null) {
-                        com.rf.taskmodule.utils.CommonUtils.preventTwoClick(it)
+                        CommonUtils.preventTwoClick(it)
                     }
                 }
                 binding.llTxtData.setOnClickListener {
                     if (mListener != null) {
-                        com.rf.taskmodule.utils.CommonUtils.preventTwoClick(it)
+                        CommonUtils.preventTwoClick(it)
                     }
                 }
 
@@ -166,7 +166,7 @@ class ProductScanAdapter(var context: Context) :
 
 
     inner class StoreProductItemViewHolder(var binding: ItemRowSelectOrderSdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(binding.root) {
+        BaseSdkViewHolder(binding.root) {
         override fun onBind(position: Int) {
             var data: CatalogProduct? = mFilteredList[position]
             if (data != null) {
@@ -215,17 +215,17 @@ class ProductScanAdapter(var context: Context) :
                 }
                 binding.llImage.setOnClickListener {
                     if (mListener != null) {
-                        com.rf.taskmodule.utils.CommonUtils.preventTwoClick(it)
+                        CommonUtils.preventTwoClick(it)
                     }
                 }
                 binding.llTxtData.setOnClickListener {
                     if (mListener != null) {
-                        com.rf.taskmodule.utils.CommonUtils.preventTwoClick(it)
+                        CommonUtils.preventTwoClick(it)
                     }
                 }
                 binding.tvProductCounter.setOnClickListener {
                     if (mListener != null) {
-                        com.rf.taskmodule.utils.CommonUtils.preventTwoClick(it)
+                        CommonUtils.preventTwoClick(it)
                         openAddQuantityDialog(binding.tvProductCounter, position)
                     }
                 }
@@ -346,7 +346,7 @@ class ProductScanAdapter(var context: Context) :
     }
 
     inner class EmptyViewHolder(var binding: LayoutEmptyCategoryViewSdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(binding.root) {
+        BaseSdkViewHolder(binding.root) {
 
         override fun onBind(position: Int) {
             binding.tvDesc.text = context.getString(R.string.seems_like_no_product)
@@ -375,7 +375,7 @@ class ProductScanAdapter(var context: Context) :
         }
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) {
         holder.onBind(holder.adapterPosition)
     }
 

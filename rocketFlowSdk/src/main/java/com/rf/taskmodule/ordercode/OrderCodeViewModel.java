@@ -4,11 +4,6 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-
-import com.rf.taskmodule.data.DataManager;
-import com.rf.taskmodule.data.network.APIError;
-import com.rf.taskmodule.utils.CommonUtils;
-import com.rf.taskmodule.utils.rx.AppSchedulerProvider;
 import com.rf.taskmodule.data.DataManager;
 import com.rf.taskmodule.data.network.APIError;
 import com.rf.taskmodule.data.network.ApiCallback;

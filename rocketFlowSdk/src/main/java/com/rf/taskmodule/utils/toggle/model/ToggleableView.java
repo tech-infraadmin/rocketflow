@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewDebug;
 
 import com.rf.taskmodule.utils.toggle.interfaces.OnToggledListener;
-import com.rf.taskmodule.utils.toggle.interfaces.OnToggledListener;
 
 
 /**

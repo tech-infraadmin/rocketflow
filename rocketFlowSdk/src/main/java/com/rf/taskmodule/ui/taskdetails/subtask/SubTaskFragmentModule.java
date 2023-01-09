@@ -2,7 +2,7 @@ package com.rf.taskmodule.ui.taskdetails.subtask;//package com.rf.taskmodule.ui.
 //
 //import androidx.lifecycle.ViewModelProvider;
 //
-//import com.rf.taskmodule.ViewModelProviderFactory;
+//import com.rf.taskmodule.ui.ViewModelProviderFactory;
 //import com.rf.taskmodule.data.DataManager;
 //import com.rf.taskmodule.utils.rx.SchedulerProvider;
 //

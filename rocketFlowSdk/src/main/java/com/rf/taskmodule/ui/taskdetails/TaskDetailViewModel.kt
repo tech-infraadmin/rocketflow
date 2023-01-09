@@ -37,9 +37,9 @@ import kotlin.collections.set
 /**
  * Created by rahul on 16/10/18
  */
-class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-        com.rf.taskmodule.ui.base.BaseSdkViewModel<TaskDetailNavigator>(dataManager, schedulerProvider),
-    com.rf.taskmodule.data.network.ApiCallback,
+class TaskDetailViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+        BaseSdkViewModel<TaskDetailNavigator>(dataManager, schedulerProvider),
+    ApiCallback,
         LocationObserver {
 
     var isContactAvail = ObservableBoolean(false)
@@ -76,7 +76,7 @@ class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, sched
     private var outOfNetWOrk: ArrayList<Event>? = null
     private val tag = "TaskDetailViewModel"
     private var polylineWidth = 10f
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var httpManager: HttpManager
     lateinit var request: AcceptRejectRequest
     lateinit var api: Api
 
@@ -98,11 +98,11 @@ class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, sched
         if (task.contact != null) {
             if (task.contact!!.name != null) {
                 setContact(task.contact?.name!!)
-            } else if (task.contact!!.mobile != null) {
-                setContact(task.contact?.mobile!!)
+            } else if (task.contact!!.mobileNumber != null) {
+                setContact(task.contact?.mobileNumber!!)
             }
 
-            if (task.contact!!.mobile != null) {
+            if (task.contact!!.mobileNumber != null) {
                 setIsContactAvail(true)
             } else {
                 setIsContactAvail(false)
@@ -114,7 +114,7 @@ class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, sched
         navigator.onCallClick()
     }
 
-    fun getTaskById(httpManager: com.rf.taskmodule.data.network.HttpManager, request: AcceptRejectRequest, api: Api?) {
+    fun getTaskById(httpManager: HttpManager, request: AcceptRejectRequest, api: Api?) {
         this.httpManager = httpManager
         this.request = request
         this.api = api!!
@@ -135,7 +135,7 @@ class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, sched
 
     }
 
-    override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+    override fun onRequestTimeOut(callBack: ApiCallback) {
         navigator.showTimeOutMessage(callBack)
     }
 
@@ -193,7 +193,7 @@ class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, sched
      *
      * @param events event array.
      */
-    fun isolateEvents(events: List<Event>?, context: Context, preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper) {
+    fun isolateEvents(events: List<Event>?, context: Context, preferencesHelper: PreferencesHelper) {
 
         if (events != null && events.isNotEmpty()) {
             var list = ArrayList<AlertEvent>()
@@ -521,7 +521,7 @@ class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, sched
             if (i + 1 <= eventList.size - 1) {
                 val end = eventList[i + 1]
 
-                com.rf.taskmodule.utils.Log.e(tag, "${end.eventTime} :event time: ${start.eventTime}")
+                Log.e(tag, "${end.eventTime} :event time: ${start.eventTime}")
                 //compare time if start time and end time difference is <= 2 sec
                 // then create a hashMap of lat-lng and add into the map else create a hashMap of
                 // markers and increase count value by 1 and initialize new hashMap object.
@@ -558,7 +558,7 @@ class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, sched
             LocalBroadcastManager.getInstance(taskDetailActivity)
                     .registerReceiver(eventReceiver, intentFilter)
         } catch (e: Exception) {
-            com.rf.taskmodule.utils.Log.e(tag, "inside onResume(): $e")
+            Log.e(tag, "inside onResume(): $e")
             e.printStackTrace()
         }
     }
@@ -567,7 +567,7 @@ class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, sched
         try {
             LocalBroadcastManager.getInstance(context).unregisterReceiver(eventReceiver)
         } catch (e: Exception) {
-            com.rf.taskmodule.utils.Log.e(tag, "inside onPause(): $e")
+            Log.e(tag, "inside onPause(): $e")
             e.printStackTrace()
         }
     }
@@ -610,7 +610,7 @@ class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, sched
                 }
             }
         } catch (e: Exception) {
-            com.rf.taskmodule.utils.Log.e("TaskDetailViewModel", "Exception Inside handleAlerts(): $e")
+            Log.e("TaskDetailViewModel", "Exception Inside handleAlerts(): $e")
         }
     }
 
@@ -631,10 +631,10 @@ class TaskDetailViewModel(dataManager: com.rf.taskmodule.data.DataManager, sched
     }
 
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return TaskDetailViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

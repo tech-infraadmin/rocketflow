@@ -66,8 +66,8 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivitySkuInfoSdkBinding, SkuInfoViewModel>(), SkuInfoNavigator,
-    com.rf.taskmodule.ui.dynamicform.dynamicfragment.DynamicAdapter.AdapterListener {
+open class SkuInfoActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, SkuInfoViewModel>(), SkuInfoNavigator,
+    DynamicAdapter.AdapterListener {
 
     private var imageFilePath: String? = null
     private var categoryId: String? = null
@@ -120,15 +120,15 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
 
     lateinit var mSkuInfoViewModel: SkuInfoViewModel
 
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
     lateinit var binding: ActivitySkuInfoSdkBinding
 
     lateinit var rvDynamicForm: RecyclerView
 
 
-    lateinit var showDynamicFormDataAdapter: com.rf.taskmodule.ui.dynamicform.dynamicfragment.DynamicAdapter
+    lateinit var showDynamicFormDataAdapter: DynamicAdapter
 
     companion object {
         private val TAG = SkuInfoActivity::class.java.simpleName
@@ -146,40 +146,40 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
         setToolbar(binding.toolbar, "Sub Task CTA")
         handlerThread = ExecutorThread()
 
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)) {
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORIES)) {
             var categoryMap: Map<String, String>? = null
-            val str: String = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)!!
+            val str: String = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORIES)!!
             categoryMap = Gson().fromJson(
                 str,
                 object : TypeToken<HashMap<String?, String?>?>() {}.type
             )
             if (categoryMap != null && categoryMap!!.containsKey("categoryId")) {
                 categoryId = categoryMap!!.get("categoryId")
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("d", "categoryId", categoryId)
+                CommonUtils.showLogMessage("d", "categoryId", categoryId)
             }
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)) {
-            taskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_ID)) {
+            taskId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
             formId =taskId
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("d", "taskId", taskId)
+            CommonUtils.showLogMessage("d", "taskId", taskId)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)) {
-            target = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("d", "target", target)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)) {
+            target = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)
+            CommonUtils.showLogMessage("d", "target", target)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)) {
-            flavourId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("d", "flavourId", flavourId)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)) {
+            flavourId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)
+            CommonUtils.showLogMessage("d", "flavourId", flavourId)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING)) {
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING)) {
             dynamicPricing =
-                intent.getBooleanExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, false)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("d", "dynamicPricing", dynamicPricing.toString())
+                intent.getBooleanExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, false)
+            CommonUtils.showLogMessage("d", "dynamicPricing", dynamicPricing.toString())
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID))
-            ctaId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID))
+            ctaId = intent.getStringExtra(AppConstants.Extra.EXTRA_CTA_ID)
 
-        com.rf.taskmodule.utils.CommonUtils.showLogMessage("d", "ctaId", ctaId)
+        CommonUtils.showLogMessage("d", "ctaId", ctaId)
 
         var viewProgress = binding.viewProgress
         titleText = viewProgress.findViewById<TextView>(R.id.tvTitle)
@@ -190,7 +190,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
         rlProgress = viewProgress!!.findViewById<RelativeLayout>(R.id.rlProgress)
 
         showDynamicFormDataAdapter =
-            com.rf.taskmodule.ui.dynamicform.dynamicfragment.DynamicAdapter(
+            DynamicAdapter(
                 ArrayList()
             )
         showDynamicFormDataAdapter.setAdapterListener(this)
@@ -224,17 +224,17 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
         return mSkuInfoViewModel!!
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
-            com.rf.taskmodule.utils.Log.d("result  = ",result.toString());
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<SkuResponse> =
-                com.rf.taskmodule.utils.JSONConverter()
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
+            Log.d("result  = ",result.toString());
+            val jsonConverter: JSONConverter<SkuResponse> =
+                JSONConverter()
             val response = jsonConverter.jsonToObject(result.toString(), SkuResponse::class.java)
             if (response != null) {
                 if (response.successful == true) {
                     showLoading()
-                    val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.EXECUTE_UPDATE]
+                    val api = TrackiSdkApplication.getApiMap()[ApiType.EXECUTE_UPDATE]
                     val request = ExecuteUpdateRequest(
                         taskId!!, ctaId!!,
                         DateTimeUtil.getCurrentDateInMillis(), TaskData()
@@ -251,10 +251,10 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
     }
 
     override fun handleExecutiveMapResponse(
-        position: Int, callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?,
+        position: Int, callback: ApiCallback, result: Any?,
         error: APIError?
     ) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val executive =
                 Gson().fromJson<ExecutiveMap>(result.toString(), ExecutiveMap::class.java)
             executive?.let {
@@ -273,10 +273,10 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
         }
     }
 
-    override fun handleTaskInfoDataResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
-       com.rf.taskmodule.utils.Log.d("result",result.toString())
-       com.rf.taskmodule.utils.Log.d("error",error.toString())
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+    override fun handleTaskInfoDataResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+       Log.d("result",result.toString())
+       Log.d("error",error.toString())
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val getTaskInfoDataResponse = Gson().fromJson<GetTaskInfoResponse>(
                 result.toString(),
                 GetTaskInfoResponse::class.java
@@ -319,9 +319,9 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
         }
     }
 
-    override fun handleUploadFileResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleUploadFileResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
 
             if (!isOtpApiHit) {
                 val fileUrlsResponse =
@@ -343,20 +343,20 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
     }
 
     override fun handleExecuteUpdateResponse(
-        apiCallback: com.rf.taskmodule.data.network.ApiCallback?,
+        apiCallback: ApiCallback?,
         result: Any?,
         error: APIError?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(apiCallback, error, result, this)) {
+        if (CommonUtils.handleResponse(apiCallback, error, result, this)) {
             openMainActivity()
         }
     }
 
     fun openMainActivity() {
         val intent = Intent()
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID, taskId)
+        intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
+        intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
@@ -387,7 +387,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
     }
 
     private fun proceedToImagePicking() {
-        val chooseImageIntent = com.rf.taskmodule.utils.image_utility.ImagePicker.getPickImageIntent(this)
+        val chooseImageIntent = ImagePicker.getPickImageIntent(this)
         startActivityForResult(chooseImageIntent, DynamicFragment.PICK_IMAGE_FILE_ID)
     }
 
@@ -396,7 +396,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
         if (actualImage == null) {
             TrackiToast.Message.showShort(this, "No image is selected")
         } else {
-            com.rf.taskmodule.utils.image_utility.Compressor(this)
+            Compressor(this)
                 .setQuality(90)
                 .compressToFileAsFlowable(actualImage)
                 .subscribeOn(Schedulers.io())
@@ -405,11 +405,11 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                     compressedImage = file
 
                     val spilt = compressedImage?.absolutePath?.split("/".toRegex())?.toTypedArray()
-                    com.rf.taskmodule.utils.Log.e(DynamicFragment.TAG, "image mane is: ${spilt!![spilt.size - 1]}")
+                    Log.e(DynamicFragment.TAG, "image mane is: ${spilt!![spilt.size - 1]}")
                     if (compressedImage != null) {
                         try {
-                            com.rf.taskmodule.utils.Log.e(DynamicFragment.TAG, "MB: ${compressedImage!!.sizeInMb}")
-                            com.rf.taskmodule.utils.Log.e(DynamicFragment.TAG, "KB: ${compressedImage!!.sizeInKb}")
+                            Log.e(DynamicFragment.TAG, "MB: ${compressedImage!!.sizeInMb}")
+                            Log.e(DynamicFragment.TAG, "KB: ${compressedImage!!.sizeInKb}")
                         } catch (e: Exception) {
 
                         }
@@ -418,8 +418,8 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                     //set the image name into the adapter
                     //formData.enteredValue = spilt[spilt.size - 1]
                     formData.enteredValue = compressedImage?.path;
-                    com.rf.taskmodule.utils.Log.e(DynamicFragment.TAG, "path: ${compressedImage?.path}")
-                    com.rf.taskmodule.utils.Log.e(DynamicFragment.TAG, "abspath: ${compressedImage?.absolutePath}")
+                    Log.e(DynamicFragment.TAG, "path: ${compressedImage?.path}")
+                    Log.e(DynamicFragment.TAG, "abspath: ${compressedImage?.absolutePath}")
                     val fileList: ArrayList<File>? = ArrayList()
                     fileList?.add(compressedImage!!)
 
@@ -476,7 +476,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
         hideKeyboard()
         //get hashMap from adapter
         val fieldList = showDynamicFormDataAdapter.formDataList
-        com.rf.taskmodule.utils.Log.d("TAG",fieldList.size.toString())
+        Log.d("TAG",fieldList.size.toString())
         //traverse hashMap and check if required filed is empty then show error
         for (formData: FormData in fieldList!!) {
             if (formData.required) {
@@ -539,7 +539,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                                     val mapElement = hmIterator.next() as Map.Entry<*, *>
                                     map[mapElement.key.toString()] =
                                         mapElement.value as ArrayList<FormData>
-                                    com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                                    CommonUtils.showLogMessage(
                                         "e",
                                         "inner map value",
                                         mapElement.value.toString()
@@ -548,9 +548,9 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                             }
                             preferencesHelper.formDataMap = map
                             var jsonConverter =
-                                com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<FormData>>>()
+                                JSONConverter<HashMap<String, ArrayList<FormData>>>()
                             var data = jsonConverter.objectToJson(map)
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                            CommonUtils.showLogMessage(
                                 "e",
                                 "inner form data value",
                                 data.toString()
@@ -589,9 +589,9 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
         if (fieldList.isNotEmpty()) {
             mainMap?.set(formId!!, fieldList)
             val jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<FormData>>>()
+                JSONConverter<HashMap<String, ArrayList<FormData>>>()
             val data = jsonConverter.objectToJson(mainMap!!)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "allowed field", data.toString())
+            CommonUtils.showLogMessage("e", "allowed field", data.toString())
         }
         mainData = ArrayList()
         for ((_, value) in mainMap!!) {
@@ -603,14 +603,14 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                 val v = mainData!![i].file
                 if (v != null && v.isNotEmpty()) {
                     if (mainData!![i].type == DataType.CAMERA && v[0].path.equals(
-                            com.rf.taskmodule.utils.AppConstants.ADD_MORE,
+                            AppConstants.ADD_MORE,
                             ignoreCase = true
                         )
                     ) {
                         v.removeAt(0)
                     }
                     if (mainData!![i].type == DataType.CAMERA && v.size>0&&v[v.size-1].path.equals(
-                            com.rf.taskmodule.utils.AppConstants.ADD_MORE,
+                            AppConstants.ADD_MORE,
                             ignoreCase = true
                         )
                     ) {
@@ -629,17 +629,17 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                         hashMapFileRequest[key] = v
                     }
                 }
-                com.rf.taskmodule.utils.Log.e("NewCreateTaskActivity", mainData!![i].uniqueID + "<------->" + mainData!![i].enteredValue)
+                Log.e("NewCreateTaskActivity", mainData!![i].uniqueID + "<------->" + mainData!![i].enteredValue)
             }
             val jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<File>>>();
-            com.rf.taskmodule.utils.Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(hashMapFileRequest))
-            com.rf.taskmodule.utils.Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
+                JSONConverter<HashMap<String, ArrayList<File>>>();
+            Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(hashMapFileRequest))
+            Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
             if (hashMapFileRequest.isNotEmpty()) {
                 if (NetworkUtils.isNetworkConnected(this)) {
                     if (NetworkUtils.isConnectedFast(this)) {
                         binding.viewProgress.visibility = View.VISIBLE
-                        com.rf.taskmodule.utils.CommonUtils.makeScreenDisable(this)
+                        CommonUtils.makeScreenDisable(this)
                         fileUploadCounter = 0
                         nestedScrollView.postDelayed(
                             { nestedScrollView.fullScroll(View.FOCUS_DOWN) },
@@ -657,10 +657,10 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                         )
                         handlerThread?.start()
                     } else {
-                        com.rf.taskmodule.utils.CommonUtils.showSnakbarForNetworkSettings(
+                        CommonUtils.showSnakbarForNetworkSettings(
                             this,
                             nestedScrollView,
-                            com.rf.taskmodule.utils.AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE
+                            AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE
                         )
                     }
                 } else {
@@ -689,9 +689,9 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
             }
         }
         val jsonConverterDataToUpload =
-            com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<FormData>>>()
+            JSONConverter<HashMap<String, ArrayList<FormData>>>()
         val dataUpload = jsonConverterDataToUpload.objectToJson(dataToUpload)
-        com.rf.taskmodule.utils.Log.e("Final Data Filtered--->", dataUpload)
+        Log.e("Final Data Filtered--->", dataUpload)
 
        val data = ArrayList<ProductItem>()
         getTaskInfoResponse?.data?.forEach { item ->
@@ -710,9 +710,9 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
             var old = 0
             if (i != null) {
                 while (i <= item.specs?.size?.times(item.count!!)!!){
-                    com.rf.taskmodule.utils.Log.d("Size Total ",item.specs?.size?.times(item.count!!)!!.toString())
-                    com.rf.taskmodule.utils.Log.d("specs size old ",old.toString())
-                    com.rf.taskmodule.utils.Log.d("specs size i ",i.toString())
+                    Log.d("Size Total ",item.specs?.size?.times(item.count!!)!!.toString())
+                    Log.d("specs size old ",old.toString())
+                    Log.d("specs size i ",i.toString())
                     val specification: ArrayList<SkuSpecification> = ArrayList()
                     for(it in old until i){
                         val skuSpecification = SkuSpecification()
@@ -723,12 +723,12 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                         }else {
                             skuSpecification.value = specs.get(it).value
                         }
-                        com.rf.taskmodule.utils.Log.d("skuSpecification", skuSpecification.name)
+                        Log.d("skuSpecification", skuSpecification.name)
                         specification.add(skuSpecification)
                     }
                     val unitItem = UnitItem()
                     unitItem.specifications = specification
-                    com.rf.taskmodule.utils.Log.d("specifications", unitItem.specifications!!.size.toString())
+                    Log.d("specifications", unitItem.specifications!!.size.toString())
                     units.add(unitItem)
                     old = i
                     i += count!!
@@ -743,12 +743,12 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
         skuSpecs.data = data
 
         val skuSpecsJson =
-            com.rf.taskmodule.utils.JSONConverter<SKUInfoSpecsRequest>()
+            JSONConverter<SKUInfoSpecsRequest>()
         val skuSpecsData = skuSpecsJson.objectToJson(skuSpecs)
-        com.rf.taskmodule.utils.Log.e("Final Data skuSpecsData--->", skuSpecsData)
+        Log.e("Final Data skuSpecsData--->", skuSpecsData)
         if (NetworkUtils.isNetworkConnected(this)) {
             showLoading()
-            val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.SAVE_TASK_UNITS]
+            val api = TrackiSdkApplication.getApiMap()[ApiType.SAVE_TASK_UNITS]
             mSkuInfoViewModel.uploadSkuInfoData(skuSpecs, httpManager, api)
         } else {
             hideLoading()
@@ -777,7 +777,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                                     val mapElement = hmIterator.next() as Map.Entry<*, *>
                                     map[mapElement.key.toString()] =
                                         mapElement.value as ArrayList<FormData>
-                                    com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                                    CommonUtils.showLogMessage(
                                         "e",
                                         "inner map value",
                                         mapElement.value.toString()
@@ -786,9 +786,9 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                             }
                             preferencesHelper.formDataMap = map
                             var jsonConverter =
-                                com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<FormData>>>()
+                                JSONConverter<HashMap<String, ArrayList<FormData>>>()
                             var data = jsonConverter.objectToJson(map)
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                            CommonUtils.showLogMessage(
                                 "e",
                                 "inner form data value",
                                 data.toString()
@@ -913,7 +913,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
     }
 
     override fun getDropdownItems(position: Int, target: String, rollId: String?) {
-        if (com.rf.taskmodule.utils.CommonUtils.containsEnum(target))
+        if (CommonUtils.containsEnum(target))
             mSkuInfoViewModel.executiveMap(position, target, httpManager, rollId)
     }
 
@@ -1002,9 +1002,9 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
             startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
 
         } catch (e: GooglePlayServicesRepairableException) {
-            com.rf.taskmodule.utils.Log.e(DynamicFragment.TAG, e.message)
+            Log.e(DynamicFragment.TAG, e.message)
         } catch (e: GooglePlayServicesNotAvailableException) {
-            com.rf.taskmodule.utils.Log.e(DynamicFragment.TAG, e.message)
+            Log.e(DynamicFragment.TAG, e.message)
         }
     }
 
@@ -1035,7 +1035,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             DynamicFragment.PICK_IMAGE_FILE_ID -> {
-                actualImage = com.rf.taskmodule.utils.image_utility.ImagePicker.getImageFileToUpload(this, resultCode, data)
+                actualImage = ImagePicker.getImageFileToUpload(this, resultCode, data)
                 compressImage()
             }
             DynamicFragment.CAMERA_PIC_REQUEST -> {
@@ -1048,11 +1048,11 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                         if (file.exists()) {
                             //  imageView.setImageURI(image.path?)
 //                            var bm = BitmapFactory.decodeFile(imageFilePath)
-                            val bm = com.rf.taskmodule.utils.image_utility.ImagePicker.getImageResized(this, uri!!)
+                            val bm = ImagePicker.getImageResized(this, uri!!)
 //                            val rotation = ImagePicker.getRotation(context, uri, true)
 //                            bm = ImagePicker.rotate(bm, rotation)
                             // Code to manage the bitmap
-                            actualImage = com.rf.taskmodule.utils.CommonUtils.convertBitmapToFile(
+                            actualImage = CommonUtils.convertBitmapToFile(
                                 this, bm,
                                 "upload_" + Calendar.getInstance().timeInMillis + ".jpg"
                             )
@@ -1060,7 +1060,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
 
                             if (actualImage != null) {
 
-                                com.rf.taskmodule.utils.image_utility.Compressor(
+                                Compressor(
                                     this
                                 )
                                     .setQuality(90)
@@ -1079,10 +1079,10 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                                         )
                                     })
                             } else {
-                                com.rf.taskmodule.utils.Log.e(DynamicFragment.TAG, "Image is not captured")
+                                Log.e(DynamicFragment.TAG, "Image is not captured")
                             }
                         } else {
-                            com.rf.taskmodule.utils.Log.e(DynamicFragment.TAG, "Image is not captured")
+                            Log.e(DynamicFragment.TAG, "Image is not captured")
                         }
 
 
@@ -1112,9 +1112,9 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                                     showDynamicFormDataAdapter.formDataList[vidViewposition].enteredValue = filePath
                                     if (file.exists()) {
                                         if (file.delete()) {
-                                            com.rf.taskmodule.utils.Log.e("file Deleted :", file!!.path!!)
+                                            Log.e("file Deleted :", file!!.path!!)
                                         } else {
-                                            com.rf.taskmodule.utils.Log.e("file not Deleted :", file!!.path!!.toString())
+                                            Log.e("file not Deleted :", file!!.path!!.toString())
                                         }
                                     }
                                     runOnUiThread(Runnable {
@@ -1143,9 +1143,9 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                                                         data.enteredValue = filePath
                                                         if (file.exists()) {
                                                             if (file.delete()) {
-                                                                com.rf.taskmodule.utils.Log.e("file Deleted :", file!!.path)
+                                                                Log.e("file Deleted :", file!!.path)
                                                             } else {
-                                                                com.rf.taskmodule.utils.Log.e(
+                                                                Log.e(
                                                                     "file not Deleted :",
                                                                     file!!.path
                                                                 )
@@ -1179,7 +1179,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
             AUTOCOMPLETE_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     val place = Autocomplete.getPlaceFromIntent(data!!)
-                    com.rf.taskmodule.utils.Log.i(DynamicFragment.TAG, "Place: " + place.name + ", " + place.id)
+                    Log.i(DynamicFragment.TAG, "Place: " + place.name + ", " + place.id)
                     var latLong = place.latLng
                     var location =
                         com.rf.taskmodule.ui.addplace.Location(latLong!!.latitude, latLong.longitude)
@@ -1187,10 +1187,10 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                     var hubLocation = com.rf.taskmodule.ui.addplace.HubLocation(location, 0)
                     hubLocation.address = place.name
                     var jsonConverter =
-                        com.rf.taskmodule.utils.JSONConverter<HubLocation>()
+                        JSONConverter<HubLocation>()
                     //adapter.formDataList[position].enteredValue = jsonConverter.objectToJson(hubLocation)
                     showDynamicFormDataAdapter.formDataList[position].enteredValue = place.name
-                    com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                    CommonUtils.showLogMessage(
                         "e",
                         "enterdvalue",
                         showDynamicFormDataAdapter.formDataList[position].enteredValue
@@ -1202,7 +1202,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
 
                 } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                     val status = Autocomplete.getStatusFromIntent(data!!)
-                    com.rf.taskmodule.utils.Log.i(DynamicFragment.TAG, status.statusMessage)
+                    Log.i(DynamicFragment.TAG, status.statusMessage)
                     TrackiToast.Message.showShort(this, status.statusMessage!!)
 
                 } else if (resultCode == Activity.RESULT_CANCELED) {
@@ -1210,12 +1210,12 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                 }
 
             }
-            com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_SCAN->{
+            AppConstants.REQUEST_CODE_SCAN->{
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null && data.hasExtra("id")) {
                         var id=data.getStringExtra("id")
                         showDynamicFormDataAdapter.formDataList[position].enteredValue = id
-                        com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                        CommonUtils.showLogMessage(
                             "e",
                             "enterdvalue",
                             showDynamicFormDataAdapter.formDataList[position].enteredValue
@@ -1240,8 +1240,8 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                     fileUploadCounter += obj.chunkSize
                     var progressUploadText = "${fileUploadCounter}/${obj.totalSize}"
                     var percentage = ((fileUploadCounter * 100 / obj.totalSize))
-                    com.rf.taskmodule.utils.Log.e(TAG, "progressUploadText=> $progressUploadText")
-                    com.rf.taskmodule.utils.Log.e(TAG, "percentage=> $percentage")
+                    Log.e(TAG, "progressUploadText=> $progressUploadText")
+                    Log.e(TAG, "percentage=> $percentage")
                     runOnUiThread {
                         progressBar!!.progress = percentage
                         percentageText!!.text = "$percentage %"
@@ -1249,7 +1249,7 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                     }
                 }
                 /*For Success */0 -> {
-                if (com.rf.taskmodule.utils.CommonUtils.stringListHashMap.isNotEmpty()) {
+                if (CommonUtils.stringListHashMap.isNotEmpty()) {
                     //get hashMap from adapter and match the name with key of maps
                     // if found then replace entered value with url of image
                     runOnUiThread {
@@ -1260,12 +1260,12 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                         for (i in mainData?.indices!!) {
                             try {
                                 if (mainData!![i].type != DataType.BUTTON) {
-                                    if (com.rf.taskmodule.utils.CommonUtils.stringListHashMap?.containsKey(mainData!![i].uniqueID)!!) {
-                                        com.rf.taskmodule.utils.Log.e("Upload Form List--->", mainData!![i].uniqueID!!)
+                                    if (CommonUtils.stringListHashMap?.containsKey(mainData!![i].uniqueID)!!) {
+                                        Log.e("Upload Form List--->", mainData!![i].uniqueID!!)
                                         mainData!![i].enteredValue =
-                                            com.rf.taskmodule.utils.CommonUtils.getCommaSeparatedList(
-                                                com.rf.taskmodule.utils.CommonUtils.stringListHashMap[mainData!![i].uniqueID])
-                                        com.rf.taskmodule.utils.Log.e("Upload Form List--->", mainData!![i].enteredValue!!)
+                                            CommonUtils.getCommaSeparatedList(
+                                                CommonUtils.stringListHashMap[mainData!![i].uniqueID])
+                                        Log.e("Upload Form List--->", mainData!![i].enteredValue!!)
                                     }
                                 }
                             } catch (e: Exception) {
@@ -1273,14 +1273,14 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                             }
                         }
                         //assign empty object to map again
-                        com.rf.taskmodule.utils.CommonUtils.stringListHashMap = ConcurrentHashMap()
+                        CommonUtils.stringListHashMap = ConcurrentHashMap()
                         finalApiHit(mainData!!)
                     }
                 } else {
-                    com.rf.taskmodule.utils.Log.e(TAG, "Map is empty...Try Again")
+                    Log.e(TAG, "Map is empty...Try Again")
                     handlerThread?.interrupt()
                     hideLoading()
-                    com.rf.taskmodule.utils.CommonUtils.stringListHashMap = ConcurrentHashMap()
+                    CommonUtils.stringListHashMap = ConcurrentHashMap()
                         finalApiHit(mainData!!)
                 }
             }
@@ -1288,12 +1288,12 @@ open class SkuInfoActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityS
                 if (count == 0) {
                     runOnUiThread {
                         binding.viewProgress.visibility = View.GONE
-                        com.rf.taskmodule.utils.CommonUtils.makeScreenClickable(this@SkuInfoActivity)
+                        CommonUtils.makeScreenClickable(this@SkuInfoActivity)
                     }
                     count++
                     fileUploadCounter = 0
                     TrackiToast.Message.showShort(this@SkuInfoActivity,
-                        com.rf.taskmodule.utils.AppConstants.UNABLE_TO_PROCESS_REQUEST)
+                        AppConstants.UNABLE_TO_PROCESS_REQUEST)
                     handlerThread?.interrupt()
                     hideLoading()
                 }

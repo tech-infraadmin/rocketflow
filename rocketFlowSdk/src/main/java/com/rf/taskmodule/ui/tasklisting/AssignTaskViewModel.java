@@ -5,15 +5,19 @@ import android.os.CountDownTimer;
 
 import androidx.databinding.ObservableField;
 
+import com.rf.taskmodule.data.model.response.config.AssigneeDetail;
+import com.rf.taskmodule.data.model.response.config.CallToActions;
+import com.rf.taskmodule.data.model.response.config.Executor;
+import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.utils.AppConstants;
-import com.rf.taskmodule.utils.CommonUtils;
 import com.rf.taskmodule.utils.DateTimeUtil;
+import com.rf.taskmodule.utils.Log;
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
 import com.rf.taskmodule.data.model.response.config.AssigneeDetail;
 import com.rf.taskmodule.data.model.response.config.CallToActions;
 import com.rf.taskmodule.data.model.response.config.Executor;
 import com.rf.taskmodule.data.model.response.config.Task;
-//import com.rf.taskmodule.ui.receiver.ServiceRestartReceiver;
+//import com.rf.taskmodule.Receiver.ServiceRestartReceiver;
 import com.rf.taskmodule.utils.AppConstants;
 import com.rf.taskmodule.utils.CommonUtils;
 import com.rf.taskmodule.utils.DateTimeUtil;
@@ -68,7 +72,7 @@ public class AssignTaskViewModel {
         try {
 
 
-            String taskId= CommonUtils.getAllowFieldLabelName("REFERENCE_ID",categoryId,preferencesHelper);
+            String taskId=CommonUtils.getAllowFieldLabelName("REFERENCE_ID",categoryId,preferencesHelper);
             if(!taskId.isEmpty()){
                 labelReffranceId.set(taskId);
             }else{
@@ -201,13 +205,13 @@ public class AssignTaskViewModel {
                         contactPersonName.set(task.getAssigneeDetail().getName());
                     }
 
-                } else if (task.getContact() != null && task.getContact().getMobile() != null && !task.getContact().getMobile().isEmpty()) {
+                } else if (task.getContact() != null && task.getContact().getMobileNumber() != null && !task.getContact().getMobileNumber().isEmpty()) {
                     isCallRelativeLayoutVisible.set(true);
                     contactPersonRole.set("Contact Details");
                     contactPersonName.set(task.getContact().getName());
-                    contactMobile.set(task.getContact().getMobile());
-                    if (task.getContact().getMobile() != null) {
-                        String mobile = task.getContact().getMobile();
+                    contactMobile.set(task.getContact().getMobileNumber());
+                    if (task.getContact().getMobileNumber() != null) {
+                        String mobile = task.getContact().getMobileNumber();
                         contactMobile.set(mobile);
                     }
                 }

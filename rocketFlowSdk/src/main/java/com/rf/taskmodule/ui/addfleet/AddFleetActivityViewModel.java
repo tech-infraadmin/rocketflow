@@ -4,9 +4,14 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.rf.taskmodule.data.DataManager;
+import com.rf.taskmodule.data.model.request.AddFleetRequest;
+import com.rf.taskmodule.data.model.request.UpdateFileRequest;
 import com.rf.taskmodule.data.model.response.config.Api;
 import com.rf.taskmodule.data.network.APIError;
-import com.rf.taskmodule.utils.CommonUtils;
+import com.rf.taskmodule.data.network.ApiCallback;
+import com.rf.taskmodule.data.network.HttpManager;
+import com.rf.taskmodule.utils.rx.AppSchedulerProvider;
+import com.rf.taskmodule.utils.rx.SchedulerProvider;
 import com.rf.taskmodule.data.DataManager;
 import com.rf.taskmodule.data.model.request.AddFleetRequest;
 import com.rf.taskmodule.data.model.request.UpdateFileRequest;
@@ -16,7 +21,6 @@ import com.rf.taskmodule.data.network.ApiCallback;
 import com.rf.taskmodule.data.network.HttpManager;
 import com.rf.taskmodule.ui.base.BaseSdkViewModel;
 import com.rf.taskmodule.utils.CommonUtils;
-import com.rf.taskmodule.utils.rx.AppSchedulerProvider;
 import com.rf.taskmodule.utils.rx.SchedulerProvider;
 
 /**

@@ -5,10 +5,13 @@ import static com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FLEET_LIST_CALLIN
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,14 +19,18 @@ import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -33,7 +40,49 @@ import androidx.lifecycle.ViewModelProviders;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
+import com.rf.taskmodule.data.local.db.DatabaseHelper;
+import com.rf.taskmodule.data.local.prefs.AppPreferencesHelper;
+import com.rf.taskmodule.data.model.NotificationEventStatus;
+import com.rf.taskmodule.data.model.NotificationModel;
+import com.rf.taskmodule.data.model.request.Addrloc;
+import com.rf.taskmodule.data.model.request.Data;
+import com.rf.taskmodule.data.model.request.EndTaskRequest;
+import com.rf.taskmodule.data.model.request.Location;
+import com.rf.taskmodule.data.model.request.OnlineOffLineRequest;
+import com.rf.taskmodule.data.model.request.PunchInOut;
+import com.rf.taskmodule.data.model.request.PunchRequest;
+import com.rf.taskmodule.data.model.response.config.Buddy;
+import com.rf.taskmodule.data.model.response.config.BuddyListResponse;
+import com.rf.taskmodule.data.model.response.config.Fleet;
+import com.rf.taskmodule.data.model.response.config.FleetListResponse;
+import com.rf.taskmodule.data.model.response.config.GeoCoordinates;
+import com.rf.taskmodule.data.model.response.config.Navigation;
+import com.rf.taskmodule.data.model.response.config.OnLineOfflineResponse;
+import com.rf.taskmodule.data.model.response.config.Place;
+import com.rf.taskmodule.data.model.response.config.ProfileInfo;
+import com.rf.taskmodule.data.model.response.config.Task;
+import com.rf.taskmodule.data.network.APIError;
+import com.rf.taskmodule.data.network.ApiCallback;
+import com.rf.taskmodule.data.network.HttpManager;
+import com.rf.taskmodule.databinding.ActivitySdkMainBinding;
+import com.rf.taskmodule.ui.addplace.LocationListResponse;
+import com.rf.taskmodule.ui.buddylisting.BuddyListingActivity;
+import com.rf.taskmodule.ui.common.DoubleButtonDialog;
+import com.rf.taskmodule.ui.common.OnClickListener;
+import com.rf.taskmodule.ui.custom.RoundImageView;
+import com.rf.taskmodule.ui.fleetlisting.FleetListingActivity;
+import com.rf.taskmodule.ui.newcreatetask.NewCreateTaskActivity;
+import com.rf.taskmodule.ui.taskdetails.NewTaskDetailsActivity;
+import com.rf.taskmodule.utils.AppConstants;
+import com.rf.taskmodule.utils.DateTimeUtil;
+import com.rf.taskmodule.utils.JSONConverter;
+import com.rf.taskmodule.utils.Log;
+import com.rf.taskmodule.utils.NetworkUtils;
+import com.rf.taskmodule.utils.ShakeDetector;
+import com.rf.taskmodule.utils.TaskStatus;
+import com.rf.taskmodule.utils.TrackiToast;
 import com.rocketflow.sdk.RocketFlyer;
+
 import com.rf.taskmodule.BR;
 //import com.rf.taskmodule.BuildConfig;
 import com.rf.taskmodule.R;
@@ -61,7 +110,6 @@ import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.network.APIError;
 import com.rf.taskmodule.data.network.ApiCallback;
 import com.rf.taskmodule.data.network.HttpManager;
-import com.rf.taskmodule.databinding.ActivitySdkMainBinding;
 //import com.rf.taskmodule.ui.account.MyAccountActivity;
 import com.rf.taskmodule.ui.addplace.LocationListResponse;
 //import com.rf.taskmodule.ui.attendance.AttendanceBaseFragment;
@@ -93,8 +141,10 @@ import com.rf.taskmodule.utils.DateTimeUtil;
 import com.rf.taskmodule.utils.JSONConverter;
 import com.rf.taskmodule.utils.Log;
 import com.rf.taskmodule.utils.NetworkUtils;
+import com.rf.taskmodule.utils.ShakeDetector;
 import com.rf.taskmodule.utils.TaskStatus;
 import com.rf.taskmodule.utils.TrackiToast;
+
 import com.trackthat.lib.TrackThat;
 import com.trackthat.lib.internal.network.TrackThatCallback;
 import com.trackthat.lib.models.ErrorResponse;
@@ -120,13 +170,15 @@ import java.util.List;
  * Created by rahul on 6/9/18.
  */
 public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, MainViewModel>
-        implements MainNavigator, View.OnClickListener, TaskDashBoardFragment.NavigationClickFromTaskDashBoard
-        {
+        implements MainNavigator, View.OnClickListener, TaskDashBoardFragment.NavigationClickFromTaskDashBoard {
 
 
     private static final String TAG = "MainSDKActivity";
 
     MainViewModel mMainViewModel;
+    SensorManager mSensorManager = null;
+    Sensor mAccelerometer = null;
+    ShakeDetector mShakeDetector = new ShakeDetector();
 
     PreferencesHelper preferencesHelper;
     HttpManager httpManager;
@@ -166,12 +218,12 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
     }
 
 
-            @Override
-            public MainViewModel getViewModel() {
-                MainViewModel.Factory factory = new MainViewModel.Factory(RocketFlyer.Companion.dataManager());
-                mMainViewModel = ViewModelProviders.of(this,factory).get(MainViewModel.class);
-                return mMainViewModel;
-            }
+    @Override
+    public MainViewModel getViewModel() {
+        MainViewModel.Factory factory = new MainViewModel.Factory(RocketFlyer.Companion.dataManager());
+        mMainViewModel = ViewModelProviders.of(this, factory).get(MainViewModel.class);
+        return mMainViewModel;
+    }
 
 
     @Override
@@ -181,9 +233,11 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
 
         httpManager = RocketFlyer.Companion.httpManager();
         preferencesHelper = RocketFlyer.Companion.preferenceHelper();
+//        Log.e("shakerDetect", "inside Function");
 
+        setShaker();
         mMainViewModel.setNavigator(this);
-        Log.d("Hello","MainActivity");
+        Log.d("Hello", "MainActivity");
 
         preferencesHelper.setIsFleetAndBuddyShow(false);
         if (getIntent().hasExtra(AppConstants.Extra.TITLE)) {
@@ -193,6 +247,18 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
         }
 
         addFragmentInContainer(TaskDashBoardFragment.newInstance(this));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSensorManager.registerListener(mShakeDetector,mAccelerometer,SensorManager.SENSOR_DELAY_UI);
+    }
+
+    @Override
+    protected void onPause() {
+        mSensorManager.unregisterListener(mShakeDetector);
+        super.onPause();
     }
 
     private void handleTaskWorkFromPush(String message) {
@@ -284,18 +350,18 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 //            checkPermissionAndAskPermission();
 //        }
- //   }
+    //   }
 
     private void addFragmentInContainer(Fragment fragment) {
-        if (getVisibleFragment() == null){
+        if (getVisibleFragment() == null) {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             ft.disallowAddToBackStack();
             ft.replace(R.id.fragment_container, fragment, fragment.getClass().getSimpleName());
             ft.commit();
-        }else if (!getVisibleFragment().getClass().getSimpleName().equals(fragment.getClass().getSimpleName())){
-           Log.d("fragment visible",getVisibleFragment().getClass().getSimpleName());
-           Log.d("fragment visible",fragment.getClass().getSimpleName());
+        } else if (!getVisibleFragment().getClass().getSimpleName().equals(fragment.getClass().getSimpleName())) {
+            Log.d("fragment visible", getVisibleFragment().getClass().getSimpleName());
+            Log.d("fragment visible", fragment.getClass().getSimpleName());
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             ft.disallowAddToBackStack();
@@ -304,12 +370,12 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
         }
     }
 
-    public Fragment getVisibleFragment(){
+    public Fragment getVisibleFragment() {
         FragmentManager fragmentManager = MainSDKActivity.this.getSupportFragmentManager();
         List<Fragment> fragments = fragmentManager.getFragments();
-        if(fragments != null){
-            for(Fragment fragment : fragments){
-                if(fragment != null && fragment.isVisible())
+        if (fragments != null) {
+            for (Fragment fragment : fragments) {
+                if (fragment != null && fragment.isVisible())
                     return fragment;
             }
         }
@@ -382,6 +448,77 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
 //        });
 //
 //    }
+
+    private void setShaker() {
+        Log.e("shakerDetect", "inside Function");
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mShakeDetector = new ShakeDetector();
+        mShakeDetector.setOnShakeListener(count -> {
+            Log.e("shakerDetect", "shaked");
+            if (count == 3) {
+                Log.e("shakerDetect", "shaked 3 times");
+                showBaseDialog();
+            }
+        });
+    }
+
+    private void showBaseDialog() {
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.dialog_base_change);
+        AppCompatEditText passEdit = dialog.findViewById(R.id.passwordBase);
+        LinearLayout baseLL = dialog.findViewById(R.id.llBuild);
+        RadioGroup radioGrp = dialog.findViewById(R.id.radioGrpBuild);
+        Button saveBtn = dialog.findViewById(R.id.btnSaveBase);
+        Button cancelBtn = dialog.findViewById(R.id.btnCancelBase);
+
+        final String[] url = {"na"};
+        radioGrp.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.radioUAT) {
+                url[0] = "https://uat.rocketflyer.in/rfapi/secure/tracki/";
+            } else if (checkedId == R.id.radioPROD) {
+                url[0] = "https://api.rocketflow.in/rfapi/secure/tracki/";
+            }
+        });
+
+        saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String password = passEdit.getText().toString();
+                if (baseLL.getVisibility() == View.GONE) {
+                    if (password == "2567") {
+                        baseLL.setVisibility(View.VISIBLE);
+                        passEdit.setVisibility(View.GONE);
+                    }
+                } else {
+
+                    if (url[0] == "na") {
+                        TrackiToast.Message.showShort(MainSDKActivity.this, "Please Select one of the variants");
+                    } else {
+//                    val editor = sharedPreferences.edit()
+//                    editor.clear().apply()
+//                        pref.baseMode = url
+                        baseLL.setVisibility(View.GONE);
+                        passEdit.setVisibility(View.VISIBLE);
+                        dialog.dismiss();
+
+                    }
+                }
+            }
+        });
+
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+    }
 
     private void perFormSwitchTask() {
 //        if (preferencesHelper.getUserType() != null && preferencesHelper.getUserType().equals(UserType.DRIVER.name())) {
@@ -467,7 +604,7 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
                                     onlineOfflineStatus = true;
                                     request.setStatus("ONLINE");
                                 }
-                                Log.d("onCheckedChanged","onCheckedChanged 1");
+                                Log.d("onCheckedChanged", "onCheckedChanged 1");
                                 showLoading();
                                 mMainViewModel.markOnlineOffline(httpManager, request);
                             }
@@ -838,7 +975,7 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
             }
             EndTaskRequest request = new EndTaskRequest(task.getTaskId(), null, DateTimeUtil.getCurrentDateInMillis(), destination);
             if (NetworkUtils.isNetworkConnected(this)) {
-                Log.d("onCheckedChanged","onCheckedChanged 2");
+                Log.d("onCheckedChanged", "onCheckedChanged 2");
                 showLoading();
                 mMainViewModel.endTask(httpManager, request);
             } else {
@@ -846,7 +983,7 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
             }
         } else {
             if (NetworkUtils.isNetworkConnected(this)) {
-                Log.d("onCheckedChanged","onCheckedChanged 3");
+                Log.d("onCheckedChanged", "onCheckedChanged 3");
                 showLoading();
                 mMainViewModel.logout(httpManager);
             } else {
@@ -938,7 +1075,7 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
                         CommonUtils.showLogMessage("e", "batteryLevel", "" + batteryLevel);
 
 
-                        com.rf.taskmodule.data.model.request.Location locationobj = new com.rf.taskmodule.data.model.request.Location();
+                        Location locationobj = new Location();
                         locationobj.setLocationId(CommonUtils.genrateId());
                         locationobj.setLatitude(loc.getLatitude());
                         locationobj.setLongitude(loc.getLongitude());
@@ -970,7 +1107,7 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
                         TrackthatLocation loc = (TrackthatLocation) successResponse.getResponseObject();
                         TrackThat.addLogoutEvent(loc.getLatitude(), loc.getLongitude(), false, batteryLevel);
                         TrackThat.addForcePunchOutEvent(loc.getLatitude(), loc.getLongitude(), false, batteryLevel);
-                        com.rf.taskmodule.data.model.request.Location locationobj = new com.rf.taskmodule.data.model.request.Location();
+                        Location locationobj = new Location();
                         locationobj.setLocationId(CommonUtils.genrateId());
                         locationobj.setLatitude(loc.getLatitude());
                         locationobj.setLongitude(loc.getLongitude());
@@ -1015,7 +1152,7 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
                 if (list != null && list.size() > 0) {
                     hideLoading();
                     startActivityForResult(BuddyListingActivity.newIntent(this)
-                                    .putExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true),
+                                    .putExtra(AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true),
                             AppConstants.REQUEST_CODE_CREATE_TASK);
                 } else {
                     mMainViewModel.checkFleet(httpManager);
@@ -1034,11 +1171,11 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
             List<Fleet> list = buddyListResponse.getFleets();
             if (list != null && list.size() > 0) {
                 startActivityForResult(FleetListingActivity.newIntent(this)
-                                .putExtra(EXTRA_FLEET_LIST_CALLING_FROM_DASHBOARD_MENU, true),
+                                .putExtra(AppConstants.Extra.EXTRA_FLEET_LIST_CALLING_FROM_DASHBOARD_MENU, true),
                         AppConstants.REQUEST_CODE_CREATE_TASK);
             } else {
                 startActivityForResult(NewCreateTaskActivity.Companion.newIntent(this)
-                                .putExtra(EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true),
+                                .putExtra(AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true),
                         AppConstants.REQUEST_CODE_CREATE_TASK);
             }
         }
@@ -1129,7 +1266,7 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
             JSONConverter jsonConverter = new JSONConverter();
             LocationListResponse response = (LocationListResponse) jsonConverter.jsonToObject(result.toString(), LocationListResponse.class);
             if (response.getSuccessful()) {
-                Log.e("appLog",""+response.getHubs());
+                Log.e("appLog", "" + response.getHubs());
                 if (response.getHubs() != null && !response.getHubs().isEmpty()) {
                     preferencesHelper.saveUserHubList(response.getHubs());
                 } else {
@@ -1179,7 +1316,7 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AppConstants.REQUEST_CODE_FOR_PLACE) {
-            Log.d("TaskDashBoardFragment","TaskDashBoardFragment 3");
+            Log.d("TaskDashBoardFragment", "TaskDashBoardFragment 3");
             TaskDashBoardFragment fragmentByTag = (TaskDashBoardFragment) getSupportFragmentManager().findFragmentByTag(TaskDashBoardFragment.class.getSimpleName());
             if (fragmentByTag != null) {
                 fragmentByTag.performLocationSpinnerTask();

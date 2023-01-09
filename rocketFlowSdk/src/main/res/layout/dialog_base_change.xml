@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_margin="@dimen/dimen_10"
+    android:background="@drawable/bg_double_button"
+    android:orientation="vertical"
+    android:padding="@dimen/dimen_5">
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/passwordBase"
+        style="@style/EditTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Password"
+        android:visibility="visible" />
+
+    <!--<androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/baseLink"
+        style="@style/EditTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Base URL"
+        android:visibility="gone" />-->
+
+    <LinearLayout
+        android:layout_marginTop="@dimen/dimen_10"
+        android:layout_marginBottom="@dimen/dimen_10"
+        android:id="@+id/llBuild"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:id="@+id/radioGrpBuild"
+            android:layout_marginTop="@dimen/dimen_10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:buttonTint="@color/colorPrimary"
+                android:id="@+id/radioUAT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UAT"/>
+
+            <RadioButton
+                android:buttonTint="@color/colorPrimary"
+                android:layout_marginTop="@dimen/dimen_10"
+                android:id="@+id/radioPROD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PROD"/>
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_10"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="@dimen/dimen_5">
+
+        <Button
+            android:id="@+id/btnCancelBase"
+            style="@style/ButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dimen_40"
+            android:layout_marginEnd="@dimen/dimen_10"
+            android:layout_marginRight="@dimen/dimen_10"
+            android:layout_weight=".4"
+            android:textSize="@dimen/text_size_13"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/btnSaveBase"
+            style="@style/ButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dimen_40"
+            android:layout_marginStart="@dimen/dimen_10"
+            android:layout_marginLeft="@dimen/dimen_10"
+            android:layout_weight=".4"
+            android:textSize="@dimen/text_size_13"
+            android:background="@drawable/bg_stroke_grey"
+            android:text="Save"
+            android:textColor="@color/colorPrimary" />
+
+    </LinearLayout>
+
+</LinearLayout>

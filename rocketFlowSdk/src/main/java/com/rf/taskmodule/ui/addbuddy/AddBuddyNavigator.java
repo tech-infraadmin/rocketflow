@@ -4,8 +4,6 @@ import android.view.View;
 
 import com.rf.taskmodule.ui.base.BaseSdkNavigator;
 
-import com.rf.taskmodule.ui.base.BaseSdkNavigator;
-
 /**
  * Created by rahul on 18/9/18
  */

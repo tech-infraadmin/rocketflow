@@ -4,9 +4,8 @@ import android.content.Context
 import android.os.Bundle
 //import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
-//import com.rf.taskmodule.TrackiApplication
+//import com.rf.taskmodule.ui.TrackiApplication
 import com.rf.taskmodule.data.model.BaseResponse
-import com.rf.taskmodule.data.model.request.AnalyticRequest
 import com.rf.taskmodule.data.network.APIError
 import com.rf.taskmodule.data.network.ApiCallback
 import com.rf.taskmodule.utils.AppConstants.Analytics.Events.*
@@ -19,7 +18,7 @@ import com.rf.taskmodule.utils.AppConstants.Analytics.Events.*
  * Created by rahul on 16/4/19
  */
 class AnalyticsHelper(val context: Context) :
-    com.rf.taskmodule.data.network.ApiCallback {
+    ApiCallback {
 
 //    private lateinit var application:  context.applicationContext
 //    private lateinit var analyticRequest: AnalyticRequest
@@ -103,8 +102,8 @@ class AnalyticsHelper(val context: Context) :
         }
 
         val params = Bundle()
-        params.putString(com.rf.taskmodule.utils.AppConstants.Analytics.EXTRA_EVENT_NAME, eventName)
-        params.putString(com.rf.taskmodule.utils.AppConstants.Analytics.EXTRA_PAGE_NAME, pageName)
+        params.putString(AppConstants.Analytics.EXTRA_EVENT_NAME, eventName)
+        params.putString(AppConstants.Analytics.EXTRA_PAGE_NAME, pageName)
         //firebaseAnalytics.logEvent(AppConstants.Analytics.EXTRA_EVENT, params)
     }
 
@@ -119,7 +118,7 @@ class AnalyticsHelper(val context: Context) :
     }
 
     override fun onResponse(result: Any?, error: APIError?) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(this, error, result, context)) {
+        if (CommonUtils.handleResponse(this, error, result, context)) {
             val baseResponse: BaseResponse = Gson().fromJson(result.toString(), BaseResponse::class.java)
         }
     }
@@ -132,7 +131,7 @@ class AnalyticsHelper(val context: Context) :
     override fun onNetworkErrorClose() {
     }
 
-    override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+    override fun onRequestTimeOut(callBack: ApiCallback) {
     }
 
     override fun onLogout() {

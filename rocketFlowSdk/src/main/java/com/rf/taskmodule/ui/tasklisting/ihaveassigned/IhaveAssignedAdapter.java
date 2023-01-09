@@ -10,8 +10,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.rf.taskmodule.data.model.response.config.ActionConfig;
+import com.rf.taskmodule.data.model.response.config.AssigneeDetail;
+import com.rf.taskmodule.data.model.response.config.GeoCoordinates;
+import com.rf.taskmodule.data.model.response.config.Navigation;
+import com.rf.taskmodule.data.model.response.config.Task;
+import com.rf.taskmodule.data.model.response.config.UserGroup;
 import com.rf.taskmodule.ui.tasklisting.assignedtome.TaskAssignToMeViewModel;
-import com.rf.taskmodule.utils.CommonUtils;
 
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
@@ -167,7 +172,7 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
             Boolean isPointOfContactVisible=false;
             if(categoryId!=null)
             {
-                String startLocationLabel= CommonUtils.getAllowFieldLabelName("START_LOCATION",categoryId,preferencesHelper);
+                String startLocationLabel=CommonUtils.getAllowFieldLabelName("START_LOCATION",categoryId,preferencesHelper);
                 String systemLocationLabel=CommonUtils.getAllowFieldLabelName("SYSTEM_LOCATION",categoryId,preferencesHelper);
                 if(!startLocationLabel.isEmpty()){
                     mBinding.labelStartLocation.setText(startLocationLabel);
@@ -327,13 +332,13 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
             if(task.getContact()!=null){
                 isPointOfContactVisible=true;
                 mBinding.tvContactName.setText(task.getContact().getName());
-                mBinding.tvContactMobile.setText(task.getContact().getMobile());
+                mBinding.tvContactMobile.setText(task.getContact().getMobileNumber());
                 mBinding.rlPointOfContact.setVisibility(View.VISIBLE);
                 mBinding.rlCallContactPerson.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (task.getContact().getMobile() != null) {
-                            String mobile = task.getContact().getMobile();
+                        if (task.getContact().getMobileNumber() != null) {
+                            String mobile = task.getContact().getMobileNumber();
                             CommonUtils.openDialer(context, mobile);
                         }
                     }

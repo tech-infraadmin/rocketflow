@@ -50,7 +50,6 @@ import com.rf.taskmodule.ui.fleetlisting.FleetListingActivity;
 import com.rf.taskmodule.ui.geofencing.GeofenceUtil;
 import com.rf.taskmodule.ui.main.filter.BuddyFilterActivity;
 import com.rf.taskmodule.utils.AppConstants;
-import com.rf.taskmodule.utils.CommonUtils;
 import com.rf.taskmodule.utils.ErrorScreenHelper;
 import com.rf.taskmodule.utils.Log;
 import com.rf.taskmodule.utils.NetworkStateReceiver;
@@ -451,13 +450,14 @@ public abstract class BaseSdkActivity<T extends ViewDataBinding, V extends BaseS
     protected void setToolbar(Toolbar mToolbar, String title) {
         if (title != null) {
             mToolbar.setTitle(title);
-            mToolbar.setTitleTextColor(Color.BLACK);
+            mToolbar.setBackgroundColor(Color.parseColor("#3581F3"));
+            mToolbar.setTitleTextColor(Color.WHITE);
             mToolbar.setTitleTextAppearance(this, R.style.CamptonBookTextAppearance);
             // centerToolbarTitle(mToolbar);
         }
         setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+            //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }

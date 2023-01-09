@@ -11,6 +11,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.request.RequestOptions;
+import com.rf.taskmodule.data.model.response.config.Fleet;
+
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.data.model.response.config.Fleet;
 import com.rf.taskmodule.databinding.ItemFleetListingEmptyViewSdkBinding;

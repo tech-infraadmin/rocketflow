@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rocketflow.sdk.RocketFlyer
-import com.rf.taskmodule.BR
 import com.rf.taskmodule.R
 import com.rf.taskmodule.TrackiSdkApplication
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper
@@ -28,14 +27,16 @@ import com.rf.taskmodule.ui.selectorder.CataLogProductCategory
 import com.rf.taskmodule.ui.selectorder.CatalogCategoryResponse
 import com.rf.taskmodule.ui.selectorder.PaginationRequest
 import com.rf.taskmodule.ui.tasklisting.PaginationListener
+import com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START
 import com.rf.taskmodule.utils.ApiType
 import com.rf.taskmodule.utils.AppConstants
 import com.rf.taskmodule.utils.CommonUtils
 import com.rf.taskmodule.utils.JSONConverter
+import com.rf.taskmodule.BR
 import java.util.HashMap
 
 class ProductCategoryListActivity :
-    com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityProductCategoryListSdkBinding, GetFlavourCategoryListViewModel>(),
+    BaseSdkActivity<ActivityProductCategoryListSdkBinding, GetFlavourCategoryListViewModel>(),
     ProductCategoryNavigator, CategoryAdapter.OnCategoryListener {
     private var subCat: Boolean=false
     private var categoryMap: String? = null
@@ -45,8 +46,8 @@ class ProductCategoryListActivity :
     lateinit var getFlavourCategoryListViewModel: GetFlavourCategoryListViewModel
 
 
-    lateinit var mPref: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var mPref: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
     lateinit var binding: ActivityProductCategoryListSdkBinding
 
@@ -55,7 +56,7 @@ class ProductCategoryListActivity :
     private var mMapCategory: Map<String, String>? = null
     var flavorId: String? = null
 
-    private var currentPage = com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START
+    private var currentPage = PAGE_START
     private var isLastPage = false
     private var isLoading = false
     private var mLayoutManager: LinearLayoutManager? = null
@@ -94,9 +95,9 @@ class ProductCategoryListActivity :
         } else {
             setToolbar(binding.toolbar, "Product Categories")
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)) {
-            categoryMap = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "categoryMap", categoryMap)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORIES)) {
+            categoryMap = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORIES)
+            CommonUtils.showLogMessage("e", "categoryMap", categoryMap)
             mMapCategory = Gson().fromJson<Map<String, String>>(
                 categoryMap,
                 object : TypeToken<HashMap<String?, String?>?>() {}.type
@@ -137,7 +138,7 @@ class ProductCategoryListActivity :
         if (prodCat.subCat!!) {
             val categoryIntent = Intent(this, ProductCategoryListActivity::class.java)
             categoryIntent.putExtra(
-                com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES,
+                AppConstants.Extra.EXTRA_CATEGORIES,
                 categoryMap
             )
             categoryIntent.putExtra(
@@ -162,7 +163,7 @@ class ProductCategoryListActivity :
         intent.putExtra("data", product)
         if (categoryMap != null) {
             intent.putExtra(
-                com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES,
+                AppConstants.Extra.EXTRA_CATEGORIES,
                 categoryMap
             )
         }
@@ -174,7 +175,7 @@ class ProductCategoryListActivity :
         when (resultCode) {
             Activity.RESULT_OK -> {
                 if (requestCode == CONST_ADD) {
-                    currentPage = com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START
+                    currentPage = PAGE_START
                     getCategories()
                 }
 
@@ -187,7 +188,7 @@ class ProductCategoryListActivity :
     }
 
     override fun onStatusChange(product: CataLogProductCategory, position: Int) {
-        if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.UPDATE_PRODUCT_CATEGORY_STATUS)) {
+        if (TrackiSdkApplication.getApiMap().containsKey(ApiType.UPDATE_PRODUCT_CATEGORY_STATUS)) {
             this.position = position
             isDelete = false
             showLoading()
@@ -206,7 +207,7 @@ class ProductCategoryListActivity :
                 override fun onClickCancel() {}
                 override fun onClick() {
                     this@ProductCategoryListActivity.position = position
-                    if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.DELETE_PRODUCT_CATEGORY)) {
+                    if (TrackiSdkApplication.getApiMap().containsKey(ApiType.DELETE_PRODUCT_CATEGORY)) {
                         isDelete = true
                         showLoading()
                         getFlavourCategoryListViewModel.deleteProductCategory(httpManager, prodCat)
@@ -221,7 +222,7 @@ class ProductCategoryListActivity :
         categoryIntent.putExtra("action", "Add")
         if (categoryMap != null) {
             categoryIntent.putExtra(
-                com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES,
+                AppConstants.Extra.EXTRA_CATEGORIES,
                 categoryMap
             )
         }
@@ -232,20 +233,20 @@ class ProductCategoryListActivity :
         startActivityForResult(categoryIntent, CONST_ADD)
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
     }
 
     override fun handleProductCategoryResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
 
         hideLoading()
         this.isLoading = false
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<CatalogCategoryResponse>()
+                JSONConverter<CatalogCategoryResponse>()
             var responseMain: CatalogCategoryResponse = jsonConverter.jsonToObject(
                 result.toString(),
                 CatalogCategoryResponse::class.java
@@ -256,11 +257,11 @@ class ProductCategoryListActivity :
                 setRecyclerView()
                 categoryAdapter!!.addItems(list)
                 binding.ivAddCategory.visibility = View.VISIBLE
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                CommonUtils.showLogMessage(
                     "e", "adapter total_count =>",
                     "" + categoryAdapter.itemCount
                 )
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                CommonUtils.showLogMessage(
                     "e", "fetch total_count =>",
                     "" + responseMain.count
                 )
@@ -275,14 +276,14 @@ class ProductCategoryListActivity :
     }
 
     override fun handleDeleteProductCategoryResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<BaseResponse>()
+                JSONConverter<BaseResponse>()
             var responseMain: BaseResponse? = jsonConverter.jsonToObject(
                 result.toString(),
                 BaseResponse::class.java
@@ -303,14 +304,14 @@ class ProductCategoryListActivity :
     }
 
     override fun handleUpdateProductStatusCategoryResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<BaseResponse>()
+                JSONConverter<BaseResponse>()
             var responseMain: BaseResponse? = jsonConverter.jsonToObject(
                 result.toString(),
                 BaseResponse::class.java
@@ -332,7 +333,7 @@ class ProductCategoryListActivity :
 
 
     private fun getCategories() {
-        if (currentPage == com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START) {
+        if (currentPage == PAGE_START) {
             if (::categoryAdapter.isInitialized)
                 categoryAdapter.clearList()
             if (rvProductCategory != null)
@@ -369,7 +370,7 @@ class ProductCategoryListActivity :
 
         }
 
-        rvProductCategory!!.addOnScrollListener(object : com.rf.taskmodule.ui.tasklisting.PaginationListener(mLayoutManager!!) {
+        rvProductCategory!!.addOnScrollListener(object : PaginationListener(mLayoutManager!!) {
             override fun loadMoreItems() {
                 this@ProductCategoryListActivity.isLoading = true
                 currentPage++

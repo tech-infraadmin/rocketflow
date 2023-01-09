@@ -20,11 +20,11 @@ import com.rf.taskmodule.ui.custom.GlideApp
 import com.rf.taskmodule.utils.CommonUtils
 
 class ShowImageGridAdapter(private var mList: ArrayList<String>?) :
-    RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+    RecyclerView.Adapter<BaseSdkViewHolder>() {
     private var cellwidthWillbe: Int = 0
     private var context: Context? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         context = parent.context
         val simpleViewItemBinding: ItemRowProductImageSdkBinding =
             ItemRowProductImageSdkBinding.inflate(
@@ -50,7 +50,7 @@ class ShowImageGridAdapter(private var mList: ArrayList<String>?) :
     }
 
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) = holder.onBind(position)
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) = holder.onBind(position)
 
     fun addItems(list: ArrayList<String>) {
         mList = list
@@ -63,16 +63,16 @@ class ShowImageGridAdapter(private var mList: ArrayList<String>?) :
 
 
     inner class SimpleViewHolder(private val mBinding: ItemRowProductImageSdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+        BaseSdkViewHolder(mBinding.root) {
 
 
         override fun onBind(position: Int) {
             val lists = mList!![position]
             if (cellwidthWillbe != 0) {
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "cellwidthWillbe", "" + cellwidthWillbe)
+                CommonUtils.showLogMessage("e", "cellwidthWillbe", "" + cellwidthWillbe)
                 mBinding.ivImage.setLayoutParams(
                     FrameLayout.LayoutParams(
-                        com.rf.taskmodule.utils.CommonUtils.dpToPixel(context, cellwidthWillbe), com.rf.taskmodule.utils.CommonUtils.dpToPixel(context, cellwidthWillbe)
+                        CommonUtils.dpToPixel(context, cellwidthWillbe), CommonUtils.dpToPixel(context, cellwidthWillbe)
                     )
                 )
             }

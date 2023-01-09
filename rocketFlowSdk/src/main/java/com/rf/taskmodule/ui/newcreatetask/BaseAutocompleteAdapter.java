@@ -14,8 +14,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 //import com.bumptech.glide.request.RequestOptions;
+import com.rf.taskmodule.data.model.request.ClientSearchRequest;
+import com.rf.taskmodule.data.model.response.config.Api;
+import com.rf.taskmodule.data.model.response.config.ClientData;
+import com.rf.taskmodule.data.model.response.config.ClientDataResponse;
 import com.rf.taskmodule.data.network.APIError;
-import com.rf.taskmodule.utils.CommonUtils;
+import com.rf.taskmodule.data.network.ApiCallback;
+import com.rf.taskmodule.data.network.HttpManager;
 import com.rf.taskmodule.utils.JSONConverter;
 
 import com.rf.taskmodule.R;

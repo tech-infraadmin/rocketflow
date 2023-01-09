@@ -24,17 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
-import com.rf.taskmodule.TrackiSdkApplication;
-import com.rf.taskmodule.data.model.response.config.Api;
-import com.rf.taskmodule.data.network.APIError;
-import com.rf.taskmodule.ui.newcreatetask.NewCreateTaskActivity;
-import com.rf.taskmodule.utils.AppConstants;
-import com.rf.taskmodule.utils.CommonUtils;
-import com.rf.taskmodule.utils.TrackiToast;
-import com.rocketflow.sdk.RocketFlyer;
-import com.rf.taskmodule.BR;
 import com.rf.taskmodule.R;
-import com.rf.taskmodule.TrackiSdkApplication;
 import com.rf.taskmodule.data.model.request.ChangeFleetStatusApiRequest;
 import com.rf.taskmodule.data.model.request.DeleteFleetRequest;
 import com.rf.taskmodule.data.model.request.EntityStatus;
@@ -46,6 +36,22 @@ import com.rf.taskmodule.data.network.APIError;
 import com.rf.taskmodule.data.network.ApiCallback;
 import com.rf.taskmodule.data.network.HttpManager;
 import com.rf.taskmodule.databinding.ActivityFleetListingSdkBinding;
+import com.rf.taskmodule.ui.newcreatetask.NewCreateTaskActivity;
+import com.rf.taskmodule.utils.ApiType;
+import com.rf.taskmodule.utils.AppConstants;
+import com.rf.taskmodule.utils.TrackiToast;
+import com.rocketflow.sdk.RocketFlyer;
+import com.rf.taskmodule.TrackiSdkApplication;
+import com.rf.taskmodule.data.model.request.ChangeFleetStatusApiRequest;
+import com.rf.taskmodule.data.model.request.DeleteFleetRequest;
+import com.rf.taskmodule.data.model.request.EntityStatus;
+import com.rf.taskmodule.data.model.request.FleetRequest;
+import com.rf.taskmodule.data.model.response.config.Api;
+import com.rf.taskmodule.data.model.response.config.Fleet;
+import com.rf.taskmodule.data.model.response.config.FleetListResponse;
+import com.rf.taskmodule.data.network.APIError;
+import com.rf.taskmodule.data.network.ApiCallback;
+import com.rf.taskmodule.data.network.HttpManager;
 import com.rf.taskmodule.ui.addfleet.AddFleetActivity;
 import com.rf.taskmodule.ui.base.BaseSdkActivity;
 import com.rf.taskmodule.ui.common.DoubleButtonDialog;
@@ -60,6 +66,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.rf.taskmodule.BR;
 
 /**
  * Created by rahul on 10/10/18

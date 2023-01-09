@@ -15,6 +15,8 @@ import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 
+import com.rf.taskmodule.data.database.DatabaseClient;
+
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.data.database.DatabaseClient;
 import com.rf.taskmodule.databinding.ActivityContactListSdkBinding;

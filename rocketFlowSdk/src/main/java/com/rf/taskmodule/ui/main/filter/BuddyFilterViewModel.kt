@@ -10,18 +10,18 @@ import com.rf.taskmodule.utils.rx.SchedulerProvider
 /**
  * Created by rahul on 11/10/18
  */
-open class BuddyFilterViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-        com.rf.taskmodule.ui.base.BaseSdkViewModel<BuddyFilterNavigator>(dataManager, schedulerProvider) {
+open class BuddyFilterViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+        BaseSdkViewModel<BuddyFilterNavigator>(dataManager, schedulerProvider) {
     fun onProceedClick() {
         navigator.applyFilter()
     }
 
 
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return BuddyFilterViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

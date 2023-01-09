@@ -38,7 +38,7 @@ data class BaseAppData(
         var punchIn: String? = null,
         var punchId: String? = null,
         var islogin: String? = null,
-        var shift: MutableMap<Int?, MutableList<com.rf.taskmodule.utils.ShiftTime>>?=null
+        var shift: MutableMap<Int?, MutableList<ShiftTime>>?=null
 
 )
 

@@ -8,7 +8,6 @@ import com.rf.taskmodule.data.network.HttpManager
 import com.rf.taskmodule.data.network.NetworkManager
 import com.rf.taskmodule.utils.CommonUtils
 import com.trackthat.lib.TrackThat
-import com.rf.taskmodule.TrackiSdkApplication
 
 @Keep
 class RocketFlyer private constructor(){
@@ -84,6 +83,11 @@ class RocketFlyer private constructor(){
 
         @JvmStatic
         fun start(processId: String, startActivity : Boolean) {
+            RocketFlyerBuilder.getRFInstance()!!.start(processId,startActivity)
+        }
+
+        @JvmStatic
+        fun copy(processId: String, startActivity : Boolean) {
             RocketFlyerBuilder.getRFInstance()!!.start(processId,startActivity)
         }
 

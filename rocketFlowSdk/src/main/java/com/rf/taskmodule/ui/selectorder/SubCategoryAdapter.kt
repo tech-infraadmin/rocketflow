@@ -55,7 +55,7 @@ class SubCategoryAdapter (var context: Context) :
 
 
     inner class SubCategoryItemViewHolder(var binding: ItemRowSubCategorySdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(binding.root) {
+        BaseSdkViewHolder(binding.root) {
         override fun onBind(position: Int) {
             var data: CataLogProductCategory? = listItems!![position]
             if (data != null) {

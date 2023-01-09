@@ -99,22 +99,36 @@ internal class RocketFlyerImp(
         }
     }
 
-    /*class ItemOnClickListener implements View.OnClickListener {
-        private View _parent;
+    @SuppressLint("SuspiciousIndentation")
+    override fun copy(processId: String, startActivity: Boolean) {
+        contextRef.get()?.let {
+            try{
+                val pref = RocketFlyerBuilder.getPrefInstance()
+                if(pref==null|| pref.loginToken==null|| pref.loginToken.isEmpty()){
+                    return
+                }
 
-        public ItemOnClickListener(ViewGroup parent) {
-            _parent = parent;
-        }
+                val configResponse = Gson().fromJson(
+                    pref.configResponse.toString(),
+                    ConfigResponse::class.java
+                )
 
-        @Override
-        public void onClick(View view) {
-            //.......
-            // close the dropdown
-            View root = _parent.getRootView();
-            root.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK));
-            root.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
+                com.rf.taskmodule.utils.CommonUtils.saveConfigDetails(
+                    it,
+                    configResponse,
+                    RocketFlyer.preferenceHelper(),
+                    "1")
+
+                if (startActivity) {
+                    val intent = com.rf.taskmodule.ui.main.MainSDKActivity.newIntent(it)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    it.startActivity(intent)
+                }
+            }catch (e : Exception){
+                showToast(it, "Call init before start method :$e")
+            }
         }
-    }*/
+    }
 
     override fun terminate() {
         contextRef.get()?.let {
@@ -123,7 +137,6 @@ internal class RocketFlyerImp(
             //showToast(it,"Terminate");
         }
     }
-
 
     private fun showToast(context: Context, str : String){
         Toast.makeText(context,str,Toast.LENGTH_SHORT).show()

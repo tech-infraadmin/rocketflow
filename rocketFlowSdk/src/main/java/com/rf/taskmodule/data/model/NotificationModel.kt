@@ -16,7 +16,7 @@ class NotificationModel {
     var timeStamp:Long=0
 
     val hubLocations: List<HubLocation?>? = null
-    val shiftTimes: Map<Int, List<com.rf.taskmodule.utils.ShiftTime?>?>? = null
+    val shiftTimes: Map<Int, List<ShiftTime?>?>? = null
     val configResponse: ConfigResponse? = null
     val event2: String? = null
     val categoryId: String? = null

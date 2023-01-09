@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -16,8 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import com.rocketflow.sdk.RocketFlyer
-
-import com.rf.taskmodule.BR
 import com.rf.taskmodule.R
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper
 import com.rf.taskmodule.data.model.request.LinkInventoryRequest
@@ -27,16 +24,15 @@ import com.rf.taskmodule.data.network.APIError
 import com.rf.taskmodule.data.network.ApiCallback
 import com.rf.taskmodule.data.network.HttpManager
 import com.rf.taskmodule.databinding.ActivityCartSdkBinding
-
-
 import com.rf.taskmodule.ui.base.BaseSdkActivity
 import com.rf.taskmodule.ui.newcreatetask.NewCreateTaskActivity
 import com.rf.taskmodule.ui.selectorder.CatalogProduct
 import com.rf.taskmodule.ui.selectorder.SelectOrderActivity
 import com.rf.taskmodule.utils.*
 import com.trackthat.lib.models.BaseResponse
+import com.rf.taskmodule.BR
 
-class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBinding, CartViewModel>(), CartItemAdapter.onCartProductAddListener,
+class CartActivity : BaseSdkActivity<ActivityCartSdkBinding, CartViewModel>(), CartItemAdapter.onCartProductAddListener,
         View.OnClickListener, CartNavigator {
     private var flavourId: String?=null
     private var promocode: String? = null
@@ -50,8 +46,8 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
     private var linkingType: TaggingType?=null
     private var linkOption: LinkOptions? = null
 
-    lateinit var mPref: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var mPref: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
     open var savedOrderMap: HashMap<String, CatalogProduct>? = null
 
@@ -77,28 +73,28 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
         httpManager = RocketFlyer.httpManager()!!
         mPref = RocketFlyer.preferenceHelper()!!
 
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_CHARGE)) {
-            deliveryChargeAmount = intent.getFloatExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_CHARGE, 0F)
+        if (intent.hasExtra(AppConstants.DELIVERY_CHARGE)) {
+            deliveryChargeAmount = intent.getFloatExtra(AppConstants.DELIVERY_CHARGE, 0F)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_MODE)) {
-            deliverMode = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_MODE)
+        if (intent.hasExtra(AppConstants.DELIVERY_MODE)) {
+            deliverMode = intent.getStringExtra(AppConstants.DELIVERY_MODE)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)) {
-            target = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)) {
+            target = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)) {
-            taskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_ID)) {
+            taskId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID))
-            ctaId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID))
+            ctaId = intent.getStringExtra(AppConstants.Extra.EXTRA_CTA_ID)
 
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID))
-            categoryId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID)
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)) {
-            flavourId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORY_ID))
+            categoryId = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORY_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)) {
+            flavourId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)
         }
-        if(intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING)){
-            dynamicPricing=intent.getBooleanExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING,false)
+        if(intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING)){
+            dynamicPricing=intent.getBooleanExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING,false)
         }
 
         if (deliverMode != null) {
@@ -154,7 +150,7 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
         }
         binding.adapter = cartItemAdapter
         if (mPref.userDetail != null && mPref.userDetail!!.userId != null) {
-            if (com.rf.taskmodule.utils.CommonUtils.getTotalItemCount(mPref.userDetail.userId!!, mPref) > 0) {
+            if (CommonUtils.getTotalItemCount(mPref.userDetail.userId!!, mPref) > 0) {
                 if (mPref.getProductInCartWRC() != null && mPref.getProductInCartWRC()!!
                                 .containsKey(mPref.userDetail.userId!!)
                 ) {
@@ -208,7 +204,7 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
             binding.tvBillAmountValue.text =
                     "₹ " + totalAmount.toString()
         binding.tvTotalItemCount.text =
-                com.rf.taskmodule.utils.CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref).toString()
+                CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref).toString()
 
 
     }
@@ -216,7 +212,7 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
     fun getTotalAmount(): Float {
         var amount = 0F
         if (mPref.userDetail != null && mPref.userDetail!!.userId != null) {
-            if (com.rf.taskmodule.utils.CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref) > 0) {
+            if (CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref) > 0) {
                 if (mPref.getProductInCartWRC() != null && mPref.getProductInCartWRC()!!
                                 .containsKey(mPref.userDetail!!.userId!!)
                 ) {
@@ -251,9 +247,9 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
         saveOrderInCart[mPref.userDetail!!.userId!!] = savedOrderMap!!
         mPref.saveProductInCartWRC(saveOrderInCart)
         var jsonConverter2 =
-            com.rf.taskmodule.utils.JSONConverter<Map<String, Map<String, CatalogProduct>>>()
+            JSONConverter<Map<String, Map<String, CatalogProduct>>>()
         var str2 = jsonConverter2.objectToJson(mPref.getProductInCartWRC())
-        com.rf.taskmodule.utils.Log.e("map_addProduct", str2)
+        Log.e("map_addProduct", str2)
 
         invalidateOptionsMenu()
 //        var jsonConverter = JSONConverter<HashMap<String, CatalogProduct>>()
@@ -279,11 +275,11 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
         menuItem.isVisible = false
         var count = 0
         var jsonConverter =
-            com.rf.taskmodule.utils.JSONConverter<Map<String, Map<String, CatalogProduct>>>()
+            JSONConverter<Map<String, Map<String, CatalogProduct>>>()
         var str = jsonConverter.objectToJson(mPref.getProductInCartWRC())
 //        Log.e("map_menu", str)
         if (mPref.userDetail != null && mPref.userDetail!!.userId != null)
-            count = com.rf.taskmodule.utils.CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref)
+            count = CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref)
         menuItem.icon = buildCounterDrawable(count, R.drawable.ic_cart)
         return true
     }
@@ -424,7 +420,7 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
             val dashBoardBoxItem = DashBoardBoxItem()
             dashBoardBoxItem.categoryId = categoryId
             intent.putExtra(
-                com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES,
+                AppConstants.Extra.EXTRA_CATEGORIES,
                 Gson().toJson(dashBoardBoxItem)
             )
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -432,7 +428,7 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
         }else{
         if (mPref.userDetail != null && mPref.userDetail!!.userId != null) {
-            if (com.rf.taskmodule.utils.CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref) > 0) {
+            if (CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref) > 0) {
                 if (mPref.getProductInCartWRC() != null && mPref.getProductInCartWRC()!!
                                 .containsKey(mPref.userDetail!!.userId!!)
                 ) {
@@ -444,7 +440,7 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
                     saveOrderInCart.remove(mPref.userDetail!!.userId!!)
                     mPref.saveProductInCartWRC(saveOrderInCart)
                     var jsonConverter2 =
-                        com.rf.taskmodule.utils.JSONConverter<Map<String, Map<String, CatalogProduct>>>()
+                        JSONConverter<Map<String, Map<String, CatalogProduct>>>()
                     var str2 = jsonConverter2.objectToJson(mPref.getProductInCartWRC())
 //                    Log.e("delete_map", str2)
 
@@ -454,13 +450,13 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
 
         val returnIntent = Intent()
         if (taskId != null)
-            returnIntent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID, taskId)
+            returnIntent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
         if (buddyId != null)
-            returnIntent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_ID, buddyId)
+            returnIntent.putExtra(AppConstants.Extra.EXTRA_BUDDY_ID, buddyId)
         if (fleetId != null)
-            returnIntent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FLEET_ID, fleetId)
+            returnIntent.putExtra(AppConstants.Extra.EXTRA_FLEET_ID, fleetId)
         if (buddyName != null)
-            returnIntent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_NAME, buddyName)
+            returnIntent.putExtra(AppConstants.Extra.EXTRA_BUDDY_NAME, buddyName)
 //            returnIntent.putExtra("result", result)
 
         setResult(Activity.RESULT_OK, returnIntent)
@@ -480,7 +476,7 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
         val dashBoardBoxItem = DashBoardBoxItem()
         dashBoardBoxItem.categoryId = categoryId
         intent.putExtra(
-            com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES,
+            AppConstants.Extra.EXTRA_CATEGORIES,
             Gson().toJson(dashBoardBoxItem)
         )
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -500,14 +496,14 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
         return cartViewModel!!
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
     }
 
-    override fun handleCartResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleCartResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@CartActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@CartActivity)) {
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<CartResponse>()
+                JSONConverter<CartResponse>()
             var responseMain: CartResponse = jsonConverter.jsonToObject(result.toString(), CartResponse::class.java) as CartResponse
             if (responseMain.data != null && responseMain.data!!.isNotEmpty()) {
                 var list = responseMain.data!!
@@ -546,11 +542,11 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
         }
     }
 
-    override fun handleCreateOrderResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleCreateOrderResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@CartActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@CartActivity)) {
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<BaseResponse>()
+                JSONConverter<BaseResponse>()
             var responseMain: BaseResponse = jsonConverter.jsonToObject(result.toString(), BaseResponse::class.java) as BaseResponse
 
             if (responseMain.responseMsg != null) {
@@ -562,13 +558,13 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
         }
     }
 
-    override fun handleApplyCouponResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleApplyCouponResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@CartActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@CartActivity)) {
 
 
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<ApplyCouponResponse>()
+                JSONConverter<ApplyCouponResponse>()
             var responseMain: ApplyCouponResponse = jsonConverter.jsonToObject(result.toString(), ApplyCouponResponse::class.java) as ApplyCouponResponse
             if (responseMain.discount != null) {
 
@@ -606,9 +602,9 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
         }
     }
 
-    override fun linkInventoryResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun linkInventoryResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             onSuccess()
 
         }
@@ -616,7 +612,7 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
 
     fun linkInventory() {
         if (linkOption != null && linkOption == LinkOptions.DIRECT){
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)) {
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID)) {
                 ///Code for order tagging
                 return
             } else {
@@ -627,11 +623,11 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
                         invIds.add(data.pid!!)
                     }
                     val intent = NewCreateTaskActivity.newIntent(this)
-                    intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM, "taskListing")
+                    intent.putExtra(AppConstants.Extra.FROM, "taskListing")
                     val dashBoardBoxItem = DashBoardBoxItem()
                     dashBoardBoxItem.categoryId = categoryId
                     intent.putExtra(
-                        com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES,
+                        AppConstants.Extra.EXTRA_CATEGORIES,
                         Gson().toJson(dashBoardBoxItem)
                     )
                     intent.putStringArrayListExtra(
@@ -643,20 +639,20 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
                         true
                     )
                     intent.putExtra(
-                        com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU,
+                        AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU,
                         true
                     )
-                    startActivityForResult(intent, com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_CREATE_TASK_DIRECT)
+                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK_DIRECT)
                 } else {
                     TrackiToast.Message.showShort(this, "Please add items")
                 }
             }
         }else{
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)) {
-                if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)) {
-                    taskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID)) {
+                if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_ID)) {
+                    taskId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
                 }
-                var ctaId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)
+                var ctaId = intent.getStringExtra(AppConstants.Extra.EXTRA_CTA_ID)
 
 
                 var linkRequest = LinkInventoryRequest()
@@ -715,10 +711,10 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
                         }
                     }
                 }
-                val jsonConverter: com.rf.taskmodule.utils.JSONConverter<LinkInventoryRequest> =
-                    com.rf.taskmodule.utils.JSONConverter()
+                val jsonConverter: JSONConverter<LinkInventoryRequest> =
+                    JSONConverter()
                 var strRequest = jsonConverter.objectToJson(linkRequest)
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "strRequest", strRequest);
+                CommonUtils.showLogMessage("e", "strRequest", strRequest);
                 showLoading()
                 cartViewModel.linkInventory(httpManager, linkRequest)
 
@@ -727,14 +723,14 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
                 var list = cartItemAdapter.getAllList().filter { it.addInOrder }
                 if (list.isNotEmpty()) {
                     val intent = NewCreateTaskActivity.newIntent(this)
-                    intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM, "taskListing")
+                    intent.putExtra(AppConstants.Extra.FROM, "taskListing")
                     val dashBoardBoxItem = DashBoardBoxItem()
                     dashBoardBoxItem.categoryId = categoryId
                     intent.putExtra(
-                        com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES,
+                        AppConstants.Extra.EXTRA_CATEGORIES,
                         Gson().toJson(dashBoardBoxItem))
-                    intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true)
-                    startActivityForResult(intent, com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_CREATE_TASK)
+                    intent.putExtra(AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true)
+                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
                 } else {
                     TrackiToast.Message.showShort(this, "Please add items")
                 }
@@ -769,12 +765,12 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_CREATE_TASK) {
+        if (requestCode == AppConstants.REQUEST_CODE_CREATE_TASK) {
             if (resultCode == Activity.RESULT_OK) {
-                taskId = data!!.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
-                buddyName = data!!.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_NAME)
-                buddyId = data!!.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_ID)
-                fleetId = data!!.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FLEET_ID)
+                taskId = data!!.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
+                buddyName = data!!.getStringExtra(AppConstants.Extra.EXTRA_BUDDY_NAME)
+                buddyId = data!!.getStringExtra(AppConstants.Extra.EXTRA_BUDDY_ID)
+                fleetId = data!!.getStringExtra(AppConstants.Extra.EXTRA_FLEET_ID)
                 var linkRequest = LinkInventoryRequest()
                 if (savedOrderMap != null && savedOrderMap!!.isNotEmpty()) {
 //                    var map = HashMap<String, Int>()
@@ -831,10 +827,10 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
                         }
                     }
                 }
-                val jsonConverter: com.rf.taskmodule.utils.JSONConverter<LinkInventoryRequest> =
-                    com.rf.taskmodule.utils.JSONConverter()
+                val jsonConverter: JSONConverter<LinkInventoryRequest> =
+                    JSONConverter()
                 var strRequest = jsonConverter.objectToJson(linkRequest)
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "strRequest", strRequest);
+                CommonUtils.showLogMessage("e", "strRequest", strRequest);
                 showLoading()
                 cartViewModel.linkInventory(httpManager, linkRequest)
 
@@ -842,7 +838,7 @@ class CartActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityCartSdkBi
             if (resultCode == Activity.RESULT_CANCELED) {
 
             }
-        } else if (requestCode == com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_CREATE_TASK_DIRECT) {
+        } else if (requestCode == AppConstants.REQUEST_CODE_CREATE_TASK_DIRECT) {
             if (resultCode == Activity.RESULT_OK) {
               onSuccess()
             }

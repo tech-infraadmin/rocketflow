@@ -50,7 +50,7 @@ import java.io.IOException
 
 
 class ProductScan :
-    com.rf.taskmodule.ui.base.BaseSdkActivity<ProductScanSdkBinding, ProductScanViewModel>(),
+    BaseSdkActivity<ProductScanSdkBinding, ProductScanViewModel>(),
     ViewTreeObserver.OnGlobalLayoutListener, ProductScanNavigator, ProductScanAdapter.OnProductAddListener {
 
     var mSurfaceView: SurfaceView? = null
@@ -95,9 +95,9 @@ class ProductScan :
 
     lateinit var productScanViewModel: ProductScanViewModel
 
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
-    lateinit var mPref: com.rf.taskmodule.data.local.prefs.PreferencesHelper
+    lateinit var preferencesHelper: PreferencesHelper
+    lateinit var httpManager: HttpManager
+    lateinit var mPref: PreferencesHelper
 
     var from:String?=null
 
@@ -124,7 +124,7 @@ class ProductScan :
 
     private fun getSavedMap() {
         if (mPref.userDetail != null && mPref.userDetail.userId != null) {
-            if (com.rf.taskmodule.utils.CommonUtils.getTotalItemCount(mPref.userDetail.userId!!, mPref) > 0) {
+            if (CommonUtils.getTotalItemCount(mPref.userDetail.userId!!, mPref) > 0) {
                 if (mPref.getProductInCartWRC() != null && mPref.getProductInCartWRC()!!
                         .containsKey(mPref.userDetail.userId)
                 ) {
@@ -142,28 +142,28 @@ class ProductScan :
 
         globalList = ArrayList()
 
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_CHARGE)) {
-            deliveryChargeAmount = intent.getFloatExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_CHARGE, 0F)
+        if (intent.hasExtra(AppConstants.DELIVERY_CHARGE)) {
+            deliveryChargeAmount = intent.getFloatExtra(AppConstants.DELIVERY_CHARGE, 0F)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_MODE)) {
-            deliverMode = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_MODE)
+        if (intent.hasExtra(AppConstants.DELIVERY_MODE)) {
+            deliverMode = intent.getStringExtra(AppConstants.DELIVERY_MODE)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)) {
-            target = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)) {
+            target = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)) {
-            taskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_ID)) {
+            taskId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID))
-            ctaId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID))
+            ctaId = intent.getStringExtra(AppConstants.Extra.EXTRA_CTA_ID)
 
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID))
-            categoryId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID)
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)) {
-            flavourId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORY_ID))
+            categoryId = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORY_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)) {
+            flavourId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)
         }
-        if(intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING)){
-            dynamicPricing=intent.getBooleanExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING,false)
+        if(intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING)){
+            dynamicPricing=intent.getBooleanExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING,false)
         }
         if(intent.hasExtra("from")){
             from=intent.getStringExtra("from")
@@ -198,7 +198,7 @@ class ProductScan :
             }
         }
         catch (e: Exception){
-            com.rf.taskmodule.utils.Log.e("exception","${e.message}")
+            Log.e("exception","${e.message}")
         }
 
         binding.goBack.setOnClickListener {
@@ -206,7 +206,7 @@ class ProductScan :
             val dashBoardBoxItem = DashBoardBoxItem()
             dashBoardBoxItem.categoryId = categoryId
             intent.putExtra(
-                com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES,
+                AppConstants.Extra.EXTRA_CATEGORIES,
                 Gson().toJson(dashBoardBoxItem)
             )
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -257,20 +257,20 @@ class ProductScan :
         }
         val intent = Intent(this, CartActivity::class.java)
 
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_CHARGE, deliveryChargeAmount)
+        intent.putExtra(AppConstants.DELIVERY_CHARGE, deliveryChargeAmount)
         if (taskId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID, taskId)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
         if (target != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET, target)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET, target)
         if (flavourId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, flavourId)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, flavourId)
         if (categoryId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
+            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
         if (ctaId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID, ctaId)
+            intent.putExtra(AppConstants.Extra.EXTRA_CTA_ID, ctaId)
         if (deliverMode != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_MODE, deliverMode)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, dynamicPricing)
+            intent.putExtra(AppConstants.DELIVERY_MODE, deliverMode)
+        intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, dynamicPricing)
 
         startActivityForResult(intent, PLACE_ORDER)
         finish()
@@ -325,7 +325,7 @@ class ProductScan :
 //                    ringtone()
                     playSound()
                     var value = barcodeSparseArray.valueAt(0).displayValue
-                    com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "BARCODE_Value", value)
+                    CommonUtils.showLogMessage("e", "BARCODE_Value", value)
                     productScanViewModel.getQrCodeValue(httpManager, value)
                     /*if (!isClassCall) {
                         isClassCall = true
@@ -431,7 +431,7 @@ class ProductScan :
 
     override fun addProduct(data: CatalogProduct, position: Int) {
         if (linkingType != null && linkingType == TaggingType.SINGLE && linkOption != null && linkOption == LinkOptions.DIRECT) {
-            com.rf.taskmodule.utils.Log.e("position", "" + position)
+            Log.e("position", "" + position)
             savedOrderMap = HashMap()
             if (data.addInOrder) {
                 savedOrderMap!![data.pid!!] = data
@@ -467,15 +467,15 @@ class ProductScan :
         saveOrderInCart[mPref.userDetail.userId!!] = savedOrderMap!!
         mPref.saveProductInCartWRC(saveOrderInCart)
         var jsonConverter2 =
-            com.rf.taskmodule.utils.JSONConverter<Map<String, Map<String, CatalogProduct>>>()
+            JSONConverter<Map<String, Map<String, CatalogProduct>>>()
         var str2 = jsonConverter2.objectToJson(mPref.getProductInCartWRC())
 
 
         invalidateOptionsMenu()
         var jsonConverter =
-            com.rf.taskmodule.utils.JSONConverter<HashMap<String, CatalogProduct>>()
+            JSONConverter<HashMap<String, CatalogProduct>>()
         var str = jsonConverter.objectToJson(savedOrderMap)
-        com.rf.taskmodule.utils.Log.e("map", str)
+        Log.e("map", str)
 
     }
 
@@ -485,12 +485,12 @@ class ProductScan :
     }
 
 
-    override fun handleQrCodeResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleQrCodeResponse(callback: ApiCallback, result: Any?, error: APIError?) {
 
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@ProductScan)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@ProductScan)) {
 
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<QrCodeResponse> =
-                com.rf.taskmodule.utils.JSONConverter()
+            val jsonConverter: JSONConverter<QrCodeResponse> =
+                JSONConverter()
             var response: QrCodeResponse = jsonConverter.jsonToObject(
                 result.toString(),
                 QrCodeResponse::class.java
@@ -538,17 +538,17 @@ class ProductScan :
     }
 
     override fun handleProductDetailsResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?,
         pid: String?
     ) {
         try {
             hideLoading()
-            if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@ProductScan)) {
-                com.rf.taskmodule.utils.Log.e("checkData", "$result")
-                val jsonConverter: com.rf.taskmodule.utils.JSONConverter<ProductDetailsResponse> =
-                    com.rf.taskmodule.utils.JSONConverter()
+            if (CommonUtils.handleResponse(callback, error, result, this@ProductScan)) {
+                Log.e("checkData", "$result")
+                val jsonConverter: JSONConverter<ProductDetailsResponse> =
+                    JSONConverter()
                 var response: ProductDetailsResponse =
                     jsonConverter.jsonToObject(
                         result.toString(),
@@ -556,18 +556,18 @@ class ProductScan :
                     )
                 if (response.data != null) {
                     val productDetails = response.data
-                    com.rf.taskmodule.utils.Log.e("checkID", "in1")
+                    Log.e("checkID", "in1")
                     if (productDetails != null) {
-                        com.rf.taskmodule.utils.Log.e("checkID", "in2")
+                        Log.e("checkID", "in2")
                         if (globalList.isNotEmpty()) {
                             var setList = false
                             for (data in globalList) {
-                                com.rf.taskmodule.utils.Log.e("checkID", "in3 $data")
-                                com.rf.taskmodule.utils.Log.e("checkID", "in4 $productDetails")
+                                Log.e("checkID", "in3 $data")
+                                Log.e("checkID", "in4 $productDetails")
                                 if (data.pid != productDetails.pid) {
                                     setList = true
                                 } else {
-                                    com.rf.taskmodule.utils.Log.e("checkID", "off")
+                                    Log.e("checkID", "off")
                                     setList = false
                                     break
                                 }
@@ -663,13 +663,13 @@ class ProductScan :
             }
         }
         catch (e: Exception){
-            com.rf.taskmodule.utils.Log.e("warning",e.message.toString())
+            Log.e("warning",e.message.toString())
         }
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@ProductScan)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@ProductScan)) {
             var taskResponse = Gson().fromJson("$result", TaskResponse::class.java)
             taskResponse.taskDetail?.let { task ->
             }

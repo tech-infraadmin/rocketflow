@@ -6,9 +6,9 @@ import com.rf.taskmodule.ui.base.BaseSdkNavigator
 
 interface ProductCategoryNavigator : BaseSdkNavigator {
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?)
 
-    fun handleProductCategoryResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
-    fun handleUpdateProductStatusCategoryResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
-    fun handleDeleteProductCategoryResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
+    fun handleProductCategoryResponse(callback: ApiCallback, result: Any?, error: APIError?)
+    fun handleUpdateProductStatusCategoryResponse(callback: ApiCallback, result: Any?, error: APIError?)
+    fun handleDeleteProductCategoryResponse(callback: ApiCallback, result: Any?, error: APIError?)
 }

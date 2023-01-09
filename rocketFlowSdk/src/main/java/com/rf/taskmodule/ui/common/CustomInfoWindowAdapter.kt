@@ -1,11 +1,5 @@
 package com.rf.taskmodule.ui.common
 
-import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.TextView
-import com.rf.taskmodule.R
-
 /**
  * Created by rahul on 26/12/18
  *

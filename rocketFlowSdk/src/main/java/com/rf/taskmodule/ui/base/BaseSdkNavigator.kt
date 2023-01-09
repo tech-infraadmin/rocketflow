@@ -8,6 +8,6 @@ import com.rf.taskmodule.data.network.ApiCallback
  * Created by rahul on 15/11/18
  */
 interface BaseSdkNavigator {
-    fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
-    fun showTimeOutMessage(@NonNull callback: com.rf.taskmodule.data.network.ApiCallback)
+    fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?)
+    fun showTimeOutMessage(@NonNull callback: ApiCallback)
 }

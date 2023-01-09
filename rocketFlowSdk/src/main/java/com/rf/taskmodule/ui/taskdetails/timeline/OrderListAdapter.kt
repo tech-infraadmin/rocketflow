@@ -24,7 +24,7 @@ import java.util.*
  * rocketflyer technology pvt. ltd
  * vikas.kesharvani@rocketflyer.in
  */
-class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerView.Adapter<BaseSdkViewHolder>() {
 
     private var context: Context? = null
 
@@ -36,7 +36,7 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
         private const val VIEW_TYPE_INVENTORY = 1
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         context = parent.context
         return when (viewType) {
             VIEW_TYPE_INVENTORY -> {
@@ -68,7 +68,7 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
         VIEW_TYPE_EMPTY
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) = holder.onBind(position)
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) = holder.onBind(position)
 
     fun addItems(list: ArrayList<OrderDetails>) {
         mList = list
@@ -76,7 +76,7 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
 
 
     inner class OrdersViewModel(private val mBinding: ItemRowOrderSdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+        BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             val lists = mList!![position]
@@ -136,7 +136,7 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
     }
 
     inner class EmptyViewHolder(private val mBinding: ItemMyEarningEmptySdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+        BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             val emptyViewModel = MyEarningsEmptyItemViewModel()

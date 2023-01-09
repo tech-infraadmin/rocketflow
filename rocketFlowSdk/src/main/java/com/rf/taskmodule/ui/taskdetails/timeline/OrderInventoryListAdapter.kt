@@ -20,7 +20,7 @@ import com.rf.taskmodule.utils.Log
  * rocketflyer technology pvt. ltd
  * vikas.kesharvani@rocketflyer.in
  */
-class OrderInventoryListAdapter(private var mList: ArrayList<OrderItemsInfo>?) : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+class OrderInventoryListAdapter(private var mList: ArrayList<OrderItemsInfo>?) : RecyclerView.Adapter<BaseSdkViewHolder>() {
 
     private var context: Context? = null
     var onItemClick: ((OrderItemsInfo) -> Unit)? = null
@@ -31,7 +31,7 @@ class OrderInventoryListAdapter(private var mList: ArrayList<OrderItemsInfo>?) :
         private const val VIEW_TYPE_INVENTORY = 1
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         context = parent.context
         return when (viewType) {
             VIEW_TYPE_INVENTORY -> {
@@ -63,7 +63,7 @@ class OrderInventoryListAdapter(private var mList: ArrayList<OrderItemsInfo>?) :
         VIEW_TYPE_EMPTY
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) = holder.onBind(position)
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) = holder.onBind(position)
 
     fun addItems(list: ArrayList<OrderItemsInfo>) {
         mList = list
@@ -71,11 +71,11 @@ class OrderInventoryListAdapter(private var mList: ArrayList<OrderItemsInfo>?) :
 
 
     inner class OrdersListViewModel(private val mBinding: ItemRowOrderListSdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+        BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             itemView.setOnClickListener {
-                com.rf.taskmodule.utils.Log.d("TAG", "customerName.toString()")
+                Log.d("TAG", "customerName.toString()")
                 onItemClick?.invoke(mList!![position])
             }
             val lists = mList!![position]
@@ -95,7 +95,7 @@ class OrderInventoryListAdapter(private var mList: ArrayList<OrderItemsInfo>?) :
     }
 
     inner class EmptyViewHolder(private val mBinding: ItemMyEarningEmptySdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+        BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             itemView.setOnClickListener {

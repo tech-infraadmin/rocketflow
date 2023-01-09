@@ -15,6 +15,11 @@ import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
 import com.rf.taskmodule.data.model.GeofenceData;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.utils.Log;
+import com.rf.taskmodule.data.local.db.DatabaseHelper;
+import com.rf.taskmodule.data.local.db.GeofenceDataSource;
+import com.rf.taskmodule.data.model.GeofenceData;
+import com.rf.taskmodule.data.model.response.config.Task;
+import com.rf.taskmodule.utils.Log;
 import com.trackthat.lib.TrackThat;
 
 import java.util.ArrayList;

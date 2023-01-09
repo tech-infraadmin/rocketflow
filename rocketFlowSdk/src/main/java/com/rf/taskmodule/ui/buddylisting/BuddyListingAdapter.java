@@ -1,8 +1,4 @@
 package com.rf.taskmodule.ui.buddylisting;
-
-import static com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU;
-import static com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_NAVIGATION_MENU;
-
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -10,7 +6,11 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.rf.taskmodule.data.model.response.config.Buddy;
+import com.rf.taskmodule.data.model.response.config.BuddySelectionType;
 import com.rf.taskmodule.utils.AppConstants;
+import com.rf.taskmodule.utils.BuddyStatus;
+import com.rf.taskmodule.utils.Log;
 
 import com.rf.taskmodule.data.model.response.config.Buddy;
 import com.rf.taskmodule.data.model.response.config.BuddySelectionType;

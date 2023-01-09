@@ -6,6 +6,6 @@ import com.rf.taskmodule.ui.base.BaseSdkNavigator
 
 interface ProductScanNavigator : BaseSdkNavigator {
 
-    fun handleQrCodeResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
-    fun handleProductDetailsResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?, pid:String?)
+    fun handleQrCodeResponse(callback: ApiCallback, result: Any?, error: APIError?)
+    fun handleProductDetailsResponse(callback: ApiCallback, result: Any?, error: APIError?, pid:String?)
 }

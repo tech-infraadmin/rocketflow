@@ -63,6 +63,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -106,6 +107,7 @@ import com.google.android.material.snackbar.Snackbar;
 //import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
 
+import com.rf.taskmodule.BuildConfig;
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.TrackiSdkApplication;
 import com.rf.taskmodule.data.local.db.Action;
@@ -166,18 +168,66 @@ import com.rf.taskmodule.ui.common.Base64;
 //import com.rf.taskmodule.ui.login.LoginActivity;
 //import com.rf.taskmodule.ui.main.MainActivity;
 //import com.rf.taskmodule.ui.password.ChangePasswordActivity;
-//import com.rf.taskmodule.ui.receiver.ServiceRestartReceiver;
-//import com.rf.taskmodule.ui.register.RegisterActivity;
+//import com.rf.taskmodule.Receiver.ServiceRestartReceiver;
+//import com.rf.taskmodule.Register.RegisterActivity;
 import com.rf.taskmodule.ui.selectorder.CatalogProduct;
 //import com.rf.taskmodule.ui.service.sync.SyncService;
 //import com.rf.taskmodule.ui.service.transition.TransitionService;
 import com.rf.taskmodule.ui.tasklisting.CallToActionButtonAdapter;
 import com.rf.taskmodule.ui.tasklisting.TaskClickListener;
 //import com.rf.taskmodule.ui.update.AppUpdateScreenActivity;
-import com.rf.taskmodule.TrackiSdkApplication;
 import com.rf.taskmodule.data.local.db.Action;
+import com.rf.taskmodule.data.local.db.ApiEventModel;
+import com.rf.taskmodule.data.local.db.DatabaseHelper;
+import com.rf.taskmodule.data.local.db.IAlarmTable;
+import com.rf.taskmodule.data.local.prefs.AppPreferencesHelper;
+import com.rf.taskmodule.data.local.prefs.StartIdealTrackWork;
+import com.rf.taskmodule.data.local.prefs.StopIdleTracking;
 import com.rf.taskmodule.data.model.BaseResponse;
+import com.rf.taskmodule.data.model.NotificationData;
+import com.rf.taskmodule.data.model.NotificationEvent;
+import com.rf.taskmodule.data.model.NotificationModel;
+import com.rf.taskmodule.data.model.TrackingAction;
+import com.rf.taskmodule.data.model.request.CalculateFormData;
+import com.rf.taskmodule.data.model.request.DynamicFormMainData;
+import com.rf.taskmodule.data.model.request.EndTaskRequest;
+import com.rf.taskmodule.data.model.request.TaskData;
+import com.rf.taskmodule.data.model.response.config.AllowedField;
+import com.rf.taskmodule.data.model.response.config.AppConfig;
+import com.rf.taskmodule.data.model.response.config.AttendanceStatus;
+import com.rf.taskmodule.data.model.response.config.CallToActions;
+import com.rf.taskmodule.data.model.response.config.ChannelConfig;
+import com.rf.taskmodule.data.model.response.config.Config;
+import com.rf.taskmodule.data.model.response.config.ConfigResponse;
+import com.rf.taskmodule.data.model.response.config.DataType;
+import com.rf.taskmodule.data.model.response.config.DeprecationAndExpiration;
+import com.rf.taskmodule.data.model.response.config.DynamicFormData;
+import com.rf.taskmodule.data.model.response.config.DynamicFormsNew;
+import com.rf.taskmodule.data.model.response.config.Executor;
+import com.rf.taskmodule.data.model.response.config.Field;
+import com.rf.taskmodule.data.model.response.config.FileUrlsResponse;
+import com.rf.taskmodule.data.model.response.config.Flavour;
+import com.rf.taskmodule.data.model.response.config.FormData;
+import com.rf.taskmodule.data.model.response.config.FoundWidgetItem;
+import com.rf.taskmodule.data.model.response.config.GeoCoordinates;
+import com.rf.taskmodule.data.model.response.config.LeaveApprovalStatus;
+import com.rf.taskmodule.data.model.response.config.LeaveStatus;
+import com.rf.taskmodule.data.model.response.config.LeaveType;
+import com.rf.taskmodule.data.model.response.config.OnTripConfig;
+import com.rf.taskmodule.data.model.response.config.Place;
+import com.rf.taskmodule.data.model.response.config.ProfileInfo;
+import com.rf.taskmodule.data.model.response.config.SDKToken;
+import com.rf.taskmodule.data.model.response.config.SdkConfig;
+import com.rf.taskmodule.data.model.response.config.Task;
+import com.rf.taskmodule.data.model.response.config.VendorConfig;
+import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
 import com.rf.taskmodule.data.network.APIError;
+import com.rf.taskmodule.data.network.ApiCallback;
+import com.rf.taskmodule.ui.base.BaseSdkActivity;
+import com.rf.taskmodule.ui.common.Base64;
+import com.rf.taskmodule.ui.selectorder.CatalogProduct;
+import com.rf.taskmodule.ui.tasklisting.CallToActionButtonAdapter;
+import com.rf.taskmodule.ui.tasklisting.TaskClickListener;
 import com.trackthat.lib.TrackThat;
 import com.trackthat.lib.internal.common.Trunk;
 import com.trackthat.lib.models.TrackthatLocation;
@@ -211,7 +261,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import kotlin.jvm.internal.Intrinsics;
-import com.rf.taskmodule.BuildConfig;
 
 import static android.content.Context.ALARM_SERVICE;
 import static com.rf.taskmodule.utils.AppConstants.ALERT_NO_CONNECTION;
@@ -236,7 +285,27 @@ public final class CommonUtils {
     public static String errorString =null;
     private static Dialog errorDialog;
 
-    private CommonUtils() {
+    public CommonUtils() {
+    }
+
+    public void setTopColor(Integer colorId, Window window, Context context) {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(ContextCompat.getColor(context, colorId));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.getDecorView().getWindowInsetsController().setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+        }
+        else{
+            window.getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+        }
     }
 
     public static Map<String, String> buildWebViewHeader(Context context) {
@@ -1724,7 +1793,7 @@ public final class CommonUtils {
 
 
     public static void saveSDKAccessToken(SDKToken sdkToken,
-                                         PreferencesHelper preferencesHelper) {
+                                          PreferencesHelper preferencesHelper) {
 
         preferencesHelper.setAccessId(sdkToken.getAccessId());
         preferencesHelper.setLoginToken(sdkToken.getToken());
@@ -1743,6 +1812,67 @@ public final class CommonUtils {
                                          PreferencesHelper preferencesHelper, String from) {
         saveConfigDetails(context, configResponse, preferencesHelper, from, null);
     }
+
+    public static void copyConfigDetails(Context context, ConfigResponse configResponse,
+                                         PreferencesHelper preferencesHelper, String from) {
+        copyConfigDetails(context, configResponse, preferencesHelper, from, null);
+    }
+
+    public static void copyConfigDetails(Context context, ConfigResponse configResponse,
+                                         PreferencesHelper preferencesHelper, String from, @Nullable String jsonobject) {
+
+//        if (configResponse.getDynamicFormConfig() != null) {
+//            TrackiApplication.setDynamicFormConfig(configResponse.getDynamicFormConfig());
+//        }
+        preferencesHelper.saveRefreshConfig(configResponse.getRefreshConfig());
+        if (Boolean.FALSE.equals(configResponse.getRefreshConfig())) {
+            Log.d("Config", "Don't Save");
+            Gson gson = new Gson();
+            ConfigResponse config = gson.fromJson(String.valueOf(preferencesHelper.getConfigResponse()), ConfigResponse.class);
+            copyConfigResponse(config,from,jsonobject,preferencesHelper,context);
+        }else{
+            Log.d("Config","Config Save");
+            Gson gson = new Gson();
+            String json = gson.toJson(configResponse);
+            preferencesHelper.saveConfigResponse(json);
+            copyConfigResponse(configResponse,from,jsonobject,preferencesHelper,context);
+        }
+    }
+
+
+    private static void copyConfigResponse(ConfigResponse configResponse, String from, String jsonobject, PreferencesHelper preferencesHelper, Context context) {
+        preferencesHelper.saveFilterMap(null);
+        if (configResponse.getLookups() != null) {
+            TrackiSdkApplication.setLookups(configResponse.getLookups());
+        }
+        if (configResponse.getDynamicForms() != null) {
+            TrackiSdkApplication.setDynamicFormsNews(configResponse.getDynamicForms());
+        }
+        AppConfig appConfig = configResponse.getAppConfig();
+        if (appConfig != null) {
+            try {
+                TrackiSdkApplication.setNavigationMenuList(appConfig.getNavigations());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if (appConfig.getApis() != null) {
+                TrackiSdkApplication.setApiList(appConfig.getApis());
+            }
+
+            if (null != appConfig.getAutoStart()) {
+                TrackiSdkApplication.setAutoStart(appConfig.getAutoStart());
+            }
+            if (from.equalsIgnoreCase("1")) {
+
+                //DeprecationAndExpiration screen = configResponse.getAppConfig().getAppVersionInfo();
+                DeprecationAndExpiration screen = configResponse.getAppVersionInfo();
+                if (screen != null) {
+                    TrackiSdkApplication.setApiList(appConfig.getApis());
+                }
+            }
+        }
+    }
+
 
     public static void saveConfigDetailsFromSystemTrayClick(Activity context, ConfigResponse configResponse,
                                                             PreferencesHelper preferencesHelper, String from, String jsonobject) {
@@ -2185,7 +2315,7 @@ public final class CommonUtils {
     }
 
 
-    public static AllowedField getFlavourField(String flavorid,String key,PreferencesHelper preferencesHelper){
+    public static AllowedField getFlavourField(String flavorid, String key, PreferencesHelper preferencesHelper){
         AllowedField rquired=null;
         if(preferencesHelper==null||preferencesHelper.getFlavourMap()==null||preferencesHelper.getFlavourMap().size()==0)
             return null;

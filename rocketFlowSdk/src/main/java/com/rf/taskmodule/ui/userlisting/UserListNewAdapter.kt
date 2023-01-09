@@ -15,16 +15,16 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.rf.taskmodule.R
 import com.rf.taskmodule.data.model.response.config.UserData
-//import com.rf.taskmodule.databinding.ItemEmployeeListBinding
 import com.rf.taskmodule.databinding.ItemMyEarningEmptySdkBinding
 import com.rf.taskmodule.databinding.ItemUserNewSdkBinding
+//import com.rf.taskmodule.databinding.ItemEmployeeListBinding
 //import com.rf.taskmodule.ui.addcustomer.AddCustomerActivity
 //import com.rf.taskmodule.ui.attendance.EmployeeListActivity
 import com.rf.taskmodule.ui.base.BaseSdkViewHolder
 import com.rf.taskmodule.ui.custom.GlideApp
 import com.rf.taskmodule.ui.earnings.MyEarningsEmptyItemViewModel
 
-class UserListNewAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder> {
+class UserListNewAdapter : RecyclerView.Adapter<BaseSdkViewHolder> {
 
     private var context: Context? = null
 
@@ -46,7 +46,7 @@ class UserListNewAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSd
         listener=context as UserListNewAdapter.onUserSelected
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         context = parent.context
         return when (viewType) {
             VIEW_TYPE_USERS -> {
@@ -78,7 +78,7 @@ class UserListNewAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSd
         VIEW_TYPE_EMPTY
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) = holder.onBind(position)
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) = holder.onBind(position)
 
     fun addItems(list: ArrayList<UserData>) {
         mList!!.addAll(list)
@@ -134,7 +134,7 @@ class UserListNewAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSd
     }
 
     inner class EmployeeListViewHolder(private val mBinding: ItemUserNewSdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             val data = mList!![position]
@@ -201,7 +201,7 @@ class UserListNewAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSd
     }
 
     inner class EmptyViewHolder(private val mBinding: ItemMyEarningEmptySdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             val emptyViewModel = MyEarningsEmptyItemViewModel()

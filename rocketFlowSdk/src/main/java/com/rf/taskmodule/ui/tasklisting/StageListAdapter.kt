@@ -16,7 +16,7 @@ import com.rf.taskmodule.ui.base.BaseSdkViewHolder
  * rocketflyer technology pvt. ltd
  * vikas.kesharvani@rocketflyer.in
  */
-class StageListAdapter(private var mList: ArrayList<DashBoardBoxItem>?) : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+class StageListAdapter(private var mList: ArrayList<DashBoardBoxItem>?) : RecyclerView.Adapter<BaseSdkViewHolder>() {
 
     private lateinit var listener: DashBoardListener
     private var context: Context? = null
@@ -26,7 +26,7 @@ class StageListAdapter(private var mList: ArrayList<DashBoardBoxItem>?) : Recycl
         this.listener = listener
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         context = parent.context
         val simpleViewItemBinding: LayoutStagesSdkBinding =
                 LayoutStagesSdkBinding.inflate(
@@ -51,7 +51,7 @@ class StageListAdapter(private var mList: ArrayList<DashBoardBoxItem>?) : Recycl
 
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) = holder.onBind(position)
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) = holder.onBind(position)
 
     fun addItems(list: ArrayList<DashBoardBoxItem>) {
         mList = list
@@ -66,7 +66,7 @@ class StageListAdapter(private var mList: ArrayList<DashBoardBoxItem>?) : Recycl
 
 
     inner class SimpleViewHolder(private val mBinding: LayoutStagesSdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
 
 
         override fun onBind(position: Int) {

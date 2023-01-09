@@ -87,7 +87,7 @@
                     android:layout_below="@+id/tvDriverStatus"
                     android:layout_marginLeft="@dimen/dimen_6"
                     android:text="@{viewModel.status}"
-                   android:layoutDirection="rtl"
+                    android:layoutDirection="rtl"
                     tools:text="Active"
                     android:textAllCaps="true"
                     android:checked="false" />

@@ -1,7 +1,5 @@
 package com.rf.taskmodule.ui.addfleet;
 
-import static com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FLEET;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -22,20 +20,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
-import com.rf.taskmodule.TrackiSdkApplication;
-import com.rf.taskmodule.data.model.response.config.Api;
-import com.rf.taskmodule.data.model.response.config.Fleet;
-import com.rf.taskmodule.data.model.response.config.ProfileResponse;
-import com.rf.taskmodule.data.network.APIError;
-import com.rf.taskmodule.utils.ApiType;
-import com.rf.taskmodule.utils.AppConstants;
-import com.rf.taskmodule.utils.CommonUtils;
-import com.rf.taskmodule.utils.FileType;
-import com.rf.taskmodule.utils.TrackiToast;
-import com.rf.taskmodule.utils.image_utility.Compressor;
-import com.rf.taskmodule.utils.image_utility.ImagePicker;
-import com.rocketflow.sdk.RocketFlyer;
-import com.rf.taskmodule.BR;
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.TrackiSdkApplication;
 import com.rf.taskmodule.data.model.request.AddFleetRequest;
@@ -49,16 +33,19 @@ import com.rf.taskmodule.data.network.HttpManager;
 import com.rf.taskmodule.databinding.ActivityAddFleetSdkBinding;
 import com.rf.taskmodule.ui.base.BaseSdkActivity;
 import com.rf.taskmodule.utils.ApiType;
+import com.rf.taskmodule.utils.AppConstants;
 import com.rf.taskmodule.utils.CommonUtils;
 import com.rf.taskmodule.utils.FileType;
 import com.rf.taskmodule.utils.TrackiToast;
 import com.rf.taskmodule.utils.image_utility.Compressor;
 import com.rf.taskmodule.utils.image_utility.ImagePicker;
+import com.rocketflow.sdk.RocketFlyer;
 
 import java.io.File;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import com.rf.taskmodule.BR;
 
 /**
  * Created by rahul on 6/9/18

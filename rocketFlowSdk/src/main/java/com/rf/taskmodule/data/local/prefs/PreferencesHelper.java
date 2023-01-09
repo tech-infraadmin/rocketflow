@@ -7,17 +7,24 @@ import androidx.annotation.Nullable;
 //import com.google.android.gms.maps.model.LatLng;
 import com.rf.taskmodule.data.model.AlarmInfo;
 import com.rf.taskmodule.data.model.DataObject;
+import com.rf.taskmodule.data.model.request.SaveFilterData;
 import com.rf.taskmodule.data.model.response.config.Api;
 import com.rf.taskmodule.data.model.response.config.ChannelConfig;
+import com.rf.taskmodule.data.model.response.config.EmergencyContact;
 import com.rf.taskmodule.data.model.response.config.Flavour;
 import com.rf.taskmodule.data.model.response.config.FormData;
+import com.rf.taskmodule.data.model.response.config.GeoCoordinates;
+import com.rf.taskmodule.data.model.response.config.GeoFenceData;
 import com.rf.taskmodule.data.model.response.config.IdleTrackingInfo;
 import com.rf.taskmodule.data.model.response.config.OverstoppingConfig;
 import com.rf.taskmodule.data.model.response.config.ProfileInfo;
 import com.rf.taskmodule.data.model.response.config.ProjectCategories;
 import com.rf.taskmodule.data.model.response.config.RoleConfigData;
+import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
+import com.rf.taskmodule.ui.addplace.Hub;
 import com.rf.taskmodule.ui.selectorder.CatalogProduct;
+import com.rf.taskmodule.utils.ApiType;
 import com.rf.taskmodule.utils.ShiftTime;
 import com.rf.taskmodule.utils.UserType;
 
@@ -118,6 +125,9 @@ public interface PreferencesHelper {
     void setTrackingId(String trackingId);
 
     String getActiveTaskIdId();
+
+    String getBaseMode();
+    void setBaseMode(String url);
 
     void setActiveTaskId(String trackingId);
 

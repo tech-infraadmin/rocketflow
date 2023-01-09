@@ -1,5 +1,6 @@
 package com.rf.taskmodule.data.model.response.config
 
+import com.rf.taskmodule.ui.custom.GlideApp
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Parcelable
@@ -14,15 +15,17 @@ import com.rf.taskmodule.data.model.BaseResponse
 import com.rf.taskmodule.data.model.NotificationResponse
 import com.rf.taskmodule.data.model.request.AddEmployeeRequest
 import com.rf.taskmodule.data.model.request.AddressInfo
-import com.rf.taskmodule.data.model.request.Contact
 import com.rf.taskmodule.data.model.request.Shift
-import com.rf.taskmodule.ui.custom.GlideApp
 import com.rf.taskmodule.ui.products.PackInfo
 import com.rf.taskmodule.ui.taskdetails.StageHistoryData
 import com.rf.taskmodule.ui.tasklisting.PagingData
-import com.rf.taskmodule.utils.*
+import com.rf.taskmodule.utils.BuddyStatus
+import com.rf.taskmodule.utils.ChatUserStatus
+import com.rf.taskmodule.utils.TaskStatus
+import com.rf.taskmodule.utils.UserType
 import kotlinx.android.parcel.Parcelize
 import com.rf.taskmodule.R
+import com.rf.taskmodule.utils.ShiftTime
 import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
@@ -314,6 +317,7 @@ class Task : BaseResponse(), Serializable {
     var allowSubTask = false
     var trackingState: TrackingState? = null
     var driverPayoutBreakUps: PayoutBreakup? = null
+    var multiReferedTask: kotlin.collections.ArrayList<String>? = null
     var taskstats: TripsStatistics? = null
     var subCategoryIds: ArrayList<String>? = null
 
@@ -945,7 +949,7 @@ class SignUpResponse : BaseResponse() {
 
 class OtpResponse : BaseResponse() {
     var profileDetail: ProfileInfo? = null
-    var shifts: Map<Int, List<com.rf.taskmodule.utils.ShiftTime>>? = null
+    var shifts: Map<Int, List<ShiftTime>>? = null
     var hubLocations: List<HubLocation>? = null
     var userTypes: List<UserType>? = null
 }

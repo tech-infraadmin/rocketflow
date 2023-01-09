@@ -50,23 +50,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.rf.taskmodule.TrackiSdkApplication;
-import com.rf.taskmodule.data.model.BaseResponse;
-import com.rf.taskmodule.data.network.APIError;
-import com.rf.taskmodule.ui.base.BaseSdkFragment;
-import com.rf.taskmodule.ui.main.InsightAdapter;
-import com.rf.taskmodule.utils.AppConstants;
-import com.rf.taskmodule.utils.CommonUtils;
-import com.rf.taskmodule.utils.DateTimeUtil;
-import com.rf.taskmodule.utils.JSONConverter;
-import com.rf.taskmodule.utils.NetworkUtils;
-import com.rocketflow.sdk.RocketFlyer;
-
-import com.rf.taskmodule.BR;
-import com.rf.taskmodule.R;
-import com.rf.taskmodule.TrackiSdkApplication;
 import com.rf.taskmodule.data.local.prefs.AppPreferencesHelper;
-import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
 import com.rf.taskmodule.data.model.BaseResponse;
 import com.rf.taskmodule.data.model.request.SaveFilterData;
 import com.rf.taskmodule.data.model.request.StatusRequest;
@@ -95,7 +79,6 @@ import com.rf.taskmodule.data.network.HttpManager;
 import com.rf.taskmodule.databinding.DashboardBinding;
 import com.rf.taskmodule.ui.addplace.Hub;
 import com.rf.taskmodule.ui.base.BaseSdkFragment;
-import com.rf.taskmodule.ui.custom.GlideApp;
 import com.rf.taskmodule.ui.dynamicform.DynamicFormActivity;
 import com.rf.taskmodule.ui.main.DashBoardStageCountAdapter;
 import com.rf.taskmodule.ui.main.InsightAdapter;
@@ -104,6 +87,7 @@ import com.rf.taskmodule.ui.newcreatetask.NewCreateTaskActivity;
 import com.rf.taskmodule.ui.scanqrcode.ScanQrAndBarCodeActivity;
 import com.rf.taskmodule.ui.selectorder.SelectOrderActivity;
 import com.rf.taskmodule.ui.taskdetails.NewTaskDetailsActivity;
+import com.rf.taskmodule.ui.tasklisting.PaginationListener;
 import com.rf.taskmodule.ui.tasklisting.PagingData;
 import com.rf.taskmodule.ui.tasklisting.TaskActivity;
 import com.rf.taskmodule.ui.tasklisting.TaskItemClickListener;
@@ -112,7 +96,6 @@ import com.rf.taskmodule.ui.tasklisting.ihaveassigned.TabDataClass;
 import com.rf.taskmodule.utils.ApiType;
 import com.rf.taskmodule.utils.AppConstants;
 import com.rf.taskmodule.utils.BuddyInfo;
-import com.rf.taskmodule.utils.CommonUtils;
 import com.rf.taskmodule.utils.DateTimeUtil;
 import com.rf.taskmodule.utils.JSONConverter;
 import com.rf.taskmodule.utils.Log;
@@ -120,6 +103,14 @@ import com.rf.taskmodule.utils.NetworkUtils;
 import com.rf.taskmodule.utils.TaskStatus;
 import com.rf.taskmodule.utils.TrackiToast;
 import com.rf.taskmodule.utils.toggle.widget.LabeledSwitch;
+import com.rocketflow.sdk.RocketFlyer;
+
+import com.rf.taskmodule.BR;
+import com.rf.taskmodule.R;
+import com.rf.taskmodule.TrackiSdkApplication;
+import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
+import com.rf.taskmodule.ui.custom.GlideApp;
+import com.rf.taskmodule.utils.CommonUtils;
 
 import com.trackthat.lib.TrackThat;
 import com.trackthat.lib.internal.network.TrackThatCallback;
@@ -143,14 +134,11 @@ import java.util.Objects;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
-import static com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START;
-import static com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU;
 
 public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, TaskDashBoardViewModel> implements TaskDashBoardNavigator, View.OnClickListener, DashBoardStageCountAdapter.DashBoardListener, TaskItemClickListener {
     private static final String TAG = "TaskDashBoardFragment";
     private static final int REQUEST_CAMERA = 3;
     TaskDashBoardViewModel mMainViewModel;
-
     PreferencesHelper preferencesHelper;
     HttpManager httpManager;
 
@@ -206,12 +194,13 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
     private ProfileInfo userDetail;
     private List<TabDataClass> fragments = new ArrayList<>();
 
+
     private ImageView close;
 
     private LabeledSwitch switchToggle;
 
     private String dfdId = null;
-    private int currentPage = PAGE_START;
+    private int currentPage = PaginationListener.PAGE_START;
     private boolean isLastPage = false;
     private boolean isLoading = false;
     private CardView cardFromDate;
@@ -307,10 +296,13 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
         taskStageDashBoardBinding = getViewDataBinding();
 
         setUp();
+
         populateCategorySpinner();
 
         switchToggle = taskStageDashBoardBinding.toolLayoutDashboard.findViewById(R.id.switch_toggle_dash);
         setToggle(switchToggle);
+
+
 
         toggleCount = 2;
 
@@ -337,6 +329,8 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
             mockSetup();
         }
     }
+
+
 
     private void setToggle(LabeledSwitch switchToggle) {
         switchToggle.setOnToggledListener((toggleableView, isOn) -> {
@@ -481,6 +475,7 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
         ivNavigationIcon.setOnClickListener(this);
         ivScanQrCode.setOnClickListener(this);
         ivFilter.setOnClickListener(this);
+
 
         ViewTreeObserver viewTreeObserver = taskStageDashBoardBinding.rlRecycler.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {

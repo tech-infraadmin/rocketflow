@@ -2,6 +2,7 @@ package com.rf.taskmodule.data.local.db;
 
 
 import com.rf.taskmodule.data.model.GeofenceData;
+import com.rf.taskmodule.data.model.GeofenceData;
 
 public interface GeofenceDataSource {
 

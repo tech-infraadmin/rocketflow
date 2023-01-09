@@ -47,6 +47,8 @@
             android:id="@+id/recyclerCtaButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:layout_below="@+id/tvLabelTakeAction"
             android:layout_marginLeft="@dimen/dimen_4"
             android:layout_marginTop="@dimen/dimen_15"

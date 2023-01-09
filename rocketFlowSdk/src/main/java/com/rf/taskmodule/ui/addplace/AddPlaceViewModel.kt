@@ -10,32 +10,32 @@ import com.rf.taskmodule.ui.base.BaseSdkViewModel
 import com.rf.taskmodule.utils.CommonUtils
 import com.rf.taskmodule.utils.rx.SchedulerProvider
 
-open class AddPlaceViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-        com.rf.taskmodule.ui.base.BaseSdkViewModel<AddPlaceNavigator>(dataManager, schedulerProvider) {
+open class AddPlaceViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+        BaseSdkViewModel<AddPlaceNavigator>(dataManager, schedulerProvider) {
 
-    private lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    private lateinit var httpManager: HttpManager
     private lateinit var api: Api
      var addPlaceRequest: AddPlaceRequest?=null
 
 
     fun isViewNullOrEmpty(string: String): Boolean {
-        return com.rf.taskmodule.utils.CommonUtils.isViewNullOrEmpty(string)
+        return CommonUtils.isViewNullOrEmpty(string)
     }
 
     fun isMobileValid(string: String): Boolean {
-        return com.rf.taskmodule.utils.CommonUtils.isMobileValid(string)
+        return CommonUtils.isMobileValid(string)
     }
     fun selectLocation(view: View) {
         navigator.openPlaceAutoComplete(view)
     }
 
 
-    fun getLocation(httpManager: com.rf.taskmodule.data.network.HttpManager, api: Api) {
+    fun getLocation(httpManager: HttpManager, api: Api) {
         this.httpManager = httpManager
         this.api = api
         GetLocation().hitApi()
     }
-    fun updateLocation(httpManager: com.rf.taskmodule.data.network.HttpManager, addPlaceRequest:AddPlaceRequest, api: Api) {
+    fun updateLocation(httpManager: HttpManager, addPlaceRequest:AddPlaceRequest, api: Api) {
         this.httpManager = httpManager
         this.api = api
         this.addPlaceRequest = addPlaceRequest
@@ -50,7 +50,7 @@ open class AddPlaceViewModel(dataManager: com.rf.taskmodule.data.DataManager, sc
     /**
      *
      */
-    inner class GetLocation : com.rf.taskmodule.data.network.ApiCallback {
+    inner class GetLocation : ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleStateCityResponse(this@GetLocation, result, error)
@@ -65,7 +65,7 @@ open class AddPlaceViewModel(dataManager: com.rf.taskmodule.data.DataManager, sc
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -73,7 +73,7 @@ open class AddPlaceViewModel(dataManager: com.rf.taskmodule.data.DataManager, sc
         }
     }
 
-    inner class UpdateLocation : com.rf.taskmodule.data.network.ApiCallback {
+    inner class UpdateLocation : ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleAddPlaceResponse(this@UpdateLocation, result, error)
@@ -88,7 +88,7 @@ open class AddPlaceViewModel(dataManager: com.rf.taskmodule.data.DataManager, sc
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 

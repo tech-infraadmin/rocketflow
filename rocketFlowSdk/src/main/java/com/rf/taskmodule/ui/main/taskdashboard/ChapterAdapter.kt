@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.rf.taskmodule.R
-import com.bumptech.glide.Glide
 import android.widget.TextView
 import com.rf.taskmodule.data.model.response.config.Category
 import com.rf.taskmodule.ui.custom.GlideApp
@@ -52,7 +51,7 @@ class ChapterAdapter(
             }
         }
 
-        com.rf.taskmodule.utils.Log.d("selected", selectedCategory);
+        Log.d("selected", selectedCategory);
         if(selectedCategory == chapters[position].categoryId){
             holder.cardView.setBackgroundResource(R.drawable.layout_bg_red)
         }else {

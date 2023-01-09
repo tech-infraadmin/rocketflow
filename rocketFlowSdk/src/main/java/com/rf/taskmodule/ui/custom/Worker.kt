@@ -26,7 +26,7 @@ import java.util.concurrent.Callable
  */
 internal class Worker(private val key: String,
                       private val files: List<File>,
-                      private val httpManager: com.rf.taskmodule.data.network.HttpManager,
+                      private val httpManager: HttpManager,
                       private val api: Api,
                       private val mHandler: Handler?
 ) : Callable<FileUrlsResponse> {
@@ -42,30 +42,30 @@ internal class Worker(private val key: String,
             fileResponse = Gson().fromJson(response, FileUrlsResponse::class.java)
             if (fileResponse.successful) {
                 //update the data after getting response
-                com.rf.taskmodule.utils.CommonUtils.updateData(fileResponse)
+                CommonUtils.updateData(fileResponse)
             } else {
-                com.rf.taskmodule.utils.Log.e("Worker", "call(): response not success")
+                Log.e("Worker", "call(): response not success")
                 message = mHandler?.obtainMessage(1, APIError.ErrorType.SERVER_DOWN.name)
             }
         } catch (var5: SocketTimeoutException) {
-            com.rf.taskmodule.utils.Log.e("Worker", "call(): $var5")
+            Log.e("Worker", "call(): $var5")
             message = mHandler?.obtainMessage(1, APIError.ErrorType.TIMEOUT.name)
         } catch (var6: SocketException) {
-            com.rf.taskmodule.utils.Log.e("Worker", "call(): $var6")
+            Log.e("Worker", "call(): $var6")
             message = mHandler?.obtainMessage(1, APIError.ErrorType.NETWORK_FAIL.name)
         } catch (var6: UnknownHostException) {
-            com.rf.taskmodule.utils.Log.e("Worker", "call(): $var6")
+            Log.e("Worker", "call(): $var6")
             message = mHandler?.obtainMessage(1, APIError.ErrorType.NETWORK_FAIL.name)
         } catch (var6: UnsupportedEncodingException) {
-            com.rf.taskmodule.utils.Log.e("Worker", "call(): $var6")
+            Log.e("Worker", "call(): $var6")
             message = mHandler?.obtainMessage(1, APIError.ErrorType.NETWORK_FAIL.name)
         } catch (e: ParseException) {
-            com.rf.taskmodule.utils.Log.e("Worker", "call(): $e")
+            Log.e("Worker", "call(): $e")
             message = mHandler?.obtainMessage(1, APIError.ErrorType.PARSE_FAILED.name)
         } catch (ex: InterruptedException) {
-            com.rf.taskmodule.utils.Log.e("Worker", "call():Thread got Interrupted: $ex")
+            Log.e("Worker", "call():Thread got Interrupted: $ex")
         } catch (e: Exception) {
-            com.rf.taskmodule.utils.Log.e("Worker", "call(): $e")
+            Log.e("Worker", "call(): $e")
             message = mHandler?.obtainMessage(1, APIError.ErrorType.UNKNOWN_ERROR.name)
         }
         message?.sendToTarget()

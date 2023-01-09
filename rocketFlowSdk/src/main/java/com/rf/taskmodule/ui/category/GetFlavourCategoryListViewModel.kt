@@ -16,16 +16,16 @@ import com.rf.taskmodule.utils.rx.AppSchedulerProvider
 import com.rf.taskmodule.utils.rx.SchedulerProvider
 
 class GetFlavourCategoryListViewModel(
-    dataManager: com.rf.taskmodule.data.DataManager,
-    schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider
+    dataManager: DataManager,
+    schedulerProvider: SchedulerProvider
 ) :
-    com.rf.taskmodule.ui.base.BaseSdkViewModel<ProductCategoryNavigator>(dataManager, schedulerProvider) {
+    BaseSdkViewModel<ProductCategoryNavigator>(dataManager, schedulerProvider) {
 
-    private lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    private lateinit var httpManager: HttpManager
 
 
     fun getProductCategory(
-        httpManager: com.rf.taskmodule.data.network.HttpManager,
+        httpManager: HttpManager,
         request: PaginationRequest?,
         flavorId: String?,
         categoryId: String?,
@@ -40,7 +40,7 @@ class GetFlavourCategoryListViewModel(
         var flavorId: String?,
         var categoryId: String?,
         var loadBy:String
-    ) : com.rf.taskmodule.data.network.ApiCallback {
+    ) : ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -48,8 +48,8 @@ class GetFlavourCategoryListViewModel(
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.PRODUCT_CATEGORIES)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.PRODUCT_CATEGORIES]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.PRODUCT_CATEGORIES)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.PRODUCT_CATEGORIES]!!
                 var apiUrl = Api()
                 if (flavorId != null && paginationRequest != null&&categoryId!=null) {
                     apiUrl.url =
@@ -78,7 +78,7 @@ class GetFlavourCategoryListViewModel(
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -87,13 +87,13 @@ class GetFlavourCategoryListViewModel(
         }
     }
 
-    fun deleteProductCategory(httpManager: com.rf.taskmodule.data.network.HttpManager, request: CataLogProductCategory?) {
+    fun deleteProductCategory(httpManager: HttpManager, request: CataLogProductCategory?) {
         this.httpManager = httpManager
         DeleteProductCategory(request).hitApi()
     }
 
     inner class DeleteProductCategory(var request: CataLogProductCategory?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -101,8 +101,8 @@ class GetFlavourCategoryListViewModel(
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.DELETE_PRODUCT_CATEGORY)) {
-                val apiUrl = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.DELETE_PRODUCT_CATEGORY]
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.DELETE_PRODUCT_CATEGORY)) {
+                val apiUrl = TrackiSdkApplication.getApiMap()[ApiType.DELETE_PRODUCT_CATEGORY]
                 if (dataManager != null)
                     dataManager.deleteProductCategory(this, request, httpManager, apiUrl)
             }
@@ -115,7 +115,7 @@ class GetFlavourCategoryListViewModel(
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -124,13 +124,13 @@ class GetFlavourCategoryListViewModel(
         }
     }
 
-    fun updateStatusProductCategory(httpManager: com.rf.taskmodule.data.network.HttpManager, request: CataLogProductCategory?) {
+    fun updateStatusProductCategory(httpManager: HttpManager, request: CataLogProductCategory?) {
         this.httpManager = httpManager
         UpdateProductCategory(request).hitApi()
     }
 
     inner class UpdateProductCategory(var request: CataLogProductCategory?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -138,8 +138,8 @@ class GetFlavourCategoryListViewModel(
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.UPDATE_PRODUCT_CATEGORY_STATUS)) {
-                val apiUrl = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.UPDATE_PRODUCT_CATEGORY_STATUS]
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.UPDATE_PRODUCT_CATEGORY_STATUS)) {
+                val apiUrl = TrackiSdkApplication.getApiMap()[ApiType.UPDATE_PRODUCT_CATEGORY_STATUS]
                 if (dataManager != null)
                     dataManager.deleteProductCategory(this, request, httpManager, apiUrl)
             }
@@ -152,7 +152,7 @@ class GetFlavourCategoryListViewModel(
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -162,10 +162,10 @@ class GetFlavourCategoryListViewModel(
     }
 
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GetFlavourCategoryListViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

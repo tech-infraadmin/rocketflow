@@ -10,8 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 //import com.bumptech.glide.Glide;
 //import com.bumptech.glide.request.RequestOptions;
+import com.rf.taskmodule.data.model.response.config.GeoCoordinates;
+import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.utils.AppConstants;
-import com.rf.taskmodule.utils.CommonUtils;
 
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
@@ -158,7 +159,7 @@ public class AssignedtoMeAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
             {
                 //START_LOCATION, END_LOCATION, SELECT_BUDDY, SELECT_CLIENT, START_TIME, END_TIME, POINT_OF_CONTACT, TASK_NAME,
                 //        TASK_TYPE, DESCRIPTION, SELECT_FLEET, SELECT_CITY
-                String startLocationLabel= CommonUtils.getAllowFieldLabelName("START_LOCATION",categoryId,preferencesHelper);
+                String startLocationLabel=CommonUtils.getAllowFieldLabelName("START_LOCATION",categoryId,preferencesHelper);
                 String systemLocationLabel=CommonUtils.getAllowFieldLabelName("SYSTEM_LOCATION",categoryId,preferencesHelper);
                 if(!startLocationLabel.isEmpty()){
                     mBinding.labelStartLocation.setText(startLocationLabel);
@@ -228,13 +229,13 @@ public class AssignedtoMeAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
             if (task.getContact() != null) {
                 isPointOfContactVisible=true;
                 mBinding.tvContactName.setText(task.getContact().getName());
-                mBinding.tvContactMobile.setText(task.getContact().getMobile());
+                mBinding.tvContactMobile.setText(task.getContact().getMobileNumber());
                 mBinding.rlPointOfContact.setVisibility(View.VISIBLE);
                 mBinding.rlCallContactPerson.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (task.getContact().getMobile() != null) {
-                            String mobile = task.getContact().getMobile();
+                        if (task.getContact().getMobileNumber() != null) {
+                            String mobile = task.getContact().getMobileNumber();
                             CommonUtils.openDialer(context, mobile);
                         }
                     }

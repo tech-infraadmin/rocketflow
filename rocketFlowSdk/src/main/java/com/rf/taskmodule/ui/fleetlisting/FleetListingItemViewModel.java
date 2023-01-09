@@ -6,6 +6,8 @@ import androidx.databinding.ObservableField;
 
 import com.rf.taskmodule.data.model.response.config.Fleet;
 
+import com.rf.taskmodule.data.model.response.config.Fleet;
+
 /**
  * Created by rahul on 18/9/18
  */

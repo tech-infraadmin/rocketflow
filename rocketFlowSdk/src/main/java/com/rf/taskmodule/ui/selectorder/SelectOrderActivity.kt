@@ -51,11 +51,12 @@ import com.rf.taskmodule.ui.newcreatetask.NewCreateTaskActivity
 import com.rf.taskmodule.ui.scanqrcode.ProductScan
 import com.rf.taskmodule.ui.taskdetails.timeline.ProductMapAdapter
 import com.rf.taskmodule.ui.tasklisting.PaginationListener
+import com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START
 import com.rf.taskmodule.utils.*
 import com.trackthat.lib.models.BaseResponse
 
 
-open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivitySelectOrderSdkBinding, SelectOrderViewModel>(),
+open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, SelectOrderViewModel>(),
     SubCategoryAdapter.OnSubCategorySelected, SelectProductAdapter.OnProductAddListener,
     View.OnClickListener, SelectOrderNavigator {
     private var linkOption: LinkOptions? = null
@@ -74,10 +75,10 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
 
     open var savedOrderMap: HashMap<String, CatalogProduct>? = null
 
-    lateinit var mPref: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var mPref: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
-    private var currentPage = com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START
+    private var currentPage = PAGE_START
     private var isLastPage = false
     private val REQUEST_CAMERA = 3
     private var isLoading = false
@@ -115,48 +116,48 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
         binding.btnPlaceOrder.setOnClickListener(this)
         val sharedPreferences = getSharedPreferences("backAlpha",Context.MODE_PRIVATE)
         val check = sharedPreferences.getBoolean("back",false)
-        com.rf.taskmodule.utils.Log.e("backAlpha","$check")
+        Log.e("backAlpha","$check")
         if (check){
             onBackPressed()
             sharedPreferences.edit().putBoolean("back",false).apply()
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)) {
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORIES)) {
             var categoryMap: Map<String, String>? = null
-            val str: String = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)!!
+            val str: String = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORIES)!!
             categoryMap = Gson().fromJson(
                 str,
                 object : TypeToken<java.util.HashMap<String?, String?>?>() {}.type
             )
             if (categoryMap != null && categoryMap!!.containsKey("categoryId")) {
                 categoryId = categoryMap!!.get("categoryId")
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "categoryId", categoryId)
+                CommonUtils.showLogMessage("e", "categoryId", categoryId)
 
 
             }
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)) {
-            taskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_ID)) {
+            taskId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)) {
-            target = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)) {
+            target = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)) {
-            flavourId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)) {
+            flavourId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID)
         }
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING)) {
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING)) {
             dynamicPricing =
-                intent.getBooleanExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, false)
+                intent.getBooleanExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, false)
         }
 
 
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID))
-            ctaId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID))
+            ctaId = intent.getStringExtra(AppConstants.Extra.EXTRA_CTA_ID)
         getSavedMap()
         stageAdapter = SubCategoryAdapter(this)
         selectProductAdapter = SelectProductAdapter(this)
         if (categoryId != null) {
             getInventoryConfig(categoryId!!)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "flavourId", flavourId)
+            CommonUtils.showLogMessage("e", "flavourId", flavourId)
             selectProductAdapter.setLinkOption(linkOption!!)
             if (linkingType != null && linkingType == TaggingType.SINGLE
                 && linkOption != null && linkOption == LinkOptions.DIRECT
@@ -188,7 +189,7 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
             binding.tvCountSearchResult.text = ""
             binding.tvResults.text = ""
             if (cid != null) {
-                currentPage = com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START
+                currentPage = PAGE_START
                 getProductFromFromServer(cid!!)
             }
         }
@@ -238,7 +239,7 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
                 if (myCatData.inventoryConfig != null && myCatData.inventoryConfig!!.geoTagging != null) {
                     geoTagging = myCatData.inventoryConfig!!.geoTagging!!
                 }
-                if (!intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING)) {
+                if (!intent.hasExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING)) {
                     if (myCatData.inventoryConfig != null && myCatData.inventoryConfig!!.dynamicPricing != null) {
                         dynamicPricing = myCatData.inventoryConfig!!.dynamicPricing!!
 
@@ -264,7 +265,7 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
             rvProducts!!.adapter = selectProductAdapter
         }
 
-        rvProducts!!.addOnScrollListener(object : com.rf.taskmodule.ui.tasklisting.PaginationListener(mLayoutManager!!) {
+        rvProducts!!.addOnScrollListener(object :PaginationListener(mLayoutManager!!) {
             override fun loadMoreItems() {
                 this@SelectOrderActivity.isLoading = true
                 if (cid != null) {
@@ -304,21 +305,21 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
 
     override fun onCategorySelected(data: CataLogProductCategory) {
         if (data.cid != null)
-            currentPage = com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START
+            currentPage =PAGE_START
         getProductFromFromServer(data.cid!!)
 
     }
 
 
     private fun getSavedMap() {
-        com.rf.taskmodule.utils.Log.e("inMap","1")
+        Log.e("inMap","1")
         if (mPref.userDetail != null && mPref.userDetail.userId != null) {
-            com.rf.taskmodule.utils.Log.e("inMap","2")
-            if (com.rf.taskmodule.utils.CommonUtils.getTotalItemCount(mPref.userDetail.userId!!, mPref) > 0) {
+            Log.e("inMap","2")
+            if (CommonUtils.getTotalItemCount(mPref.userDetail.userId!!, mPref) > 0) {
                 if (mPref.productInCartWRC != null && mPref.productInCartWRC!!
                         .containsKey(mPref.userDetail.userId)
                 ) {
-                    com.rf.taskmodule.utils.Log.e("inMap","3")
+                    Log.e("inMap","3")
                     savedOrderMap = mPref.getProductInCartWRC()!![mPref.userDetail.userId]
                 }
             } else {
@@ -329,7 +330,7 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
 
     override fun addProduct(data: CatalogProduct, position: Int) {
         if (linkingType != null && linkingType == TaggingType.SINGLE && linkOption != null && linkOption == LinkOptions.DIRECT) {
-            com.rf.taskmodule.utils.Log.e("position", "" + position)
+            Log.e("position", "" + position)
             savedOrderMap = HashMap()
             if (data.addInOrder) {
                 savedOrderMap!![data.pid!!] = data
@@ -366,16 +367,16 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
         saveOrderInCart[mPref.userDetail.userId!!] = savedOrderMap!!
         mPref.saveProductInCartWRC(saveOrderInCart)
         var jsonConverter2 =
-            com.rf.taskmodule.utils.JSONConverter<Map<String, Map<String, CatalogProduct>>>()
+            JSONConverter<Map<String, Map<String, CatalogProduct>>>()
         var str2 = jsonConverter2.objectToJson(mPref.getProductInCartWRC())
 //        Log.e("map_addProduct", str2)
 
 
         invalidateOptionsMenu()
         var jsonConverter =
-            com.rf.taskmodule.utils.JSONConverter<HashMap<String, CatalogProduct>>()
+            JSONConverter<HashMap<String, CatalogProduct>>()
         var str = jsonConverter.objectToJson(savedOrderMap)
-        com.rf.taskmodule.utils.Log.e("map", str)
+        Log.e("map", str)
         if (savedOrderMap!!.isNotEmpty())
             binding.llButton.visibility = View.VISIBLE
         else {
@@ -391,7 +392,7 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
 
 
     private fun getProducts(cid: String?) {
-        if (currentPage == com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START) {
+        if (currentPage == PAGE_START) {
             selectProductAdapter.clearList()
             binding.rvProducts.removeAllViewsInLayout()
 
@@ -447,11 +448,11 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
 
         var count = 0
         var jsonConverter =
-            com.rf.taskmodule.utils.JSONConverter<Map<String, Map<String, CatalogProduct>>>()
+            JSONConverter<Map<String, Map<String, CatalogProduct>>>()
         var str = jsonConverter.objectToJson(mPref.productInCartWRC)
-        com.rf.taskmodule.utils.Log.e("map_menu", str)
+        Log.e("map_menu", str)
         if (mPref.userDetail != null && mPref.userDetail.userId != null)
-            count = com.rf.taskmodule.utils.CommonUtils.getTotalItemCount(mPref.userDetail.userId!!, mPref)
+            count = CommonUtils.getTotalItemCount(mPref.userDetail.userId!!, mPref)
         menuItem.setIcon(buildCounterDrawable(count, R.drawable.ic_cart))
         qrCode.icon = buildCounterDrawable(0,R.drawable.ic_qr_code)
         return true
@@ -480,7 +481,7 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
 
     fun onLinkInventorySucess() {
         if (mPref.userDetail != null && mPref.userDetail!!.userId != null) {
-            if (com.rf.taskmodule.utils.CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref) > 0) {
+            if (CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref) > 0) {
                 if (mPref.getProductInCartWRC() != null && mPref.getProductInCartWRC()!!
                         .containsKey(mPref.userDetail!!.userId!!)
                 ) {
@@ -491,9 +492,9 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
                     saveOrderInCart.remove(mPref.userDetail!!.userId!!)
                     mPref.saveProductInCartWRC(saveOrderInCart)
                     var jsonConverter2 =
-                        com.rf.taskmodule.utils.JSONConverter<Map<String, Map<String, CatalogProduct>>>()
+                        JSONConverter<Map<String, Map<String, CatalogProduct>>>()
                     var str2 = jsonConverter2.objectToJson(mPref.getProductInCartWRC())
-                    com.rf.taskmodule.utils.Log.e("delete_map", str2)
+                    Log.e("delete_map", str2)
 
                 }
             }
@@ -522,20 +523,20 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
                 selectProductAdapter.clearList()
                 binding.rvProducts.removeAllViewsInLayout()
                 if (cid != null) {
-                    currentPage = com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START
+                    currentPage = PAGE_START
                     getProductFromFromServer(cid!!)
                 }
             }
-        } else if (requestCode == com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_CREATE_TASK_DIRECT) {
+        } else if (requestCode == AppConstants.REQUEST_CODE_CREATE_TASK_DIRECT) {
             if (resultCode == Activity.RESULT_OK) {
                 onLinkInventorySucess()
             }
-        } else if (requestCode == com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_CREATE_TASK) {
+        } else if (requestCode == AppConstants.REQUEST_CODE_CREATE_TASK) {
             if (resultCode == Activity.RESULT_OK) {
-                taskId = data!!.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
-                buddyName = data!!.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_NAME)
-                buddyId = data!!.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_ID)
-                fleetId = data!!.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FLEET_ID)
+                taskId = data!!.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
+                buddyName = data!!.getStringExtra(AppConstants.Extra.EXTRA_BUDDY_NAME)
+                buddyId = data!!.getStringExtra(AppConstants.Extra.EXTRA_BUDDY_ID)
+                fleetId = data!!.getStringExtra(AppConstants.Extra.EXTRA_FLEET_ID)
                 var linkRequest = LinkInventoryRequest()
                 if (savedOrderMap != null && savedOrderMap!!.isNotEmpty()) {
 //                    var map = HashMap<String, Int>()
@@ -586,10 +587,10 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
                         }
                     }
                 }
-                val jsonConverter: com.rf.taskmodule.utils.JSONConverter<LinkInventoryRequest> =
-                    com.rf.taskmodule.utils.JSONConverter()
+                val jsonConverter: JSONConverter<LinkInventoryRequest> =
+                    JSONConverter()
                 var strRequest = jsonConverter.objectToJson(linkRequest)
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "strRequest", strRequest);
+                CommonUtils.showLogMessage("e", "strRequest", strRequest);
                 showLoading()
                 selectOrderViewModel.linkInventory(httpManager, linkRequest)
 
@@ -678,20 +679,20 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
         }
         var intent = Intent(this, CartActivity::class.java)
 
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_CHARGE, deliveryChargeAmount)
+        intent.putExtra(AppConstants.DELIVERY_CHARGE, deliveryChargeAmount)
         if (taskId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID, taskId)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
         if (target != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET, target)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET, target)
         if (flavourId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, flavourId)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, flavourId)
         if (categoryId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
+            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
         if (ctaId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID, ctaId)
+            intent.putExtra(AppConstants.Extra.EXTRA_CTA_ID, ctaId)
         if (deliverMode != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_MODE, deliverMode)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, dynamicPricing)
+            intent.putExtra(AppConstants.DELIVERY_MODE, deliverMode)
+        intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, dynamicPricing)
         startActivityForResult(intent, PLACE_ORDER)
     }
 
@@ -707,19 +708,19 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
         return selectOrderViewModel!!
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
     }
 
     override fun handleProductCategoryResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@SelectOrderActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@SelectOrderActivity)) {
 
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<CatalogCategoryResponse> =
-                com.rf.taskmodule.utils.JSONConverter()
+            val jsonConverter: JSONConverter<CatalogCategoryResponse> =
+                JSONConverter()
             var responseMain: CatalogCategoryResponse = jsonConverter.jsonToObject(
                 result.toString(),
                 CatalogCategoryResponse::class.java
@@ -742,12 +743,12 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
         }
     }
 
-    override fun handleProductResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleProductResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
         this.isLoading = false
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@SelectOrderActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@SelectOrderActivity)) {
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<CatalogProductResponse>()
+                JSONConverter<CatalogProductResponse>()
             var responseMain: CatalogProductResponse = jsonConverter.jsonToObject(
                 result.toString(),
                 CatalogProductResponse::class.java
@@ -776,11 +777,11 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
                 setRecyclerView()
                 selectProductAdapter!!.addItems(list)
                 binding.rlSearch.visibility = View.VISIBLE
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                CommonUtils.showLogMessage(
                     "e", "adapter total_count =>",
                     "" + selectProductAdapter.itemCount
                 )
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                CommonUtils.showLogMessage(
                     "e", "fetch total_count =>",
                     "" + responseMain.count
                 )
@@ -812,11 +813,11 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
         }
     }
 
-    override fun handleCreateOrderResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleCreateOrderResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@SelectOrderActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@SelectOrderActivity)) {
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<BaseResponse>()
+                JSONConverter<BaseResponse>()
             var responseMain: BaseResponse = jsonConverter.jsonToObject(
                 result.toString(),
                 BaseResponse::class.java
@@ -831,17 +832,17 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
         }
     }
 
-    override fun linkInventoryResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun linkInventoryResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             onLinkInventorySucess()
 
         }
     }
 
-    override fun handleHubListResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleHubListResponse(callback: ApiCallback, result: Any?, error: APIError?) {
 //        hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
 
             val geoLocation = Gson().fromJson<GetUserManualLocationData>(
                 result.toString(),
@@ -891,7 +892,7 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
     fun linkInventory() {
 
         if (linkOption != null && linkOption == LinkOptions.DIRECT) {
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)) {
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID)) {
                 // TODO Code for order tagging
                 return
             } else {
@@ -914,11 +915,11 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
             }
 
         } else {
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)) {
-                if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)) {
-                    taskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID)) {
+                if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_ID)) {
+                    taskId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
                 }
-                var ctaId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)
+                var ctaId = intent.getStringExtra(AppConstants.Extra.EXTRA_CTA_ID)
 
 
                 var linkRequest = LinkInventoryRequest()
@@ -973,10 +974,10 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
                         }
                     }
                 }
-                val jsonConverter: com.rf.taskmodule.utils.JSONConverter<LinkInventoryRequest> =
-                    com.rf.taskmodule.utils.JSONConverter()
+                val jsonConverter: JSONConverter<LinkInventoryRequest> =
+                    JSONConverter()
                 var strRequest = jsonConverter.objectToJson(linkRequest)
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "strRequest", strRequest);
+                CommonUtils.showLogMessage("e", "strRequest", strRequest);
                 showLoading()
                 selectOrderViewModel.linkInventory(httpManager, linkRequest)
 
@@ -985,18 +986,18 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
                 var list = selectProductAdapter.getAllList().filter { it.addInOrder }
                 if (list.isNotEmpty()) {
                     val intent = NewCreateTaskActivity.newIntent(this)
-                    intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM, "taskListing")
+                    intent.putExtra(AppConstants.Extra.FROM, "taskListing")
                     val dashBoardBoxItem = DashBoardBoxItem()
                     dashBoardBoxItem.categoryId = categoryId
                     intent.putExtra(
-                        com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES,
+                        AppConstants.Extra.EXTRA_CATEGORIES,
                         Gson().toJson(dashBoardBoxItem)
                     )
                     intent.putExtra(
-                        com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU,
+                        AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU,
                         true
                     )
-                    startActivityForResult(intent, com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_CREATE_TASK)
+                    startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
                 } else {
                     TrackiToast.Message.showShort(this, "Please add items")
                 }
@@ -1081,11 +1082,11 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
 
     private fun createTaskSingleDirect(invIds: java.util.ArrayList<String>, reffId: String?) {
         val intent = NewCreateTaskActivity.newIntent(this)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM, "taskListing")
+        intent.putExtra(AppConstants.Extra.FROM, "taskListing")
         val dashBoardBoxItem = DashBoardBoxItem()
         dashBoardBoxItem.categoryId = categoryId
         intent.putExtra(
-            com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES,
+            AppConstants.Extra.EXTRA_CATEGORIES,
             Gson().toJson(dashBoardBoxItem)
         )
         intent.putStringArrayListExtra(
@@ -1103,10 +1104,10 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
             true
         )
         intent.putExtra(
-            com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU,
+            AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU,
             true
         )
-        startActivityForResult(intent, com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_CREATE_TASK_DIRECT)
+        startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK_DIRECT)
     }
 
     private fun openDialogShowImage(url: String) {
@@ -1191,7 +1192,7 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
                 geoId = data.id
                 binding.tvHubs.text = data.name
                 if (cid != null) {
-                    currentPage = com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START
+                    currentPage =PAGE_START
                     getProductFromFromServer(cid!!)
                 }
             }
@@ -1244,20 +1245,20 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
         //list send
         val listDataTemp = selectProductAdapter.getAllList().filter { it.addInOrder }
         val intent = ProductScan.newIntent(this, listDataTemp as ArrayList<CatalogProduct>)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_CHARGE, deliveryChargeAmount)
+        intent.putExtra(AppConstants.DELIVERY_CHARGE, deliveryChargeAmount)
         if (taskId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID, taskId)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskId)
         if (target != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET, target)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_TARGET, target)
         if (flavourId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, flavourId)
+            intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_IN_FLAVOUR_ID, flavourId)
         if (categoryId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
+            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
         if (ctaId != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID, ctaId)
+            intent.putExtra(AppConstants.Extra.EXTRA_CTA_ID, ctaId)
         if (deliverMode != null)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.DELIVERY_MODE, deliverMode)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, dynamicPricing)
+            intent.putExtra(AppConstants.DELIVERY_MODE, deliverMode)
+        intent.putExtra(AppConstants.Extra.EXTRA_TASK_TAG_INV_DYNAMIC_PRICING, dynamicPricing)
         startActivity(intent)
 
     }
@@ -1267,7 +1268,7 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
         getSavedMap()
         val sharedPreferences = getSharedPreferences("backAlpha",Context.MODE_PRIVATE)
         val check = sharedPreferences.getBoolean("back",false)
-        com.rf.taskmodule.utils.Log.e("backAlpha","$check")
+        Log.e("backAlpha","$check")
         if (check){
             onBackPressed()
             sharedPreferences.edit().putBoolean("back",false).apply()
@@ -1279,7 +1280,7 @@ open class SelectOrderActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
         getSavedMap()
         val sharedPreferences = getSharedPreferences("backAlpha",Context.MODE_PRIVATE)
         val check = sharedPreferences.getBoolean("back",false)
-        com.rf.taskmodule.utils.Log.e("backAlpha","$check")
+        Log.e("backAlpha","$check")
         if (check){
             onBackPressed()
             sharedPreferences.edit().putBoolean("back",false).apply()

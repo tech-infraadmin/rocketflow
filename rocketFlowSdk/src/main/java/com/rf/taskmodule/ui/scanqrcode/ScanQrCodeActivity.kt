@@ -104,27 +104,27 @@ class ScanQrCodeActivity : AppCompatActivity(), OnGlobalLayoutListener {
                     // vibration for 800 milliseconds
                     (getSystemService(VIBRATOR_SERVICE) as Vibrator).vibrate(40)
                     val encryptionAndDecryption =
-                        com.rf.taskmodule.utils.EncryptionAndDecryption()
+                        EncryptionAndDecryption()
                     //Toast.makeText(ScanBarCodeActivity.this,barcodeSparseArray.valueAt(0)+"" , Toast.LENGTH_SHORT).show();
                     Log.d("BARCODE", "BAT " + barcodeSparseArray.valueAt(0).displayValue)
                     try {
                         Log.d("BARCODE", "BAT " + encryptionAndDecryption.getDecryptData(barcodeSparseArray.valueAt(0).displayValue))
                         val jsonConverter =
-                            com.rf.taskmodule.utils.JSONConverter<QrCodeRequest>()
+                            JSONConverter<QrCodeRequest>()
                         val barcodeData: QrCodeRequest = jsonConverter.jsonToObject(encryptionAndDecryption.getDecryptData(barcodeSparseArray.valueAt(0).displayValue), QrCodeRequest::class.java) as QrCodeRequest
                         runOnUiThread {
                             if (!isClassCall) {
                                 isClassCall = true
                                 cameraSource.stop()
                                 val intent = Intent(this@ScanQrCodeActivity, NewTaskDetailsActivity::class.java)
-                                intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID, barcodeData.taskId)
-                                intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, barcodeData.allowSubTask)
-                                intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID, barcodeData.subTaskCategoryId)
-                                intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PARENT_REF_ID, barcodeData.referenceId)
-                                intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID, barcodeData.categoryId)
-                                intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM, barcodeData.from)
-                                intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM_DATE, barcodeData.fromDate)
-                                intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM_TO, barcodeData.toDate)
+                                intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, barcodeData.taskId)
+                                intent.putExtra(AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, barcodeData.allowSubTask)
+                                intent.putExtra(AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID, barcodeData.subTaskCategoryId)
+                                intent.putExtra(AppConstants.Extra.EXTRA_PARENT_REF_ID, barcodeData.referenceId)
+                                intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, barcodeData.categoryId)
+                                intent.putExtra(AppConstants.Extra.FROM, barcodeData.from)
+                                intent.putExtra(AppConstants.Extra.FROM_DATE, barcodeData.fromDate)
+                                intent.putExtra(AppConstants.Extra.FROM_TO, barcodeData.toDate)
                                 startActivity(intent)
                                 finish()
                             }

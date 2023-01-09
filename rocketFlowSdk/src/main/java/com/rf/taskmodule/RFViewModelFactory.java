@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.rf.taskmodule.data.DataManager;
 import com.rf.taskmodule.ui.base.BaseSdkViewModel;
 import com.rf.taskmodule.utils.rx.SchedulerProvider;
+import com.rf.taskmodule.data.DataManager;
+import com.rf.taskmodule.ui.base.BaseSdkViewModel;
+import com.rf.taskmodule.utils.rx.SchedulerProvider;
 
 public class RFViewModelFactory implements ViewModelProvider.Factory {
     private final DataManager mDataManager;

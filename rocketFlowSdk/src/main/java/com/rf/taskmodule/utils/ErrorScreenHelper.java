@@ -196,7 +196,7 @@ public class ErrorScreenHelper {
                             // and check the result in onActivityResult().
                             resolvable.startResolutionForResult(
                                     context,
-                                    REQUEST_CHECK_SETTINGS);
+                                    StartLocationAlert.REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException | ClassCastException e) {
                             // Ignore the error.
                             Log.e("Baseactivity", "Exception occur inside catch block " + e);

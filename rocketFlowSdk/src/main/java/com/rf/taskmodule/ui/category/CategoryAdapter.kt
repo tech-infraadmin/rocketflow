@@ -26,7 +26,7 @@ import com.rf.taskmodule.ui.selectorder.CataLogProductCategory
  * vikas.kesharvani@rocketflyer.in
  */
 class CategoryAdapter(var context: Context) :
-    RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>(),
+    RecyclerView.Adapter<BaseSdkViewHolder>(),
     Filterable {
     var mFilteredList: ArrayList<CataLogProductCategory>? = ArrayList()
     var mList: ArrayList<CataLogProductCategory>? = ArrayList()
@@ -41,7 +41,7 @@ class CategoryAdapter(var context: Context) :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    ): BaseSdkViewHolder {
         if (viewType == VIEW_TYPE_NORMAL) {
             val simpleViewItemBinding: ItemRowProductCategorySdkBinding =
                 ItemRowProductCategorySdkBinding.inflate(
@@ -96,7 +96,7 @@ class CategoryAdapter(var context: Context) :
 
 
     inner class StoreCategoryItemViewHolder(var binding: ItemRowProductCategorySdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(binding.root) {
+        BaseSdkViewHolder(binding.root) {
         override fun onBind(position: Int) {
             var data: CataLogProductCategory? = mFilteredList!![position]
             if (data != null) {
@@ -172,7 +172,7 @@ class CategoryAdapter(var context: Context) :
     }
 
     inner class EmptyViewHolder(var binding: LayoutEmptyCategoryViewSdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(binding.root) {
+        BaseSdkViewHolder(binding.root) {
 
         override fun onBind(position: Int) {
             binding.btnAddNow.visibility=View.VISIBLE
@@ -202,7 +202,7 @@ class CategoryAdapter(var context: Context) :
         }
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) {
         holder.onBind(holder.adapterPosition)
     }
     fun showPopUpMenu(ivThreeDot: ImageView, data: CataLogProductCategory, position: Int) {

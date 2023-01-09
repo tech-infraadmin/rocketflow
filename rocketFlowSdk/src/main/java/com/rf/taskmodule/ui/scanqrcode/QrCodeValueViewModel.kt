@@ -16,29 +16,29 @@ import com.rf.taskmodule.utils.Log
 import com.rf.taskmodule.utils.rx.AppSchedulerProvider
 import com.rf.taskmodule.utils.rx.SchedulerProvider
 
-class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-    com.rf.taskmodule.ui.base.BaseSdkViewModel<QrCodeNavigator>(dataManager, schedulerProvider) {
+class QrCodeValueViewModel (dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+    BaseSdkViewModel<QrCodeNavigator>(dataManager, schedulerProvider) {
 
-    private lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    private lateinit var httpManager: HttpManager
 
 
 
-    fun getQrCodeValue(httpManager: com.rf.taskmodule.data.network.HttpManager, id: String) {
+    fun getQrCodeValue(httpManager: HttpManager, id: String) {
         this.httpManager = httpManager
         GetQrCodeValue(id).hitApi()
     }
 
     inner class GetQrCodeValue(var id: String) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
-            com.rf.taskmodule.utils.Log.e("qrResp","$result - error=>${error?.errorType}")
+            Log.e("qrResp","$result - error=>${error?.errorType}")
             navigator.handleQrCodeResponse(this, result, error)
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.ENTITY_SCANNER)) {
-                val apiMain = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.ENTITY_SCANNER]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.ENTITY_SCANNER)) {
+                val apiMain = TrackiSdkApplication.getApiMap()[ApiType.ENTITY_SCANNER]!!
                 val api = Api()
                 api.name = ApiType.ENTITY_SCANNER
                 api.timeOut = apiMain.timeOut
@@ -47,7 +47,7 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
                 val qrScanRequest = QrScanRequest()
                 qrScanRequest.code = id
 
-                com.rf.taskmodule.utils.Log.e("dataManager","$dataManager  api=>${apiMain.url}")
+                Log.e("dataManager","$dataManager  api=>${apiMain.url}")
 
 
                 if(dataManager!=null){
@@ -64,7 +64,7 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -72,13 +72,13 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         }
     }
 
-    fun getUserDetail(httpManager: com.rf.taskmodule.data.network.HttpManager, userId: String?) {
+    fun getUserDetail(httpManager: HttpManager, userId: String?) {
         this.httpManager = httpManager
         GetUserDetails(userId).hitApi()
     }
 
     inner class GetUserDetails(var userId: String?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -87,7 +87,7 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
 
         override fun hitApi() {
             if (dataManager != null) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.USER_DETAIL]!!
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.USER_DETAIL]!!
                 val api = Api()
                 if (userId != null) {
                     api.url = oldApi.url + "?fetchAddress=false&userId=${userId}"
@@ -106,7 +106,7 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -115,13 +115,13 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         }
     }
 
-    fun getTaskDetails(httpManager: com.rf.taskmodule.data.network.HttpManager, taskId: String?) {
+    fun getTaskDetails(httpManager: HttpManager, taskId: String?) {
         this.httpManager = httpManager
         GetTaskDetails(taskId).hitApi()
     }
 
     inner class GetTaskDetails(var taskId: String?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -130,7 +130,7 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
 
         override fun hitApi() {
             if (dataManager != null) {
-                val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]!!
+                val api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]!!
                 var request= AcceptRejectRequest(taskId!!)
                 if (dataManager != null)
                     dataManager.getTaskById(this, httpManager, request, api)
@@ -142,7 +142,7 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -152,7 +152,7 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
     }
 
     fun getProductDetails(
-        httpManager: com.rf.taskmodule.data.network.HttpManager,
+        httpManager: HttpManager,
         pid: String?,
     ) {
         this.httpManager = httpManager
@@ -162,7 +162,7 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
     inner class GetProductDetails(
         var pid: String?,
 
-        ) : com.rf.taskmodule.data.network.ApiCallback {
+        ) : ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -170,8 +170,8 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.PRODUCT_DETAIL)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.PRODUCT_DETAIL]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.PRODUCT_DETAIL)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.PRODUCT_DETAIL]!!
                 var apiUrl = Api()
                 if (pid != null) {
                     apiUrl.url =
@@ -193,7 +193,7 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -202,10 +202,10 @@ class QrCodeValueViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         }
     }
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return QrCodeValueViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

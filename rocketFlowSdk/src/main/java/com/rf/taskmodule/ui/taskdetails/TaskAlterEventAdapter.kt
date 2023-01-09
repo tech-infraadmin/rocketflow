@@ -38,7 +38,7 @@ class TaskAlterEventAdapter(var context:Context,var list:ArrayList<AlertEvent>):
     override fun onBindViewHolder(holder: MyAlertViewHolder, position: Int) {
         if(cellwidthWillbe!=0){
             holder.cardMain.setLayoutParams(FrameLayout.LayoutParams(
-                    cellwidthWillbe, com.rf.taskmodule.utils.CommonUtils.dpToPixel(context,110)))
+                    cellwidthWillbe, CommonUtils.dpToPixel(context,110)))
         }
         /**
          * Method used to get the events and show their count on screen.

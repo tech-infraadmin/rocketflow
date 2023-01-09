@@ -35,7 +35,7 @@ data class Hub(
         fun getAddress(textView: TextView, latitude: Double?, longitude: Double?,context:Context) {
             if (latitude != null && longitude !=null) {
                 var latlong=LatLng(latitude,longitude)
-                textView.text = com.rf.taskmodule.utils.CommonUtils.getAddress(context,latlong)
+                textView.text = CommonUtils.getAddress(context,latlong)
             }
         }
         @JvmStatic

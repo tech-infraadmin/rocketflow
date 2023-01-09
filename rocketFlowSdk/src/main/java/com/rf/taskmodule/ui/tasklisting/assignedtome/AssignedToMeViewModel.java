@@ -7,7 +7,16 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.rf.taskmodule.data.DataManager;
+import com.rf.taskmodule.data.model.request.ExecuteUpdateRequest;
+import com.rf.taskmodule.data.model.request.TaskRequest;
+import com.rf.taskmodule.data.model.response.config.Api;
+import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.network.APIError;
+import com.rf.taskmodule.data.network.ApiCallback;
+import com.rf.taskmodule.data.network.HttpManager;
+import com.rf.taskmodule.utils.rx.AppSchedulerProvider;
+import com.rf.taskmodule.utils.rx.SchedulerProvider;
 import com.rf.taskmodule.data.DataManager;
 import com.rf.taskmodule.data.model.request.ExecuteUpdateRequest;
 import com.rf.taskmodule.data.model.request.TaskRequest;
@@ -62,20 +71,21 @@ public class AssignedToMeViewModel extends BaseSdkViewModel<AssignedtoMeNavigato
 
     class TaskList implements ApiCallback {
         TaskRequest taskRequest;
+
         public TaskList(TaskRequest taskRequest) {
-            this.taskRequest=taskRequest;
+            this.taskRequest = taskRequest;
         }
 
         @Override
         public void onResponse(Object result, APIError error) {
-            if(getNavigator()!=null)
-            getNavigator().handleResponse(this, result, error);
+            if (getNavigator() != null)
+                getNavigator().handleResponse(this, result, error);
         }
 
         @Override
         public void hitApi() {
-            if(getDataManager()!=null)
-            getDataManager().getTasksList(this, httpManager, taskRequest, apiUrl);
+            if (getDataManager() != null)
+                getDataManager().getTasksList(this, httpManager, taskRequest, apiUrl);
         }
 
         @Override
@@ -90,8 +100,8 @@ public class AssignedToMeViewModel extends BaseSdkViewModel<AssignedtoMeNavigato
 
         @Override
         public void onRequestTimeOut(ApiCallback callBack) {
-            if(getNavigator()!=null)
-            getNavigator().showTimeOutMessage(callBack);
+            if (getNavigator() != null)
+                getNavigator().showTimeOutMessage(callBack);
         }
 
         @Override
@@ -99,7 +109,6 @@ public class AssignedToMeViewModel extends BaseSdkViewModel<AssignedtoMeNavigato
 
         }
     }
-
 
 
     void executeUpdates(HttpManager httpManager, ExecuteUpdateRequest request, Api api) {
@@ -148,14 +157,14 @@ public class AssignedToMeViewModel extends BaseSdkViewModel<AssignedtoMeNavigato
     }
 
 
-   static class Factory implements ViewModelProvider.Factory {
+    static class Factory implements ViewModelProvider.Factory {
         private final DataManager mDataManager;
 
-       Factory(DataManager mDataManager) {
-           this.mDataManager = mDataManager;
-       }
+        Factory(DataManager mDataManager) {
+            this.mDataManager = mDataManager;
+        }
 
-       @Override
+        @Override
         public <T extends ViewModel> T create(Class<T> modelClass) {
             return (T) new AssignedToMeViewModel(mDataManager, new AppSchedulerProvider());
         }

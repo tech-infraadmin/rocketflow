@@ -16,14 +16,14 @@ import com.rf.taskmodule.utils.ApiType
 import com.rf.taskmodule.utils.rx.AppSchedulerProvider
 import com.rf.taskmodule.utils.rx.SchedulerProvider
 
-class UserListNewViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-        com.rf.taskmodule.ui.base.BaseSdkViewModel<UserListNewNavigator>(dataManager, schedulerProvider) {
+class UserListNewViewModel (dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+        BaseSdkViewModel<UserListNewNavigator>(dataManager, schedulerProvider) {
 
-    private lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    private lateinit var httpManager: HttpManager
 
 
     fun getUserList(
-        httpManager: com.rf.taskmodule.data.network.HttpManager,
+        httpManager: HttpManager,
         roleId: String?,
         type: String?,
         attendanceReq: AttendanceReq?,
@@ -38,7 +38,7 @@ class UserListNewViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         var type: String?,
         var attendanceReq: AttendanceReq?,
         var new: Boolean
-    ) : com.rf.taskmodule.data.network.ApiCallback {
+    ) : ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -46,8 +46,8 @@ class UserListNewViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_USERS)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_USERS]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_USERS)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.GET_USERS]!!
                 val userGetRequest = UserGetRequest()
                 val api = oldApi
                 if (new) {
@@ -93,7 +93,7 @@ class UserListNewViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -102,19 +102,19 @@ class UserListNewViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         }
     }
 
-    fun executeUpdates(httpManager: com.rf.taskmodule.data.network.HttpManager?, request: ExecuteUpdateRequest?) {
+    fun executeUpdates(httpManager: HttpManager?, request: ExecuteUpdateRequest?) {
         this.httpManager = httpManager!!
         ExecuteUpdateTask(request).hitApi()
     }
 
     inner class ExecuteUpdateTask(var request: ExecuteUpdateRequest?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleExecuteUpdateResponse(this, result, error)
         }
 
         override fun hitApi() {
-            val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.EXECUTE_UPDATE]
+            val api = TrackiSdkApplication.getApiMap()[ApiType.EXECUTE_UPDATE]
             dataManager.executeUpdateTask(this, httpManager, request, api)
         }
 
@@ -123,7 +123,7 @@ class UserListNewViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
         }
 
         override fun onNetworkErrorClose() {}
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -132,10 +132,10 @@ class UserListNewViewModel (dataManager: com.rf.taskmodule.data.DataManager, sch
     }
 
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return UserListNewViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

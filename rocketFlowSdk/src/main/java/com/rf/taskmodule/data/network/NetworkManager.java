@@ -1,13 +1,6 @@
 package com.rf.taskmodule.data.network;
 
 
-import com.rf.taskmodule.data.model.request.UserGetRequest;
-import com.rf.taskmodule.data.model.response.config.Api;
-import com.rf.taskmodule.ui.category.AddCategoryRequest;
-import com.rf.taskmodule.ui.products.AddProductRequest;
-import com.rf.taskmodule.ui.selectorder.CataLogProductCategory;
-import com.rf.taskmodule.ui.taskdetails.timeline.skuinfopreview.UnitInfoRequest;
-
 import com.rf.taskmodule.data.model.request.AddEmployeeRequest;
 import com.rf.taskmodule.data.model.request.AddressInfo;
 import com.rf.taskmodule.data.model.request.BookSlotRequest;

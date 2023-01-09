@@ -17,19 +17,19 @@ import com.rf.taskmodule.utils.Log
 import com.rf.taskmodule.utils.rx.AppSchedulerProvider
 import com.rf.taskmodule.utils.rx.SchedulerProvider
 
-class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-        com.rf.taskmodule.ui.base.BaseSdkViewModel<SelectOrderNavigator>(dataManager, schedulerProvider) {
+class SelectOrderViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+        BaseSdkViewModel<SelectOrderNavigator>(dataManager, schedulerProvider) {
 
-    private lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    private lateinit var httpManager: HttpManager
 
 
-    fun getProductCategory(flavourId: String?, categoryId:String?, httpManager: com.rf.taskmodule.data.network.HttpManager, request: PaginationRequest?) {
+    fun getProductCategory(flavourId: String?, categoryId:String?, httpManager: HttpManager, request: PaginationRequest?) {
         this.httpManager = httpManager
         GetProductCategory(flavourId,categoryId,request).hitApi()
     }
 
     inner class GetProductCategory(var flavourId: String?,var categoryId: String?,var paginationRequest: PaginationRequest?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -37,8 +37,8 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.TASK_PRODUCT_CATEGORIES)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.TASK_PRODUCT_CATEGORIES]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.TASK_PRODUCT_CATEGORIES)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.TASK_PRODUCT_CATEGORIES]!!
                 var apiUrl = Api()
                 if (paginationRequest != null&&flavourId!=null&&categoryId!=null) {
                     apiUrl.url =
@@ -66,7 +66,7 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -75,13 +75,13 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         }
     }
 
-    fun getProductByKeyWord(categoryId:String?, flavourId: String?, geoId:String?, httpManager: com.rf.taskmodule.data.network.HttpManager, request: PaginationRequest?) {
+    fun getProductByKeyWord(categoryId:String?, flavourId: String?, geoId:String?, httpManager: HttpManager, request: PaginationRequest?) {
         this.httpManager = httpManager
         GetProductListByKeyWord(categoryId,flavourId,geoId, request).hitApi()
     }
 
     inner class GetProductListByKeyWord(var categoryId:String?,var flavourId: String?,var geoId:String?, var paginationRequest: PaginationRequest?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -89,8 +89,8 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_TASK_PRODUCTS)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_PRODUCTS]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_TASK_PRODUCTS)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_PRODUCTS]!!
                 var apiUrl = Api()
                 if (paginationRequest != null&&flavourId!=null&&categoryId!=null&&geoId!=null) {
 
@@ -110,7 +110,7 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
                 apiUrl.name = ApiType.GET_TASK_PRODUCTS
                 apiUrl.timeOut = oldApi.timeOut
 
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "URL==", apiUrl.url)
+                CommonUtils.showLogMessage("e", "URL==", apiUrl.url)
                 if (dataManager != null)
                     dataManager.getProducts(this, httpManager, apiUrl)
             }
@@ -123,7 +123,7 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -132,13 +132,13 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         }
     }
 
-    fun getProduct(httpManager: com.rf.taskmodule.data.network.HttpManager, categoryId:String?, cid: String?, flavourId:String?, geoId:String?, request: PaginationRequest?) {
+    fun getProduct(httpManager: HttpManager, categoryId:String?, cid: String?, flavourId:String?, geoId:String?, request: PaginationRequest?) {
         this.httpManager = httpManager
         GetProductList(categoryId,cid,flavourId,geoId, request).hitApi()
     }
 
     inner class GetProductList(var categoryId:String?,var cid: String?,var flavourId: String?,var geoId:String?, var paginationRequest: PaginationRequest?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null)
@@ -146,8 +146,8 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_TASK_PRODUCTS)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_PRODUCTS]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_TASK_PRODUCTS)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_PRODUCTS]!!
                 var apiUrl = Api()
                 if (paginationRequest != null) {
                     if (cid != null&&flavourId!=null&&geoId!=null) {
@@ -182,7 +182,7 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
                 apiUrl.name = ApiType.GET_TASK_PRODUCTS
                 apiUrl.timeOut = oldApi.timeOut
 
-                com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "URL==", apiUrl.url)
+                CommonUtils.showLogMessage("e", "URL==", apiUrl.url)
                 if (dataManager != null)
                     dataManager.getProducts(this, httpManager, apiUrl)
             }
@@ -195,7 +195,7 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if (navigator != null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -204,21 +204,21 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         }
     }
 
-    fun linkInventory(httpManager: com.rf.taskmodule.data.network.HttpManager, request: LinkInventoryRequest) {
+    fun linkInventory(httpManager: HttpManager, request: LinkInventoryRequest) {
         this.httpManager = httpManager
         LinkInventory(request).hitApi()
     }
 
     inner class LinkInventory(private var data: LinkInventoryRequest) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.linkInventoryResponse(this, result, error)
         }
 
         override fun hitApi() {
-            if (com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.LINK_INVENTORY)) {
-                val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.LINK_INVENTORY]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.LINK_INVENTORY)) {
+                val api = TrackiSdkApplication.getApiMap()[ApiType.LINK_INVENTORY]!!
 //            val api = Api()
 //            api.url = "https://qa2.rocketflyer.in/rfapi/secure/tracki/linkInventory"
 //            api.name = ApiType.LINK_INVENTORY
@@ -235,7 +235,7 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -243,24 +243,24 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         }
     }
 
-    fun getHubList(httpManager: com.rf.taskmodule.data.network.HttpManager, getManualLocationRequest: GetManualLocationRequest) {
+    fun getHubList(httpManager: HttpManager, getManualLocationRequest: GetManualLocationRequest) {
         this.httpManager = httpManager
         HubList(getManualLocationRequest).hitApi()
     }
 
     inner class HubList(var manualLocationRequest: GetManualLocationRequest) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleHubListResponse(this@HubList, result, error)
         }
 
         override fun hitApi() {
-            var api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_HUBS]
+            var api = TrackiSdkApplication.getApiMap()[ApiType.GET_HUBS]
             if (api != null) {
                 dataManager.getHubList(this@HubList, httpManager, manualLocationRequest, api)
             } else {
-                com.rf.taskmodule.utils.Log.e("message", "GET_HUBS api is null")
+                Log.e("message", "GET_HUBS api is null")
             }
         }
 
@@ -269,7 +269,7 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -277,10 +277,10 @@ class SelectOrderViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         }
     }
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SelectOrderViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

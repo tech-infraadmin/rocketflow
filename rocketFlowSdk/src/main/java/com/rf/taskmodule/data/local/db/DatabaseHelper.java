@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.NonNull;
 
+import com.rf.taskmodule.data.model.GeofenceData;
 import com.rf.taskmodule.utils.Log;
 import com.rf.taskmodule.data.model.GeofenceData;
 //import com.rf.taskmodule.ui.service.transition.UserActivity;

@@ -7,7 +7,6 @@ import android.os.Environment
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.rocketflow.sdk.RocketFlyer
-import com.rf.taskmodule.BR
 import com.rf.taskmodule.R
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper
 import com.rf.taskmodule.data.network.APIError
@@ -17,17 +16,18 @@ import com.rf.taskmodule.databinding.ActivityOrderCodeSdkBinding
 import com.rf.taskmodule.ui.base.BaseSdkActivity
 import com.rf.taskmodule.ui.custom.GlideApp
 import com.rf.taskmodule.utils.Log
+import com.rf.taskmodule.BR
 import java.io.File
 import java.io.FileOutputStream
 
 
-class OrderCodeActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityOrderCodeSdkBinding, com.rf.taskmodule.ordercode.OrderCodeViewModel>(),
-    com.rf.taskmodule.ordercode.OrderCodeNavigator {
+class OrderCodeActivity : BaseSdkActivity<ActivityOrderCodeSdkBinding, OrderCodeViewModel>(),
+    OrderCodeNavigator {
 
-    var orderCodeViewModel: com.rf.taskmodule.ordercode.OrderCodeViewModel? = null
+    var orderCodeViewModel: OrderCodeViewModel? = null
 
-    var httpManager: com.rf.taskmodule.data.network.HttpManager? = null
-    var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper? = null
+    var httpManager: HttpManager? = null
+    var preferencesHelper: PreferencesHelper? = null
 
     lateinit var binding: ActivityOrderCodeSdkBinding
 
@@ -75,15 +75,15 @@ class OrderCodeActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityOrde
     }
 
 
-    override fun getViewModel(): com.rf.taskmodule.ordercode.OrderCodeViewModel {
-        val factory = RocketFlyer.dataManager()?.let { com.rf.taskmodule.ordercode.OrderCodeViewModel.Factory(it) } // Factory
+    override fun getViewModel(): OrderCodeViewModel {
+        val factory = RocketFlyer.dataManager()?.let { OrderCodeViewModel.Factory(it) } // Factory
         if (factory != null) {
-            orderCodeViewModel = ViewModelProvider(this, factory)[com.rf.taskmodule.ordercode.OrderCodeViewModel::class.java]
+            orderCodeViewModel = ViewModelProvider(this, factory)[OrderCodeViewModel::class.java]
         }
         return orderCodeViewModel!!
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
 
     }
 
@@ -108,7 +108,7 @@ class OrderCodeActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityOrde
         }
         catch (exception: Exception){
             exception.printStackTrace()
-            com.rf.taskmodule.utils.Log.e("Exception1", "${exception.message}")
+            Log.e("Exception1", "${exception.message}")
         }
     }
 
@@ -125,7 +125,7 @@ class OrderCodeActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityOrde
             startActivity(intent)
         }
         catch (exception: Exception){
-            com.rf.taskmodule.utils.Log.e("Exception","${exception.message}")
+            Log.e("Exception","${exception.message}")
         }
     }
 

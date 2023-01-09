@@ -37,7 +37,7 @@ import java.security.NoSuchAlgorithmException
 import java.security.spec.InvalidKeySpecException
 
 
-open class NewTaskDetailsActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityNewTaskDetailsSdkBinding, TaskDetailsActivityViewModel>() {
+open class NewTaskDetailsActivity : BaseSdkActivity<ActivityNewTaskDetailsSdkBinding, TaskDetailsActivityViewModel>() {
 
     private var categoryId: String? = null
     private var from: String? = null
@@ -50,14 +50,14 @@ open class NewTaskDetailsActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Ac
     private lateinit var mActivityNewTaskDetailBinding: ActivityNewTaskDetailsSdkBinding
 
     //@Inject
-    lateinit var mPagerAdapter: com.rf.taskmodule.ui.tasklisting.TaskPagerAdapter
+    lateinit var mPagerAdapter:TaskPagerAdapter
 
 
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
+    lateinit var httpManager: HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
 
 
-    private val fragments: MutableList<com.rf.taskmodule.ui.tasklisting.ihaveassigned.TabDataClass> = ArrayList()
+    private val fragments: MutableList<TabDataClass> = ArrayList()
 
     private val TAG = "NewTaskDetailsActivity"
 
@@ -73,7 +73,7 @@ open class NewTaskDetailsActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Ac
     }
 
     override fun networkUnavailable() {
-        snackBar = com.rf.taskmodule.utils.CommonUtils.showNetWorkConnectionIssue(mActivityNewTaskDetailBinding.coordinatorLayout, getString(R.string.please_check_your_internet_connection))
+        snackBar = CommonUtils.showNetWorkConnectionIssue(mActivityNewTaskDetailBinding.coordinatorLayout, getString(R.string.please_check_your_internet_connection))
     }
     override fun getBindingVariable(): Int {
         return BR.viewModel
@@ -107,25 +107,25 @@ open class NewTaskDetailsActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Ac
     private fun getTaskData() {
         if (intent != null) {
 
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)) {
-                taskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
-                from = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM)
-                categoryId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID)
-                allowSubTask = intent.getBooleanExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, false)
-                if(intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID))
-                    subTaskCategoryId = intent.getStringArrayListExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID)
-                if(intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PARENT_REF_ID))
-                    referenceId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PARENT_REF_ID)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_ID)) {
+                taskId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
+                from = intent.getStringExtra(AppConstants.Extra.FROM)
+                categoryId = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORY_ID)
+                allowSubTask = intent.getBooleanExtra(AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, false)
+                if(intent.hasExtra(AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID))
+                    subTaskCategoryId = intent.getStringArrayListExtra(AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID)
+                if(intent.hasExtra(AppConstants.Extra.EXTRA_PARENT_REF_ID))
+                    referenceId = intent.getStringExtra(AppConstants.Extra.EXTRA_PARENT_REF_ID)
                 //task= intent.getSerializableExtra(AppConstants.Extra.EXTRA_TASK) as Task?
-                if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM_DATE)) {
-                    fromDate = intent.getLongExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM_DATE, 0)
+                if (intent.hasExtra(AppConstants.Extra.FROM_DATE)) {
+                    fromDate = intent.getLongExtra(AppConstants.Extra.FROM_DATE, 0)
                 }
-                if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM_TO)) {
-                    toDate = intent.getLongExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM_TO, 0)
+                if (intent.hasExtra(AppConstants.Extra.FROM_TO)) {
+                    toDate = intent.getLongExtra(AppConstants.Extra.FROM_TO, 0)
                 }
 
                 fragments.add(
-                    com.rf.taskmodule.ui.tasklisting.ihaveassigned.TabDataClass(
+                    TabDataClass(
                         TaskDetailsFragment.newInstance(taskId, categoryId, from),
                         "TimeLine"
                     )
@@ -134,7 +134,7 @@ open class NewTaskDetailsActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Ac
                 if (allowSubTask) {
                     tabLayout.visibility = View.VISIBLE
                     fragments.add(
-                        com.rf.taskmodule.ui.tasklisting.ihaveassigned.TabDataClass(
+                        TabDataClass(
                             SubTaskFragment.newInstance(
                                 allowSubTask,
                                 subTaskCategoryId,
@@ -152,7 +152,7 @@ open class NewTaskDetailsActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Ac
                 }
 
                 mPagerAdapter =
-                    com.rf.taskmodule.ui.tasklisting.TaskPagerAdapter(
+                    TaskPagerAdapter(
                         supportFragmentManager
                     )
                 mPagerAdapter.setFragments(fragments)
@@ -208,7 +208,7 @@ open class NewTaskDetailsActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Ac
         qrCodeRequest.fromDate = fromDate
         qrCodeRequest.toDate = toDate
         var jsonConverter =
-            com.rf.taskmodule.utils.JSONConverter<QrCodeRequest>()
+            JSONConverter<QrCodeRequest>()
         var strData = jsonConverter.objectToJson(qrCodeRequest).toString()
         val manager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val display = manager.defaultDisplay
@@ -236,13 +236,13 @@ open class NewTaskDetailsActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Ac
         val imageView = dialog.findViewById<ImageView>(R.id.ivImages)
 
         val encryptionAndDecryption =
-            com.rf.taskmodule.utils.EncryptionAndDecryption()
+            EncryptionAndDecryption()
         try {
             strData = encryptionAndDecryption.getEncryptData(strData)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "encrypt_data", strData)
+            CommonUtils.showLogMessage("e", "encrypt_data", strData)
 
             //Toast.makeText(ScanBarCodeActivity.this,barcodeSparseArray.valueAt(0)+"" , Toast.LENGTH_SHORT).show();
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "decrypt_data", encryptionAndDecryption.getDecryptData(strData))
+            CommonUtils.showLogMessage("e", "decrypt_data", encryptionAndDecryption.getDecryptData(strData))
         } catch (e: InvalidKeySpecException) {
             e.printStackTrace()
         } catch (e: NoSuchAlgorithmException) {

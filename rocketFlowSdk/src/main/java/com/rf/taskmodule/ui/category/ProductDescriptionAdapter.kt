@@ -10,7 +10,7 @@ import com.rf.taskmodule.ui.base.BaseSdkViewHolder
 
 
 class ProductDescriptionAdapter(var context: Context? = null) :
-    RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+    RecyclerView.Adapter<BaseSdkViewHolder>() {
     var mListener: OnProductDescriptionListener? = null
 
     interface OnProductDescriptionListener {
@@ -23,7 +23,7 @@ class ProductDescriptionAdapter(var context: Context? = null) :
     }
 
     private var mList: ArrayList<ProductDescription> = ArrayList()
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         context = parent.context
         val simpleViewItemBinding: ItemRowProductDescriptionSdkBinding =
             ItemRowProductDescriptionSdkBinding.inflate(
@@ -45,7 +45,7 @@ class ProductDescriptionAdapter(var context: Context? = null) :
     }
 
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) =
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) =
         holder.onBind(holder.adapterPosition)
 
     fun addItems(list: ArrayList<ProductDescription>) {
@@ -71,7 +71,7 @@ class ProductDescriptionAdapter(var context: Context? = null) :
 
 
     inner class ProductDescriptionsListViewModel(private val mBinding: ItemRowProductDescriptionSdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+        BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             val data = mList!![position]

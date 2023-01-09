@@ -46,7 +46,7 @@ import java.io.File
 import java.util.HashMap
 
 class AddProductCategoryActivity :
-    com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityAddProductCategoryBinding, AddProductCategoryViewModel>(),
+    BaseSdkActivity<ActivityAddProductCategoryBinding, AddProductCategoryViewModel>(),
     ProductDescriptionAdapter.OnProductDescriptionListener, AddProductCategoryNavigator,
     View.OnClickListener {
 
@@ -55,8 +55,8 @@ class AddProductCategoryActivity :
     lateinit var addProductCategoryViewModel: AddProductCategoryViewModel
 
 
-    lateinit var mPref: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var mPref: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
     lateinit var adapter: ProductDescriptionAdapter
     lateinit var binding: ActivityAddProductCategoryBinding
@@ -84,9 +84,9 @@ class AddProductCategoryActivity :
         httpManager = RocketFlyer.httpManager()!!
         mPref = RocketFlyer.preferenceHelper()!!
 
-        if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)) {
-            var categoryMap = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORIES)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "categoryMap", categoryMap)
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORIES)) {
+            var categoryMap = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORIES)
+            CommonUtils.showLogMessage("e", "categoryMap", categoryMap)
             mMapCategory = Gson().fromJson<Map<String, String>>(
                 categoryMap,
                 object : TypeToken<HashMap<String?, String?>?>() {}.type
@@ -97,7 +97,7 @@ class AddProductCategoryActivity :
                 }
             }
         }
-        var config= com.rf.taskmodule.utils.CommonUtils.getFlavourConfigFromFlavourId(flavorId,mPref)
+        var config= CommonUtils.getFlavourConfigFromFlavourId(flavorId,mPref)
         if (intent.hasExtra("action")) {
             action = intent.getStringExtra("action")
             if (action.equals("Add")) {
@@ -243,17 +243,17 @@ class AddProductCategoryActivity :
         adapter.removeAt(position, adapter.getAllList().size)
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
 
     }
 
     override fun handleProductCategoryResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val response = Gson().fromJson(result.toString(), AddCategoryResponse::class.java)
             if (response != null && response.successful) {
                 onSuccess()
@@ -275,12 +275,12 @@ class AddProductCategoryActivity :
     }
 
     override fun handleSendImageResponse(
-        apiCallback: com.rf.taskmodule.data.network.ApiCallback?,
+        apiCallback: ApiCallback?,
         result: Any?,
         error: APIError?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(apiCallback, error, result, this)) {
+        if (CommonUtils.handleResponse(apiCallback, error, result, this)) {
             val profileResponse = Gson().fromJson(result.toString(), ProfileResponse::class.java)
             if (profileResponse != null) {
                 imageUrl = profileResponse.imageUrl
@@ -289,12 +289,12 @@ class AddProductCategoryActivity :
     }
 
     override fun handleUpdateProductCategoryResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val response = Gson().fromJson(result.toString(), AddCategoryResponse::class.java)
             if (response != null && response.successful) {
                 onSuccess()
@@ -350,7 +350,7 @@ class AddProductCategoryActivity :
                     if (action.equals("Add")) {
                         if(parentCategoryId!=null)
                             request.parentCategoryId=parentCategoryId
-                        if (com.rf.taskmodule.TrackiSdkApplication.getApiMap()
+                        if (TrackiSdkApplication.getApiMap()
                                 .containsKey(ApiType.ADD_PRODUCT_CATEGORY)
                         ) {
                             showLoading()
@@ -358,7 +358,7 @@ class AddProductCategoryActivity :
                         }
                     } else {
                         request.cid=cid
-                        if (com.rf.taskmodule.TrackiSdkApplication.getApiMap()
+                        if (TrackiSdkApplication.getApiMap()
                                 .containsKey(ApiType.UPDATE_PRODUCT_CATEGORY)
                         ) {
                             showLoading()
@@ -394,7 +394,7 @@ class AddProductCategoryActivity :
     }
 
     private fun proceedToImagePicking() {
-        val chooseImageIntent: Intent = com.rf.taskmodule.utils.image_utility.ImagePicker.getPickImageIntent(this)
+        val chooseImageIntent: Intent = ImagePicker.getPickImageIntent(this)
         startActivityForResult(
             chooseImageIntent,
             PICK_IMAGE_FILE_ID
@@ -423,7 +423,7 @@ class AddProductCategoryActivity :
         } else {
 
 
-            com.rf.taskmodule.utils.image_utility.Compressor(this)
+            Compressor(this)
                 .compressToFileAsFlowable(actualImage)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -434,7 +434,7 @@ class AddProductCategoryActivity :
                     binding.ivActImage.setImageURI(Uri.fromFile(compressedImage))
                     val updateFileRequest =
                         UpdateFileRequest(compressedImage!!, FileType.USER_PROFILE, "")
-                    if (com.rf.taskmodule.TrackiSdkApplication.getApiMap()
+                    if (TrackiSdkApplication.getApiMap()
                             .containsKey(ApiType.UPLOAD_FILE_AGAINEST_ENTITY)
                     ) {
                         showLoading()
@@ -454,7 +454,7 @@ class AddProductCategoryActivity :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_FILE_ID) {
-            actualImage = com.rf.taskmodule.utils.image_utility.ImagePicker.getImageFileToUpload(this, resultCode, data)
+            actualImage = ImagePicker.getImageFileToUpload(this, resultCode, data)
             compressImage()
         }
     }

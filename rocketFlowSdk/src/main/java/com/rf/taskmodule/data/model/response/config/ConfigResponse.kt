@@ -2,10 +2,6 @@ package com.rf.taskmodule.data.model.response.config
 
 import com.google.gson.annotations.SerializedName
 import com.rf.taskmodule.data.model.BaseResponse
-import com.rf.taskmodule.utils.ApiType
-import com.rf.taskmodule.utils.MenuType
-import com.rf.taskmodule.utils.ScreenType
-import com.rf.taskmodule.utils.UserType
 import com.rf.taskmodule.utils.*
 import java.io.File
 import java.io.Serializable
@@ -235,7 +231,7 @@ class AppConfig {
     var enablePunchGeofencing = false
     var servicePref = false
     var insights = false
-    var shifts: Map<Int, List<com.rf.taskmodule.utils.ShiftTime>>? = null
+    var shifts: Map<Int, List<ShiftTime>>? = null
     var workflowCategories: List<WorkFlowCategories>? = null
     var flavors: List<Flavour>? = null
     var idleTrackingInfo: IdleTrackingInfo? = null
@@ -457,6 +453,8 @@ class WorkFlowCategories {
     var channelConfig: ChannelConfig? = null
     var inventoryConfig: InventoryConfig? = null
     var subTaskConfig: SubTaskConfig?=null
+    var taskReferencingEnabled: Boolean? = false
+    var multiTaskReferencingEnabled: Boolean? = false
     var stageNameMap:LinkedHashMap<String,String>?=null
     var allowCreation: Boolean = false
     var showMerchantTasks: Boolean = false

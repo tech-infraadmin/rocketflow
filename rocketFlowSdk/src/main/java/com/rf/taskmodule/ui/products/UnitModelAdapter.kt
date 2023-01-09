@@ -10,7 +10,7 @@ import com.rf.taskmodule.databinding.ItemRowUnitSdkBinding
 import com.rf.taskmodule.ui.base.BaseSdkViewHolder
 
 class UnitModelAdapter(var context: Context) :
-    RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>(),
+    RecyclerView.Adapter<BaseSdkViewHolder>(),
     Filterable {
     var mFilteredList: ArrayList<UnitModel> = ArrayList()
     var mList: ArrayList<UnitModel> = ArrayList()
@@ -24,7 +24,7 @@ class UnitModelAdapter(var context: Context) :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    ): BaseSdkViewHolder {
         val simpleViewItemBinding: ItemRowUnitSdkBinding =
             ItemRowUnitSdkBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
@@ -34,7 +34,7 @@ class UnitModelAdapter(var context: Context) :
 
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) {
         holder.onBind(holder.adapterPosition)
     }
 
@@ -78,7 +78,7 @@ class UnitModelAdapter(var context: Context) :
     }
 
     inner class UnitItemViewHolder(var binding: ItemRowUnitSdkBinding) :
-        com.rf.taskmodule.ui.base.BaseSdkViewHolder(binding.root) {
+        BaseSdkViewHolder(binding.root) {
         override fun onBind(position: Int) {
             var data: UnitModel? = mFilteredList!![position]
             if (data != null) {

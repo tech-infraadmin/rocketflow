@@ -1,4 +1,4 @@
-package com.rf.taskmodule
+package com.rf.taskmodule.ui
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -16,8 +16,8 @@ import java.io.File
 /**
  * Created by rahul on 20/3/19
  */
-class DynamicFormViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-        com.rf.taskmodule.ui.base.BaseSdkViewModel<DynamicFormNavigator>(dataManager, schedulerProvider) {
+class DynamicFormViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+        BaseSdkViewModel<DynamicFormNavigator>(dataManager, schedulerProvider) {
 
     /*  private var httpManager: HttpManager? = null
       private var api: Api? = null
@@ -26,11 +26,11 @@ class DynamicFormViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
           navigator.onSubmitClick()
       }*/
 
-    private var httpManager: com.rf.taskmodule.data.network.HttpManager? = null
+    private var httpManager: HttpManager? = null
     private var api: Api? = null
 
 
-    fun uploadTaskData(dynamicFormMainData: DynamicFormMainData, httpManager: com.rf.taskmodule.data.network.HttpManager, api: Api?) {
+    fun uploadTaskData(dynamicFormMainData: DynamicFormMainData, httpManager: HttpManager, api: Api?) {
         this.httpManager = httpManager
         this.api = api
         UploadFormList(dynamicFormMainData).hitApi()
@@ -38,7 +38,7 @@ class DynamicFormViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
 
 
     inner class UploadFormList(val dynamicFormMainData: DynamicFormMainData) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null)
@@ -57,7 +57,7 @@ class DynamicFormViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null)
             navigator.showTimeOutMessage(callBack)
         }
@@ -67,14 +67,14 @@ class DynamicFormViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
 
     }
 
-    fun uploadFileList(hashMap: HashMap<String, ArrayList<File>>, httpManager: com.rf.taskmodule.data.network.HttpManager, api: Api?, isApi:Boolean) {
+    fun uploadFileList(hashMap: HashMap<String, ArrayList<File>>, httpManager: HttpManager, api: Api?, isApi:Boolean) {
         this.httpManager = httpManager
         this.api = api!!
         UploadFiles(hashMap,isApi).hitApi()
     }
 
     inner class UploadFiles(val hashMap: HashMap<String, ArrayList<File>>,var isApi:Boolean) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(isApi) {
@@ -99,7 +99,7 @@ class DynamicFormViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null)
             navigator.showTimeOutMessage(callBack)
         }
@@ -109,10 +109,10 @@ class DynamicFormViewModel(dataManager: com.rf.taskmodule.data.DataManager, sche
 
     }
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return DynamicFormViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

@@ -70,15 +70,15 @@ class AlarmTable extends BaseTable {
             ");";
 
     static void onClearTable(final SQLiteDatabase db) {
-        BaseTable.onClearTable(TABLE_NAME, db);
+        onClearTable(TABLE_NAME, db);
     }
 
     static void onCreate(final SQLiteDatabase db) {
-        BaseTable.onCreate(TABLE_NAME, db, TABLE_CREATE_QUERY);
+        onCreate(TABLE_NAME, db, TABLE_CREATE_QUERY);
     }
 
     static void onUpgrade(final SQLiteDatabase db, int oldVersion, int newVersion) {
-        BaseTable.onUpgrade(TABLE_NAME, db, TABLE_CREATE_QUERY, oldVersion, newVersion);
+        onUpgrade(TABLE_NAME, db, TABLE_CREATE_QUERY, oldVersion, newVersion);
     }
 
     long addPendingApiEvent(SQLiteDatabase db, ApiEventModel apiEventModel) {

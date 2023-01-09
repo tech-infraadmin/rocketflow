@@ -13,13 +13,13 @@ import com.trackthat.lib.TrackThat
  * vikas.kesharvani@rocketflyer.in
  */
 class StopIdleTracking: BroadcastReceiver() {
-    var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper? = null
+    var preferencesHelper: PreferencesHelper? = null
     override fun onReceive(context: Context?, intent: Intent?) {
      //   TrackiToast.Message.showShort(context!!,"Stop Tracking")
         preferencesHelper =
-            com.rf.taskmodule.data.local.prefs.AppPreferencesHelper(
+            AppPreferencesHelper(
                 context,
-                com.rf.taskmodule.utils.AppConstants.PREF_NAME
+                AppConstants.PREF_NAME
             )
         if (preferencesHelper!!.idleTripActive ) {
             preferencesHelper!!.idleTripActive = false

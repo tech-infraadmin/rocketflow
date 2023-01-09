@@ -14,12 +14,12 @@ import com.rf.taskmodule.utils.rx.SchedulerProvider
 /**
  * Created by rahul on 23/10/18
  */
-class WebViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-        com.rf.taskmodule.ui.base.BaseSdkViewModel<WebViewNavigator>(dataManager, schedulerProvider),
-    com.rf.taskmodule.data.network.ApiCallback {
+class WebViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+        BaseSdkViewModel<WebViewNavigator>(dataManager, schedulerProvider),
+    ApiCallback {
 
     private val mIsLoading = ObservableBoolean(false)
-    private var httpManager: com.rf.taskmodule.data.network.HttpManager? = null
+    private var httpManager: HttpManager? = null
     private var configVersion: String? = ""
 
     fun getIsLoading(): ObservableBoolean {
@@ -27,7 +27,7 @@ class WebViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerPro
     }
 
     fun getConfig(
-        httpManager: com.rf.taskmodule.data.network.HttpManager,
+        httpManager: HttpManager,
         configVersion: String
     ) {
         this.configVersion = configVersion
@@ -51,7 +51,7 @@ class WebViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerPro
     override fun onNetworkErrorClose() {
     }
 
-    override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback?) {
+    override fun onRequestTimeOut(callBack: ApiCallback?) {
         navigator.showTimeOutMessage(callBack!!)
     }
 
@@ -63,10 +63,10 @@ class WebViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerPro
         mIsLoading.set(isLoading)
     }
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return WebViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.google.gson.Gson;
 import com.rf.taskmodule.utils.Log;
+import com.rf.taskmodule.utils.Log;
 
 /**
  * Created by rahul on 2/1/19

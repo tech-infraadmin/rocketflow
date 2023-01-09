@@ -20,19 +20,19 @@ import java.nio.charset.StandardCharsets
 /**
  * Created by Rahul Abrol on 13/7/19.
  */
-class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-        com.rf.taskmodule.ui.base.BaseSdkViewModel<DynamicNavigator>(dataManager, schedulerProvider) {
+class DynamicViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+        BaseSdkViewModel<DynamicNavigator>(dataManager, schedulerProvider) {
 
-    private lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    private lateinit var httpManager: HttpManager
 
 
-    fun executiveMap(position: Int, target: String, httpManager: com.rf.taskmodule.data.network.HttpManager, rollId:String?) {
+    fun executiveMap(position: Int, target: String, httpManager: HttpManager, rollId:String?) {
         this.httpManager = httpManager
         ExecutiveMap(position,target,rollId).hitApi()
     }
 
     private inner class ExecutiveMap(val position: Int,var target :String,var rollId:String?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleExecutiveMapResponse(position, this, result, error)
@@ -42,7 +42,7 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
             var apiMap=ApiType.valueOf(target)
             //val api = TrackiApplication.getApiMap()[ApiType.EXECUTIVE_MAP]
 
-            val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[apiMap]
+            val api = TrackiSdkApplication.getApiMap()[apiMap]
             if(rollId!=null){
                 var queryString="?roleIds="+ URLEncoder.encode(rollId, StandardCharsets.UTF_8.toString())
                 var apiNew=Api()
@@ -67,7 +67,7 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -76,19 +76,19 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
 
     }
 
-    fun getTaskData(httpManager: com.rf.taskmodule.data.network.HttpManager, data:Any?) {
+    fun getTaskData(httpManager: HttpManager, data:Any?) {
         this.httpManager = httpManager
         GetTaskData(data).hitApi()
     }
 
 
-    fun getPreviousFormData(httpManager: com.rf.taskmodule.data.network.HttpManager, data:Any?) {
+    fun getPreviousFormData(httpManager: HttpManager, data:Any?) {
         this.httpManager = httpManager
         GetPreviousFormData(data).hitApi()
     }
 
     private inner class GetPreviousFormData(var data:Any?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null)
@@ -96,8 +96,8 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         }
 
         override fun hitApi() {
-            if(com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_TASK_DATA)) {
-                val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_DATA]
+            if(TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_TASK_DATA)) {
+                val api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_DATA]
                 if(dataManager!=null)
                 dataManager.taskData(this, httpManager, data, api)
             }
@@ -110,7 +110,7 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null)
             navigator.showTimeOutMessage(callBack)
         }
@@ -120,7 +120,7 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
     }
 
     private inner class GetTaskData(var data:Any?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null)
@@ -128,8 +128,8 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         }
 
         override fun hitApi() {
-            if(com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_TASK_DATA)) {
-                val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_DATA]
+            if(TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_TASK_DATA)) {
+                val api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_DATA]
                 if(dataManager!=null)
                 dataManager.taskData(this, httpManager, data, api)
             }
@@ -142,7 +142,7 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null)
             navigator.showTimeOutMessage(callBack)
         }
@@ -151,20 +151,20 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         }
     }
 
-    fun uploadFileList(hashMap: HashMap<String, ArrayList<File>>, httpManager: com.rf.taskmodule.data.network.HttpManager) {
+    fun uploadFileList(hashMap: HashMap<String, ArrayList<File>>, httpManager: HttpManager) {
         this.httpManager = httpManager
         UploadFiles(hashMap).hitApi()
     }
 
         inner class UploadFiles(val hashMap: HashMap<String, ArrayList<File>>) :
-            com.rf.taskmodule.data.network.ApiCallback {
+            ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleUploadFileResponse(this, result, error)
         }
 
         override fun hitApi() {
-            val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.UPLOAD_FILE]
+            val api = TrackiSdkApplication.getApiMap()[ApiType.UPLOAD_FILE]
             dataManager.uploadFiles(this@UploadFiles, httpManager, hashMap, api)
         }
 
@@ -175,7 +175,7 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -184,13 +184,13 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
 
     }
 
-    fun verifyOtpServerRequest(otpRequest: OtpRequest, httpManager: com.rf.taskmodule.data.network.HttpManager?) {
+    fun verifyOtpServerRequest(otpRequest: OtpRequest, httpManager: HttpManager?) {
         this.httpManager = httpManager!!
         VerifyOtp(otpRequest).hitApi()
     }
 
     inner class VerifyOtp(val otpRequest: OtpRequest) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null)
@@ -198,8 +198,8 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         }
 
         override fun hitApi() {
-            if(com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.VERIFY_MOBILE)) {
-                val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.VERIFY_MOBILE]
+            if(TrackiSdkApplication.getApiMap().containsKey(ApiType.VERIFY_MOBILE)) {
+                val api = TrackiSdkApplication.getApiMap()[ApiType.VERIFY_MOBILE]
                 if(dataManager!=null)
                 dataManager.verifyOtp(httpManager, this, otpRequest, api)
             }
@@ -212,7 +212,7 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null)
             navigator.showTimeOutMessage(callBack)
         }
@@ -222,10 +222,10 @@ class DynamicViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
 
     }
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return DynamicViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

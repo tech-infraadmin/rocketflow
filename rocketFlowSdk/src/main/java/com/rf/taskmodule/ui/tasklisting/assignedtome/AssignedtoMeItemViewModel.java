@@ -4,8 +4,14 @@ import android.content.Context;
 
 import androidx.databinding.ObservableField;
 
+import com.rf.taskmodule.data.model.response.config.CallToActions;
+import com.rf.taskmodule.data.model.response.config.Executor;
+import com.rf.taskmodule.data.model.response.config.Task;
+import com.rf.taskmodule.data.model.response.config.TrackingState;
 import com.rf.taskmodule.utils.AppConstants;
-import com.rf.taskmodule.utils.CommonUtils;
+import com.rf.taskmodule.utils.DateTimeUtil;
+import com.rf.taskmodule.utils.Log;
+import com.rf.taskmodule.utils.TaskStatus;
 
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
@@ -13,7 +19,7 @@ import com.rf.taskmodule.data.model.response.config.CallToActions;
 import com.rf.taskmodule.data.model.response.config.Executor;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.model.response.config.TrackingState;
-//import com.rf.taskmodule.ui.receiver.ServiceRestartReceiver;
+//import com.rf.taskmodule.Receiver.ServiceRestartReceiver;
 import com.rf.taskmodule.utils.AppConstants;
 import com.rf.taskmodule.utils.CommonUtils;
 import com.rf.taskmodule.utils.DateTimeUtil;
@@ -128,10 +134,10 @@ public class AssignedtoMeItemViewModel {
             if (task.getContact() != null) {
                 if (task.getContact().getName() != null) {
                     contact.set(task.getContact().getName());
-                } else if (task.getContact().getMobile() != null) {
-                    contact.set(task.getContact().getMobile());
+                } else if (task.getContact().getMobileNumber() != null) {
+                    contact.set(task.getContact().getMobileNumber());
                 }
-                isContactAvail.set(task.getContact().getMobile() != null);
+                isContactAvail.set(task.getContact().getMobileNumber() != null);
             }
             if (task.getAssigneeDetail() != null) {
                 if (!task.getAutoCreated() && !task.getAutoCancel()) {

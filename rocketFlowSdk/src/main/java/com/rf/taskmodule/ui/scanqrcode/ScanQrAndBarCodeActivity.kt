@@ -26,8 +26,8 @@ import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import com.google.gson.Gson
-import com.rocketflow.sdk.RocketFlyer
 import com.rf.taskmodule.BR
+import com.rocketflow.sdk.RocketFlyer
 import com.rf.taskmodule.R
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper
 import com.rf.taskmodule.data.model.response.config.*
@@ -44,7 +44,7 @@ import java.io.IOException
 
 
 class ScanQrAndBarCodeActivity :
-    com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityScanQrAndBarCodeSdkBinding, QrCodeValueViewModel>(),
+    BaseSdkActivity<ActivityScanQrAndBarCodeSdkBinding, QrCodeValueViewModel>(),
     ViewTreeObserver.OnGlobalLayoutListener, QrCodeNavigator {
 
 
@@ -68,8 +68,8 @@ class ScanQrAndBarCodeActivity :
 
     lateinit var qrCodeValueViewModel: QrCodeValueViewModel
 
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
 
 
@@ -150,7 +150,7 @@ class ScanQrAndBarCodeActivity :
 //                    ringtone()
                     playSound()
                     var value = barcodeSparseArray.valueAt(0).displayValue
-                    com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "BARCODE_Value", value)
+                    CommonUtils.showLogMessage("e", "BARCODE_Value", value)
                     runOnUiThread {
                         if (!isClassCall) {
                             isClassCall = true
@@ -263,12 +263,12 @@ class ScanQrAndBarCodeActivity :
         return qrCodeValueViewModel!!
     }
 
-    override fun handleQrCodeResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleQrCodeResponse(callback: ApiCallback, result: Any?, error: APIError?) {
 
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
 
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<QrCodeResponse> =
-                com.rf.taskmodule.utils.JSONConverter()
+            val jsonConverter: JSONConverter<QrCodeResponse> =
+                JSONConverter()
             var response: QrCodeResponse = jsonConverter.jsonToObject(
                 result.toString(),
                 QrCodeResponse::class.java
@@ -333,11 +333,11 @@ class ScanQrAndBarCodeActivity :
     }
 
 
-    override fun handleUserDetailsResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleUserDetailsResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<UpdateResponse> =
-                com.rf.taskmodule.utils.JSONConverter()
+        if (CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
+            val jsonConverter: JSONConverter<UpdateResponse> =
+                JSONConverter()
             var response: UpdateResponse = jsonConverter.jsonToObject(
                 result.toString(),
                 UpdateResponse::class.java
@@ -390,13 +390,13 @@ class ScanQrAndBarCodeActivity :
     }
 
     override fun handleProductDetailsResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?,
         pid: String?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
             openProductDetailsActivity(pid)
         }else {
             finish()
@@ -423,21 +423,35 @@ class ScanQrAndBarCodeActivity :
 
     private fun openTaskDetailsActivity(task: Task?) {
         if (task != null) {
-            val intent = Intent(this@ScanQrAndBarCodeActivity, NewTaskDetailsActivity::class.java)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID, task.taskId)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, task.allowSubTask)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID, task.subCategoryIds)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_PARENT_REF_ID, task.referenceId)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID, task.categoryId)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM, com.rf.taskmodule.utils.AppConstants.Extra.ASSIGNED_TO_ME)
-            startActivity(intent)
-            finish()
+            val sharedPreferences: SharedPreferences =
+                getSharedPreferences("Scan", MODE_PRIVATE)
+
+            if (sharedPreferences.getBoolean("newTask",false) == true){
+                val returnIntent = Intent()
+                val gson = Gson()
+                val json = gson.toJson(task)
+                returnIntent.putExtra("result", json)
+                setResult(RESULT_OK, returnIntent)
+                sharedPreferences.edit().putBoolean("newTask",false).apply()
+                finish()
+            }
+            else{
+                val intent = Intent(this@ScanQrAndBarCodeActivity, NewTaskDetailsActivity::class.java)
+                intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, task.taskId)
+                intent.putExtra(AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, task.allowSubTask)
+                intent.putExtra(AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID, task.subCategoryIds)
+                intent.putExtra(AppConstants.Extra.EXTRA_PARENT_REF_ID, task.referenceId)
+                intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, task.categoryId)
+                intent.putExtra(AppConstants.Extra.FROM, AppConstants.Extra.ASSIGNED_TO_ME)
+                startActivity(intent)
+                finish()
+            }
         }
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
             var taskResponse = Gson().fromJson("$result", TaskResponse::class.java)
             taskResponse.taskDetail?.let { task ->
                 openTaskDetailsActivity(task)

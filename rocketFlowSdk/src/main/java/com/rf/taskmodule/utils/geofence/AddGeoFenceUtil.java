@@ -13,11 +13,9 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
 import com.rf.taskmodule.data.model.response.config.GeoCoordinates;
-import com.rf.taskmodule.utils.CommonUtils;
-import com.rf.taskmodule.utils.TrackiToast;
-import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
-import com.rf.taskmodule.data.model.response.config.GeoCoordinates;
 import com.rf.taskmodule.ui.base.BaseSdkActivity;
+import com.rf.taskmodule.utils.CommonUtils;
+
 import com.rf.taskmodule.utils.TrackiToast;
 
 import java.util.ArrayList;

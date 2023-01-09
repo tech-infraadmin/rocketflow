@@ -10,17 +10,16 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.rf.taskmodule.databinding.ActivityBuddyFilterSdkBinding
 import com.rf.taskmodule.BR
 import com.rf.taskmodule.R
-import com.rf.taskmodule.databinding.ActivityBuddyFilterSdkBinding
 import com.rf.taskmodule.ui.base.BaseSdkActivity
 import com.rf.taskmodule.utils.AppConstants
-
 
 /**
  * Created by rahul on 11/10/18
  */
-open class BuddyFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityBuddyFilterSdkBinding, BuddyFilterViewModel>(),
+open class BuddyFilterActivity : BaseSdkActivity<ActivityBuddyFilterSdkBinding, BuddyFilterViewModel>(),
         BuddyFilterNavigator, View.OnClickListener {
 
     lateinit var mBuddyFilterViewModel: BuddyFilterViewModel
@@ -123,7 +122,7 @@ open class BuddyFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<Activ
             test.add(3)
         }
 
-        intent.putIntegerArrayListExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FILTER_BUDDY, test)
+        intent.putIntegerArrayListExtra(AppConstants.Extra.EXTRA_FILTER_BUDDY, test)
         setResult(Activity.RESULT_OK, intent)
         finish()
     }

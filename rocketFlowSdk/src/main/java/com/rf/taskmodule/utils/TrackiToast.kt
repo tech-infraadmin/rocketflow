@@ -32,7 +32,7 @@ class TrackiToast {
                     toast.show()
                 }
 //                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-                com.rf.taskmodule.utils.Log.e("message", message)
+                Log.e("message", message)
             }
 
         }
@@ -57,7 +57,7 @@ class TrackiToast {
                 }
 
               //  Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                com.rf.taskmodule.utils.Log.e("message", message)
+                Log.e("message", message)
             }
 
         }

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -61,11 +62,32 @@ import com.bumptech.glide.request.transition.Transition;
 //import com.google.android.gms.maps.model.LatLng;
 //import com.iceteck.silicompressorr.SiliCompressor;
 import com.github.gcacace.signaturepad.views.SignaturePad;
-import com.rf.taskmodule.TrackiSdkApplication;
+import com.rf.taskmodule.data.model.GetPopulationDataResponse;
+import com.rf.taskmodule.data.model.request.CalculateFormData;
+import com.rf.taskmodule.data.model.request.UpdateFileRequest;
+import com.rf.taskmodule.data.model.response.config.Api;
+import com.rf.taskmodule.data.model.response.config.DataType;
+import com.rf.taskmodule.data.model.response.config.DynamicFormData;
+import com.rf.taskmodule.data.model.response.config.FormData;
+import com.rf.taskmodule.data.model.response.config.ProfileResponse;
+import com.rf.taskmodule.data.model.response.config.TaskData;
+import com.rf.taskmodule.data.model.response.config.Type;
+import com.rf.taskmodule.data.model.response.config.WidgetData;
 import com.rf.taskmodule.data.network.APIError;
+import com.rf.taskmodule.data.network.HttpManager;
+import com.rf.taskmodule.utils.ApiType;
 import com.rf.taskmodule.utils.AppConstants;
-import com.rf.taskmodule.utils.CommonUtils;
+import com.rf.taskmodule.utils.DateTimeUtil;
+import com.rf.taskmodule.utils.FileType;
 import com.rf.taskmodule.utils.JSONConverter;
+import com.rf.taskmodule.utils.Log;
+import com.rf.taskmodule.utils.NetworkUtils;
+import com.rf.taskmodule.utils.TrackiToast;
+import com.rf.taskmodule.utils.ZoomableImageView;
+import com.rf.taskmodule.utils.image_utility.Compressor;
+import com.rf.taskmodule.utils.toggle.interfaces.OnToggledListener;
+import com.rf.taskmodule.utils.toggle.model.ToggleableView;
+import com.rf.taskmodule.utils.toggle.widget.LabeledSwitch;
 
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.TrackiSdkApplication;
@@ -186,6 +208,7 @@ import javax.script.ScriptException;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import taskmodule.ui.PlayVideoVerticallyActivity;
 
 /**
  * Created by Vikas Kesharvani on 25/06/20.
@@ -612,9 +635,9 @@ public class ChildDynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
             ivPlay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-/*                    Intent intent = new Intent(context, PlayVideoVerticallyActivity.class);
+                    Intent intent = new Intent(context, PlayVideoVerticallyActivity.class);
                     intent.putExtra("url", file1.getAbsolutePath());
-                    context.startActivity(intent);*/
+                    context.startActivity(intent);
                 }
             });
             formDataList.get(position).setFile(fileArrayList);
@@ -1190,9 +1213,9 @@ public class ChildDynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
                 ivPlay.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-//                        Intent intent = new Intent(context, PlayVideoVerticallyActivity.class);
-//                        intent.putExtra("url", formData.getEnteredValue());
-//                        context.startActivity(intent);
+                        Intent intent = new Intent(context, PlayVideoVerticallyActivity.class);
+                        intent.putExtra("url", formData.getEnteredValue());
+                        context.startActivity(intent);
                     }
                 });
             }

@@ -16,7 +16,7 @@ import com.rf.taskmodule.databinding.ItemCtaButtonSdkBinding
 import com.rf.taskmodule.utils.CommonUtils
 
 
-class CallToActionButtonAdapter (var context: Context, var mListener: com.rf.taskmodule.ui.tasklisting.TaskClickListener, var task: Task) :
+class CallToActionButtonAdapter (var context: Context, var mListener: TaskClickListener, var task: Task) :
         RecyclerView.Adapter<CallToActionButtonAdapter.CtaButtonViewHolder>() {
     var items: ArrayList<CallToActions> = ArrayList()
 
@@ -64,7 +64,7 @@ class CallToActionButtonAdapter (var context: Context, var mListener: com.rf.tas
             (context as Activity).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics)
             val height = displayMetrics.heightPixels
             var width = displayMetrics.widthPixels/2
-            width=width- com.rf.taskmodule.utils.CommonUtils.dpToPixel(context,25)
+            width=width- CommonUtils.dpToPixel(context,25)
             var buttonParams=ctaButtonBinding.ctaButton.layoutParams
             ctaButtonBinding.ctaButton.setLayoutParams(LinearLayout.LayoutParams(width, buttonParams.height))
 

@@ -1,4 +1,4 @@
-package com.rf.taskmodule.ordercode;//package com.rf.taskmodule.ordercode;
+package com.rf.taskmodule.ordercode;//package com.rf.taskmodule.ui.ordercode;
 //
 //import com.rf.taskmodule.data.DataManager;
 //import com.rf.taskmodule.utils.rx.SchedulerProvider;

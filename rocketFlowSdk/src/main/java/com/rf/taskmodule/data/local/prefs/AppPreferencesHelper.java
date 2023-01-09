@@ -9,19 +9,27 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.rf.taskmodule.data.model.AlarmInfo;
 import com.rf.taskmodule.data.model.DataObject;
+import com.rf.taskmodule.data.model.request.SaveFilterData;
 import com.rf.taskmodule.data.model.response.config.Api;
 import com.rf.taskmodule.data.model.response.config.ChannelConfig;
+import com.rf.taskmodule.data.model.response.config.EmergencyContact;
 import com.rf.taskmodule.data.model.response.config.Flavour;
 import com.rf.taskmodule.data.model.response.config.FormData;
+import com.rf.taskmodule.data.model.response.config.GeoCoordinates;
+import com.rf.taskmodule.data.model.response.config.GeoFenceData;
 import com.rf.taskmodule.data.model.response.config.IdleTrackingInfo;
 import com.rf.taskmodule.data.model.response.config.OverstoppingConfig;
 import com.rf.taskmodule.data.model.response.config.ProfileInfo;
 import com.rf.taskmodule.data.model.response.config.ProjectCategories;
 import com.rf.taskmodule.data.model.response.config.RoleConfigData;
+import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
+import com.rf.taskmodule.utils.ApiType;
 import com.rf.taskmodule.utils.AppConstants;
 import com.rf.taskmodule.utils.ShiftTime;
+import com.rf.taskmodule.utils.UserType;
 
+import com.rf.taskmodule.BuildConfig;
 import com.rf.taskmodule.data.model.AlarmInfo;
 import com.rf.taskmodule.data.model.DataObject;
 import com.rf.taskmodule.data.model.request.SaveFilterData;
@@ -77,6 +85,8 @@ public class AppPreferencesHelper implements PreferencesHelper {
     public static final String PREF_VERIFIED_CTAS = "PREF_VERIFIED_CTAS";
 
     public static final String PREF_KEY_BACK_MODE = "PREF_KEY_BACK_MODE";
+
+    public static final String PREF_BASE_MODE = "PREF_BASE_MODE";
 
     public static final String PREF_KEY_ONLINE_STATUS = "PREF_KEY_ONLINE_STATUS";
     public static final String PREF_KEY_TOGGLE_FEATURE = "PREF_KEY_TOGGLE_FEATURE";
@@ -415,6 +425,16 @@ public class AppPreferencesHelper implements PreferencesHelper {
     @Override
     public String getActiveTaskIdId() {
         return mPrefs.getString(PREF_KEY_ACTIVE_TASK_ID, "");
+    }
+
+    @Override
+    public String getBaseMode() {
+        return mPrefs.getString(PREF_BASE_MODE,BuildConfig.BASE_URL);
+    }
+
+    @Override
+    public void setBaseMode(String url) {
+        mPrefs.edit().putString(PREF_BASE_MODE,url).apply();
     }
 
     @Override

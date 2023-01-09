@@ -13,20 +13,20 @@ import com.trackthat.lib.TrackThat
  * vikas.kesharvani@rocketflyer.in
  */
 internal class StartIdealTrackWork(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
-    var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper?=null
+    var preferencesHelper: PreferencesHelper?=null
     init {
         preferencesHelper=
-            com.rf.taskmodule.data.local.prefs.AppPreferencesHelper(
+            AppPreferencesHelper(
                 context,
-                com.rf.taskmodule.utils.AppConstants.PREF_NAME
+                AppConstants.PREF_NAME
             )
        // Toast.makeText(context,"Data",Toast.LENGTH_SHORT).show()
     }
     override fun doWork(): Result {
         preferencesHelper!!.idleTripActive = true
         TrackThat.startTracking(preferencesHelper!!.punchId, false)
-        com.rf.taskmodule.utils.Log.e("StartIdealTrackWork=>","startIdealTrack=>")
-        com.rf.taskmodule.utils.Log.e("idleTripActive=>",preferencesHelper!!.idleTripActive.toString())
+        Log.e("StartIdealTrackWork=>","startIdealTrack=>")
+        Log.e("idleTripActive=>",preferencesHelper!!.idleTripActive.toString())
         return Result.success()
     }
 }

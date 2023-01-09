@@ -28,12 +28,12 @@ import com.rf.taskmodule.utils.Log
 import com.rf.taskmodule.utils.TrackiToast
 import kotlin.collections.ArrayList
 
-class UserListNewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityUserListNewSdkBinding, UserListNewViewModel>(), UserListNewNavigator, UserListNewAdapter.onUserSelected{
+class UserListNewActivity : BaseSdkActivity<ActivityUserListNewSdkBinding, UserListNewViewModel>(), UserListNewNavigator, UserListNewAdapter.onUserSelected{
 
     lateinit var mUserListViewModel: UserListNewViewModel
 
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
     lateinit var adapter: UserListNewAdapter
 
@@ -113,7 +113,7 @@ class UserListNewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityUs
     }
 
     private fun getUsers(){
-        com.rf.taskmodule.utils.Log.e("getUsers","$roleIds")
+        Log.e("getUsers","$roleIds")
         mUserListViewModel.getUserList(httpManager,roleIds,null,null,true)
     }
 
@@ -152,16 +152,16 @@ class UserListNewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityUs
 
 
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@UserListNewActivity)) {
-            val jsonConverter: com.rf.taskmodule.utils.JSONConverter<UserListResponse> =
-                com.rf.taskmodule.utils.JSONConverter()
+        if (CommonUtils.handleResponse(callback, error, result, this@UserListNewActivity)) {
+            val jsonConverter: JSONConverter<UserListResponse> =
+                JSONConverter()
             var response: UserListResponse = jsonConverter.jsonToObject(result.toString(), UserListResponse::class.java) as UserListResponse
             if (response.data != null) {
                 setRecyclerView()
                 val userList = response.data as ArrayList<UserData>
-                com.rf.taskmodule.utils.Log.e("listUserList","$userList")
+                Log.e("listUserList","$userList")
                 usersList = response.data as ArrayList<UserData>
                 adapter.addItems(usersList)
             } else {
@@ -175,7 +175,7 @@ class UserListNewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityUs
     }
 
     override fun handleExecuteUpdateResponse(
-        apiCallback: com.rf.taskmodule.data.network.ApiCallback?,
+        apiCallback: ApiCallback?,
         result: Any?,
         error: APIError?
     ) {

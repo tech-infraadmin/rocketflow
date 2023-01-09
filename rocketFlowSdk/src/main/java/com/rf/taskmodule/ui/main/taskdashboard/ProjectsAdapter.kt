@@ -42,7 +42,7 @@ class ProjectsAdapter(
                 .into(holder.ivChapter)
         }
 
-        com.rf.taskmodule.utils.Log.d("selected", selectedProjectId)
+        Log.d("selected", selectedProjectId)
 
         if(selectedProjectId == subjects[position].projectId){
             holder.selected.setBackgroundColor(ContextCompat.getColor( holder.selected.context, R.color.blue))

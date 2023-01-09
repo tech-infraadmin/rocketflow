@@ -1,6 +1,6 @@
 package com.rf.taskmodule.ui.webview
 
-//import com.rf.taskmodule.Config
+//import com.rf.taskmodule.ui.Config
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
@@ -37,7 +37,7 @@ import com.rf.taskmodule.utils.CommonUtils
 import com.rf.taskmodule.utils.Log
 
 
-class PaymentViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityPaymentWebviewSdkBinding, PaymentViewModel>(),
+class PaymentViewActivity : BaseSdkActivity<ActivityPaymentWebviewSdkBinding, PaymentViewModel>(),
     PaymentNavigator {
 
 
@@ -74,7 +74,7 @@ class PaymentViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityPa
     }
 
     override fun networkUnavailable() {
-        snackBar = com.rf.taskmodule.utils.CommonUtils.showNetWorkConnectionIssue(
+        snackBar = CommonUtils.showNetWorkConnectionIssue(
             mActivityWebviewBinding!!.coordinatorLayout,
             getString(R.string.please_check_your_internet_connection)
         )
@@ -94,11 +94,11 @@ class PaymentViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityPa
     private fun init() {
 
 
-        taskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID).toString()
+        taskId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID).toString()
 
-        FROM = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM).toString()
+        FROM = intent.getStringExtra(AppConstants.Extra.FROM).toString()
 
-        categoryId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID).toString()
+        categoryId = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORY_ID).toString()
 
 
         webView = mActivityWebviewBinding?.webView!!
@@ -121,9 +121,9 @@ class PaymentViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityPa
     private fun loadUrl(webView: WebView) {
         webView.loadUrl(
             pageUrl,
-            com.rf.taskmodule.utils.CommonUtils.buildDeviceHeader(this@PaymentViewActivity)
+            CommonUtils.buildDeviceHeader(this@PaymentViewActivity)
         )
-        com.rf.taskmodule.utils.Log.e("payment url", "$pageUrl")
+        Log.e("payment url", "$pageUrl")
     }
 
     @SuppressLint("NewApi")
@@ -164,9 +164,9 @@ class PaymentViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityPa
 
         proceed.setOnClickListener {
             val intentNew = Intent(context,NewTaskDetailsActivity::class.java)
-            intentNew.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CATEGORY_ID,categoryId)
-            intentNew.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID,taskId)
-            intentNew.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.FROM,FROM)
+            intentNew.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID,categoryId)
+            intentNew.putExtra(AppConstants.Extra.EXTRA_TASK_ID,taskId)
+            intentNew.putExtra(AppConstants.Extra.FROM,FROM)
             startActivity(intentNew)
             finish()
         }
@@ -192,12 +192,12 @@ class PaymentViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityPa
             super.onPageStarted(view, url, favicon)
             contentProgressBar.visibility = View.VISIBLE
 //            https://uat.rocketflyer.in/signin
-            com.rf.taskmodule.utils.Log.e("urlDivert","$url")
+            Log.e("urlDivert","$url")
             val urlFailure = "https://uat.rocketflyer.in/webView/TASK_DETAILS/$taskId/FAILURE"
             val urlFailure1 = "https://uat.rocketflyer.in/webView/TASK_DETAILS/null/FAILURE"
             val urlSuccess = "https://uat.rocketflyer.in/webView/TASK_DETAILS/$taskId/SUCCESS"
             val urlSuccess1 = "https://uat.rocketflyer.in/webView/TASK_DETAILS/null/SUCCESS"
-            com.rf.taskmodule.utils.Log.e("urlDivertNew","$urlFailure")
+            Log.e("urlDivertNew","$urlFailure")
             if (url == urlFailure || url == urlFailure1) {
                 webView.stopLoading()
                 openSFDialog(false,context)
@@ -231,8 +231,8 @@ class PaymentViewActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityPa
 //            super.onReceivedSslError(view, handler, error)
             val builder = AlertDialog.Builder(this@PaymentViewActivity)
             builder.setMessage(R.string.notification_error_ssl_cert_invalid)
-            builder.setPositiveButton(com.rf.taskmodule.utils.AppConstants.CONTINUE) { _, _ -> handler!!.proceed() }
-            builder.setNegativeButton(com.rf.taskmodule.utils.AppConstants.CANCEL) { _, _ -> handler!!.cancel() }
+            builder.setPositiveButton(AppConstants.CONTINUE) { _, _ -> handler!!.proceed() }
+            builder.setNegativeButton(AppConstants.CANCEL) { _, _ -> handler!!.cancel() }
             val dialog = builder.create()
             dialog.show()
         }

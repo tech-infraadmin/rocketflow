@@ -8,16 +8,16 @@ import com.rf.taskmodule.utils.Log
 import java.io.File
 
 class GetDynamicFormListById {
-    var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper? = null
+    var preferencesHelper: PreferencesHelper? = null
 //    init {
 //        preferencesHelper= AppPreferencesHelper(TrackiApplication.instance, AppConstants.PREF_NAME);
 //    }
 
-    fun getDynamicFormListById(preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper, formId: String): ArrayList<FormData> {
-        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "formId", formId)
+    fun getDynamicFormListById(preferencesHelper: PreferencesHelper, formId: String): ArrayList<FormData> {
+        CommonUtils.showLogMessage("e", "formId", formId)
         this.preferencesHelper = preferencesHelper;
         var formDataList = ArrayList<FormData>()
-        var dynamicFormsNew = com.rf.taskmodule.utils.CommonUtils.getFormByFormId(formId!!)
+        var dynamicFormsNew = CommonUtils.getFormByFormId(formId!!)
         if (dynamicFormsNew != null) {
 //                        var jsonConverter= JSONConverter<DynamicFormsNew>()
 //                        var json=jsonConverter.objectToJson(dynamicFormsNew)
@@ -47,7 +47,7 @@ class GetDynamicFormListById {
                 formData.minLength = dat[i].minLength
                 if (preferencesHelper != null && preferencesHelper!!.formDataMap != null && preferencesHelper!!.formDataMap.isNotEmpty()) {
                     var previousDataList = preferencesHelper!!.formDataMap[formId]
-                    com.rf.taskmodule.utils.Log.e("preferencesHelper", "notnull")
+                    Log.e("preferencesHelper", "notnull")
                     if (previousDataList != null && previousDataList.isNotEmpty()) {
                         for (j in previousDataList.indices) {
                             if (formData.name!! == previousDataList[j].name) {

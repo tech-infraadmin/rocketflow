@@ -4,6 +4,7 @@ package com.rf.taskmodule.utils.toggle.interfaces;
 
 
 import com.rf.taskmodule.utils.toggle.model.ToggleableView;
+import com.rf.taskmodule.utils.toggle.model.ToggleableView;
 
 public interface OnToggledListener {
 

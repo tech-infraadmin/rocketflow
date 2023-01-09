@@ -10,13 +10,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-import com.rf.taskmodule.data.local.prefs.PostFileErrorToServerWork;
-import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
-import com.rf.taskmodule.data.model.request.FileListRequest;
-import com.rf.taskmodule.data.model.request.UpdateFileRequest;
-import com.rf.taskmodule.data.model.response.config.Api;
 import com.rf.taskmodule.utils.ApiType;
-import com.rf.taskmodule.utils.CommonUtils;
 import com.rf.taskmodule.utils.Log;
 
 import com.rf.taskmodule.BuildConfig;
@@ -367,13 +361,14 @@ public class HttpManager {
      */
     private String build(String t) {
 //        Api Token = (Base 64 of ( SHA 256 of ( App_Key+ Certificate Hash+Access Id + Login Token + Timestamp)))
-        String accessId = null;
+        String accessId = "null";
         String loginToken = null;
 
         String token = app_key + cert;
         if (preferencesHelper.getAccessId() != null) {
             //accessId = AppConstants.Extra.ACCESS_ID;
             accessId = preferencesHelper.getAccessId();
+//            accessId = "9H131AkAXg";
             token = token + accessId + t;
         }
         if (preferencesHelper.getLoginToken() != null) {
@@ -416,6 +411,7 @@ public class HttpManager {
         String fcmToken = preferencesHelper.getFcmToken();
         String accessId = preferencesHelper.getAccessId();
         //String accessId = "2YwC80gKsM";
+//        String accessId = "9H131AkAXg";
 
         boolean firstInstall = preferencesHelper.isFirstTimeInstallFlag();
         int s;

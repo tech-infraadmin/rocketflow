@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.rf.taskmodule.data.model.GeofenceData;
+import com.rf.taskmodule.data.model.GeofenceData;
 //import com.trackthat.lib.internal.common.Trunk;
 
 import java.util.Date;

@@ -25,7 +25,7 @@ import com.rf.taskmodule.ui.custom.GlideApp
 import com.rf.taskmodule.ui.earnings.MyEarningsEmptyItemViewModel
 import com.rf.taskmodule.utils.CommonUtils
 
-class UserListAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder> {
+class UserListAdapter : RecyclerView.Adapter<BaseSdkViewHolder> {
 
     private var isHideRoll: Boolean=false
     private var context: Context? = null
@@ -49,7 +49,7 @@ class UserListAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkVi
     }
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         context = parent.context
         return when (viewType) {
             VIEW_TYPE_USERS -> {
@@ -81,7 +81,7 @@ class UserListAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkVi
         VIEW_TYPE_EMPTY
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) = holder.onBind(position)
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) = holder.onBind(position)
 
     fun rollStatus(isHideRoll:Boolean){
         this.isHideRoll=isHideRoll
@@ -139,7 +139,7 @@ class UserListAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkVi
 
 
     inner class EmployeeListViewHolder(private val mBinding: ItemUserListSdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             val data = mList!![position]
@@ -211,7 +211,7 @@ class UserListAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkVi
 
             mBinding.llOptions.setOnClickListener {
                 if (data.mobile != null && data.mobile!!.isNotEmpty())
-                    com.rf.taskmodule.utils.CommonUtils.openDialer(context, data.mobile)
+                    CommonUtils.openDialer(context, data.mobile)
             }
             mBinding.executePendingBindings()
         }
@@ -220,7 +220,7 @@ class UserListAdapter : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkVi
     }
 
     inner class EmptyViewHolder(private val mBinding: ItemMyEarningEmptySdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             val emptyViewModel = MyEarningsEmptyItemViewModel()

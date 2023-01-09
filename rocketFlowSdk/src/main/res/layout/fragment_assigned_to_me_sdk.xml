@@ -117,8 +117,8 @@
                                 android:paddingTop="@dimen/dimen_2"
                                 android:paddingRight="@dimen/dimen_3"
                                 android:paddingBottom="@dimen/dimen_2"
-                                android:tint="@color/yellow_punch_btn"
-                                app:srcCompat="@drawable/ic_date_range" />
+                                app:srcCompat="@drawable/ic_date_range"
+                                app:tint="@color/yellow_punch_btn" />
 
                             <TextView
                                 android:id="@+id/tvFromDate"
@@ -176,8 +176,8 @@
                                     android:layout_marginLeft="@dimen/dimen_5"
                                     android:paddingLeft="@dimen/dimen_3"
                                     android:paddingRight="@dimen/dimen_3"
-                                    android:tint="@color/black"
-                                    app:srcCompat="@drawable/ic_search_white" />
+                                    app:srcCompat="@drawable/ic_search_white"
+                                    app:tint="@color/black" />
 
                                 <EditText
                                     android:id="@+id/etSearch"

@@ -2,6 +2,7 @@ package com.rf.taskmodule.ui.dynamicform.dynamicfragment
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -19,13 +20,19 @@ import com.rf.taskmodule.R
 import com.rf.taskmodule.data.model.response.config.DataType
 import com.rf.taskmodule.data.model.response.config.Field
 import com.rf.taskmodule.data.model.response.config.TaskData
-import com.rf.taskmodule.databinding.*
+import com.rf.taskmodule.databinding.ItemDynamicFormEmptyViewSdkBinding
+import com.rf.taskmodule.databinding.ItemLayoutFormDetailsSdkBinding
+import com.rf.taskmodule.databinding.ItemLayoutPlayAudioDetailsSdkBinding
+import com.rf.taskmodule.databinding.ItemLayoutPreviewVideoSdkBinding
+import com.rf.taskmodule.databinding.ItemLayoutSingleImagesSdkBinding
+import com.rf.taskmodule.databinding.ItemRowImageFormDetailsSdkBinding
 import com.rf.taskmodule.ui.base.BaseSdkViewHolder
 //import com.rf.taskmodule.ui.chat.PlayVideoVerticallyActivity
 //import com.rf.taskmodule.ui.custom.GlideApp
 import com.rf.taskmodule.ui.dynamicform.FormEmptyItemViewModel
 import com.rf.taskmodule.utils.CommonUtils
 import com.rf.taskmodule.utils.Log
+import taskmodule.ui.PlayVideoVerticallyActivity
 import java.io.IOException
 
 
@@ -34,7 +41,7 @@ import java.io.IOException
  * rocketflyer technology pvt. ltd
  * vikas.kesharvani@rocketflyer.in
  */
-class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : RecyclerView.Adapter<com.rf.taskmodule.ui.base.BaseSdkViewHolder>() {
+class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : RecyclerView.Adapter<BaseSdkViewHolder>() {
 
     companion object {
         private const val VIEW_EMPTY = 0
@@ -50,7 +57,7 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
     var allowedFields = ArrayList<Field>()
 
     var context: Context? = null
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): com.rf.taskmodule.ui.base.BaseSdkViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseSdkViewHolder {
         this.context = parent.context
         when (viewType) {
             VIEW_DISPLAY_TEXT -> {
@@ -134,7 +141,7 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
         }
     }
 
-    override fun onBindViewHolder(holder: com.rf.taskmodule.ui.base.BaseSdkViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BaseSdkViewHolder, position: Int) {
         holder.onBind(position)
     }
 
@@ -142,7 +149,7 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
      * Class used to handle all the text fields for email,text & number.
      */
     private inner class FormPreviewViewHolder(var mBinding: ItemLayoutFormDetailsSdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
 
         override fun onBind(position: Int) {
             val formData = formDataList[position]
@@ -164,7 +171,7 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
      * Class used to handle all the pictures
      */
     private inner class FormPictureViewHolder(var mBinding: ItemRowImageFormDetailsSdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
 
         private var linearLayoutAdd: LinearLayout = mBinding.root.findViewById(R.id.lLayout)
 
@@ -179,19 +186,26 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
             // To force execution, use the executePendingBindings() method.
             mBinding.executePendingBindings()
 
-            if (formData.value?.isNotEmpty()!!) {
-                linearLayoutAdd.removeAllViews()
-                val urls = formData.value?.split(",")?.toTypedArray()
-                if (urls != null) {
-                    for (i in urls?.indices!!) {
-                        val mInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                        val view = mInflater.inflate(R.layout.add_photo_view_sdk, linearLayoutAdd, false) as ImageView
-                        Glide.with(context!!).load(urls[i]).into(view)
+            if (formData.value != null) {
+                if (formData.value?.isNotEmpty()!!) {
+                    linearLayoutAdd.removeAllViews()
+                    val urls = formData.value?.split(",")?.toTypedArray()
+                    if (urls != null) {
+                        for (i in urls.indices) {
+                            val mInflater =
+                                context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                            val view = mInflater.inflate(
+                                R.layout.add_photo_view_sdk,
+                                linearLayoutAdd,
+                                false
+                            ) as ImageView
+                            Glide.with(context!!).load(urls[i]).into(view)
 
-                        linearLayoutAdd.addView(view)
-                        view.setOnClickListener {
-                            if (urls[i].isNotEmpty())
-                                openDialogShowImage(urls[i])
+                            linearLayoutAdd.addView(view)
+                            view.setOnClickListener {
+                                if (urls[i].isNotEmpty())
+                                    openDialogShowImage(urls[i])
+                            }
                         }
                     }
                 }
@@ -245,7 +259,7 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
      * Class used to handle single the pictures
      */
     private inner class FormSinglePictureViewHolder(var mBinding: ItemLayoutSingleImagesSdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
 
 
         override fun onBind(position: Int) {
@@ -273,7 +287,7 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
      * Class used to handle single the pictures
      */
     private inner class FormVideoViewHolder(var mBinding: ItemLayoutPreviewVideoSdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
 
 
         override fun onBind(position: Int) {
@@ -291,9 +305,9 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
                     Glide.with(context!!).load(formData.value!!)
                             .into(mBinding.ivVideo)
                     mBinding.ivPlay.setOnClickListener(View.OnClickListener {
-//                        val intent = Intent(context, PlayVideoVerticallyActivity::class.java)
-//                        intent.putExtra("url", formData.value)
-//                        context!!.startActivity(intent)
+                        val intent = Intent(context, PlayVideoVerticallyActivity::class.java)
+                        intent.putExtra("url", formData.value)
+                        context!!.startActivity(intent)
                     })
                 }
             }
@@ -305,7 +319,7 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
      * Class used to handle single the pictures
      */
     private inner class FormAudioViewHolder(var mBinding: ItemLayoutPlayAudioDetailsSdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root) {
+            BaseSdkViewHolder(mBinding.root) {
         private var player: MediaPlayer? = null
         private var fileName: String? = null
         private var start = true
@@ -323,7 +337,7 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
             if (formData.value != null) {
                 if (formData.value!!.isNotEmpty()) {
                     fileName = formData.value
-                    com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "value", formData.value)
+                    CommonUtils.showLogMessage("e", "value", formData.value)
                     // fileName="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
                     mBinding.ivPlayRec.background = ContextCompat.getDrawable(context!!, R.drawable.circle_audio_play)
                     mBinding.ivPlayRec.isEnabled = true
@@ -376,7 +390,7 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
                 player!!.prepare()
                 player!!.start()
             } catch (e: IOException) {
-                com.rf.taskmodule.utils.Log.e("LOG_TAG", "prepare() failed")
+                Log.e("LOG_TAG", "prepare() failed")
             }
         }
 
@@ -427,7 +441,7 @@ class ShowDynamicFormDataAdapter(var formDataList: ArrayList<TaskData>) : Recycl
      * If hashMap is empty show empty view
      */
     private inner class EmptyViewHolder(private val mBinding: ItemDynamicFormEmptyViewSdkBinding) :
-            com.rf.taskmodule.ui.base.BaseSdkViewHolder(mBinding.root), FormEmptyItemViewModel.ClickListener {
+            BaseSdkViewHolder(mBinding.root), FormEmptyItemViewModel.ClickListener {
 
         override fun onBind(position: Int) {
             val emptyItemViewModel = FormEmptyItemViewModel(this)

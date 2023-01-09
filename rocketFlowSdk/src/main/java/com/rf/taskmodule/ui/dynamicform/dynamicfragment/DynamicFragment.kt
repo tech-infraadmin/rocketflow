@@ -25,8 +25,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException
+import com.google.android.gms.common.GooglePlayServicesRepairableException
+import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.gson.Gson
 import com.rocketflow.sdk.RocketFlyer
 import com.rf.taskmodule.BR
@@ -49,6 +53,7 @@ import com.rf.taskmodule.utils.image_utility.Compressor
 import com.rf.taskmodule.utils.image_utility.ImagePicker
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import com.rf.taskmodule.ui.newdynamicform.NewDynamicFormFragment
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -57,17 +62,17 @@ import java.util.*
 /**
  * Created by Rahul Abrol on 13/7/19.
  */
-class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewModel>(),
-    DynamicNavigator, com.rf.taskmodule.ui.dynamicform.dynamicfragment.DynamicAdapter.AdapterListener {
+class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewModel>(),
+    DynamicNavigator, DynamicAdapter.AdapterListener {
 
     private lateinit var manager: LinearLayoutManager
     private var imageFilePath: String? = null
 
 
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
-    lateinit var adapter: com.rf.taskmodule.ui.dynamicform.dynamicfragment.DynamicAdapter
+    lateinit var adapter: DynamicAdapter
 
     lateinit var showDynamicFormDataAdapter: ShowDynamicFormDataAdapter
 
@@ -79,7 +84,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
     var positions = -1
 
     private var permissionArray =
-        arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        arrayOf(Manifest.permission.CAMERA)
 
     private lateinit var formData: FormData
     private var position = -1
@@ -143,11 +148,11 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
     private fun setUp() {
         if (arguments != null) {
             showDynamicFormDataAdapter = ShowDynamicFormDataAdapter(ArrayList())
-            if (requireArguments().containsKey(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)) {
-                scannerFieldName = requireArguments().getString(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)
+            if (requireArguments().containsKey(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)) {
+                scannerFieldName = requireArguments().getString(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)
             }
-            if (requireArguments().containsKey(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)) {
-                scannerFieldValue = requireArguments().getString(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)
+            if (requireArguments().containsKey(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)) {
+                scannerFieldValue = requireArguments().getString(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)
             }
 
             if (requireArguments().getString("tcfId") != null) {
@@ -169,11 +174,11 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                 formDataList = arguments?.getSerializable("hashMap") as ArrayList<FormData>
                 try {
                     if (formDataList.isNullOrEmpty()) {
-                        dynamicFormsNew = com.rf.taskmodule.utils.CommonUtils.getFormByFormId(formId!!)
+                        dynamicFormsNew = CommonUtils.getFormByFormId(formId!!)
                         var jsonConverter =
-                            com.rf.taskmodule.utils.JSONConverter<DynamicFormsNew>()
+                            JSONConverter<DynamicFormsNew>()
                         var data = jsonConverter.objectToJson(dynamicFormsNew)
-                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "form data", data.toString())
+                        CommonUtils.showLogMessage("e", "form data", data.toString())
                         if (dynamicFormsNew != null) {
                             val dat = dynamicFormsNew?.fields!!
                             formDataList = ArrayList()
@@ -256,7 +261,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
         manager = LinearLayoutManager(baseActivity)
         rvDynamicForm?.layoutManager = manager
         adapter =
-            com.rf.taskmodule.ui.dynamicform.dynamicfragment.DynamicAdapter(
+            DynamicAdapter(
                 ArrayList()
             )
         adapter.setAdapterListener(this)
@@ -340,7 +345,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
     }
 
     private fun proceedToImagePicking() {
-        val chooseImageIntent = com.rf.taskmodule.utils.image_utility.ImagePicker.getPickImageIntent(baseActivity)
+        val chooseImageIntent = ImagePicker.getPickImageIntent(baseActivity)
         startActivityForResult(chooseImageIntent, PICK_IMAGE_FILE_ID)
     }
 
@@ -358,7 +363,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
             //compressedImageView.setImageBitmap(new Compressor(this).compressToBitmap(actualImage));
 
             // Compress image using RxJava in background thread
-            com.rf.taskmodule.utils.image_utility.Compressor(baseActivity)
+            Compressor(baseActivity)
                 .setQuality(90)
                 .compressToFileAsFlowable(actualImage)
                 .subscribeOn(Schedulers.io())
@@ -367,11 +372,11 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                     compressedImage = file
 
                     val spilt = compressedImage?.absolutePath?.split("/".toRegex())?.toTypedArray()
-                    com.rf.taskmodule.utils.Log.e(TAG, "image mane is: ${spilt!![spilt.size - 1]}")
+                    Log.e(TAG, "image mane is: ${spilt!![spilt.size - 1]}")
                     if (compressedImage != null) {
                         try {
-                            com.rf.taskmodule.utils.Log.e(TAG, "MB: ${compressedImage!!.sizeInMb}")
-                            com.rf.taskmodule.utils.Log.e(TAG, "KB: ${compressedImage!!.sizeInKb}")
+                            Log.e(TAG, "MB: ${compressedImage!!.sizeInMb}")
+                            Log.e(TAG, "KB: ${compressedImage!!.sizeInKb}")
                         } catch (e: Exception) {
 
                         }
@@ -380,8 +385,8 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                     //set the image name into the adapter
                     //formData.enteredValue = spilt[spilt.size - 1]
                     formData.enteredValue = compressedImage?.path;
-                    com.rf.taskmodule.utils.Log.e(TAG, "path: ${compressedImage?.path}")
-                    com.rf.taskmodule.utils.Log.e(TAG, "abspath: ${compressedImage?.absolutePath}")
+                    Log.e(TAG, "path: ${compressedImage?.path}")
+                    Log.e(TAG, "abspath: ${compressedImage?.absolutePath}")
                     val fileList: ArrayList<File>? = ArrayList()
                     fileList?.add(compressedImage!!)
 
@@ -461,7 +466,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             PICK_IMAGE_FILE_ID -> {
-                actualImage = com.rf.taskmodule.utils.image_utility.ImagePicker.getImageFileToUpload(baseActivity, resultCode, data)
+                actualImage = ImagePicker.getImageFileToUpload(baseActivity, resultCode, data)
                 compressImage()
             }
             CAMERA_PIC_REQUEST -> {
@@ -474,11 +479,11 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                         if (file.exists()) {
                             //  imageView.setImageURI(image.path?)
 //                            var bm = BitmapFactory.decodeFile(imageFilePath)
-                            val bm = com.rf.taskmodule.utils.image_utility.ImagePicker.getImageResized(context, uri!!)
+                            val bm = ImagePicker.getImageResized(context, uri!!)
 //                            val rotation = ImagePicker.getRotation(context, uri, true)
 //                            bm = ImagePicker.rotate(bm, rotation)
                             // Code to manage the bitmap
-                            actualImage = com.rf.taskmodule.utils.CommonUtils.convertBitmapToFile(
+                            actualImage = CommonUtils.convertBitmapToFile(
                                 baseActivity, bm,
                                 "upload_" + Calendar.getInstance().timeInMillis + ".jpg"
                             )
@@ -486,7 +491,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
 
                             if (actualImage != null) {
 
-                                com.rf.taskmodule.utils.image_utility.Compressor(
+                                Compressor(
                                     baseActivity
                                 )
                                     .setQuality(90)
@@ -505,10 +510,10 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                                         )
                                     })
                             } else {
-                                com.rf.taskmodule.utils.Log.e(TAG, "Image is not captured")
+                                Log.e(TAG, "Image is not captured")
                             }
                         } else {
-                            com.rf.taskmodule.utils.Log.e(TAG, "Image is not captured")
+                            Log.e(TAG, "Image is not captured")
                         }
 
 
@@ -536,19 +541,19 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
 //                                        .compressVideo(file.path, file.parent)
                                     var filePath = file.path;
                                         adapter.formDataList[vidViewposition].enteredValue = filePath
-                                    if (file.exists()) {
+                                    /*if (file.exists()) {
                                         if (file.delete()) {
-                                            com.rf.taskmodule.utils.Log.e("file Deleted :", file!!.path!!)
+                                            Log.e("file Deleted :", file!!.path!!)
                                         } else {
-                                            com.rf.taskmodule.utils.Log.e("file not Deleted :", file!!.path!!.toString())
+                                            Log.e("file not Deleted :", file!!.path!!.toString())
                                         }
-                                    }
+                                    }*/
                                     requireActivity().runOnUiThread(Runnable {
                                         setVid(vidViewposition, video!!, filePath!!)
                                         //  adapter.notifyDataSetChanged()
                                     })
                                     if (video != null && video!!.exists()) {
-                                        video!!.delete()
+//                                        video!!.delete()
                                     }
                                 }
 
@@ -569,14 +574,14 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                                                         // data.enteredValue=file.path
                                                         data.enteredValue = filePath
                                                         if (file.exists()) {
-                                                            if (file.delete()) {
-                                                                com.rf.taskmodule.utils.Log.e("file Deleted :", file!!.path)
+                                                            /*if (file.delete()) {
+                                                                Log.e("file Deleted :", file!!.path)
                                                             } else {
-                                                                com.rf.taskmodule.utils.Log.e(
+                                                                Log.e(
                                                                     "file not Deleted :",
                                                                     file!!.path
                                                                 )
-                                                            }
+                                                            }*/
                                                         }
                                                         requireActivity().runOnUiThread(Runnable {
                                                             setChildVideo(
@@ -616,7 +621,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
             AUTOCOMPLETE_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     val place = Autocomplete.getPlaceFromIntent(data!!)
-                    com.rf.taskmodule.utils.Log.i(TAG, "Place: " + place.name + ", " + place.id)
+                    Log.i(TAG, "Place: " + place.name + ", " + place.id)
                     var latLong = place.latLng
                     var location =
                         com.rf.taskmodule.ui.addplace.Location(latLong!!.latitude, latLong.longitude)
@@ -624,22 +629,22 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                     var hubLocation = com.rf.taskmodule.ui.addplace.HubLocation(location, 0)
                     hubLocation.address = place.name
                     var jsonConverter =
-                        com.rf.taskmodule.utils.JSONConverter<com.rf.taskmodule.ui.addplace.HubLocation>()
+                        JSONConverter<HubLocation>()
                     //adapter.formDataList[position].enteredValue = jsonConverter.objectToJson(hubLocation)
-                    adapter.formDataList[position].enteredValue = place.name
-                    com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                    adapter.formDataList[position].enteredValue = "${place.name} ${place.address}"
+                    CommonUtils.showLogMessage(
                         "e",
                         "enterdvalue",
                         adapter.formDataList[position].enteredValue
                     )
                     adapter.formDataList[position].value =
                         adapter.formDataList[position].enteredValue
-                    adapter.formDataList[position].value = place.name
+                    adapter.formDataList[position].value = "${place.name} ${place.address}"
                     adapter.notifyItemChanged(position)
 
                 } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                     val status = Autocomplete.getStatusFromIntent(data!!)
-                    com.rf.taskmodule.utils.Log.i(TAG, status.statusMessage)
+                    Log.i(TAG, status.statusMessage)
                     TrackiToast.Message.showShort(requireContext(), status.statusMessage!!)
 
                 } else if (resultCode == Activity.RESULT_CANCELED) {
@@ -647,12 +652,12 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                 }
 
             }
-            com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_SCAN->{
+            AppConstants.REQUEST_CODE_SCAN->{
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null && data.hasExtra("id")) {
                         var id=data.getStringExtra("id")
                         adapter.formDataList[position].enteredValue = id
-                        com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                        CommonUtils.showLogMessage(
                             "e",
                             "enterdvalue",
                             adapter.formDataList[position].enteredValue
@@ -691,7 +696,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
 
     override fun getDropdownItems(position: Int, target: String, rollId: String?) {
 
-        if (com.rf.taskmodule.utils.CommonUtils.containsEnum(target))
+        if (CommonUtils.containsEnum(target))
             mDynamicViewModel?.executiveMap(position, target, httpManager, rollId)
 
     }
@@ -739,32 +744,25 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 proceedToImagePicking()
             }
-        } else if (requestCode == com.rf.taskmodule.utils.AppConstants.PERMISSIONS_REQUEST_CODE_MULTIPLE) {
+        } else if (requestCode == AppConstants.PERMISSIONS_REQUEST_CODE_MULTIPLE) {
 
             val perms = HashMap<String, Int>()
             perms[Manifest.permission.CAMERA] = PackageManager.PERMISSION_GRANTED
-            perms[Manifest.permission.WRITE_EXTERNAL_STORAGE] = PackageManager.PERMISSION_GRANTED
             if (grantResults.isNotEmpty()) {
                 for (i in permissions.indices)
                     perms[permissions[i]] = grantResults[i]
 
                 val camPer = perms[Manifest.permission.CAMERA]
-                val extStorPer = perms[Manifest.permission.WRITE_EXTERNAL_STORAGE]
                 // Check for both permissions
-                if ((camPer != null && camPer == PackageManager.PERMISSION_GRANTED) &&
-                    (extStorPer != null && extStorPer == PackageManager.PERMISSION_GRANTED)
+                if ((camPer != null && camPer == PackageManager.PERMISSION_GRANTED)
                 ) {
-                    com.rf.taskmodule.utils.Log.d(TAG, "Camera and Storage permission granted")
+                    Log.d(TAG, "Camera and Storage permission granted")
                     openCamera()
 
                 } else {
                     if (ActivityCompat.shouldShowRequestPermissionRationale(
                             baseActivity,
                             Manifest.permission.CAMERA
-                        ) ||
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                            baseActivity,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE
                         )
                     ) {
                         showDialogOK(
@@ -780,6 +778,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                             }
                         }
                     } else {
+                        Log.e("checkLog","module2")
                         TrackiToast.Message
                             .showLong(baseActivity, "Go to settings and enable permissions")
                     }
@@ -821,9 +820,9 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
             if (tcfId != null)
                 bundle.putString("tcfId", tcfId)
             if (scannerFieldName != null)
-                bundle.putString(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME, scannerFieldName)
+                bundle.putString(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME, scannerFieldName)
             if (scannerFieldValue != null)
-                bundle.putString(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE, scannerFieldValue)
+                bundle.putString(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE, scannerFieldValue)
             bundle.putSerializable("hashMap", formList)
             bundle.putBoolean("isEditable", isEditable)
             fragment.arguments = bundle
@@ -834,10 +833,10 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
 
 
     override fun handleExecutiveMapResponse(
-        position: Int, callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?,
+        position: Int, callback: ApiCallback, result: Any?,
         error: APIError?
     ) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, baseActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, baseActivity)) {
             val executive =
                 Gson().fromJson<ExecutiveMap>(result.toString(), ExecutiveMap::class.java)
             executive?.let {
@@ -874,9 +873,9 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
     }
 
 
-    override fun handleGetTaskDataResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleGetTaskDataResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, context)) {
+        if (CommonUtils.handleResponse(callback, error, result, context)) {
             val getTaskDataResponse = Gson().fromJson<GetTaskDataResponse>(
                 result.toString(),
                 GetTaskDataResponse::class.java
@@ -942,12 +941,12 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
     }
 
     override fun handleGetPreviousFormResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, context)) {
+        if (CommonUtils.handleResponse(callback, error, result, context)) {
             val getTaskDataResponse = Gson().fromJson<GetTaskDataResponse>(
                 result.toString(),
                 GetTaskDataResponse::class.java
@@ -968,7 +967,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
 
 
                     if (formDataList.isNullOrEmpty()) {
-                        dynamicFormsNew = com.rf.taskmodule.utils.CommonUtils.getFormByFormId(formId!!)
+                        dynamicFormsNew = CommonUtils.getFormByFormId(formId!!)
 //                   var jsonConverter=JSONConverter<DynamicFormsNew>()
 //                   var data=jsonConverter.objectToJson(dynamicFormsNew)
 //                   CommonUtils.showLogMessage("e","form data",data.toString())
@@ -1089,7 +1088,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                                     val mapElement = hmIterator.next() as Map.Entry<*, *>
                                     map[mapElement.key.toString()] =
                                         mapElement.value as ArrayList<FormData>
-                                    com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                                    CommonUtils.showLogMessage(
                                         "e",
                                         "inner map value",
                                         mapElement.value.toString()
@@ -1098,9 +1097,9 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                             }
                             preferencesHelper.formDataMap = map
                             var jsonConverter =
-                                com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<FormData>>>()
+                                JSONConverter<HashMap<String, ArrayList<FormData>>>()
                             var data = jsonConverter.objectToJson(map)
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                            CommonUtils.showLogMessage(
                                 "e",
                                 "inner form data value",
                                 data.toString()
@@ -1147,9 +1146,9 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
 //                        }
                         preferencesHelper.formDataMap = map
                         var jsonConverter =
-                            com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<FormData>>>()
+                            JSONConverter<HashMap<String, ArrayList<FormData>>>()
                         var data = jsonConverter.objectToJson(map)
-                        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "form data value", data.toString())
+                        CommonUtils.showLogMessage("e", "form data value", data.toString())
                         formSubmitListener?.onProcessClick(
                             fieldList,
                             formDataa?.actionConfig,
@@ -1177,9 +1176,9 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
 
     }
 
-    override fun handleUploadFileResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleUploadFileResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, baseActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, baseActivity)) {
 
             if (!isOtpApiHit) {
                 val fileUrlsResponse =
@@ -1222,7 +1221,7 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                                     val mapElement = hmIterator.next() as Map.Entry<*, *>
                                     map[mapElement.key.toString()] =
                                         mapElement.value as ArrayList<FormData>
-                                    com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                                    CommonUtils.showLogMessage(
                                         "e",
                                         "inner map value",
                                         mapElement.value.toString()
@@ -1231,9 +1230,9 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
                             }
                             preferencesHelper.formDataMap = map
                             var jsonConverter =
-                                com.rf.taskmodule.utils.JSONConverter<HashMap<String, ArrayList<FormData>>>()
+                                JSONConverter<HashMap<String, ArrayList<FormData>>>()
                             var data = jsonConverter.objectToJson(map)
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage(
+                            CommonUtils.showLogMessage(
                                 "e",
                                 "inner form data value",
                                 data.toString()
@@ -1358,23 +1357,23 @@ class DynamicFragment : com.rf.taskmodule.ui.base.BaseSdkFragment<FragmentFormLi
     }
 
     override fun openPlacePicker(position: Int, formData: FormData?) {
-//        try {
-//            this.position = position
-//            // this.formData=formData!!
-//            val fields: List<Place.Field> =
-//                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
-//
-//            // Start the autocomplete intent.
-//            val intent: Intent =
-//                Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields)
-//                    .build(requireContext())
-//            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
-//
-//        } catch (e: GooglePlayServicesRepairableException) {
-//            Log.e(TAG, e.message)
-//        } catch (e: GooglePlayServicesNotAvailableException) {
-//            Log.e(TAG, e.message)
-//        }
+        try {
+            this.position = position
+            // this.formData=formData!!
+            val fields: List<Place.Field> =
+                listOf(Place.Field.ID, Place.Field.ADDRESS, Place.Field.NAME, Place.Field.LAT_LNG)
+
+            // Start the autocomplete intent.
+            val intent: Intent =
+                Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields)
+                    .build(requireContext())
+            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
+
+        } catch (e: GooglePlayServicesRepairableException) {
+            Log.e(NewDynamicFormFragment.TAG, e.message)
+        } catch (e: GooglePlayServicesNotAvailableException) {
+            Log.e(NewDynamicFormFragment.TAG, e.message)
+        }
     }
 
     override fun openScanner(position: Int, formData: FormData?) {

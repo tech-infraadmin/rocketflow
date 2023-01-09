@@ -50,7 +50,7 @@ import kotlin.collections.ArrayList
  *
  * Created by rahul on 29/3/19
  */
-class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDynamicFormSdkBinding, DynamicFormViewModel>(),
+class DynamicFormActivity : BaseSdkActivity<ActivityDynamicFormSdkBinding, DynamicFormViewModel>(),
     DynamicFormNavigator, FormSubmitListener {
 //    init {
 //        System.loadLibrary("keys")
@@ -62,12 +62,12 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
     private var showToolbar: Boolean = true //it is used for main activity
 
 
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
+    lateinit var httpManager: HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
 
     lateinit var mDynamicFormViewModel: DynamicFormViewModel
     private var mActivityDynamicFormSdkBinding: ActivityDynamicFormSdkBinding? = null
-    private lateinit var dBHelper: com.rf.taskmodule.data.local.db.DatabaseHelper
+    private lateinit var dBHelper: DatabaseHelper
 
     override fun getBindingVariable() = BR.viewModel
     override fun getLayoutId() = R.layout.activity_dynamic_form_sdk
@@ -83,7 +83,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
     private var taskAction: String? = null
     private var ivBack: ImageView? = null
     private var currentOpenedFragment: String? = null
-    private var geofenceData: com.rf.taskmodule.data.model.GeofenceData? = null
+    private var geofenceData: GeofenceData? = null
 
     private var ctaId: String? = null
     private var dynamicFormsNew: DynamicFormsNew? = null
@@ -116,7 +116,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
         httpManager = RocketFlyer.httpManager()!!
         preferencesHelper = RocketFlyer.preferenceHelper()!!
 
-        dBHelper = com.rf.taskmodule.data.local.db.DatabaseHelper.getInstance(this@DynamicFormActivity)
+        dBHelper = DatabaseHelper.getInstance(this@DynamicFormActivity)
         handlerThread = ExecutorThread()
         toolbar = mActivityDynamicFormSdkBinding!!.toolbar
 
@@ -133,35 +133,35 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
 
         if (intent != null) {
             val intent = intent
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FORM_TYPE)) {
-                taskAction = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FORM_TYPE)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_FORM_TYPE)) {
+                taskAction = intent.getStringExtra(AppConstants.Extra.EXTRA_FORM_TYPE)
             }
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FORM_ID)) {
-                formId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FORM_ID)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_FORM_ID)) {
+                formId = intent.getStringExtra(AppConstants.Extra.EXTRA_FORM_ID)
             }
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)) {
-                taskId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TASK_ID)
-            }
-
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID)) {
-                ctaId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_CTA_ID);
-            }
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TCF_ID)) {
-                tcfId = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TCF_ID);
-            }
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_DATA)) {
-                geofenceData = intent.getSerializableExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_DATA) as com.rf.taskmodule.data.model.GeofenceData
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_TASK_ID)) {
+                taskId = intent.getStringExtra(AppConstants.Extra.EXTRA_TASK_ID)
             }
 
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_IS_EDITABLE)) {
-                isEditable = intent.getBooleanExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_IS_EDITABLE, true)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID)) {
+                ctaId = intent.getStringExtra(AppConstants.Extra.EXTRA_CTA_ID);
             }
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.HIDE_BUTTON)) {
-                isHideButton = intent.getBooleanExtra(com.rf.taskmodule.utils.AppConstants.Extra.HIDE_BUTTON, false)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_TCF_ID)) {
+                tcfId = intent.getStringExtra(AppConstants.Extra.EXTRA_TCF_ID);
+            }
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_DATA)) {
+                geofenceData = intent.getSerializableExtra(AppConstants.Extra.EXTRA_DATA) as GeofenceData
+            }
+
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_IS_EDITABLE)) {
+                isEditable = intent.getBooleanExtra(AppConstants.Extra.EXTRA_IS_EDITABLE, true)
+            }
+            if (intent.hasExtra(AppConstants.Extra.HIDE_BUTTON)) {
+                isHideButton = intent.getBooleanExtra(AppConstants.Extra.HIDE_BUTTON, false)
             }
             //it is used for main activity.
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SHOW_TOOLBAR)) {
-                showToolbar = intent.getBooleanExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SHOW_TOOLBAR, true)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_SHOW_TOOLBAR)) {
+                showToolbar = intent.getBooleanExtra(AppConstants.Extra.EXTRA_SHOW_TOOLBAR, true)
                 if (!showToolbar) {
                     if (supportActionBar != null) {
                         supportActionBar!!.setDisplayHomeAsUpEnabled(false)
@@ -169,11 +169,11 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                 }
             }
 
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)) {
-                scannerFieldName = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)) {
+                scannerFieldName = intent.getStringExtra(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)
             }
-            if (intent.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)) {
-                scannerFieldValue = intent.getStringExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)
+            if (intent.hasExtra(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)) {
+                scannerFieldValue = intent.getStringExtra(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)
             }
             dynamicFragment = DynamicFragment.getInstance(formId!!, taskId!!, isEditable, tcfId, isHideButton,scannerFieldName,scannerFieldValue, ArrayList())
             if(dynamicFragment!=null)
@@ -182,7 +182,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
         }
 
 
-        dynamicFormsNew = com.rf.taskmodule.utils.CommonUtils.getFormByFormId(formId!!)
+        dynamicFormsNew = CommonUtils.getFormByFormId(formId!!)
         var viewProgress=mActivityDynamicFormSdkBinding!!.viewProgress
         titleText=viewProgress.findViewById<TextView>(R.id.tvTitle)
         currentStatusText=viewProgress!!.findViewById<TextView>(R.id.currentStatusText)
@@ -207,8 +207,8 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
      * @param fragment fragment that needs to be added/replaced.
      */
     private fun replaceFragment(fragment: Fragment, fragmentName: String?) {
-        val formName = com.rf.taskmodule.utils.CommonUtils.getFormByFormId(fragmentName)
-        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "formid", fragmentName);
+        val formName = CommonUtils.getFormByFormId(fragmentName)
+        CommonUtils.showLogMessage("e", "formid", fragmentName);
         if (formName?.name != null) {
             mActivityDynamicFormSdkBinding?.toolbar?.title = formName.name
         } else {
@@ -227,7 +227,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
         if (formList.size > 1) {
             ivBack?.visibility = View.VISIBLE
         }
-        com.rf.taskmodule.utils.Log.e(TAG, "Fragment name----> ${formList.size} <---> $fragmentName")
+        Log.e(TAG, "Fragment name----> ${formList.size} <---> $fragmentName")
         val manager = supportFragmentManager
 
         val ft = manager.beginTransaction()
@@ -255,11 +255,11 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
     override fun onProcessClick(list: ArrayList<FormData>, dynamicActionConfig: DynamicActionConfig?,
                                 currentFormId: String?, dfdid: String?) {
         currentOpenedFragment = currentFormId
-        com.rf.taskmodule.utils.Log.e(TAG, "Current Opened Fragment----> $currentOpenedFragment")
-        com.rf.taskmodule.utils.Log.e(TAG, "config type----> ${dynamicActionConfig?.action} ")
+        Log.e(TAG, "Current Opened Fragment----> $currentOpenedFragment")
+        Log.e(TAG, "config type----> ${dynamicActionConfig?.action} ")
         var jsonConverter =
-            com.rf.taskmodule.utils.JSONConverter<ArrayList<FormData>>();
-        com.rf.taskmodule.utils.Log.e(TAG, jsonConverter.objectToJson(list))
+            JSONConverter<ArrayList<FormData>>();
+        Log.e(TAG, jsonConverter.objectToJson(list))
         mDfdId = dfdid
         if (mainMap == null) {
             mainMap = java.util.HashMap()
@@ -291,11 +291,11 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                         //remove last element only if type is camera else
                         // SIGNATURE OR FILE always contains single image
                         if (mainData!![i].type == DataType.CAMERA && v[0].path.equals(
-                                com.rf.taskmodule.utils.AppConstants.ADD_MORE, ignoreCase = true)) {
+                                AppConstants.ADD_MORE, ignoreCase = true)) {
                             v.removeAt(0)
                         }
                         if (mainData!![i].type == DataType.CAMERA && v.size>0&&v[v.size-1].path.equals(
-                                com.rf.taskmodule.utils.AppConstants.ADD_MORE,
+                                AppConstants.ADD_MORE,
                                 ignoreCase = true
                             )
                         ) {
@@ -316,7 +316,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                         }
 
                     }
-                    com.rf.taskmodule.utils.Log.e("DynamicFormActivity", mainData!![i].name + "<------->"
+                    Log.e("DynamicFormActivity", mainData!![i].name + "<------->"
                             + mainData!![i].enteredValue)
                 }
 
@@ -330,7 +330,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                             count = 0
 //                            mActivityCreateTaskBinding.btnCLick.visibility=View.GONE
                             mActivityDynamicFormSdkBinding!!.viewProgress.visibility=View.VISIBLE
-                            com.rf.taskmodule.utils.CommonUtils.makeScreenDisable(this)
+                            CommonUtils.makeScreenDisable(this)
                             dynamicFragment!!.sendDataToServer(true)
                             fileUploadCounter=0
                             nestedScrollView.postDelayed({ nestedScrollView.fullScroll(View.FOCUS_DOWN) },200)
@@ -348,7 +348,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
 
                             }
                         } else {
-                            com.rf.taskmodule.utils.CommonUtils.showSnakbarForNetworkSettings(this@DynamicFormActivity, container, com.rf.taskmodule.utils.AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE)
+                            CommonUtils.showSnakbarForNetworkSettings(this@DynamicFormActivity, container, AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE)
                         }
 
                     } else {
@@ -379,12 +379,12 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                         //remove last element only if type is camera else
                         // SIGNATURE OR FILE always contains single image
                         if (mainData!![i].type == DataType.CAMERA && v[0].path.equals(
-                                com.rf.taskmodule.utils.AppConstants.ADD_MORE, ignoreCase = true)) {
+                                AppConstants.ADD_MORE, ignoreCase = true)) {
                             // Log.e("path",v[i].path)
                             v.removeAt(0)
                         }
                         if (mainData!![i].type == DataType.CAMERA &&v.size>0&& v[v.size-1].path.equals(
-                                com.rf.taskmodule.utils.AppConstants.ADD_MORE,
+                                AppConstants.ADD_MORE,
                                 ignoreCase = true
                             )
                         ) {
@@ -396,7 +396,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                             hashMapFileRequest[key] = v
                         }
                     }
-                    com.rf.taskmodule.utils.Log.e("DynamicFormActivity", mainData!![i].name + "<------->"
+                    Log.e("DynamicFormActivity", mainData!![i].name + "<------->"
                             + mainData!![i].enteredValue)
                 }
 
@@ -409,7 +409,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                         if (NetworkUtils.isConnectedFast(this@DynamicFormActivity)) {
                             // showLoading()
                             mActivityDynamicFormSdkBinding!!.viewProgress.visibility=View.VISIBLE
-                            com.rf.taskmodule.utils.CommonUtils.makeScreenDisable(this)
+                            CommonUtils.makeScreenDisable(this)
                             dynamicFragment!!.sendDataToServer(true)
                             fileUploadCounter=0
                             nestedScrollView.postDelayed({ nestedScrollView.fullScroll(View.FOCUS_DOWN) },200)
@@ -427,7 +427,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
 
                             }
                         } else {
-                            com.rf.taskmodule.utils.CommonUtils.showSnakbarForNetworkSettings(this@DynamicFormActivity, container, com.rf.taskmodule.utils.AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE)
+                            CommonUtils.showSnakbarForNetworkSettings(this@DynamicFormActivity, container, AppConstants.SLOW_INTERNET_CONNECTION_MESSAGE)
                         }
 
                     } else {
@@ -443,18 +443,18 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
     }
 
     private fun perFormCreateTask() {
-        var dynamicFormMainData = com.rf.taskmodule.utils.CommonUtils.createFormData(mainData, ctaId, taskId!!, dynamicFormsNew!!.formId,
+        var dynamicFormMainData = CommonUtils.createFormData(mainData, ctaId, taskId!!, dynamicFormsNew!!.formId,
             dynamicFormsNew!!.version)
-        com.rf.taskmodule.utils.Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
+        Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
         var apiType = ApiType.CREATE_TASK
-        var api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[apiType]
+        var api = TrackiSdkApplication.getApiMap()[apiType]
         var taskData = dynamicFormMainData!!.taskData
         val intent = Intent()
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FORM_TYPE, taskAction)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.DFID, formId)
+        intent.putExtra(AppConstants.Extra.EXTRA_FORM_TYPE, taskAction)
+        intent.putExtra(AppConstants.DFID, formId)
         if (!isEditable)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.DFDID, mDfdId)
-        intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FORM_MAP, dynamicFormMainData)
+            intent.putExtra(AppConstants.DFDID, mDfdId)
+        intent.putExtra(AppConstants.Extra.EXTRA_FORM_MAP, dynamicFormMainData)
         setResult(Activity.RESULT_OK, intent)
         finish()
 
@@ -462,40 +462,40 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
 
     private fun finalApiHit() {
         showLoading()
-        var dynamicFormMainData = com.rf.taskmodule.utils.CommonUtils.createFormData(mainData, ctaId, taskId!!, dynamicFormsNew!!.formId,
+        var dynamicFormMainData = CommonUtils.createFormData(mainData, ctaId, taskId!!, dynamicFormsNew!!.formId,
             dynamicFormsNew!!.version)
-        com.rf.taskmodule.utils.Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
+        Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
         var jsonConverter =
-            com.rf.taskmodule.utils.JSONConverter<DynamicFormMainData>()
+            JSONConverter<DynamicFormMainData>()
         var request = jsonConverter.objectToJson(dynamicFormMainData);
-        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "data", request)
+        CommonUtils.showLogMessage("e", "data", request)
 
-        val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.UPDATE_TASK_DATA]
+        val api = TrackiSdkApplication.getApiMap()[ApiType.UPDATE_TASK_DATA]
         mDynamicFormViewModel.uploadTaskData(dynamicFormMainData, httpManager, api)
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@DynamicFormActivity)) {
+        if (CommonUtils.handleResponse(callback, error, result, this@DynamicFormActivity)) {
 
             var resp: UploadTaskDataResponse = Gson().fromJson(result.toString(), UploadTaskDataResponse::class.java)
 
             var dfdId: String = resp.id!!
 
             val intent = Intent()
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FORM_TYPE, taskAction)
+            intent.putExtra(AppConstants.Extra.EXTRA_FORM_TYPE, taskAction)
             if (isEditable) {
-                intent.putExtra(com.rf.taskmodule.utils.AppConstants.DFDID, dfdId)
+                intent.putExtra(AppConstants.DFDID, dfdId)
             } else {
-                intent.putExtra(com.rf.taskmodule.utils.AppConstants.DFDID, mDfdId)
+                intent.putExtra(AppConstants.DFDID, mDfdId)
             }
             if (preferencesHelper.formDataMap != null && preferencesHelper.formDataMap.isNotEmpty()) {
-                preferencesHelper.clear(com.rf.taskmodule.data.local.prefs.AppPreferencesHelper.PreferencesKeys.PREF_KEY_IS_FORM_DATA_MAP);
+                preferencesHelper.clear(AppPreferencesHelper.PreferencesKeys.PREF_KEY_IS_FORM_DATA_MAP);
             }
-            var dynamicFormMainData = com.rf.taskmodule.utils.CommonUtils.createFormData(mainData, ctaId, taskId!!, dynamicFormsNew!!.formId,
+            var dynamicFormMainData = CommonUtils.createFormData(mainData, ctaId, taskId!!, dynamicFormsNew!!.formId,
                 dynamicFormsNew!!.version)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.DFID, formId)
-            intent.putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FORM_MAP, dynamicFormMainData)
+            intent.putExtra(AppConstants.DFID, formId)
+            intent.putExtra(AppConstants.Extra.EXTRA_FORM_MAP, dynamicFormMainData)
             setResult(Activity.RESULT_OK, intent)
             finish()
         } else {
@@ -506,8 +506,8 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
 
     }
 
-    override fun upLoadFileApiResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@DynamicFormActivity)) {
+    override fun upLoadFileApiResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, this@DynamicFormActivity)) {
             val fileUrlsResponse = Gson().fromJson(result.toString(), FileUrlsResponse::class.java)
             val fileResponseMap = fileUrlsResponse.filesUrl
             if (mainData != null) {
@@ -538,8 +538,8 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
 
     }
 
-    override fun upLoadFileDisposeApiResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this@DynamicFormActivity)) {
+    override fun upLoadFileDisposeApiResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, this@DynamicFormActivity)) {
             val fileUrlsResponse = Gson().fromJson(result.toString(), FileUrlsResponse::class.java)
             val fileResponseMap = fileUrlsResponse.filesUrl
             if (mainData != null) {
@@ -589,8 +589,8 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                     fileUploadCounter += obj.chunkSize
                     var progressUploadText = "${fileUploadCounter}/${obj.totalSize}"
                     var percentage = ((fileUploadCounter * 100 / obj.totalSize))
-                    com.rf.taskmodule.utils.Log.e(TAG, "progressUploadText=> " + progressUploadText)
-                    com.rf.taskmodule.utils.Log.e(TAG, "percentage=> " + percentage.toString())
+                    Log.e(TAG, "progressUploadText=> " + progressUploadText)
+                    Log.e(TAG, "percentage=> " + percentage.toString())
                     runOnUiThread {
                         progressBar!!.progress = percentage
                         percentageText!!.text = "$percentage %"
@@ -601,7 +601,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
 
                 }
                 /*For Success */0 -> {
-                if (com.rf.taskmodule.utils.CommonUtils.stringListHashMap.isNotEmpty()) {
+                if (CommonUtils.stringListHashMap.isNotEmpty()) {
                     runOnUiThread {
                         rlProgress!!.visibility=View.GONE
                         rlSubmittingData!!.visibility=View.VISIBLE
@@ -614,10 +614,10 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                         for (i in mainData?.indices!!) {
                             try {
                                 if (mainData!![i].type != DataType.BUTTON) {
-                                    if (com.rf.taskmodule.utils.CommonUtils.stringListHashMap?.containsKey(mainData!![i].name)!!) {
+                                    if (CommonUtils.stringListHashMap?.containsKey(mainData!![i].name)!!) {
                                         //Log.e("Upload Form List--->", mainData!![i].name!!)
-                                        mainData!![i].enteredValue = com.rf.taskmodule.utils.CommonUtils.getCommaSeparatedList(
-                                            com.rf.taskmodule.utils.CommonUtils.stringListHashMap[mainData!![i].name])
+                                        mainData!![i].enteredValue = CommonUtils.getCommaSeparatedList(
+                                            CommonUtils.stringListHashMap[mainData!![i].name])
                                     }
                                     finalMap[mainData!![i].name!!] = mainData!![i].enteredValue!!
                                 }
@@ -626,7 +626,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                             }
                         }
                         //assign empty object to map again
-                        com.rf.taskmodule.utils.CommonUtils.stringListHashMap = ConcurrentHashMap()
+                        CommonUtils.stringListHashMap = ConcurrentHashMap()
                         if (actionConfig?.action == Type.API)
                             finalApiHit()
                         else if (actionConfig?.action == Type.DISPOSE) {
@@ -634,7 +634,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                         }
                     }
                 } else {
-                    com.rf.taskmodule.utils.Log.e(TAG, "Map is empty...Try Again")
+                    Log.e(TAG, "Map is empty...Try Again")
                     hideLoading()
                     try {
                         handlerThread?.interrupt()
@@ -642,7 +642,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                     }
 
 
-                    com.rf.taskmodule.utils.CommonUtils.stringListHashMap = ConcurrentHashMap()
+                    CommonUtils.stringListHashMap = ConcurrentHashMap()
                     if (actionConfig?.action == Type.API)
                         finalApiHit()
                     else if (actionConfig?.action == Type.DISPOSE) {
@@ -655,7 +655,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                     count++
                     runOnUiThread {
                         mActivityDynamicFormSdkBinding!!.viewProgress.visibility = View.GONE
-                        com.rf.taskmodule.utils.CommonUtils.makeScreenClickable(this@DynamicFormActivity)
+                        CommonUtils.makeScreenClickable(this@DynamicFormActivity)
                         dynamicFragment!!.sendDataToServer(false)
                     }
 
@@ -681,7 +681,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
                     // This is where you do your work in the UI thread.
                     // Your worker tells you in the message what to do.
                     TrackiToast.Message.showShort(this@DynamicFormActivity,
-                        com.rf.taskmodule.utils.AppConstants.UNABLE_TO_PROCESS_REQUEST)
+                        AppConstants.UNABLE_TO_PROCESS_REQUEST)
                     //after getting error form the thread we interrupt the thread
                     hideLoading()
                     try {
@@ -700,7 +700,7 @@ class DynamicFormActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityDy
     }
 
     override fun networkUnavailable() {
-        snackBar = com.rf.taskmodule.utils.CommonUtils.showNetWorkConnectionIssue(mActivityDynamicFormSdkBinding!!.llMain, getString(R.string.please_check_your_internet_connection))
+        snackBar = CommonUtils.showNetWorkConnectionIssue(mActivityDynamicFormSdkBinding!!.llMain, getString(R.string.please_check_your_internet_connection))
     }
 
 }

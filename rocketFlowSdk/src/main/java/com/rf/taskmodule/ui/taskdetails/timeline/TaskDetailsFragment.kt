@@ -1,7 +1,6 @@
 package com.rf.taskmodule.ui.taskdetails.timeline
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
@@ -35,8 +34,8 @@ import com.rf.taskmodule.data.local.prefs.StartIdealTrackWork
 import com.rf.taskmodule.data.model.BaseResponse
 import com.rf.taskmodule.data.model.GeofenceData
 import com.rf.taskmodule.data.model.request.*
-import com.rf.taskmodule.data.model.request.TaskData
 import com.rf.taskmodule.data.model.response.config.*
+import com.rf.taskmodule.data.model.response.config.TaskData
 import com.rf.taskmodule.data.network.APIError
 import com.rf.taskmodule.data.network.ApiCallback
 import com.rf.taskmodule.data.network.HttpManager
@@ -74,7 +73,6 @@ import com.trackthat.lib.models.SuccessResponse
 import com.trackthat.lib.models.TrackthatLocation
 import kotlinx.android.synthetic.main.item_dynamic_form_time_sdk.*
 import kotlinx.android.synthetic.main.layout_frgmrnt_task_details_sdk.*
-import org.w3c.dom.Text
 import com.rf.taskmodule.ui.addplace.Hub
 import com.rf.taskmodule.ui.addplace.LocationListResponse
 import com.rf.taskmodule.ui.dynamicform.dynamicfragment.*
@@ -85,10 +83,10 @@ import kotlin.collections.ArrayList
 
 
 class TaskDetailsFragment :
-    com.rf.taskmodule.ui.base.BaseSdkFragment<LayoutFrgmrntTaskDetailsSdkBinding, NewTaskDetailsViewModel>(),
-    com.rf.taskmodule.ui.tasklisting.assignedtome.TaskAssignToMeViewModel.AssignedtoMeItemViewModelListener,
-    com.rf.taskmodule.ui.tasklisting.TaskClickListener, TaskTimeLineAdapter.PreviousFormListener,
-    TDNavigator, com.rf.taskmodule.ui.dynamicform.dynamicfragment.DynamicAdapter.AdapterListener {
+    BaseSdkFragment<LayoutFrgmrntTaskDetailsSdkBinding, NewTaskDetailsViewModel>(),
+    TaskAssignToMeViewModel.AssignedtoMeItemViewModelListener,
+    TaskClickListener, TaskTimeLineAdapter.PreviousFormListener,
+    TDNavigator, DynamicAdapter.AdapterListener {
 
     private var ecRequest: ExecuteUpdateRequest = ExecuteUpdateRequest("", "", 0L, null, null)
 
@@ -126,23 +124,24 @@ class TaskDetailsFragment :
     private var ctaId: String? = null
     private var taskAction: String? = null
     private var tcfId: String? = null
-    private var geofenceData: com.rf.taskmodule.data.model.GeofenceData? = null
+    private var geofenceData: GeofenceData? = null
     private var formId: String? = null
     private var dynamicFormsNew: DynamicFormsNew? = null
     private var isEditable: Boolean = false
     private var isHideButton: Boolean = false
 
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
+    lateinit var httpManager: HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
     //var addGeoFenceUtil: AddGeoFenceUtil? = null
 
     private lateinit var mActivityNewTaskDetailBinding: LayoutFrgmrntTaskDetailsSdkBinding
 
     private var task: Task? = null
+    private var taskRef: Task? = null
 
     lateinit var showDynamicFormDataAdapter: ShowDynamicFormDataAdapter
 
-    var addGeoFenceUtil: com.rf.taskmodule.utils.geofence.AddGeoFenceUtil? = null
+    var addGeoFenceUtil: AddGeoFenceUtil? = null
 
     var taskId: String? = null
     private var api: Api? = null
@@ -161,6 +160,7 @@ class TaskDetailsFragment :
     private var dfId: String? = null
     private var dfdId: String? = null
     private var FROM: String? = null
+    private var refCall: Boolean? = false
     private val formList = ArrayList<String>()
 
     var slotDataResponse: SlotDataResponse = SlotDataResponse()
@@ -223,8 +223,8 @@ class TaskDetailsFragment :
         tvLabelTakeAction = bottomSheet.findViewById(R.id.tvLabelTakeAction)
         sheetBehavior = BottomSheetBehavior.from(bottomSheet!!)
         sheetBehavior.isHideable = false
-        sheetBehavior.isFitToContents = true
-        sheetBehavior.setPeekHeight(com.rf.taskmodule.utils.CommonUtils.dpToPixel(activity, 80), true)
+        sheetBehavior.isFitToContents = false
+        sheetBehavior.setPeekHeight(CommonUtils.dpToPixel(activity, 80), true)
         sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         getTaskData()
         expandCollapse()
@@ -269,16 +269,16 @@ class TaskDetailsFragment :
             if (requireArguments().getString(Extra.EXTRA_CATEGORY_ID) != null) {
                 categoryId = requireArguments().getString(Extra.EXTRA_CATEGORY_ID)
             }
-            com.rf.taskmodule.utils.Log.d("categoryId", categoryId)
+            Log.d("categoryId", categoryId)
             showLoading()
-            api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
+            api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
             if (api != null && ::mNewTaskViewModel.isInitialized)
                 mNewTaskViewModel.getTaskById(httpManager, AcceptRejectRequest(taskId!!), api)
 
 
             if (categoryId != null) {
                 val startLocationLabel =
-                    com.rf.taskmodule.utils.CommonUtils.getAllowFieldLabelName(
+                    CommonUtils.getAllowFieldLabelName(
                         "START_LOCATION",
                         categoryId,
                         preferencesHelper
@@ -289,11 +289,11 @@ class TaskDetailsFragment :
                         labelStartLocation.text = startLocationLabel
                 }
                 val taskId =
-                    com.rf.taskmodule.utils.CommonUtils.getAllowFieldLabelName("TASK_ID", categoryId, preferencesHelper)
+                    CommonUtils.getAllowFieldLabelName("TASK_ID", categoryId, preferencesHelper)
                 if (!taskId.isEmpty()) {
                     // label_id.setText(taskId)
                 }
-                val reffenceId = com.rf.taskmodule.utils.CommonUtils.getAllowFieldLabelName(
+                val reffenceId = CommonUtils.getAllowFieldLabelName(
                     "REFERENCE_ID",
                     categoryId,
                     preferencesHelper
@@ -301,7 +301,7 @@ class TaskDetailsFragment :
                 if (!reffenceId.isEmpty()) {
                     tvLabelRefferenceId.text = reffenceId
                 }
-                val pocLabel = com.rf.taskmodule.utils.CommonUtils.getAllowFieldLabelName(
+                val pocLabel = CommonUtils.getAllowFieldLabelName(
                     "POINT_OF_CONTACT",
                     categoryId,
                     preferencesHelper
@@ -310,12 +310,12 @@ class TaskDetailsFragment :
                     tvLabelPoc.text = pocLabel
                 }
                 val descLabel =
-                    com.rf.taskmodule.utils.CommonUtils.getAllowFieldLabelName("DESCRIPTION", categoryId, preferencesHelper)
+                    CommonUtils.getAllowFieldLabelName("DESCRIPTION", categoryId, preferencesHelper)
                 if (!descLabel.isEmpty()) {
                     tvLabelDesc.text = descLabel
                 }
 
-                val endLocationName = com.rf.taskmodule.utils.CommonUtils.getAllowFieldLabelName(
+                val endLocationName = CommonUtils.getAllowFieldLabelName(
                     "END_LOCATION",
                     categoryId,
                     preferencesHelper
@@ -324,22 +324,22 @@ class TaskDetailsFragment :
                     labelEndLocation.text = endLocationName
                 }
                 val startTime =
-                    com.rf.taskmodule.utils.CommonUtils.getAllowFieldLabelName("START_TIME", categoryId, preferencesHelper)
+                    CommonUtils.getAllowFieldLabelName("START_TIME", categoryId, preferencesHelper)
                 if (!startTime.isEmpty()) {
                     labelScheduledAt.text = startTime
                 }
                 val endTime =
-                    com.rf.taskmodule.utils.CommonUtils.getAllowFieldLabelName("END_TIME", categoryId, preferencesHelper)
+                    CommonUtils.getAllowFieldLabelName("END_TIME", categoryId, preferencesHelper)
                 if (!endTime.isEmpty()) {
                     labelEndAt.text = endTime
                 }
                 val assigneeLabel =
-                    com.rf.taskmodule.utils.CommonUtils.getAssigneeLabel(categoryId, preferencesHelper)
+                    CommonUtils.getAssigneeLabel(categoryId, preferencesHelper)
                 if (!assigneeLabel.isEmpty()) {
                     tvClientsDetails.text = assigneeLabel
                 }
                 val buddyLabel =
-                    com.rf.taskmodule.utils.CommonUtils.getBuddyLabel(categoryId, preferencesHelper)
+                    CommonUtils.getBuddyLabel(categoryId, preferencesHelper)
                 if (!buddyLabel.isEmpty()) {
                     tvAssignedTolable.text = buddyLabel
                 }
@@ -365,131 +365,182 @@ class TaskDetailsFragment :
     fun setMargin(dp: Int) {
         var layoutParams: RelativeLayout.LayoutParams =
             nestedScrollView.layoutParams as (RelativeLayout.LayoutParams)
-        layoutParams.setMargins(0, 0, 0, com.rf.taskmodule.utils.CommonUtils.dpToPixel(activity, dp))
+        layoutParams.setMargins(0, 0, 0, CommonUtils.dpToPixel(activity, dp))
         nestedScrollView.layoutParams = layoutParams;
     }
 
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
 
         try {
 
 
-            if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, baseActivity)) {
+            if (CommonUtils.handleResponse(callback, error, result, baseActivity)) {
 
                 taskResponse = Gson().fromJson("$result", TaskResponse::class.java)
                 if (taskResponse != null) {
 
-                    task = taskResponse!!.taskDetail
-                    if (categoryId.isNullOrEmpty())
-                        categoryId = task?.categoryId
-                    val itemViewModel =
-                        com.rf.taskmodule.ui.tasklisting.assignedtome.TaskAssignToMeViewModel(
+                    if (refCall == false) {
+
+                        task = taskResponse!!.taskDetail
+                        if (categoryId.isNullOrEmpty())
+                            categoryId = task?.categoryId
+                        val itemViewModel =
+                            TaskAssignToMeViewModel(
+                                task,
+                                this, baseActivity, preferencesHelper, categoryId
+                            )
+                        mActivityNewTaskDetailBinding.data = itemViewModel
+                        llMain.visibility = View.VISIBLE
+                        hideLoading()
+                        var isShow = CommonUtils.handleCallToActionsNew(
+                            baseActivity,
                             task,
-                            this, baseActivity, preferencesHelper, categoryId
+                            recyclerCtaButton,
+                            this
                         )
-                    mActivityNewTaskDetailBinding.data = itemViewModel
-                    llMain.visibility = View.VISIBLE
-                    hideLoading()
-                    var isShow = com.rf.taskmodule.utils.CommonUtils.handleCallToActionsNew(
-                        baseActivity,
-                        task,
-                        recyclerCtaButton,
-                        this
-                    )
-                    if (isShow) {
-                        tvLabelTakeAction!!.visibility = View.VISIBLE
-                        setMargin(50)
+                        if (isShow) {
+                            tvLabelTakeAction!!.visibility = View.VISIBLE
+                            setMargin(50)
 
-                    } else {
-                        tvLabelTakeAction!!.visibility = View.GONE
-                        setMargin(0)
-                    }
-                    if (task!!.clientTaskId != null && task!!.clientTaskId!!.isNotEmpty()) {
-                        tvTaskId.text = task!!.clientTaskId!!
-                    }
-                    perFormTimerReminder(task)
-                    perFormLocationReminder(task)
-                    if (task!!.trackingState != null) {
-                        handleTracking(task!!.trackingState!!, task!!.taskId!!)
-                    }
-
-
-                    if (task!!.orderDetails != null && task!!.orderDetails!!.isNotEmpty()) {
-                        cardOrders.visibility = View.VISIBLE
-                        val adapter = OrderListAdapter(task!!.orderDetails)
-                        rvOrderList.adapter = adapter
-                        adapter.onItemClick = { item ->
-                            val intent = SkuInfoPreviewActivity.newIntent(requireActivity())
-                            intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-                            intent.putExtra(Extra.EXTRA_PRODUCT_ID, item.productId.toString())
-                            intent.putExtra(
-                                Extra.EXTRA_PRODUCT_NAME,
-                                item.productName.toString()
-                            )
-                            startActivityForResult(
-                                intent,
-                                com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_TAG_INVENTORY
-                            )
+                        } else {
+                            tvLabelTakeAction!!.visibility = View.GONE
+                            setMargin(0)
                         }
-                    } else if (task!!.products != null && task!!.products!!.isNotEmpty()) {
-                        cardOrders.visibility = View.VISIBLE
-                        tvInventoriesLabel.text = getString(R.string.inventory_label)
-                        val adapter = ProductOrderAdapter(task!!.products)
-                        rvOrderList.adapter = adapter
-                    } else {
-                        cardOrders.visibility = View.GONE
-                    }
-                    ivPinStartLocation.setOnClickListener {
-
-                        if (task!!.source != null && task!!.source!!.location != null) {
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage(
-                                "e",
-                                "source point map",
-                                "source start points map"
-                            )
-                            val geoCoordinates = task!!.source!!.location
-                            com.rf.taskmodule.utils.CommonUtils.openGoogleMapWithOneLocation(
-                                context,
-                                geoCoordinates!!.latitude,
-                                geoCoordinates.longitude
-                            )
+                        if (task!!.clientTaskId != null && task!!.clientTaskId!!.isNotEmpty()) {
+                            tvTaskId.text = task!!.clientTaskId!!
+                        }
+                        perFormTimerReminder(task)
+                        perFormLocationReminder(task)
+                        if (task!!.trackingState != null) {
+                            handleTracking(task!!.trackingState!!, task!!.taskId!!)
                         }
 
-                    }
-
-                    com.rf.taskmodule.utils.Log.e("code", "check => ${task!!.encCodeUrl}")
-                    if (task!!.encCodeUrl != null) {
-                        qrUrl = task!!.encCodeUrl.toString()
-                        GlideApp.with(baseActivity).load(qrUrl)
-                            .into(mActivityNewTaskDetailBinding.ivQrCode)
-                    } else {
-
-                        mActivityNewTaskDetailBinding.llQrCode.visibility = View.GONE
-                    }
-                    ivPinEndLocation.setOnClickListener {
-
-                        if (task!!.destination != null && task!!.destination!!.location != null) {
-                            com.rf.taskmodule.utils.CommonUtils.showLogMessage(
-                                "e",
-                                "destination point map",
-                                "source start points map"
-                            )
-                            val geoCoordinates = task!!.destination!!.location
-                            com.rf.taskmodule.utils.CommonUtils.openGoogleMapWithOneLocation(
-                                context,
-                                geoCoordinates!!.latitude,
-                                geoCoordinates.longitude
-                            )
+                        if (task!!.multiReferedTask != null) {
+                            if (task!!.multiReferedTask!!.size > 0) {
+                                if (task!!.multiReferedTask!![0] != "") {
+                                    mActivityNewTaskDetailBinding.rlReference.visibility =
+                                        View.VISIBLE
+                                    //getDataHere
+                                    refCall = true
+                                    api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
+                                    mNewTaskViewModel.getTaskById(
+                                        httpManager,
+                                        AcceptRejectRequest(task!!.multiReferedTask!![0].toString()),
+                                        api
+                                    )
+                                } else {
+                                    mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
+                                }
+                            } else {
+                                mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
+                            }
+                        } else {
+                            mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
                         }
 
-                    }
+                        if (task!!.orderDetails != null && task!!.orderDetails!!.isNotEmpty()) {
+                            cardOrders.visibility = View.VISIBLE
+                            val adapter = OrderListAdapter(task!!.orderDetails)
+                            rvOrderList.adapter = adapter
+                            adapter.onItemClick = { item ->
+                                val intent = SkuInfoPreviewActivity.newIntent(requireActivity())
+                                intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+                                intent.putExtra(Extra.EXTRA_PRODUCT_ID, item.productId.toString())
+                                intent.putExtra(
+                                    Extra.EXTRA_PRODUCT_NAME,
+                                    item.productName.toString()
+                                )
+                                startActivityForResult(
+                                    intent,
+                                    AppConstants.REQUEST_CODE_TAG_INVENTORY
+                                )
+                            }
+                        } else if (task!!.products != null && task!!.products!!.isNotEmpty()) {
+                            cardOrders.visibility = View.VISIBLE
+                            tvInventoriesLabel.text = getString(R.string.inventory_label)
+                            val adapter = ProductOrderAdapter(task!!.products)
+                            rvOrderList.adapter = adapter
+                        } else {
+                            cardOrders.visibility = View.GONE
+                        }
+                        ivPinStartLocation.setOnClickListener {
 
-                    if (task!!.trackable) {
-                        ivCurrentStageLocation.visibility = View.VISIBLE
+                            if (task!!.source != null && task!!.source!!.location != null) {
+                                CommonUtils.showLogMessage(
+                                    "e",
+                                    "source point map",
+                                    "source start points map"
+                                )
+                                val geoCoordinates = task!!.source!!.location
+                                CommonUtils.openGoogleMapWithOneLocation(
+                                    context,
+                                    geoCoordinates!!.latitude,
+                                    geoCoordinates.longitude
+                                )
+                            }
+
+                        }
+
+                        Log.e("code", "check => ${task!!.encCodeUrl}")
+                        if (task!!.encCodeUrl != null) {
+                            qrUrl = task!!.encCodeUrl.toString()
+                            GlideApp.with(baseActivity).load(qrUrl)
+                                .into(mActivityNewTaskDetailBinding.ivQrCode)
+                        } else {
+
+                            mActivityNewTaskDetailBinding.llQrCode.visibility = View.GONE
+                        }
+                        ivPinEndLocation.setOnClickListener {
+
+                            if (task!!.destination != null && task!!.destination!!.location != null) {
+                                CommonUtils.showLogMessage(
+                                    "e",
+                                    "destination point map",
+                                    "source start points map"
+                                )
+                                val geoCoordinates = task!!.destination!!.location
+                                CommonUtils.openGoogleMapWithOneLocation(
+                                    context,
+                                    geoCoordinates!!.latitude,
+                                    geoCoordinates.longitude
+                                )
+                            }
+
+                        }
+
+                        if (task!!.trackable) {
+                            ivCurrentStageLocation.visibility = View.VISIBLE
 //                        ivCurrentStageLocation.visibility = View.GONE
-                        ivCurrentStageLocation.setOnClickListener {
-                            if (FROM.equals(com.rf.taskmodule.utils.AppConstants.Extra.ASSIGNED_TO_ME)) {
+                            ivCurrentStageLocation.setOnClickListener {
+                                if (FROM.equals(AppConstants.Extra.ASSIGNED_TO_ME)) {
+                                    startActivity(
+                                        TaskDetailActivity.Companion.newIntent(baseActivity)
+                                            .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+                                    );
+                                } else {
+                                    if (preferencesHelper.userDetail != null && preferencesHelper.userDetail.userId != null && !preferencesHelper.userDetail!!.userId!!.isEmpty()) {
+                                        val navigation = Navigation()
+                                        val actionConfig = ActionConfig()
+                                        val userId = preferencesHelper.userDetail.userId
+                                        actionConfig.actionUrl =
+                                            task!!.trackingUrl + "&userId=" + userId
+                                        // actionConfig.actionUrl = task!!.trackingUrl
+                                        navigation.actionConfig = actionConfig
+                                        navigation.title = "Tracking Details"
+                                        startActivity(
+                                            WebViewActivity.newIntent(baseActivity)
+                                                .putExtra(
+                                                    AppConstants.Extra.EXTRA_WEB_INFO,
+                                                    navigation
+                                                )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        rlAssignedToTrack.setOnClickListener(View.OnClickListener {
+                            if (FROM.equals(AppConstants.Extra.ASSIGNED_TO_ME)) {
                                 startActivity(
                                     TaskDetailActivity.Companion.newIntent(baseActivity)
                                         .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
@@ -506,66 +557,77 @@ class TaskDetailsFragment :
                                     navigation.title = "Tracking Details"
                                     startActivity(
                                         WebViewActivity.newIntent(baseActivity)
-                                            .putExtra(
-                                                com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_WEB_INFO,
-                                                navigation
-                                            )
+                                            .putExtra(AppConstants.Extra.EXTRA_WEB_INFO, navigation)
                                     )
                                 }
                             }
-                        }
-                    }
-                    rlAssignedToTrack.setOnClickListener(View.OnClickListener {
-                        if (FROM.equals(com.rf.taskmodule.utils.AppConstants.Extra.ASSIGNED_TO_ME)) {
-                            startActivity(
-                                TaskDetailActivity.Companion.newIntent(baseActivity)
-                                    .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-                            );
-                        } else {
-                            if (preferencesHelper.userDetail != null && preferencesHelper.userDetail.userId != null && !preferencesHelper.userDetail!!.userId!!.isEmpty()) {
-                                val navigation = Navigation()
-                                val actionConfig = ActionConfig()
-                                val userId = preferencesHelper.userDetail.userId
-                                actionConfig.actionUrl =
-                                    task!!.trackingUrl + "&userId=" + userId
-                                // actionConfig.actionUrl = task!!.trackingUrl
-                                navigation.actionConfig = actionConfig
-                                navigation.title = "Tracking Details"
-                                startActivity(
-                                    WebViewActivity.newIntent(baseActivity)
-                                        .putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_WEB_INFO, navigation)
+                        })
+
+                        if (task!!.stageHistory != null && task!!.stageHistory!!.isNotEmpty()) {
+                            val list = ArrayList(task!!.stageHistory!!)
+                                .sortedWith(compareByDescending<StageHistoryData> { it.timeStamp }
                                 )
-                            }
-                        }
-                    })
+                            val history = list[list.size - 1]
 
-                    if (task!!.stageHistory != null && task!!.stageHistory!!.isNotEmpty()) {
-                        val list = ArrayList(task!!.stageHistory!!)
-                            .sortedWith(compareByDescending<StageHistoryData> { it.timeStamp }
-                            )
-                        val history = list[list.size - 1]
+                            if (history != null) {
+                                if (history.dfdId != null) {
+                                    formId = history.dfdId
+                                    if (formId != null && formId!!.isNotEmpty()) {
+                                        var data = GetTaskDataRequest()
+                                        data.dfdId = history.dfdId
+                                        dynamicFormsNew = CommonUtils.getFormByFormId(formId!!)
+                                        if (dynamicFormsNew != null && dynamicFormsNew!!.version != null) {
+                                            data.dfVersion =
+                                                Integer.valueOf(dynamicFormsNew!!.version!!)
+                                        }
+                                        data.taskId = taskId
+                                        mNewTaskViewModel.getTaskData(httpManager, data)
 
-                        if (history != null) {
-                            if (history.dfdId != null) {
-                                formId = history.dfdId
-                                if (formId != null && formId!!.isNotEmpty()) {
-                                    var data = GetTaskDataRequest()
-                                    data.dfdId = history.dfdId
-                                    dynamicFormsNew = com.rf.taskmodule.utils.CommonUtils.getFormByFormId(formId!!)
-                                    if (dynamicFormsNew != null && dynamicFormsNew!!.version != null) {
-                                        data.dfVersion =
-                                            Integer.valueOf(dynamicFormsNew!!.version!!)
                                     }
-                                    data.taskId = taskId
-                                    mNewTaskViewModel.getTaskData(httpManager, data)
-
                                 }
                             }
+
+                            timeLineAdapter.addData(list)
                         }
 
-                        timeLineAdapter.addData(list)
-                    }
+                    } else {
 
+                        if (taskResponse!!.taskDetail != null) {
+                            mActivityNewTaskDetailBinding.rlReference.visibility = View.VISIBLE
+                            taskRef = taskResponse!!.taskDetail
+
+                            mActivityNewTaskDetailBinding.rlReference.setOnClickListener {
+                                val intent =
+                                    Intent(requireContext(), NewTaskDetailsActivity::class.java)
+                                intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskRef!!.taskId)
+                                intent.putExtra(
+                                    AppConstants.Extra.EXTRA_ALLOW_SUB_TASK,
+                                    taskRef!!.allowSubTask
+                                )
+                                intent.putExtra(
+                                    AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID,
+                                    taskRef!!.subCategoryIds
+                                )
+                                intent.putExtra(
+                                    AppConstants.Extra.EXTRA_PARENT_REF_ID,
+                                    taskRef!!.referenceId
+                                )
+                                intent.putExtra(
+                                    AppConstants.Extra.EXTRA_CATEGORY_ID,
+                                    taskRef!!.categoryId
+                                )
+                                intent.putExtra(
+                                    AppConstants.Extra.FROM,
+                                    AppConstants.Extra.ASSIGNED_TO_ME
+                                )
+                                startActivity(intent)
+                            }
+                        }
+                        else {
+                            mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
+                        }
+                        refCall = false
+                    }
 
                 }
 
@@ -575,12 +637,12 @@ class TaskDetailsFragment :
 
         } catch (e: Exception) {
             e.printStackTrace()
-            com.rf.taskmodule.utils.Log.e(TaskDetailActivity.TAG, "Exception Inside handleResponse(): $e")
+            Log.e(TaskDetailActivity.TAG, "Exception Inside handleResponse(): $e")
         }
     }
 
-    override fun handleSlotResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
-        com.rf.taskmodule.utils.Log.e("mode", "here1")
+    override fun handleSlotResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        Log.e("mode", "here1")
         val request = ExecuteUpdateRequest(
             taskId!!, ctaID!!,
             DateTimeUtil.getCurrentDateInMillis(), null, verificationId
@@ -590,25 +652,22 @@ class TaskDetailsFragment :
         switchCtaMode(ctaMode)
     }
 
-    override fun handleGetTaskDataResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleGetTaskDataResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
 
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, context)) {
+        if (CommonUtils.handleResponse(callback, error, result, context)) {
             val getTaskDataResponse = Gson().fromJson<GetTaskDataResponse>(
                 result.toString(),
                 GetTaskDataResponse::class.java
             )
-            var data: List<com.rf.taskmodule.data.model.response.config.TaskData>? = null
+            var data: List<TaskData>? = null
             if (getTaskDataResponse != null && getTaskDataResponse.successful) {
 
                 if (getTaskDataResponse.data != null) {
                     data = getTaskDataResponse.data!!
                     getTaskDataResponse.data!!.let {
-                        var list1 = ArrayList<com.rf.taskmodule.data.model.response.config.TaskData>()
-                        list1.addAll(it as ArrayList<com.rf.taskmodule.data.model.response.config.TaskData>)
-
-
-
+                        var list1 = ArrayList<TaskData>()
+                        list1.addAll(it as ArrayList<TaskData>)
                         showDynamicFormDataAdapter.addData(list1)
 
                     }
@@ -621,7 +680,7 @@ class TaskDetailsFragment :
         }
     }
 
-    override fun handlePaymentUrlResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handlePaymentUrlResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
 
 
@@ -629,7 +688,7 @@ class TaskDetailsFragment :
             result.toString(),
             BaseResponse::class.java
         )
-        com.rf.taskmodule.utils.Log.e("response", "$response")
+        Log.e("response", "$response")
         if (response.successful) {
             if (response.paymentUrl != null) {
                 paymentUrl = response.paymentUrl!!
@@ -647,11 +706,11 @@ class TaskDetailsFragment :
     }
 
     override fun handleVerifyCtaOtpResponse(
-        apiCallback: com.rf.taskmodule.data.network.ApiCallback,
+        apiCallback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(apiCallback, error, result, baseActivity)) {
+        if (CommonUtils.handleResponse(apiCallback, error, result, baseActivity)) {
             if (result != null) {
                 val response = Gson().fromJson("$result", BaseResponse::class.java)
                 if (response.responseCode == "450") {
@@ -680,7 +739,7 @@ class TaskDetailsFragment :
 
                     val listNew = preferencesHelper.verifiedCtas
                     var check = "${callToActions?.id.toString()}$taskId"
-                    com.rf.taskmodule.utils.Log.e("CTAid1", "$check")
+                    Log.e("CTAid1", "$check")
                     listNew.add(check)
                     preferencesHelper.verifiedCtas = listNew
                     switchCtaMode(ctaMode)
@@ -691,11 +750,11 @@ class TaskDetailsFragment :
     }
 
     override fun handleSendCtaOtpResponse(
-        apiCallback: com.rf.taskmodule.data.network.ApiCallback,
+        apiCallback: ApiCallback,
         result: Any?,
         error: APIError?
     ) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(apiCallback, error, result, baseActivity)) {
+        if (CommonUtils.handleResponse(apiCallback, error, result, baseActivity)) {
             if (result != null) {
                 val response = Gson().fromJson("$result", BaseResponse::class.java)
                 TrackiToast.Message.showShort(requireActivity(), response.responseMsg)
@@ -711,12 +770,12 @@ class TaskDetailsFragment :
         }
     }
 
-    override fun getSlotDataResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun getSlotDataResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         val slotDataResponse1 =
             Gson().fromJson(result.toString(), SlotDataResponse::class.java)
         val slotAdapter = SlotAdapter(requireContext())
         rvDate.adapter = slotAdapter
-        com.rf.taskmodule.utils.Log.e("SlotsCheck", "$slotDataResponse1")
+        Log.e("SlotsCheck", "$slotDataResponse1")
         if (slotDataResponse1.successful) {
             llSlots.visibility = View.VISIBLE
             ivNoData.visibility = View.GONE
@@ -752,41 +811,26 @@ class TaskDetailsFragment :
     private fun setSlots() {
         if (slotDataResponse.data!!.keys.isNotEmpty()) {
             val size = slotDataResponse.data!!.size
-            if (size > timePosition) {
-                val key = slotDataResponse.data!!.keys.elementAt(timePosition)
+            if (size > dayPosition) {
+                val key = slotDataResponse.data!!.keys.elementAt(dayPosition)
                 dateFinal = key
-                val timeSlots = slotDataResponse.data!!.get(key)
+                val timeSlots = slotDataResponse.data!![key]
 
-                com.rf.taskmodule.utils.Log.e("SlotsCheck", "$timeSlots")
-                var slots: ArrayList<Slot> = ArrayList()
+                if (timeSlots?.slots != null && timeSlots?.slots!!.isNotEmpty()) {
+                    rvSlot.visibility = View.VISIBLE
+                    slotImg.visibility = View.GONE
+                    val slots = timeSlots.slots as java.util.ArrayList<Slot>
 
-                if (timeSlots?.totalAvailableSlots != null) {
-                    if (timeSlots.slots != null) {
-                        if (timeSlots.slots.isNotEmpty()) {
-                            rvSlot.visibility = View.VISIBLE
-                            slotImg.visibility = View.GONE
-                            slots = timeSlots.slots as ArrayList<Slot>
-                        }
-                        else{
-                            rvSlot.visibility = View.GONE
-                            slotImg.visibility = View.VISIBLE
-                        }
+                    val slotChildAdapter = SlotChildAdapter(slots, requireContext())
+                    rvSlot.adapter = slotChildAdapter
+                    Log.e("slotCheck", "$key and Pos = $dayPosition")
+                    slotChildAdapter.onItemClick = { timeString ->
+                        selectTimeCall(timeString)
                     }
-                    else{
-                        rvSlot.visibility = View.GONE
-                        slotImg.visibility = View.VISIBLE
-                    }
-                }
-                else{
+                } else {
                     rvSlot.visibility = View.GONE
                     slotImg.visibility = View.VISIBLE
                 }
-                val slotChildAdapter = SlotChildAdapter(slots, requireContext())
-                rvSlot.adapter = slotChildAdapter
-                slotChildAdapter.onItemClick = { timeString ->
-                    selectTimeCall(timeString)
-                }
-
             }
         }
     }
@@ -796,20 +840,20 @@ class TaskDetailsFragment :
     }
 
     private fun selectDayCall(position: Int) {
-        timePosition = position
+        dayPosition = position
         setSlots()
     }
-    //done te to proceed
-    // image when no slots
-    // cta title title
+//done te to proceed
+// image when no slots
+// cta title title
 
-    override fun handleMyPlaceResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, requireContext())) {
+    override fun handleMyPlaceResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, requireContext())) {
 
             val response: LocationListResponse =
                 Gson().fromJson(result.toString(), LocationListResponse::class.java)
             if (response.successful!!) {
-                com.rf.taskmodule.utils.Log.e("appLog1", "" + response.hubs)
+                Log.e("appLog1", "" + response.hubs)
                 if (response.hubs != null && !response.hubs!!.isEmpty()) {
                     preferencesHelper.saveUserHubList(response.hubs)
                     dialogSlot = Dialog(requireContext())
@@ -861,10 +905,11 @@ class TaskDetailsFragment :
                         if (dateFinal != "" && timeFinal != "") {
                             dialogSlot.dismiss()
                             //etSlot.setText("$dateFinal $timeFinal")
-                            hub = hubs.find { it.hubId == hubIdFinal }!!
-                            val bookSlotRequest = BookSlotRequest(ctaID, dateFinal, timeFinal, taskId)
+//                            hub = hubs.find { it.hubId == hubIdFinal }!!
+                            val bookSlotRequest =
+                                BookSlotRequest(ctaID, dateFinal, timeFinal, taskId)
                             resp = "slot"
-                            com.rf.taskmodule.utils.Log.e("mode", "booking")
+                            Log.e("mode", "booking")
                             viewModel.bookSlots(httpManager, bookSlotRequest)
                         } else {
                             TrackiToast.Message.showShort(
@@ -955,7 +1000,7 @@ class TaskDetailsFragment :
                             desc = task.description!!
                         if (task.source != null && task.source!!.address != null)
                             place = task.source!!.address!!
-                        com.rf.taskmodule.utils.CommonUtils.addAppointmentsToCalender(
+                        CommonUtils.addAppointmentsToCalender(
                             baseActivity, titile, desc, place, 1, startDate, needReminder,
                             needMainSerVice, taskId, preferencesHelper
                         )
@@ -975,7 +1020,7 @@ class TaskDetailsFragment :
                             desc = task.description!!
                         if (task.destination != null && task.destination!!.address != null)
                             place = task.destination!!.address!!
-                        com.rf.taskmodule.utils.CommonUtils.addAppointmentsToCalender(
+                        CommonUtils.addAppointmentsToCalender(
                             baseActivity, titile, desc, place, 1, startDate, needReminder,
                             needMainSerVice, taskId, preferencesHelper
                         )
@@ -997,7 +1042,7 @@ class TaskDetailsFragment :
                         desc = task.description!!
                     if (task.source != null && task.source!!.address != null)
                         place = task.source!!.address!!
-                    com.rf.taskmodule.utils.CommonUtils.addAppointmentsToCalender(
+                    CommonUtils.addAppointmentsToCalender(
                         baseActivity, titile, desc, place, 1, startDate, needReminder,
                         needMainSerVice, taskId, preferencesHelper
                     )
@@ -1015,7 +1060,7 @@ class TaskDetailsFragment :
                         desc = task.description!!
                     if (task.destination != null && task.destination!!.address != null)
                         place = task.destination!!.address!!
-                    com.rf.taskmodule.utils.CommonUtils.addAppointmentsToCalender(
+                    CommonUtils.addAppointmentsToCalender(
                         baseActivity, titile, desc, place, 1, startDate, needReminder,
                         needMainSerVice, taskId, preferencesHelper
                     )
@@ -1087,7 +1132,7 @@ class TaskDetailsFragment :
             }
             if (sLat != 0.0 && sLng != 0.0 && dLat != 0.0 && dLng != 0.0) {
                 //open google map activity
-                com.rf.taskmodule.utils.CommonUtils.openGoogleMap(baseActivity, sLat, sLng, dLat, dLng)
+                CommonUtils.openGoogleMap(baseActivity, sLat, sLng, dLat, dLng)
             }
         } else {
             TrackiToast.Message.showShort(baseActivity, "No location found. Try Again")
@@ -1101,7 +1146,7 @@ class TaskDetailsFragment :
 
     override fun onCallClick(mobile: String?) {
         if (mobile != null) {
-            com.rf.taskmodule.utils.CommonUtils.openDialer(baseActivity, mobile)
+            CommonUtils.openDialer(baseActivity, mobile)
         }
     }
 
@@ -1133,7 +1178,7 @@ class TaskDetailsFragment :
         var ctaInventoryConfig = CtaInventoryConfig()
         try {
             var jsonConverter =
-                com.rf.taskmodule.utils.JSONConverter<CtaInventoryConfig>()
+                JSONConverter<CtaInventoryConfig>()
             ctaInventoryConfig = jsonConverter.jsonToObject(this, CtaInventoryConfig::class.java)
         } catch (e: JsonParseException) {
             return ctaInventoryConfig
@@ -1177,7 +1222,7 @@ class TaskDetailsFragment :
     }
 
     private fun perFormCtaAction() {
-        com.rf.taskmodule.utils.Log.e("checkLog", "${callToActions!!.targetInfo!!.target}")
+        Log.e("checkLog", "${callToActions!!.targetInfo!!.target}")
 
         if (callToActions!!.targetInfo!!.target == TRAGETINFO.PAYMENT) {
             checkCtaActivation(callToActions!!.enableOtp!!, callToActions!!, "payment")
@@ -1207,7 +1252,7 @@ class TaskDetailsFragment :
                     }
                 } catch (e: java.lang.Exception) {
                     hideLoading()
-                    com.rf.taskmodule.utils.Log.e(TAG, "onExecuteUpdates: ${e}")
+                    Log.e(TAG, "onExecuteUpdates: ${e}")
                     e.printStackTrace()
                 }
             } else {
@@ -1246,7 +1291,7 @@ class TaskDetailsFragment :
                                     }
                                 } catch (e: java.lang.Exception) {
                                     hideLoading()
-                                    com.rf.taskmodule.utils.Log.e(TAG, "onExecuteUpdates: ${e}")
+                                    Log.e(TAG, "onExecuteUpdates: ${e}")
                                     e.printStackTrace()
                                 }
                             }
@@ -1263,12 +1308,12 @@ class TaskDetailsFragment :
         callToActions: CallToActions,
         mode: String
     ): Int {
-        com.rf.taskmodule.utils.Log.e("modeRe", "$mode")
+        Log.e("modeRe", "$mode")
         offside = 1
         ctaMode = mode
         var check = "${callToActions?.id}${taskId}"
         ctaID = callToActions?.id
-        com.rf.taskmodule.utils.Log.e("CTAid", "$check")
+        Log.e("CTAid", "$check")
         var ctaCheck = false
         for (item in preferencesHelper.verifiedCtas) {
             if (item == check) {
@@ -1281,17 +1326,17 @@ class TaskDetailsFragment :
 
         if (ctaCheck == false) {
             ctaActivate = true
-            com.rf.taskmodule.utils.Log.e("CTAid", "verified A")
+            Log.e("CTAid", "verified A")
             switchCtaMode(ctaMode)
 
         } else {
             if (checkFlag == false) {
-                com.rf.taskmodule.utils.Log.e("CTAid", "Not Verified")
+                Log.e("CTAid", "Not Verified")
                 ctaActivate = true
                 switchCtaMode(mode)
                 return 2
             } else {
-                com.rf.taskmodule.utils.Log.e("CTAid", "Verified B")
+                Log.e("CTAid", "Verified B")
                 ctaMode = mode
                 val sendCtaOtpRequest = SendCtaOtpRequest(callToActions.id.toString(), taskId)
                 mNewTaskViewModel.sendCtaOtp(httpManager, sendCtaOtpRequest)
@@ -1302,7 +1347,7 @@ class TaskDetailsFragment :
     }
 
     private fun switchCtaMode(mode: String) {
-        com.rf.taskmodule.utils.Log.e("modeCheck", mode)
+        Log.e("modeCheck", mode)
         when (mode) {
             "Ext" -> {
                 mNewTaskViewModel.executeUpdates(httpManager, ecRequest, api!!)
@@ -1317,17 +1362,16 @@ class TaskDetailsFragment :
                     DateTimeUtil.getCurrentDateInMillis(), null, verificationId
                 )
                 ecRequest = request
-                com.rf.taskmodule.utils.Log.e("assignExec", "${callToActions?.targetInfo?.targetValues} - Values")
-
-                val jsonConverter: com.rf.taskmodule.utils.JSONConverter<SyncInfo> =
-                    com.rf.taskmodule.utils.JSONConverter()
-                val response: SyncInfo = jsonConverter.jsonToObject(
-                    "${callToActions!!.targetInfo!!.targetInfo}",
-                    SyncInfo::class.java
-                ) as SyncInfo
-
-                com.rf.taskmodule.utils.Log.e("assignExec", "check = ${response.syncInfo.toString()}")
-                if (callToActions?.targetInfo?.targetValues != null && response.syncInfo == true) {
+                Log.e("assignExec", "${callToActions?.targetInfo?.targetValues} - Values")
+                Log.e("assignExec", "check = ${callToActions!!.targetInfo!!.targetInfo}")
+//                val jsonConverter: JSONConverter<SyncInfo> = JSONConverter()
+//                val response: SyncInfo = jsonConverter.jsonToObject(
+//                    "${callToActions!!.targetInfo!!.targetInfo}",
+//                    SyncInfo::class.java
+//                ) as SyncInfo
+//
+//                Log.e("assignExec", "check = ${response.syncInfo.toString()}")
+                if (callToActions?.targetInfo?.targetValues != null) {
                     var rIds = ""
                     val intent = Intent(context, UserListNewActivity::class.java)
                     intent.putExtra("taskId", taskId)
@@ -1374,7 +1418,7 @@ class TaskDetailsFragment :
                     intent.putExtra(Extra.EXTRA_PARENT_REF_ID, task?.referenceId)
                     intent.putExtra("vid", verificationId)
                 }
-                startActivityForResult(intent, com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_CREATE_TASK)
+                startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
             }
             "TAG3" -> {
                 val request = ExecuteUpdateRequest(
@@ -1448,7 +1492,7 @@ class TaskDetailsFragment :
                     }
                     startActivityForResult(
                         intent,
-                        com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_TAG_INVENTORY
+                        AppConstants.REQUEST_CODE_TAG_INVENTORY
                     )
                 }
             }
@@ -1464,7 +1508,7 @@ class TaskDetailsFragment :
                     intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
                     startActivityForResult(
                         intent,
-                        com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_UNIT_INFO
+                        AppConstants.REQUEST_CODE_UNIT_INFO
                     )
                 }
             }
@@ -1486,7 +1530,7 @@ class TaskDetailsFragment :
                                 Extra.EXTRA_IS_EDITABLE,
                                 callToActions!!.dynamicFormEditable
                             ),
-                        com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_DYNAMIC_FORM
+                        AppConstants.REQUEST_CODE_DYNAMIC_FORM
                     )
 
                 }
@@ -1513,7 +1557,7 @@ class TaskDetailsFragment :
                 )
                 ecRequest = request
                 if (calculateCondition()) {
-                    foundWidgetItem = com.rf.taskmodule.utils.CommonUtils.getFormByFormIdContainsWidget(
+                    foundWidgetItem = CommonUtils.getFormByFormIdContainsWidget(
                         callToActions!!.dynamicFormId,
                         DataType.SCANNER
                     )
@@ -1583,7 +1627,7 @@ class TaskDetailsFragment :
                     }
                     startActivityForResult(
                         intent,
-                        com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_TAG_INVENTORY
+                        AppConstants.REQUEST_CODE_TAG_INVENTORY
                     )
                 }
             }
@@ -1603,15 +1647,15 @@ class TaskDetailsFragment :
             )
         if (::foundWidgetItem.isInitialized && id != null) {
             dfIntent.apply {
-                putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME, foundWidgetItem.name)
+                putExtra(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME, foundWidgetItem.name)
             }
             dfIntent.apply {
-                putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE, id)
+                putExtra(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE, id)
             }
         }
         startActivityForResult(
             dfIntent,
-            com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_DYNAMIC_FORM
+            AppConstants.REQUEST_CODE_DYNAMIC_FORM
         )
     }
 
@@ -1625,8 +1669,8 @@ class TaskDetailsFragment :
     override fun onExecuteUpdates(id: String?, task: Task?, cta: String?) {
         ctaID = id
         this.task = task
-        com.rf.taskmodule.utils.Log.e("checkID", "$ctaID")
-        com.rf.taskmodule.utils.Log.e(TAG, "onExecuteUpdates: $task")
+        Log.e("checkID", "$ctaID")
+        Log.e(TAG, "onExecuteUpdates: $task")
 
 
         if (task!!.currentStage != null) {
@@ -1681,11 +1725,11 @@ class TaskDetailsFragment :
                 currentLocation = GeoCoordinates()
                 currentLocation!!.latitude = loc.latitude
                 currentLocation!!.longitude = loc.longitude
-                com.rf.taskmodule.utils.Log.e(TAG, "getCurrentLocation(): onSuccess: $currentLocation")
+                Log.e(TAG, "getCurrentLocation(): onSuccess: $currentLocation")
             }
 
             override fun onError(errorResponse: ErrorResponse) {
-                com.rf.taskmodule.utils.Log.e(TAG, "onError: " + errorResponse.errorMessage)
+                Log.e(TAG, "onError: " + errorResponse.errorMessage)
             }
         })
     }
@@ -1704,7 +1748,7 @@ class TaskDetailsFragment :
      * hit the api with cta current time and task id.
      */
     @Throws(java.lang.Exception::class)
-    private fun checkConditionsAndRequestAPI(formData: TaskData?) {
+    private fun checkConditionsAndRequestAPI(formData: com.rf.taskmodule.data.model.request.TaskData?) {
         //perform action on conditions else if conditions are null then hit api with name
         if (callToActions != null) {
             //check for all the conditions and hit API
@@ -1713,18 +1757,18 @@ class TaskDetailsFragment :
                 if (conditionList!!.size > 0) {
                     for (i in conditionList.indices) {
                         val conditionItem = conditionList[i]
-                        com.rf.taskmodule.utils.Log.e(TAG, "checkConditionsAndRequestAPI: $conditionItem")
-                        if (com.rf.taskmodule.utils.AppConstants.GEOFENCE == conditionItem.type) {
+                        Log.e(TAG, "checkConditionsAndRequestAPI: $conditionItem")
+                        if (AppConstants.GEOFENCE == conditionItem.type) {
                             var geoCoordinates: GeoCoordinates? = GeoCoordinates()
                             val locationType =
-                                conditionItem.properties!![com.rf.taskmodule.utils.AppConstants.LOCATION_TYPE]
+                                conditionItem.properties!![AppConstants.LOCATION_TYPE]
                             if (locationType != null) {
-                                if (locationType.equals(com.rf.taskmodule.utils.AppConstants.START, ignoreCase = true) &&
+                                if (locationType.equals(AppConstants.START, ignoreCase = true) &&
                                     task!!.source != null
                                 ) {
                                     geoCoordinates = task!!.source!!.location
                                 } else if (locationType.equals(
-                                        com.rf.taskmodule.utils.AppConstants.END,
+                                        AppConstants.END,
                                         ignoreCase = true
                                     ) &&
                                     task!!.destination != null
@@ -1738,17 +1782,17 @@ class TaskDetailsFragment :
                                 conditionItem.isPassed = false
                                 TrackiToast.Message.showShort(
                                     baseActivity,
-                                    com.rf.taskmodule.utils.AppConstants.MSG_NO_LOCATION
+                                    AppConstants.MSG_NO_LOCATION
                                 )
                                 return
                             }
-                            var radius = conditionItem.properties!![com.rf.taskmodule.utils.AppConstants.RADIUS]
+                            var radius = conditionItem.properties!![AppConstants.RADIUS]
                             if (radius == null) {
                                 radius = "200"
                             }
-                            com.rf.taskmodule.utils.Log.e(TAG, "radius: $radius")
+                            Log.e(TAG, "radius: $radius")
 
-                            if (!com.rf.taskmodule.utils.CommonUtils.isPointOutSideCircle(
+                            if (!CommonUtils.isPointOutSideCircle(
                                     radius.toInt(),
                                     geoCoordinates.latitude, geoCoordinates.longitude,
                                     currentLocation!!.latitude, currentLocation!!.longitude
@@ -1765,22 +1809,22 @@ class TaskDetailsFragment :
                                 return
                             }
                             conditionItem.isPassed = true
-                        } else if (com.rf.taskmodule.utils.AppConstants.TIMED.equals(
+                        } else if (AppConstants.TIMED.equals(
                                 conditionItem.type,
                                 ignoreCase = true
                             )
                         ) {
                             conditionItem.isPassed = false
                             if (conditionItem.properties != null && conditionItem.properties!!.containsKey(
-                                    com.rf.taskmodule.utils.AppConstants.TIME
+                                    AppConstants.TIME
                                 )
                             ) {
                                 val timeInSeconds =
-                                    conditionItem.properties!![com.rf.taskmodule.utils.AppConstants.TIME]!!.toInt()
+                                    conditionItem.properties!![AppConstants.TIME]!!.toInt()
                                 if (System.currentTimeMillis() - task!!.stageUpdatedAt >= timeInSeconds * 1000) {
                                     TrackiToast.Message.showShort(
                                         baseActivity,
-                                        com.rf.taskmodule.utils.AppConstants.MSG_TIME_PASSED
+                                        AppConstants.MSG_TIME_PASSED
                                     )
                                     return
                                 }
@@ -1796,7 +1840,7 @@ class TaskDetailsFragment :
                         break
                     }
                 }
-                com.rf.taskmodule.utils.Log.e(TAG, "isAllPassed: $isAllPassed")
+                Log.e(TAG, "isAllPassed: $isAllPassed")
                 if (isAllPassed) {
 
                     //if(formData!=null)
@@ -1837,7 +1881,7 @@ class TaskDetailsFragment :
     }
 
     fun bookSlot() {
-        com.rf.taskmodule.utils.Log.e("slots", "ctaId - $ctaID and taskid - $taskId")
+        Log.e("slots", "ctaId - $ctaID and taskid - $taskId")
         viewModel.getUserLocations(httpManager)
 
 
@@ -1846,81 +1890,14 @@ class TaskDetailsFragment :
     private fun callSlotApi(ddHubs: Spinner) {
         var list = ArrayList<Hub>()
         var listNames = kotlin.collections.ArrayList<String>()
-        if (preferencesHelper.userHubList != null) {
-            hubs = preferencesHelper.userHubList!!
-            com.rf.taskmodule.utils.Log.e("hubsCo", "1")
-            if (hubs.isNotEmpty() || hubs != null) {
-                if (hubs.size > 1) {
-                    com.rf.taskmodule.utils.Log.e("hubsCo", "${hubs.size}")
-                    for (hub in hubs) {
-                        list.add(hub)
-                        listNames.add(hub.name.toString())
-                    }
-                    ddHubs.visibility = View.GONE
-
-                    val hubAdapter =
-                        ArrayAdapter(
-                            requireContext(),
-                            android.R.layout.simple_spinner_item,
-                            listNames
-                        )
-                    ddHubs.adapter = hubAdapter
-
-                    ddHubs.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        @SuppressLint("NewApi")
-                        override fun onItemSelected(
-                            p0: AdapterView<*>?,
-                            p1: View?,
-                            p2: Int,
-                            p3: Long
-                        ) {
-                            timePosition = p2
-                            hubIdFinal = list[timePosition].hubId.toString()
-                            viewModel.getSlotAvailability(
-                                httpManager,
-                                com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
-                                hubIdFinal,
-                                date,
-                                ctaID,
-                                taskId
-                            )
-                        }
-
-                        override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                        }
-
-                    }
-                } else {
-                    com.rf.taskmodule.utils.Log.e("hubsCo", "${hubs[0].name}")
-                    timePosition = 0
-                    list.add(hubs[0])
-                    listNames.add(hubs[0].name.toString())
-                    hubIdFinal = list[0].hubId.toString()
-                    ddHubs.visibility = View.GONE
-                }
-
-                viewModel.getSlotAvailability(
-                    httpManager,
-                    com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
-                    hubIdFinal,
-                    date,
-                    ctaID,
-                    taskId
-                )
-
-            } else {
-                ddHubs.visibility = View.GONE
-                llSlots.visibility = View.GONE
-                ivNoData.visibility = View.VISIBLE
-                TrackiToast.Message.showShort(requireContext(), "No Hubs Found")
-            }
-        }else{
-            ddHubs.visibility = View.GONE
-            llSlots.visibility = View.GONE
-            ivNoData.visibility = View.VISIBLE
-            TrackiToast.Message.showShort(requireContext(), "No Hubs Found")
-        }
+        viewModel.getSlotAvailability(
+            httpManager,
+            TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
+            hubIdFinal,
+            date,
+            ctaID,
+            taskId
+        )
         ddHubs.visibility = View.GONE
     }
 
@@ -1948,7 +1925,7 @@ class TaskDetailsFragment :
                 //   playSoundStopTracking()
                 if (preferencesHelper.punchStatus) {
                     if (!preferencesHelper.idleTripActive) {
-                        com.rf.taskmodule.utils.Log.e("AssignedFragment", "startIdealTrack=>")
+                        Log.e("AssignedFragment", "startIdealTrack=>")
                         val constraints = Constraints.Builder()
                             .setRequiredNetworkType(NetworkType.CONNECTED)
                             .build()
@@ -1975,10 +1952,13 @@ class TaskDetailsFragment :
      * @param taskId   task id of the user
      * @param formData form data if not null.
      */
-    private fun manageTracking(taskId: String, formData: TaskData?) {
+    private fun manageTracking(
+        taskId: String,
+        formData: com.rf.taskmodule.data.model.request.TaskData?
+    ) {
         //start the tracking if no ongoing task is running
 
-        com.rf.taskmodule.utils.Log.e("CTA", "${callToActions!!.targetInfo!!.target}")
+        Log.e("CTA", "${callToActions!!.targetInfo!!.target}")
         if (callToActions!!.tracking === Tracking.START) {
             if (preferencesHelper.idleTripActive) {
                 TrackThat.stopTracking()
@@ -2009,7 +1989,7 @@ class TaskDetailsFragment :
             playSoundStopTracking()
             if (preferencesHelper.punchStatus) {
                 if (!preferencesHelper.idleTripActive) {
-                    com.rf.taskmodule.utils.Log.e("AssignedFragment", "startIdealTrack=>")
+                    Log.e("AssignedFragment", "startIdealTrack=>")
                     val constraints = Constraints.Builder()
                         .setRequiresCharging(false)
                         .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -2028,7 +2008,7 @@ class TaskDetailsFragment :
             }
         }
         showLoading()
-        val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.EXECUTE_UPDATE]
+        val api = TrackiSdkApplication.getApiMap()[ApiType.EXECUTE_UPDATE]
         val request = ExecuteUpdateRequest(
             taskId, ctaID!!,
             DateTimeUtil.getCurrentDateInMillis(), formData, verificationId
@@ -2036,7 +2016,7 @@ class TaskDetailsFragment :
         val ctaLocation = CtaLocation()
         if (currentLocation != null) {
             ctaLocation.location = currentLocation
-            ctaLocation.address = com.rf.taskmodule.utils.CommonUtils.getAddress(
+            ctaLocation.address = CommonUtils.getAddress(
                 baseActivity,
                 LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
             )
@@ -2071,16 +2051,16 @@ class TaskDetailsFragment :
             if (conditionList!!.size > 0) {
                 for (i in conditionList!!.indices) {
                     val conditionItem = conditionList!![i]
-                    com.rf.taskmodule.utils.Log.e(TAG, "checkConditionsAndRequestAPI: $conditionItem")
-                    if (com.rf.taskmodule.utils.AppConstants.GEOFENCE == conditionItem.type) {
+                    Log.e(TAG, "checkConditionsAndRequestAPI: $conditionItem")
+                    if (AppConstants.GEOFENCE == conditionItem.type) {
                         var geoCoordinates: GeoCoordinates? = GeoCoordinates()
-                        val locationType = conditionItem.properties!![com.rf.taskmodule.utils.AppConstants.LOCATION_TYPE]
+                        val locationType = conditionItem.properties!![AppConstants.LOCATION_TYPE]
                         if (locationType != null) {
-                            if (locationType.equals(com.rf.taskmodule.utils.AppConstants.START, ignoreCase = true) &&
+                            if (locationType.equals(AppConstants.START, ignoreCase = true) &&
                                 task!!.source != null
                             ) {
                                 geoCoordinates = task!!.source!!.location
-                            } else if (locationType.equals(com.rf.taskmodule.utils.AppConstants.END, ignoreCase = true) &&
+                            } else if (locationType.equals(AppConstants.END, ignoreCase = true) &&
                                 task!!.destination != null
                             ) {
                                 geoCoordinates = task!!.destination!!.location
@@ -2092,15 +2072,15 @@ class TaskDetailsFragment :
                             conditionItem.isPassed = false
                             TrackiToast.Message.showShort(
                                 baseActivity,
-                                com.rf.taskmodule.utils.AppConstants.MSG_NO_LOCATION
+                                AppConstants.MSG_NO_LOCATION
                             )
                             return false
                         }
-                        var radius = conditionItem.properties!![com.rf.taskmodule.utils.AppConstants.RADIUS]
+                        var radius = conditionItem.properties!![AppConstants.RADIUS]
                         if (radius == null) {
                             radius = "200"
                         }
-                        if (!com.rf.taskmodule.utils.CommonUtils.isPointOutSideCircle(
+                        if (!CommonUtils.isPointOutSideCircle(
                                 radius.toInt(),
                                 geoCoordinates.latitude, geoCoordinates.longitude,
                                 currentLocation!!.latitude, currentLocation!!.longitude
@@ -2116,18 +2096,18 @@ class TaskDetailsFragment :
                         }
                         //reaches here if user is inside the current location.
                         conditionItem.isPassed = true
-                    } else if (com.rf.taskmodule.utils.AppConstants.TIMED.equals(conditionItem.type, ignoreCase = true)) {
+                    } else if (AppConstants.TIMED.equals(conditionItem.type, ignoreCase = true)) {
                         conditionItem.isPassed = false
                         if (conditionItem.properties != null && conditionItem.properties!!.containsKey(
-                                com.rf.taskmodule.utils.AppConstants.TIME
+                                AppConstants.TIME
                             )
                         ) {
                             val timeInSeconds =
-                                conditionItem.properties!![com.rf.taskmodule.utils.AppConstants.TIME]!!.toInt()
+                                conditionItem.properties!![AppConstants.TIME]!!.toInt()
                             if (System.currentTimeMillis() - task!!.stageUpdatedAt >= timeInSeconds * 1000) {
                                 TrackiToast.Message.showShort(
                                     baseActivity,
-                                    com.rf.taskmodule.utils.AppConstants.MSG_TIME_PASSED
+                                    AppConstants.MSG_TIME_PASSED
                                 )
                                 return false
                             }
@@ -2149,33 +2129,33 @@ class TaskDetailsFragment :
     }
 
     override fun handleExecuteUpdateResponse(
-        apiCallback: com.rf.taskmodule.data.network.ApiCallback?,
+        apiCallback: ApiCallback?,
         result: Any?,
         error: APIError?
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(apiCallback, error, result, baseActivity)) {
+        if (CommonUtils.handleResponse(apiCallback, error, result, baseActivity)) {
             getTaskData()
-            com.rf.taskmodule.utils.Log.e("execute response", "${result.toString()}")
+            Log.e("execute response", "${result.toString()}")
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_DYNAMIC_FORM) {
+        if (requestCode == AppConstants.REQUEST_CODE_DYNAMIC_FORM) {
             if (resultCode == Activity.RESULT_OK) {
-                var taskData: TaskData? = null
-                if (data != null && data.hasExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FORM_MAP)) {
+                var taskData: com.rf.taskmodule.data.model.request.TaskData? = null
+                if (data != null && data.hasExtra(AppConstants.Extra.EXTRA_FORM_MAP)) {
 
                     val formData: DynamicFormMainData =
-                        data.getParcelableExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_FORM_MAP)!!
+                        data.getParcelableExtra(AppConstants.Extra.EXTRA_FORM_MAP)!!
                     taskData = formData.taskData
                 }
-                if (data != null && data.hasExtra(com.rf.taskmodule.utils.AppConstants.DFID)) {
-                    dfId = data.getStringExtra(com.rf.taskmodule.utils.AppConstants.DFID)
+                if (data != null && data.hasExtra(AppConstants.DFID)) {
+                    dfId = data.getStringExtra(AppConstants.DFID)
                 }
-                if (data != null && data.hasExtra(com.rf.taskmodule.utils.AppConstants.DFDID)) {
-                    dfdId = data.getStringExtra(com.rf.taskmodule.utils.AppConstants.DFDID)
+                if (data != null && data.hasExtra(AppConstants.DFDID)) {
+                    dfdId = data.getStringExtra(AppConstants.DFDID)
                 }
 
                 //after filling the form check other conditions for this task.
@@ -2183,29 +2163,29 @@ class TaskDetailsFragment :
                     try {
                         checkConditionsAndRequestAPI(taskData!!)
                     } catch (e: java.lang.Exception) {
-                        com.rf.taskmodule.utils.Log.e(TAG, "onActivityResult: $e")
+                        Log.e(TAG, "onActivityResult: $e")
                         e.printStackTrace()
                     }
                 }
             }
-        } else if (requestCode == com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_TAG_INVENTORY) {
+        } else if (requestCode == AppConstants.REQUEST_CODE_TAG_INVENTORY) {
             if (resultCode == Activity.RESULT_OK) {
                 if (callToActions != null) {
                     try {
                         checkConditionsAndRequestAPI(null)
                     } catch (e: java.lang.Exception) {
-                        com.rf.taskmodule.utils.Log.e(TAG, "onActivityResult: $e")
+                        Log.e(TAG, "onActivityResult: $e")
                         e.printStackTrace()
                     }
                 }
 
             }
         } else
-            if (requestCode == com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_CREATE_TASK) {
+            if (requestCode == AppConstants.REQUEST_CODE_CREATE_TASK) {
                 if (resultCode == Activity.RESULT_OK) {
                     perFormCtaActionWithoutDialog()
                 }
-            } else if (requestCode == com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_SCAN) {
+            } else if (requestCode == AppConstants.REQUEST_CODE_SCAN) {
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null && data.hasExtra("id")) {
                         var id = data.getStringExtra("id")
@@ -2218,9 +2198,9 @@ class TaskDetailsFragment :
                     openDynamicFormScreen()
                 }
             } else
-                if (requestCode == com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_UNIT_INFO) {
+                if (requestCode == AppConstants.REQUEST_CODE_UNIT_INFO) {
                     if (resultCode == Activity.RESULT_OK) {
-                        com.rf.taskmodule.utils.Log.d(
+                        Log.d(
                             "AppConstants.Extra.EXTRA_CATEGORY_ID",
                             "data!!.getStringExtra(Extra.EXTRA_CATEGORY_ID)"
                         )
@@ -2243,7 +2223,7 @@ class TaskDetailsFragment :
             try {
                 checkConditionsAndRequestAPI(null)
             } catch (e: java.lang.Exception) {
-                com.rf.taskmodule.utils.Log.e(TAG, "onExecuteUpdates: $e")
+                Log.e(TAG, "onExecuteUpdates: $e")
                 e.printStackTrace()
             }
         }
@@ -2257,12 +2237,12 @@ class TaskDetailsFragment :
                 DynamicFormActivity.Companion.newIntent(baseActivity)
                     .putExtra(Extra.EXTRA_FORM_TYPE, dataModel.stage!!.name)
                     .putExtra(Extra.EXTRA_FORM_ID, dataModel.dfdId)
-                    .putExtra(com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_TCF_ID, dataModel.dfdId)
+                    .putExtra(AppConstants.Extra.EXTRA_TCF_ID, dataModel.dfdId)
                     .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
                     .putExtra(Extra.EXTRA_CTA_ID, dataModel.ctaId)
                     .putExtra(Extra.EXTRA_IS_EDITABLE, false)
-                    .putExtra(com.rf.taskmodule.utils.AppConstants.Extra.HIDE_BUTTON, true),
-                com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_DYNAMIC_FORM
+                    .putExtra(AppConstants.Extra.HIDE_BUTTON, true),
+                AppConstants.REQUEST_CODE_DYNAMIC_FORM
             )
         } else {
             TrackiToast.Message.showShort(requireContext(), "form not available")

@@ -18,21 +18,21 @@ import com.rf.taskmodule.utils.rx.SchedulerProvider
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-    com.rf.taskmodule.ui.base.BaseSdkViewModel<SkuInfoNavigator>(dataManager, schedulerProvider) {
+class SkuInfoViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+    BaseSdkViewModel<SkuInfoNavigator>(dataManager, schedulerProvider) {
 
     private val tag = "SkuInfoViewModel"
 
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var httpManager: HttpManager
     lateinit var api: Api
 
-    fun executiveMap(position: Int, target: String, httpManager: com.rf.taskmodule.data.network.HttpManager, rollId:String?) {
+    fun executiveMap(position: Int, target: String, httpManager: HttpManager, rollId:String?) {
         this.httpManager = httpManager
         ExecutiveMap(position,target,rollId).hitApi()
     }
 
     private inner class ExecutiveMap(val position: Int,var target :String,var rollId:String?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleExecutiveMapResponse(position, this, result, error)
@@ -42,7 +42,7 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
             var apiMap=ApiType.valueOf(target)
             //val api = TrackiApplication.getApiMap()[ApiType.EXECUTIVE_MAP]
 
-            val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[apiMap]
+            val api = TrackiSdkApplication.getApiMap()[apiMap]
             if(rollId!=null){
                 var queryString="?roleIds="+ URLEncoder.encode(rollId, StandardCharsets.UTF_8.toString())
                 var apiNew=Api()
@@ -64,7 +64,7 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -74,7 +74,7 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
     }
 
     private inner class GetTaskData(var taskId:String?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null)
@@ -82,8 +82,8 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         }
 
         override fun hitApi() {
-            if(com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.TASK_UNIT_CONFIG)) {
-                val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.TASK_UNIT_CONFIG]
+            if(TrackiSdkApplication.getApiMap().containsKey(ApiType.TASK_UNIT_CONFIG)) {
+                val api = TrackiSdkApplication.getApiMap()[ApiType.TASK_UNIT_CONFIG]
                 val apiUrl = Api()
                 apiUrl.url = api!!.url+ "?taskId=${taskId}"
                 apiUrl.name = ApiType.TASK_UNIT_CONFIG
@@ -100,7 +100,7 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -109,24 +109,24 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         }
     }
 
-    fun getTaskData(httpManager: com.rf.taskmodule.data.network.HttpManager, taskId:String?) {
+    fun getTaskData(httpManager: HttpManager, taskId:String?) {
         this.httpManager = httpManager
         GetTaskData(taskId).hitApi()
     }
 
-    fun verifyOtpServerRequest(otpRequest: OtpRequest, httpManager: com.rf.taskmodule.data.network.HttpManager?) {
+    fun verifyOtpServerRequest(otpRequest: OtpRequest, httpManager: HttpManager?) {
         this.httpManager = httpManager!!
         VerifyOtp(otpRequest).hitApi()
     }
 
-    fun uploadSkuInfoData(skuSpecsData: SKUInfoSpecsRequest, httpManager: com.rf.taskmodule.data.network.HttpManager, api: Api?) {
+    fun uploadSkuInfoData(skuSpecsData: SKUInfoSpecsRequest, httpManager: HttpManager, api: Api?) {
         this.httpManager = httpManager
         this.api = api!!
         UploadSkuInfoList(skuSpecsData).hitApi()
     }
 
     inner class UploadSkuInfoList(val skuSpecsData: SKUInfoSpecsRequest) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null) {
@@ -147,7 +147,7 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null) {
                 navigator.showTimeOutMessage(callBack)
             }
@@ -159,7 +159,7 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
     }
 
     inner class VerifyOtp(val otpRequest: OtpRequest) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null)
@@ -167,8 +167,8 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         }
 
         override fun hitApi() {
-            if(com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.VERIFY_MOBILE)) {
-                val api = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.VERIFY_MOBILE]
+            if(TrackiSdkApplication.getApiMap().containsKey(ApiType.VERIFY_MOBILE)) {
+                val api = TrackiSdkApplication.getApiMap()[ApiType.VERIFY_MOBILE]
                 if(dataManager!=null)
                     dataManager.verifyOtp(httpManager, this, otpRequest, api)
             }
@@ -181,7 +181,7 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -190,14 +190,14 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         }
     }
 
-    fun executeUpdates(httpManager: com.rf.taskmodule.data.network.HttpManager?, request: ExecuteUpdateRequest?, api: Api?) {
+    fun executeUpdates(httpManager: HttpManager?, request: ExecuteUpdateRequest?, api: Api?) {
         this.httpManager = httpManager!!
         this.api = api!!
         ExecuteUpdateTask(request).hitApi()
     }
 
     inner class ExecuteUpdateTask(var request: ExecuteUpdateRequest?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
         override fun onResponse(result: Any?, error: APIError?) {
             navigator.handleExecuteUpdateResponse(this, result, error)
         }
@@ -211,7 +211,7 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
         }
 
         override fun onNetworkErrorClose() {}
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             navigator.showTimeOutMessage(callBack)
         }
 
@@ -220,10 +220,10 @@ class SkuInfoViewModel(dataManager: com.rf.taskmodule.data.DataManager, schedule
     }
 
 
-    internal class Factory(private val mDataManager: com.rf.taskmodule.data.DataManager) : ViewModelProvider.Factory {
+    internal class Factory(private val mDataManager: DataManager) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SkuInfoViewModel(mDataManager,
-                com.rf.taskmodule.utils.rx.AppSchedulerProvider()
+                AppSchedulerProvider()
             ) as T
         }
     }

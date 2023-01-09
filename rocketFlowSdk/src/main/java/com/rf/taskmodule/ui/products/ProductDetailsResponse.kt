@@ -6,9 +6,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.google.gson.annotations.SerializedName
 import com.rf.taskmodule.data.model.response.config.DynamicFormData
-import com.rf.taskmodule.data.model.response.config.FormData
 import com.rf.taskmodule.ui.category.ProductDescription
-import com.rf.taskmodule.ui.selectorder.CatalogProduct
 import com.rf.taskmodule.ui.selectorder.ProductStock
 import java.io.Serializable
 import java.text.DecimalFormat

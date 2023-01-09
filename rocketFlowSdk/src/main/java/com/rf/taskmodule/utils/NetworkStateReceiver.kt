@@ -7,7 +7,7 @@ import android.content.Intent
 
 
 class NetworkStateReceiver : BroadcastReceiver {
-    var listeners: MutableSet<com.rf.taskmodule.utils.NetworkStateReceiverListener> = HashSet()
+    var listeners: MutableSet<NetworkStateReceiverListener> = HashSet()
     var connected: Boolean? = null
     override fun onReceive(context: Context?, intent: Intent?) {
 
@@ -42,7 +42,7 @@ class NetworkStateReceiver : BroadcastReceiver {
             notifyState(listener)
     }
 
-    private fun notifyState(listener: com.rf.taskmodule.utils.NetworkStateReceiverListener?) {
+    private fun notifyState(listener: NetworkStateReceiverListener?) {
         if (connected == null || listener == null)
             return
 
@@ -52,12 +52,12 @@ class NetworkStateReceiver : BroadcastReceiver {
             listener.networkUnavailable()
     }
 
-    fun addListener(l: com.rf.taskmodule.utils.NetworkStateReceiverListener) {
+    fun addListener(l: NetworkStateReceiverListener) {
         listeners.add(l)
         notifyState(l)
     }
 
-    fun removeListener(l: com.rf.taskmodule.utils.NetworkStateReceiverListener) {
+    fun removeListener(l: NetworkStateReceiverListener) {
         listeners.remove(l)
     }
 

@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.rocketflow.sdk.RocketFlyer
-import com.rf.taskmodule.BR
 import com.rf.taskmodule.R
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper
 import com.rf.taskmodule.data.model.request.GetManualLocationRequest
@@ -28,15 +27,15 @@ import com.rf.taskmodule.data.model.response.config.WorkFlowCategories
 import com.rf.taskmodule.data.network.APIError
 import com.rf.taskmodule.data.network.ApiCallback
 import com.rf.taskmodule.data.network.HttpManager
+import com.rf.taskmodule.databinding.ActivityTaskFilterSdkBinding
 import com.rf.taskmodule.ui.base.BaseSdkActivity
 import com.rf.taskmodule.utils.AppConstants
 import com.rf.taskmodule.utils.CommonUtils
 import kotlinx.android.synthetic.main.activity_task_filter_sdk.*
-import com.rf.taskmodule.databinding.ActivityTaskFilterSdkBinding
-import com.rf.taskmodule.utils.Log
+import com.rf.taskmodule.BR
 
 
-class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTaskFilterSdkBinding, TaskFilterViewModel>(),
+class TaskFilterActivity : BaseSdkActivity<ActivityTaskFilterSdkBinding, TaskFilterViewModel>(),
     TaskFilterNavigator {
 
 
@@ -57,8 +56,8 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
 
     private var from: String? = null
 
-    lateinit var preferencesHelper: com.rf.taskmodule.data.local.prefs.PreferencesHelper
-    lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    lateinit var preferencesHelper: PreferencesHelper
+    lateinit var httpManager: HttpManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +81,7 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
 //            }
             if (intent.hasExtra("from")) {
                 from = intent.getStringExtra("from")
-                if (from.equals(com.rf.taskmodule.utils.AppConstants.ATTENDANCE)) {
+                if (from.equals(AppConstants.ATTENDANCE)) {
                     allowGeography = true
                 }
             }
@@ -144,13 +143,13 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
 
 
     override fun handleRegionListResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?,
         isStart: Boolean
     ) {
         // hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val executive = Gson().fromJson<GetUserManualLocationData>(
                 result.toString(),
                 GetUserManualLocationData::class.java
@@ -244,7 +243,7 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                                 ) {
                                     val selectedItem = parent.getItemAtPosition(position).toString()
                                     regionId = list[position].id
-                                    com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "regionId", regionId);
+                                    CommonUtils.showLogMessage("e", "regionId", regionId);
                                     var getUserManualLocationData = GetManualLocationRequest()
                                     getUserManualLocationData.regionId = regionId
                                     getUserManualLocationData.userGeoReq = allowGeography
@@ -281,13 +280,13 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
     }
 
     override fun handleStateListResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?,
         isStart: Boolean
     ) {
         //  hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val executive = Gson().fromJson<GetUserManualLocationData>(
                 result.toString(),
                 GetUserManualLocationData::class.java
@@ -381,7 +380,7 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                                 ) {
                                     val selectedItem = parent.getItemAtPosition(position).toString()
                                     stateId = list[position].id
-                                    com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "stateId", stateId);
+                                    CommonUtils.showLogMessage("e", "stateId", stateId);
                                     var getUserManualLocationData = GetManualLocationRequest()
                                     getUserManualLocationData.regionId = regionId
                                     getUserManualLocationData.stateId = stateId
@@ -418,13 +417,13 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
     }
 
     override fun handleCityListResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?,
         isStart: Boolean
     ) {
         // hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             val executive = Gson().fromJson<GetUserManualLocationData>(
                 result.toString(),
                 GetUserManualLocationData::class.java
@@ -516,7 +515,7 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
                                 ) {
                                     val selectedItem = parent.getItemAtPosition(position).toString()
                                     cityId = list[position].id
-                                    com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "cityId", cityId);
+                                    CommonUtils.showLogMessage("e", "cityId", cityId);
                                     var getUserManualLocationData = GetManualLocationRequest()
                                     getUserManualLocationData.regionId = regionId
                                     getUserManualLocationData.stateId = stateId
@@ -559,13 +558,13 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
     }
 
     override fun handleHubListResponse(
-        callback: com.rf.taskmodule.data.network.ApiCallback,
+        callback: ApiCallback,
         result: Any?,
         error: APIError?,
         isStart: Boolean
     ) {
         hideLoading()
-        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(callback, error, result, this)) {
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
             tvHubName.text = ""
             val executive = Gson().fromJson<GetUserManualLocationData>(
                 result.toString(),
@@ -687,7 +686,7 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
 
     }
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
 
     }
 
@@ -707,11 +706,11 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
         returnIntent.putExtra("hubId", hubId)
         returnIntent.putExtra("stateId", stateId)
         returnIntent.putExtra("cityId", cityId)
-        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "regionId", regionId)
-        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "hubId", hubId)
-        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "stateId", stateId)
-        com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "cityId", cityId)
-        if (from.equals(com.rf.taskmodule.utils.AppConstants.TASK)) {
+        CommonUtils.showLogMessage("e", "regionId", regionId)
+        CommonUtils.showLogMessage("e", "hubId", hubId)
+        CommonUtils.showLogMessage("e", "stateId", stateId)
+        CommonUtils.showLogMessage("e", "cityId", cityId)
+        if (from.equals(AppConstants.TASK)) {
             var saveFilterConfig = SaveFilterData()
             saveFilterConfig.cityId = cityId
             saveFilterConfig.hubId = hubId
@@ -811,8 +810,8 @@ class TaskFilterActivity : com.rf.taskmodule.ui.base.BaseSdkActivity<ActivityTas
             val commaSeperatedName = list.joinToString { it -> "${it.name}" }
             hubId = commaSeperatedId
             tvHubName.text = commaSeperatedName
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "commastring", commaSeperatedId)
-            com.rf.taskmodule.utils.CommonUtils.showLogMessage("e", "commastring", commaSeperatedName)
+            CommonUtils.showLogMessage("e", "commastring", commaSeperatedId)
+            CommonUtils.showLogMessage("e", "commastring", commaSeperatedName)
             dialog.dismiss()
         }
         ivClose.setOnClickListener {

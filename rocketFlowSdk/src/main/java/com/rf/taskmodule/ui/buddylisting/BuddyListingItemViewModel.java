@@ -1,11 +1,7 @@
 package com.rf.taskmodule.ui.buddylisting;
 
 import android.view.View;
-
 import androidx.databinding.ObservableField;
-
-import com.rf.taskmodule.utils.CommonUtils;
-
 import com.rf.taskmodule.data.model.response.config.Buddy;
 import com.rf.taskmodule.utils.CommonUtils;
 

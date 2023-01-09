@@ -1,18 +1,13 @@
 package com.rf.taskmodule.data.model.request
 
 import android.os.Parcelable
-import androidx.databinding.BaseObservable
-import androidx.databinding.Bindable
-import androidx.databinding.library.baseAdapters.BR
-import com.rf.taskmodule.data.model.DocType
+import com.rf.taskmodule.data.model.response.config.DynamicFormData
 import com.rf.taskmodule.data.model.response.config.*
-import com.rf.taskmodule.ui.selectorder.CatalogProduct
 import com.rf.taskmodule.ui.tasklisting.PagingData
 import com.rf.taskmodule.utils.*
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 import java.io.Serializable
-import java.sql.Time
 
 
 class LoginRequest(var actionType: NextScreen, var mobile: String)
@@ -83,6 +78,7 @@ class TaskRequest(
     var loadBy: BuddyInfo?,
     var properties: Map<String, String>?
 ) {
+    var catIds: ArrayList<String>? = null
     var categoryId: String? = null
     var stageId: String? = null
     var parentTaskId: String? = null
@@ -123,7 +119,15 @@ class CreateTaskRequest(
     var taskId: String,
     var endTime: Long,
     var contact: Contact?,
-    var taskType: String?
+    var taskType: String?,
+    var field1: String?,
+    var field2: String?,
+    var field3: String?,
+    var field4: String?,
+    var field5: String?,
+    var field6: String?,
+    var field7: String?,
+    var field8: String?
 ) : Serializable {
     var taskData: TaskData? = null
     var categoryId: String? = null
@@ -134,6 +138,7 @@ class CreateTaskRequest(
     var invIds: List<String>? = null
     var directMapping: Boolean = false
     var timeSlot: TimeSlot? = null
+    var multiReferedTask: ArrayList<String>? = null
 
     // var location:GeoLocation?=null
 }

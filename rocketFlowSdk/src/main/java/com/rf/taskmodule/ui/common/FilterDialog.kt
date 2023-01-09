@@ -51,7 +51,7 @@ class FilterDialog(var ctx: Context, val listener: OnClickSearchListener, val st
                 TrackiToast.Message.showLong(context, "End date cannot be less than start date")
             } else {
                 listener.onClickSearch(fromInMillis, toInMillis,
-                        com.rf.taskmodule.utils.CommonUtils.getLeaveStatusConstant(spnStatus!!.selectedItem.toString())
+                        CommonUtils.getLeaveStatusConstant(spnStatus!!.selectedItem.toString())
                 )
             }
         }
@@ -82,7 +82,7 @@ class FilterDialog(var ctx: Context, val listener: OnClickSearchListener, val st
         btnDateFrom.text = getParsedDate(fromInMillis)
 
         btnDateFrom.setOnClickListener { v: View? ->
-            com.rf.taskmodule.utils.CommonUtils.openDatePicker(context, yr, mnth,
+            CommonUtils.openDatePicker(context, yr, mnth,
                     dayofmnth, 0, 0) { vw: DatePicker?, year: Int, monthOfYear: Int, dayOfMonth: Int ->
                 //                        String selectedDate = dayOfMonth + "-" + (monthOfYear + 1) + "-" + year;
                 fromCal[Calendar.YEAR] = year
@@ -101,7 +101,7 @@ class FilterDialog(var ctx: Context, val listener: OnClickSearchListener, val st
             }
         }
         btnDateTo.setOnClickListener { v: View? ->
-            com.rf.taskmodule.utils.CommonUtils.openDatePicker(context, mYear, mMonth,
+            CommonUtils.openDatePicker(context, mYear, mMonth,
                     mDay, fromInMillis, 0) { vw2: DatePicker?, year2: Int, monthOfYear2: Int, dayOfMonth2: Int ->
                 //                        String selectedDate = dayOfMonth + "-" + (monthOfYear + 1) + "-" + year;
                 c[Calendar.YEAR] = year2

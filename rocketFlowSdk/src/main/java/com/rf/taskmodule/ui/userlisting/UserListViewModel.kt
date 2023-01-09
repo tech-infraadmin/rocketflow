@@ -13,19 +13,19 @@ import com.rf.taskmodule.ui.base.BaseSdkViewModel
 import com.rf.taskmodule.utils.ApiType
 import com.rf.taskmodule.utils.rx.SchedulerProvider
 
-class UserListViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedulerProvider: com.rf.taskmodule.utils.rx.SchedulerProvider) :
-        com.rf.taskmodule.ui.base.BaseSdkViewModel<UserListNavigator>(dataManager, schedulerProvider) {
+class UserListViewModel (dataManager: DataManager, schedulerProvider: SchedulerProvider) :
+        BaseSdkViewModel<UserListNavigator>(dataManager, schedulerProvider) {
 
-    private lateinit var httpManager: com.rf.taskmodule.data.network.HttpManager
+    private lateinit var httpManager: HttpManager
 
 
-    fun getUserList(httpManager: com.rf.taskmodule.data.network.HttpManager, roleId:String?, type:String?, attendanceReq: AttendanceReq?) {
+    fun getUserList(httpManager: HttpManager, roleId:String?, type:String?, attendanceReq: AttendanceReq?) {
         this.httpManager = httpManager
         GetUserList(roleId,type,attendanceReq).hitApi()
     }
 
     inner class GetUserList(var roleId: String?,var type: String?,var attendanceReq: AttendanceReq?, var new: Boolean = false) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null)
@@ -33,8 +33,8 @@ class UserListViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedu
         }
 
         override fun hitApi() {
-            if(com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_USERS)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.GET_USERS]!!
+            if(TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_USERS)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.GET_USERS]!!
                 val userGetRequest = UserGetRequest()
                 val api = oldApi
                 Log.e("urlCheck", "$new")
@@ -82,7 +82,7 @@ class UserListViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedu
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null)
             navigator.showTimeOutMessage(callBack)
         }
@@ -91,13 +91,13 @@ class UserListViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedu
         }
     }
 
-    fun deleteUser(httpManager: com.rf.taskmodule.data.network.HttpManager, userId:String?) {
+    fun deleteUser(httpManager: HttpManager, userId:String?) {
         this.httpManager = httpManager
         DeleteUser(userId).hitApi()
     }
 
     inner class DeleteUser(var userId: String?) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null)
@@ -105,8 +105,8 @@ class UserListViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedu
         }
 
         override fun hitApi() {
-            if(com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.DELETE_USER)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.DELETE_USER]!!
+            if(TrackiSdkApplication.getApiMap().containsKey(ApiType.DELETE_USER)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.DELETE_USER]!!
                 val api = Api()
                 if(userId!=null) {
                     api.url = oldApi.url+"?userId="+userId
@@ -127,7 +127,7 @@ class UserListViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedu
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null)
                 navigator.showTimeOutMessage(callBack)
         }
@@ -137,13 +137,13 @@ class UserListViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedu
     }
 
 
-    fun searchUser(httpManager: com.rf.taskmodule.data.network.HttpManager, searchBy:String?, value:String?, attendanceReq: AttendanceReq) {
+    fun searchUser(httpManager: HttpManager, searchBy:String?, value:String?, attendanceReq: AttendanceReq) {
         this.httpManager = httpManager
         SearchUser(searchBy,value,attendanceReq).hitApi()
     }
 
     inner class SearchUser(var searchBy: String?,var value: String?,var attendanceReq: AttendanceReq) :
-        com.rf.taskmodule.data.network.ApiCallback {
+        ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
             if(navigator!=null)
@@ -151,8 +151,8 @@ class UserListViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedu
         }
 
         override fun hitApi() {
-            if(com.rf.taskmodule.TrackiSdkApplication.getApiMap().containsKey(ApiType.USER_SEARCH)) {
-                val oldApi = com.rf.taskmodule.TrackiSdkApplication.getApiMap()[ApiType.USER_SEARCH]!!
+            if(TrackiSdkApplication.getApiMap().containsKey(ApiType.USER_SEARCH)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.USER_SEARCH]!!
                 val api = Api()
                 api.url = oldApi.url+"?limit="+attendanceReq.limit+"&offset="+attendanceReq.offset+"&searchBy="+searchBy+"&value="+value+"&fetchAddress=false"
                // api.url = oldApi.url+"?searchBy="+searchBy+"&value="+value+"&fetchAddress=false"
@@ -170,7 +170,7 @@ class UserListViewModel (dataManager: com.rf.taskmodule.data.DataManager, schedu
         override fun onNetworkErrorClose() {
         }
 
-        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+        override fun onRequestTimeOut(callBack: ApiCallback) {
             if(navigator!=null)
                 navigator.showTimeOutMessage(callBack)
         }

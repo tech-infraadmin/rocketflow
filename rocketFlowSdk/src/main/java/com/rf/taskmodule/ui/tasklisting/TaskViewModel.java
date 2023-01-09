@@ -1,12 +1,17 @@
 package com.rf.taskmodule.ui.tasklisting;
 
-import com.rf.taskmodule.TrackiSdkApplication;
 import com.rf.taskmodule.data.DataManager;
+import com.rf.taskmodule.data.model.request.BuddiesRequest;
+import com.rf.taskmodule.data.model.request.FleetRequest;
+import com.rf.taskmodule.data.model.request.InventoryRequest;
 import com.rf.taskmodule.data.model.response.config.Api;
 import com.rf.taskmodule.data.network.APIError;
+import com.rf.taskmodule.data.network.ApiCallback;
+import com.rf.taskmodule.data.network.HttpManager;
 import com.rf.taskmodule.utils.ApiType;
 import com.rf.taskmodule.utils.BuddyInfo;
 import com.rf.taskmodule.utils.BuddyStatus;
+import com.rf.taskmodule.utils.rx.SchedulerProvider;
 import com.rf.taskmodule.TrackiSdkApplication;
 import com.rf.taskmodule.data.DataManager;
 import com.rf.taskmodule.data.model.request.BuddiesRequest;
@@ -45,7 +50,7 @@ public class TaskViewModel extends BaseSdkViewModel<TaskNavigator> {
         new FleetListingAPI().hitApi();
     }
 
-    public void sdkToken(String sdkClintId, HttpManager httpManager,ApiCallback callback){
+    public void sdkToken(String sdkClintId, HttpManager httpManager, ApiCallback callback){
         this.httpManager = httpManager;
         if(getDataManager()!=null) {
             getDataManager().getSDKLoginToken(sdkClintId,this.httpManager, callback);

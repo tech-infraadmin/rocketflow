@@ -9,16 +9,16 @@ import com.rf.taskmodule.ui.base.BaseSdkNavigator
  */
 interface DynamicNavigator : BaseSdkNavigator {
 
-    override fun handleResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?) {
+    override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
 
     }
 
-    fun handleExecutiveMapResponse(position: Int, callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
+    fun handleExecutiveMapResponse(position: Int, callback: ApiCallback, result: Any?, error: APIError?)
 
-   fun  handleGetTaskDataResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
+   fun  handleGetTaskDataResponse(callback: ApiCallback, result: Any?, error: APIError?)
 
-   fun  handleGetPreviousFormResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
+   fun  handleGetPreviousFormResponse(callback: ApiCallback, result: Any?, error: APIError?)
 
-    fun  handleUploadFileResponse(callback: com.rf.taskmodule.data.network.ApiCallback, result: Any?, error: APIError?)
+    fun  handleUploadFileResponse(callback: ApiCallback, result: Any?, error: APIError?)
 
 }

@@ -8,6 +8,40 @@ import androidx.annotation.Nullable;
 //import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.rf.taskmodule.data.local.prefs.AppPreferencesHelper;
+import com.rf.taskmodule.data.model.AlarmInfo;
+import com.rf.taskmodule.data.model.DataObject;
+import com.rf.taskmodule.data.model.request.AddEmployeeRequest;
+import com.rf.taskmodule.data.model.request.AddressInfo;
+import com.rf.taskmodule.data.model.request.BookSlotRequest;
+import com.rf.taskmodule.data.model.request.EligibleUserRequest;
+import com.rf.taskmodule.data.model.request.PaymentRequest;
+import com.rf.taskmodule.data.model.request.PlaceRequest;
+import com.rf.taskmodule.data.model.request.SKUInfoSpecsRequest;
+import com.rf.taskmodule.data.model.request.SaveFilterData;
+import com.rf.taskmodule.data.model.request.SendCtaOtpRequest;
+import com.rf.taskmodule.data.model.request.UserGetRequest;
+import com.rf.taskmodule.data.model.request.VerifyCtaOtpRequest;
+import com.rf.taskmodule.data.model.response.config.Api;
+import com.rf.taskmodule.data.model.response.config.ChannelConfig;
+import com.rf.taskmodule.data.model.response.config.EmergencyContact;
+import com.rf.taskmodule.data.model.response.config.Flavour;
+import com.rf.taskmodule.data.model.response.config.FormData;
+import com.rf.taskmodule.data.model.response.config.GeoCoordinates;
+import com.rf.taskmodule.data.model.response.config.GeoFenceData;
+import com.rf.taskmodule.data.model.response.config.IdleTrackingInfo;
+import com.rf.taskmodule.data.model.response.config.OverstoppingConfig;
+import com.rf.taskmodule.data.model.response.config.ProfileInfo;
+import com.rf.taskmodule.data.model.response.config.ProjectCategories;
+import com.rf.taskmodule.data.model.response.config.RoleConfigData;
+import com.rf.taskmodule.data.model.response.config.Task;
+import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
+import com.rf.taskmodule.data.network.ApiCallback;
+import com.rf.taskmodule.data.network.HttpManager;
+import com.rf.taskmodule.data.network.NetworkManager;
+import com.rf.taskmodule.utils.ApiType;
+import com.rf.taskmodule.utils.ShiftTime;
+import com.rf.taskmodule.utils.UserType;
+import com.rf.taskmodule.data.local.prefs.AppPreferencesHelper;
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
 import com.rf.taskmodule.data.model.AlarmInfo;
 import com.rf.taskmodule.data.model.DataObject;
@@ -126,6 +160,16 @@ public class AppDataManager implements DataManager {
     @Override
     public void setVerificationId(String verificationId) {
         mPreferencesHelper.setVerificationId(verificationId);
+    }
+
+    @Override
+    public void setBaseMode(String url){
+        mPreferencesHelper.setBaseMode(url);
+    }
+
+    @Override
+    public String getBaseMode(){
+        return mPreferencesHelper.getBaseMode();
     }
 
     @Override
