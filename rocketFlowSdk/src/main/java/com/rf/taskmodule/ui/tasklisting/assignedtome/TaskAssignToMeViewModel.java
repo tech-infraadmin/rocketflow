@@ -3,8 +3,10 @@ package com.rf.taskmodule.ui.tasklisting.assignedtome;
 import android.content.Context;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -44,7 +46,7 @@ public class TaskAssignToMeViewModel {
     public final AssignedtoMeItemViewModelListener mListener;
     public final Task task;
     public ObservableField<String> taskName = new ObservableField<>("");
-    public ObservableField<String> encCodeUrl = new ObservableField<>(null);
+    public ObservableField<String> encCodeUrl = new ObservableField<>("");
     public ObservableField<String> assigneeNameCode = new ObservableField<>("");
     public ObservableField<String> assigneeName = new ObservableField<>("");
     public ObservableField<Boolean> assigneeNameVisible = new ObservableField<>(false);
@@ -619,6 +621,18 @@ public class TaskAssignToMeViewModel {
         mListener.onChatStart(buddyId, buddyName);
     }
 
+    @BindingAdapter("encCodeUrl")
+    public static void encCodeUrl(LinearLayout view, String url) {
+        if (url!=null){
+            if (!url.isEmpty()){
+                view.setVisibility(View.VISIBLE);
+            }else {
+                view.setVisibility(View.GONE);
+            }
+        }else {
+            view.setVisibility(View.GONE);
+        }
+    }
 
     @BindingAdapter("blink")
     public static void blink(TextView view, String time) {

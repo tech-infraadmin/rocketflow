@@ -629,12 +629,10 @@
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_14"
                                     tools:text="06:36 Am" />
-
-
                             </RelativeLayout>
 
                             <LinearLayout
-                                android:visibility="@{data.encCodeUrl != null ? View.VISIBLE : View.GONE}"
+                                app:encCodeUrl="@{data.encCodeUrl}"
                                 android:id="@+id/ll_qr_code"
                                 android:layout_weight="1"
                                 android:gravity="center_vertical"
