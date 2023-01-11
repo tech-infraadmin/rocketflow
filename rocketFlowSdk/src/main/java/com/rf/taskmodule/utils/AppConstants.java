@@ -420,6 +420,7 @@ public final class AppConstants {
         public static final String EXTRA_DATA = "extra_form_data";
         public static final String EXTRA_DATE = "date";
         public static final String EXTRA_CATEGORIES = "categories";
+        public static final String EXTRA_CATEGORIES_NAME = "categoriy_name";
         public static final String EXTRA_STAGEID = "stageId";
         public static final String TITLE = "title";
         public static final String START = "start";

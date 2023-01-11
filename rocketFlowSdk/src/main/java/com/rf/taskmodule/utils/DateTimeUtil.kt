@@ -39,7 +39,7 @@ class DateTimeUtil private constructor() {
                 return ""
             }
             return try {
-                val dateString = SimpleDateFormat(TIME_FORMAT_2, Locale.US)
+                val dateString = SimpleDateFormat(TIME_FORMAT_2, Locale.getDefault())
                 dateString.format(Date(milliSeconds))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -52,7 +52,7 @@ class DateTimeUtil private constructor() {
                 return ""
             }
             return try {
-                val dateString = SimpleDateFormat(TIME_FORMAT, Locale.US)
+                val dateString = SimpleDateFormat(TIME_FORMAT, Locale.getDefault())
                 dateString.format(Date(milliSeconds))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -67,7 +67,7 @@ class DateTimeUtil private constructor() {
                 return ""
             }
             return try {
-                val dateString = SimpleDateFormat(DATE_FORMAT, Locale.US)
+                val dateString = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
                 dateString.format(Date(milliSeconds))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -82,7 +82,7 @@ class DateTimeUtil private constructor() {
                 return ""
             }
             return try {
-                val dateString = SimpleDateFormat(DATE_TIME_FORMAT_2, Locale.US)
+                val dateString = SimpleDateFormat(DATE_TIME_FORMAT_2, Locale.getDefault())
                 dateString.format(Date(milliSeconds))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -95,7 +95,7 @@ class DateTimeUtil private constructor() {
                 return ""
             }
             return try {
-                val dateString = SimpleDateFormat(format, Locale.US)
+                val dateString = SimpleDateFormat(format, Locale.getDefault())
                 dateString.format(Date(milliSeconds))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -109,7 +109,7 @@ class DateTimeUtil private constructor() {
                 return ""
             }
             return try {
-                val dateString = SimpleDateFormat(DATE_FORMAT2, Locale.US)
+                val dateString = SimpleDateFormat(DATE_FORMAT2, Locale.getDefault())
                 dateString.format(Date(milliSeconds))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -125,7 +125,7 @@ class DateTimeUtil private constructor() {
             return try {
                 var sdf=SimpleDateFormat(DATE_FORMAT3,Locale.getDefault())
                 sdf.timeZone = Calendar.getInstance().timeZone
-                val dateString = SimpleDateFormat(DATE_FORMAT3, Locale.US)
+                val dateString = SimpleDateFormat(DATE_FORMAT3, Locale.getDefault())
                 dateString.format(Date(milliSeconds))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -139,7 +139,7 @@ class DateTimeUtil private constructor() {
                 return ""
             }
             return try {
-                val dateString = SimpleDateFormat(DATE_FORMAT4, Locale.US)
+                val dateString = SimpleDateFormat(DATE_FORMAT4, Locale.getDefault())
                 dateString.format(Date(milliSeconds))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -152,7 +152,7 @@ class DateTimeUtil private constructor() {
                 return ""
             }
             return try {
-                val dateString = SimpleDateFormat(DATE_TIME_FORMAT_5, Locale.US)
+                val dateString = SimpleDateFormat(DATE_TIME_FORMAT_5, Locale.getDefault())
                 dateString.format(Date(milliSeconds))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -165,7 +165,7 @@ class DateTimeUtil private constructor() {
                 return ""
             }
             // Create a DateFormatter object for displaying date in specified format.
-            val formatter = SimpleDateFormat(format, Locale.US)
+            val formatter = SimpleDateFormat(format, Locale.getDefault())
 
             // Create a calendar object that will convert the date and time value in milliseconds to date.
             val calendar = Calendar.getInstance()
@@ -178,7 +178,7 @@ class DateTimeUtil private constructor() {
             if (date == null) {
                 return ""
             }
-            val sdf = SimpleDateFormat(TIME_FORMAT, Locale.US)
+            val sdf = SimpleDateFormat(TIME_FORMAT, Locale.getDefault())
 //            sdf.timeZone = TimeZone.getTimeZone("Asia/Calcutta")
             return sdf.format(date)
         }
@@ -269,7 +269,7 @@ class DateTimeUtil private constructor() {
             return try {
                 val dateString = SimpleDateFormat(
                     DATE_FORMAT5,
-                    Locale.US
+                    Locale.getDefault()
                 )
                 dateString.format(Date(milliSeconds))
             } catch (e: Exception) {

@@ -44,7 +44,7 @@ public class TaskAssignToMeViewModel {
     public final AssignedtoMeItemViewModelListener mListener;
     public final Task task;
     public ObservableField<String> taskName = new ObservableField<>("");
-    public ObservableField<String> encCodeUrl = new ObservableField<>("");
+    public ObservableField<String> encCodeUrl = new ObservableField<>(null);
     public ObservableField<String> assigneeNameCode = new ObservableField<>("");
     public ObservableField<String> assigneeName = new ObservableField<>("");
     public ObservableField<Boolean> assigneeNameVisible = new ObservableField<>(false);

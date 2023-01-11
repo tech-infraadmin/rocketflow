@@ -622,6 +622,11 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
+    public void searchReferenceTask(ApiCallback apiCallback, HttpManager httpManager, Api api) {
+        networkManager.searchReferenceTask(apiCallback, httpManager, api);
+    }
+
+    @Override
     public void rejectTask(@NotNull ApiCallback apiCallBack, @NotNull HttpManager httpManager, @NotNull Object request, @NotNull Api api) {
         networkManager.rejectTask(apiCallBack, httpManager, request, api);
     }

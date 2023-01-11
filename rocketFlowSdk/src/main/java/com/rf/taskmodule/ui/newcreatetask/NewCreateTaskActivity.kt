@@ -105,7 +105,6 @@ open class NewCreateTaskActivity :
     private lateinit var ivNoData: ImageView
 
     var slotDataResponse: SlotDataResponse = SlotDataResponse()
-
     private var timePosition = 0
     private var keyPosition = 0
     private var dayPosition = 0
@@ -138,12 +137,11 @@ open class NewCreateTaskActivity :
     lateinit var view: View
     private lateinit var startLatLng: LatLng
     private var endLatLng: LatLng? = null
-    lateinit var api: Api
+
     private lateinit var mActivityCreateTaskBinding: ActivityNewCreateTaskSdkBinding
     private var startTime = 0L
     private var endTime = 0L
-
-    private var searchRequest: TaskRequest? = null
+    private var searchRequest: SearchReferenceRequest? = null
 
     private var startYear = 0
     private var startMonth = 0
@@ -197,7 +195,8 @@ open class NewCreateTaskActivity :
     var rlSubmittingData: RelativeLayout? = null
 
     private var categoryMap: Map<String, String>? = null
-    lateinit var etScanner: EditText
+    lateinit var etScanner: AutoCompleteTextView
+    lateinit var ivSearchRef: ImageView
 
     var listSlots: kotlin.collections.ArrayList<SlotData> = ArrayList()
     var listKeys: kotlin.collections.ArrayList<String> = ArrayList()
@@ -222,8 +221,7 @@ open class NewCreateTaskActivity :
             "",
             object : TypeToken<HashMap<String?, String?>?>() {}.type
         )
-        searchRequest =
-            TaskRequest(statusList as MutableList<out TaskStatus>, BuddyInfo.ASSIGNED_TO_ME, categoryMap)
+        searchRequest = SearchReferenceRequest()
         slotAdapter = SlotAdapter(this)
 
         mGetSuggetionViewModel = getUserSuggestionListViewModel()
@@ -637,6 +635,7 @@ open class NewCreateTaskActivity :
 
         etSlot = mActivityCreateTaskBinding.etVisitTime
 
+
         Places.initialize(this@NewCreateTaskActivity, googleMapKey!!)
         if (intent.hasExtra(AppConstants.Extra.EXTRA_PAREN_TASK_ID)) {
             parentTaskId = intent.getStringExtra(AppConstants.Extra.EXTRA_PAREN_TASK_ID)
@@ -720,19 +719,10 @@ open class NewCreateTaskActivity :
         }
 
         etScanner = mActivityCreateTaskBinding.etScanner
-        etScanner.setOnTouchListener { v, event ->
-            var DRAWABLE_LEFT = 0
-            var DRAWABLE_TOP = 1
-            var DRAWABLE_RIGHT = 2
-            var DRAWABLE_BOTTOM = 3
-
-            if (event.action == MotionEvent.ACTION_UP) {
-                if (event.rawX >= (etScanner.right - etScanner.compoundDrawables[DRAWABLE_RIGHT].bounds.width())) {
-                    //open scanner here
-                    getCameraPermission()
-                }
-            }
-            false
+        ivSearchRef = mActivityCreateTaskBinding.ivSearchRef
+        ivSearchRef.setImageDrawable(getDrawable(R.drawable.qr_code))
+        ivSearchRef.setOnClickListener {
+            getCameraPermission()
         }
 
         mActivityCreateTaskBinding.edReference.addTextChangedListener(object : TextWatcher {
@@ -818,7 +808,8 @@ open class NewCreateTaskActivity :
                     }
                     if (category.taskReferencingEnabled == true) {
                         mActivityCreateTaskBinding.cvScanner.visibility = View.VISIBLE
-                        mActivityCreateTaskBinding.etScanner.addTextChangedListener(object: TextWatcher {
+                        mActivityCreateTaskBinding.etScanner.addTextChangedListener(object :
+                            TextWatcher {
                             override fun beforeTextChanged(
                                 p0: CharSequence?,
                                 p1: Int,
@@ -834,11 +825,31 @@ open class NewCreateTaskActivity :
                                 p2: Int,
                                 p3: Int
                             ) {
+                                if (p0.toString().length > 2) {
+                                    val api1 =
+                                        TrackiSdkApplication.getApiMap()[ApiType.SEARCH_REFERENCE_ELIGIBLE_TASKS]!!
+                                    searchRequest!!.query = p0.toString().toString()
+                                    searchRequest!!.catId = categoryId
+                                    ivSearchRef.setImageDrawable(getDrawable(R.drawable.ic_cross))
+                                    ivSearchRef.setOnClickListener {
+                                        etScanner.setText("")
+                                    }
+                                    mCreateTaskViewModel.getSearchReferenceList(
+                                        httpManager,
+                                        api1,
+                                        searchRequest
+                                    )
+                                } else {
+                                    ivSearchRef.setOnClickListener {
+                                        getCameraPermission()
+                                    }
+                                    ivSearchRef.setImageDrawable(getDrawable(R.drawable.qr_code))
 
+                                }
                             }
 
                             override fun afterTextChanged(text: Editable?) {
-                                searchRefTask(text.toString())
+
                             }
                         })
                     } else {
@@ -1985,14 +1996,10 @@ open class NewCreateTaskActivity :
         }
     }
 
-    private fun searchRefTask(item: String? = ""){
-        val api = TrackiSdkApplication.getApiMap()[ApiType.TASKS]!!
-        searchRequest?.categoryId = ""
-        searchRequest?.stageId = ""
-        val arrayList = kotlin.collections.ArrayList<String>()
-        arrayList.add(item!!)
-        searchRequest!!.catIds = arrayList
-        mCreateTaskViewModel.getTaskList(httpManager,api,searchRequest)
+    private fun searchRefTask(apitemp: Api) {
+
+        Log.e("checkUrl", "${apitemp.url}")
+//        mCreateTaskViewModel.getSearchReferenceList(httpManager, apitemp, searchRequest)
     }
 
     private fun callSlotApi(ddHubs: Spinner) {
@@ -2330,23 +2337,89 @@ open class NewCreateTaskActivity :
 
     override fun handleTaskResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         if (CommonUtils.handleResponse(callback, error, result, this)) {
-            if (null != this) {
-                this.runOnUiThread(Runnable {
-                    val taskListing =
-                        Gson().fromJson(
-                            result.toString(),
-                            TaskListing::class.java
-                        )
-                    if (taskListing.paginationData != null) {
-                        val list =
-                            taskListing.tasks
 
-                        Log.e("taskSearch","${list?.get(0)?.taskName}")
-                    }
-                })
+            val taskListing =
+                Gson().fromJson(
+                    result.toString(),
+                    SearchRefResponse::class.java
+                )
+            if (taskListing.data != null) {
+                val list =
+                    taskListing.data
+
+
+                if (list != null) {
+
+                    setupAutoCompleteTextView(list)
+                }
+
             }
         }
     }
+
+    override fun handleTDResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, this@NewCreateTaskActivity)) {
+            var taskResponse1 = Gson().fromJson("$result", TaskResponse::class.java)
+            if (taskResponse1 != null) {
+                if (taskResponse1.taskDetail != null) {
+                    val taskResponse = taskResponse1.taskDetail
+                    mActivityCreateTaskBinding.rlReference.visibility = View.VISIBLE
+                    mActivityCreateTaskBinding.tvClientTaskId.text = taskResponse!!.clientTaskId
+                    listRef.clear()
+                    listRef.add(taskResponse.taskId.toString())
+                    mActivityCreateTaskBinding.tvReferenceCreatedBy.text =
+                        taskResponse.contact?.name
+                    mActivityCreateTaskBinding.rlReference.setOnClickListener {
+                        val intent = Intent(
+                            this@NewCreateTaskActivity,
+                            NewTaskDetailsActivity::class.java
+                        )
+                        intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskResponse.taskId)
+                        intent.putExtra(
+                            AppConstants.Extra.EXTRA_ALLOW_SUB_TASK,
+                            taskResponse.allowSubTask
+                        )
+                        intent.putExtra(
+                            AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID,
+                            taskResponse.subCategoryIds
+                        )
+                        intent.putExtra(
+                            AppConstants.Extra.EXTRA_PARENT_REF_ID,
+                            taskResponse.referenceId
+                        )
+                        intent.putExtra(
+                            AppConstants.Extra.EXTRA_CATEGORY_ID,
+                            taskResponse.categoryId
+                        )
+                        intent.putExtra(
+                            AppConstants.Extra.FROM,
+                            AppConstants.Extra.ASSIGNED_TO_ME
+                        )
+                        startActivity(intent)
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    private fun setupAutoCompleteTextView(list: Map<String, String>) {
+        val listTemp = kotlin.collections.ArrayList<String>()
+        val listTemp1 = kotlin.collections.ArrayList<String>()
+        for (item in list) {
+            listTemp.add(item.value)
+            listTemp1.add(item.key)
+        }
+        Log.e("checkList", "${list.size}")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listTemp)
+        etScanner.setAdapter(adapter)
+        etScanner.setOnItemClickListener { adapterView, view, pos, l ->
+
+            mCreateTaskViewModel.getTaskDetails(httpManager, listTemp1[pos])
+        }
+    }
+
 
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
@@ -2645,13 +2718,15 @@ open class NewCreateTaskActivity :
             TrackiToast.Message.showShort(this, "Please Select Your Buddy")
         } else if (llClient.visibility == View.VISIBLE && spnClient.selectedItem == null) {
             TrackiToast.Message.showShort(this, "Please Select Client")
-        } else if (llClient.visibility == View.VISIBLE && spnClient.selectedItem.toString().trim()
+        } else if (llClient.visibility == View.VISIBLE && spnClient.selectedItem.toString()
+                .trim()
                 .isEmpty()
         ) {
             TrackiToast.Message.showShort(this, "Please Select Client")
         } else if (cardViewClientList.visibility == View.VISIBLE && !::selectedUserId.isInitialized) {
             TrackiToast.Message.showShort(this, "Please Select Requested By")
-        } else if (cardViewClientList.visibility == View.VISIBLE && selectedUserId.toString().trim()
+        } else if (cardViewClientList.visibility == View.VISIBLE && selectedUserId.toString()
+                .trim()
                 .isEmpty()
         ) {
             TrackiToast.Message.showShort(this, "Please Select Requested By")
@@ -2820,7 +2895,8 @@ open class NewCreateTaskActivity :
                 createTaskRequest!!.multiReferedTask = listRef
             }
             if (intent.hasExtra("directMapping")) {
-                createTaskRequest!!.directMapping = intent.getBooleanExtra("directMapping", false)
+                createTaskRequest!!.directMapping =
+                    intent.getBooleanExtra("directMapping", false)
             }
             if (intent.hasExtra("invIds")) {
                 createTaskRequest!!.invIds = intent.getStringArrayListExtra("invIds")
@@ -2946,7 +3022,10 @@ open class NewCreateTaskActivity :
                     }
                     var jsonConverter =
                         JSONConverter<HashMap<String, ArrayList<File>>>();
-                    Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(hashMapFileRequest))
+                    Log.e(
+                        DynamicFormActivity.TAG,
+                        jsonConverter.objectToJson(hashMapFileRequest)
+                    )
                     Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
                     if (hashMapFileRequest.isNotEmpty()) {
 
@@ -2956,7 +3035,8 @@ open class NewCreateTaskActivity :
                         if (NetworkUtils.isNetworkConnected(this@NewCreateTaskActivity)) {
                             if (NetworkUtils.isConnectedFast(this@NewCreateTaskActivity)) {
                                 mActivityCreateTaskBinding.btnCLick.visibility = View.GONE
-                                mActivityCreateTaskBinding.viewProgress.visibility = View.VISIBLE
+                                mActivityCreateTaskBinding.viewProgress.visibility =
+                                    View.VISIBLE
                                 CommonUtils.makeScreenDisable(this)
                                 fileUploadCounter = 0
                                 nestedScrollView.postDelayed(
@@ -2967,7 +3047,8 @@ open class NewCreateTaskActivity :
                                 val thread = HandlerThread("workkker")
                                 thread.start()
                                 //start a handler
-                                mDynamicHandler = DynamicHandler(thread.looper, dynamicActionConfig)
+                                mDynamicHandler =
+                                    DynamicHandler(thread.looper, dynamicActionConfig)
 //                        start a thread other than main
                                 handlerThread?.setRequestParams(
                                     mDynamicHandler!!,
@@ -3050,7 +3131,10 @@ open class NewCreateTaskActivity :
                     }
                     var jsonConverter =
                         JSONConverter<HashMap<String, ArrayList<File>>>();
-                    Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(hashMapFileRequest))
+                    Log.e(
+                        DynamicFormActivity.TAG,
+                        jsonConverter.objectToJson(hashMapFileRequest)
+                    )
                     Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
                     if (hashMapFileRequest.isNotEmpty()) {
 
@@ -3065,7 +3149,8 @@ open class NewCreateTaskActivity :
                                 Log.e(TAG, "worker thread open")
                                 // showLoading()
                                 mActivityCreateTaskBinding.btnCLick.visibility = View.GONE
-                                mActivityCreateTaskBinding.viewProgress.visibility = View.VISIBLE
+                                mActivityCreateTaskBinding.viewProgress.visibility =
+                                    View.VISIBLE
                                 CommonUtils.makeScreenDisable(this)
                                 nestedScrollView.postDelayed(
                                     { nestedScrollView.fullScroll(View.FOCUS_DOWN) },
@@ -3075,7 +3160,8 @@ open class NewCreateTaskActivity :
                                 val thread = HandlerThread("workkker")
                                 thread.start()
                                 //start a handler
-                                mDynamicHandler = DynamicHandler(thread.looper, dynamicActionConfig)
+                                mDynamicHandler =
+                                    DynamicHandler(thread.looper, dynamicActionConfig)
 //                        start a thread other than main
                                 handlerThread?.setRequestParams(
                                     mDynamicHandler!!,
@@ -3190,13 +3276,15 @@ open class NewCreateTaskActivity :
     override fun upLoadFileApiResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
         if (CommonUtils.handleResponse(callback, error, result, this@NewCreateTaskActivity)) {
-            val fileUrlsResponse = Gson().fromJson(result.toString(), FileUrlsResponse::class.java)
+            val fileUrlsResponse =
+                Gson().fromJson(result.toString(), FileUrlsResponse::class.java)
             val fileResponseMap = fileUrlsResponse.filesUrl
             if (mainData != null) {
                 for (i in mainData!!.indices) {
                     var formData = mainData!![i]
                     if (fileResponseMap!!.containsKey(formData.name)) {
-                        var fileUrlList: java.util.ArrayList<String> = java.util.ArrayList<String>()
+                        var fileUrlList: java.util.ArrayList<String> =
+                            java.util.ArrayList<String>()
                         fileUrlList = fileResponseMap[formData.name]!!
                         val commaSeperatedString = fileUrlList.joinToString { it -> it }
                         formData.enteredValue = commaSeperatedString
@@ -3217,13 +3305,15 @@ open class NewCreateTaskActivity :
         error: APIError?
     ) {
         if (CommonUtils.handleResponse(callback, error, result, this@NewCreateTaskActivity)) {
-            val fileUrlsResponse = Gson().fromJson(result.toString(), FileUrlsResponse::class.java)
+            val fileUrlsResponse =
+                Gson().fromJson(result.toString(), FileUrlsResponse::class.java)
             val fileResponseMap = fileUrlsResponse.filesUrl
             if (mainData != null) {
                 for (i in mainData!!.indices) {
                     var formData = mainData!![i]
                     if (fileResponseMap!!.containsKey(formData.name)) {
-                        var fileUrlList: java.util.ArrayList<String> = java.util.ArrayList<String>()
+                        var fileUrlList: java.util.ArrayList<String> =
+                            java.util.ArrayList<String>()
                         fileUrlList = fileResponseMap[formData.name]!!
                         val commaSeperatedString = fileUrlList.joinToString { it -> it }
                         formData.enteredValue = commaSeperatedString
@@ -3335,7 +3425,8 @@ open class NewCreateTaskActivity :
                                             parent.getItemAtPosition(position).toString()
                                         regionId = list[position].id
                                         CommonUtils.showLogMessage("e", "regionId", regionId);
-                                        var getUserManualLocationData = GetManualLocationRequest()
+                                        var getUserManualLocationData =
+                                            GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionId
                                         getUserManualLocationData.userGeoReq = allowGeography
                                         spnCategoryStartState.adapter = null
@@ -3389,8 +3480,13 @@ open class NewCreateTaskActivity :
                                         val selectedItem =
                                             parent.getItemAtPosition(position).toString()
                                         regionIdEnd = list[position].id
-                                        CommonUtils.showLogMessage("e", "regionIdEnd", regionIdEnd);
-                                        var getUserManualLocationData = GetManualLocationRequest()
+                                        CommonUtils.showLogMessage(
+                                            "e",
+                                            "regionIdEnd",
+                                            regionIdEnd
+                                        );
+                                        var getUserManualLocationData =
+                                            GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionIdEnd
                                         spnCategoryEndState.adapter = null
                                         stateIdEnd = null
@@ -3535,7 +3631,8 @@ open class NewCreateTaskActivity :
                                             parent.getItemAtPosition(position).toString()
                                         stateId = list[position].id
                                         CommonUtils.showLogMessage("e", "stateId", stateId);
-                                        var getUserManualLocationData = GetManualLocationRequest()
+                                        var getUserManualLocationData =
+                                            GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionId
                                         getUserManualLocationData.stateId = stateId
                                         getUserManualLocationData.userGeoReq = allowGeography
@@ -3591,8 +3688,13 @@ open class NewCreateTaskActivity :
                                         val selectedItem =
                                             parent.getItemAtPosition(position).toString()
                                         stateIdEnd = list[position].id
-                                        CommonUtils.showLogMessage("e", "stateIdEnd", stateIdEnd);
-                                        var getUserManualLocationData = GetManualLocationRequest()
+                                        CommonUtils.showLogMessage(
+                                            "e",
+                                            "stateIdEnd",
+                                            stateIdEnd
+                                        );
+                                        var getUserManualLocationData =
+                                            GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionIdEnd
                                         getUserManualLocationData.stateId = stateIdEnd
                                         getUserManualLocationData.userGeoReq = allowGeography
@@ -3738,7 +3840,8 @@ open class NewCreateTaskActivity :
                                             parent.getItemAtPosition(position).toString()
                                         cityId = list[position].id
                                         CommonUtils.showLogMessage("e", "cityId", cityId);
-                                        var getUserManualLocationData = GetManualLocationRequest()
+                                        var getUserManualLocationData =
+                                            GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionId
                                         getUserManualLocationData.stateId = stateId
                                         getUserManualLocationData.cityId = cityId
@@ -3798,7 +3901,8 @@ open class NewCreateTaskActivity :
                                             parent.getItemAtPosition(position).toString()
                                         cityIdEnd = list[position].id
                                         CommonUtils.showLogMessage("e", "cityIdEnd", cityIdEnd);
-                                        var getUserManualLocationData = GetManualLocationRequest()
+                                        var getUserManualLocationData =
+                                            GetManualLocationRequest()
                                         getUserManualLocationData.regionId = regionIdEnd
                                         getUserManualLocationData.stateId = stateIdEnd
                                         getUserManualLocationData.cityId = cityIdEnd
@@ -4186,7 +4290,8 @@ open class NewCreateTaskActivity :
                                                 CommonUtils.stringListHashMap[mainData!![i].name]
                                             )
                                     }
-                                    finalMap[mainData!![i].name!!] = mainData!![i].enteredValue!!
+                                    finalMap[mainData!![i].name!!] =
+                                        mainData!![i].enteredValue!!
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -4285,7 +4390,8 @@ open class NewCreateTaskActivity :
 
     private fun getUserSuggestionListViewModel(): GetUserSuggestionListViewModel {
         val factory =
-            RocketFlyer.dataManager()?.let { GetUserSuggestionListViewModel.Factory(it) } // Factory
+            RocketFlyer.dataManager()
+                ?.let { GetUserSuggestionListViewModel.Factory(it) } // Factory
         if (factory != null) {
             mGetSuggetionViewModel =
                 ViewModelProvider(this, factory)[GetUserSuggestionListViewModel::class.java]

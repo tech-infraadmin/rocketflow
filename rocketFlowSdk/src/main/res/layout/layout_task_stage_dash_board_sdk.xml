@@ -16,7 +16,7 @@
 
         <include
             android:id="@+id/toolLayoutDashboard"
-            android:visibility="gone"
+            android:visibility="visible"
             layout="@layout/new_main_task_tool_sdk" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

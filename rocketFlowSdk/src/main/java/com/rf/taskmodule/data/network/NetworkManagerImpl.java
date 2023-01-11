@@ -633,6 +633,11 @@ public class NetworkManagerImpl implements NetworkManager {
     }
 
     @Override
+    public void searchReferenceTask(ApiCallback apiCallback, HttpManager httpManager, Api api){
+        getApiCall(apiCallback, httpManager, api);
+    }
+
+    @Override
     public void getProductTerminalCatgeory(ApiCallback apiCallback, HttpManager httpManager, Api api) {
         getApiCall(apiCallback, httpManager, api);
     }
@@ -882,6 +887,7 @@ public class NetworkManagerImpl implements NetworkManager {
                                 response = handleApiCache(true);
                                 break;
                             case CONFIG:
+                            case SEARCH_REFERENCE_ELIGIBLE_TASKS:
                             case SDK_LOGIN_TOKEN:
                             case LOGOUT:
                             case NOTIFICATIONS:
@@ -953,6 +959,7 @@ public class NetworkManagerImpl implements NetworkManager {
                     case POST: {
                         switch (Objects.requireNonNull(api.getName())) {
                             case LOGIN:
+                            case SEARCH_REFERENCE_ELIGIBLE_TASKS:
                             case BOOK_TIME_SLOT:
                             case SAVE_TASK_UNITS:
                             case CTA_SEND_OTP:

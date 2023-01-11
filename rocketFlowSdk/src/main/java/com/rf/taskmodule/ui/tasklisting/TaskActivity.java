@@ -16,6 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.rf.taskmodule.data.model.response.config.Buddy;
 import com.rf.taskmodule.data.model.response.config.BuddyListResponse;
@@ -41,6 +42,7 @@ import com.rf.taskmodule.ui.tasklisting.ihaveassigned.IhaveAssignedFragment;
 import com.rf.taskmodule.ui.tasklisting.ihaveassigned.TabDataClass;
 import com.rf.taskmodule.utils.AppConstants;
 import com.rf.taskmodule.utils.JSONConverter;
+import com.rf.taskmodule.utils.Log;
 import com.rocketflow.sdk.RocketFlyer;
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
 import com.rf.taskmodule.data.model.response.config.Buddy;
@@ -73,6 +75,8 @@ import com.rf.taskmodule.utils.CommonUtils;
 import com.rf.taskmodule.utils.JSONConverter;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -262,7 +266,7 @@ public class TaskActivity extends BaseSdkActivity<ActivityTaskSdkBinding, TaskVi
 //            }
 //        });
 //    }
-
+String categoryName = "";
     @SuppressLint("RestrictedApi")
     private void setUp() {
         if (getIntent() != null) {
@@ -271,6 +275,7 @@ public class TaskActivity extends BaseSdkActivity<ActivityTaskSdkBinding, TaskVi
                 CommonUtils.showLogMessage("e", "categoryMap", categoryMap);
                 mMapCategory = new Gson().fromJson(categoryMap, new TypeToken<HashMap<String, String>>() {
                 }.getType());
+
             }
             if (getIntent().hasExtra(AppConstants.Extra.EXTRA_TASK_ID)) {
 //                viewPager.setCurrentItem(1);
@@ -294,6 +299,8 @@ public class TaskActivity extends BaseSdkActivity<ActivityTaskSdkBinding, TaskVi
         }
         preferencesHelper.setIsFleetAndBuddyShow(false);
         if (getIntent().hasExtra(AppConstants.Extra.TITLE)) {
+            categoryName = getIntent().getStringExtra(AppConstants.Extra.TITLE);
+            Log.d("EXTRA_CATEGORIES", categoryName);
             setToolbar(mActivityTaskSdkBinding.toolbar, getIntent().getStringExtra(AppConstants.Extra.TITLE));
         } else {
             setToolbar(mActivityTaskSdkBinding.toolbar, getString(R.string.tasks));
@@ -307,7 +314,6 @@ public class TaskActivity extends BaseSdkActivity<ActivityTaskSdkBinding, TaskVi
         if(mMapCategory==null){
             mMapCategory = new HashMap<>();
             categoryMap = "{\"categoryId\":\""+getIntent().getStringExtra(AppConstants.Extra.EXTRA_STAGEID)+"\"}";
-
             mMapCategory.put("categoryId",getIntent().getStringExtra(AppConstants.Extra.EXTRA_STAGEID));
         }
 
@@ -378,8 +384,7 @@ public class TaskActivity extends BaseSdkActivity<ActivityTaskSdkBinding, TaskVi
                         String merchantTabLabel="Request BY Merchant";
                         if (channelSetting.getMerchantTaskLabel() != null && !channelSetting.getMerchantTaskLabel().isEmpty())
                             merchantTabLabel=channelSetting.getMerchantTaskLabel();
-                        fragments.add(new TabDataClass(IhaveAssignedFragment.newInstance(categoryMap, fromDate, toDate,true,userGeoReq), merchantTabLabel));
-
+                        fragments.add(new TabDataClass(IhaveAssignedFragment.newInstance(categoryMap, fromDate, toDate,true,userGeoReq,categoryName), merchantTabLabel));
                         mPagerAdapter.setFragments(fragments);
                         // tabLayout.getTabAt(0).select();
                         viewPager.setAdapter(mPagerAdapter);
@@ -395,9 +400,9 @@ public class TaskActivity extends BaseSdkActivity<ActivityTaskSdkBinding, TaskVi
                     if (channelSetting.getAllowCreation() != null && channelSetting.getAllowCreation()
                             && channelSetting.getTaskExecution() != null && channelSetting.getTaskExecution()) {
                         if (channelSetting.getExecutionTitle() != null && !channelSetting.getExecutionTitle().isEmpty())
-                            fragments.add(new TabDataClass(AssignedtoMeFragment.newInstance(categoryMap, fromDate, toDate, null, null,userGeoReq), channelSetting.getExecutionTitle()));
+                            fragments.add(new TabDataClass(AssignedtoMeFragment.newInstance(categoryMap, fromDate, toDate, null, null,userGeoReq,categoryName), channelSetting.getExecutionTitle()));
                         if (channelSetting.getCreationTitle() != null && !channelSetting.getCreationTitle().isEmpty())
-                            fragments.add(new TabDataClass(IhaveAssignedFragment.newInstance(categoryMap, fromDate, toDate,false,userGeoReq), channelSetting.getCreationTitle()));
+                            fragments.add(new TabDataClass(IhaveAssignedFragment.newInstance(categoryMap, fromDate, toDate,false,userGeoReq,categoryName), channelSetting.getCreationTitle()));
                         if (channelSetting.getCreationMode() == CreationMode.DIRECT) {
                             ivCreateTask.setVisibility(View.VISIBLE);
                         } else {
@@ -430,12 +435,10 @@ public class TaskActivity extends BaseSdkActivity<ActivityTaskSdkBinding, TaskVi
                                     viewPager.setCurrentItem(1, true);
                                 }
                             }
-
-
                         }
                     } else if (channelSetting.getTaskExecution() != null && channelSetting.getTaskExecution() && (channelSetting.getAllowCreation() == null || !channelSetting.getAllowCreation())) {
                         if (channelSetting.getExecutionTitle() != null && !channelSetting.getExecutionTitle().isEmpty())
-                            fragments.add(new TabDataClass(AssignedtoMeFragment.newInstance(categoryMap, fromDate, toDate, null, null,userGeoReq), channelSetting.getExecutionTitle()));
+                            fragments.add(new TabDataClass(AssignedtoMeFragment.newInstance(categoryMap, fromDate, toDate, null, null,userGeoReq,categoryName), channelSetting.getExecutionTitle()));
                         ivCreateTask.setVisibility(View.GONE);
                         tabLayout.setVisibility(View.GONE);
                         mPagerAdapter.setFragments(fragments);
@@ -463,7 +466,7 @@ public class TaskActivity extends BaseSdkActivity<ActivityTaskSdkBinding, TaskVi
                     } else if (channelSetting.getAllowCreation() != null && channelSetting.getAllowCreation()
                             && (channelSetting.getTaskExecution() == null || !channelSetting.getTaskExecution())) {
                         if (channelSetting.getCreationTitle() != null && !channelSetting.getCreationTitle().isEmpty())
-                            fragments.add(new TabDataClass(IhaveAssignedFragment.newInstance(categoryMap, fromDate, toDate,false,userGeoReq), channelSetting.getCreationTitle()));
+                            fragments.add(new TabDataClass(IhaveAssignedFragment.newInstance(categoryMap, fromDate, toDate,false,userGeoReq,categoryName), channelSetting.getCreationTitle()));
                         if (channelSetting.getCreationMode() == CreationMode.DIRECT) {
                             ivCreateTask.setVisibility(View.VISIBLE);
                         } else {

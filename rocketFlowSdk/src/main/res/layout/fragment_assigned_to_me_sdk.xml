@@ -87,20 +87,18 @@
                     android:id="@+id/llDateRange"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/dimen_8"
-                    android:layout_marginRight="@dimen/dimen_8"
-                    android:layout_marginBottom="@dimen/dimen_10"
-                    android:layout_marginTop="@dimen/dimen_12"
                     android:orientation="horizontal"
                     android:weightSum="2">
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cardFromDate"
+                        android:layout_weight="1.4"
                         android:layout_width="0dp"
+                        android:visibility="gone"
                         android:layout_height="@dimen/dimen_30"
+                        android:layout_marginStart="@dimen/dimen_5"
                         android:layout_gravity="center_vertical"
-                        android:layout_weight="1.1"
-                        app:cardBackgroundColor="@color/windowBackgroundColor"
+                        app:cardBackgroundColor="@color/light_gray"
                         app:cardCornerRadius="@dimen/dimen_20"
                         app:cardElevation="@dimen/dimen_0">
 
@@ -108,29 +106,16 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
 
-                            <ImageView
-                                android:id="@+id/ivCalender"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:paddingLeft="@dimen/dimen_10"
-                                android:paddingTop="@dimen/dimen_2"
-                                android:paddingRight="@dimen/dimen_3"
-                                android:paddingBottom="@dimen/dimen_2"
-                                app:srcCompat="@drawable/ic_date_range"
-                                app:tint="@color/yellow_punch_btn" />
-
-                            <TextView
-                                android:id="@+id/tvFromDate"
-                                style="@style/TextViewStyle"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_marginLeft="@dimen/dimen_3"
-                                android:layout_toRightOf="@+id/ivCalender"
-                                android:background="@color/transparent"
-                                android:gravity="center_vertical"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="11sp" />
+                            <!--                        <TextView-->
+                            <!--                            android:id="@+id/tvFromDate"-->
+                            <!--                            style="@style/TextViewStyle"-->
+                            <!--                            android:layout_width="match_parent"-->
+                            <!--                            android:layout_height="match_parent"-->
+                            <!--                            android:layout_marginLeft="@dimen/dimen_3"-->
+                            <!--                            android:background="@color/transparent"-->
+                            <!--                            android:gravity="center"-->
+                            <!--                            android:textSize="@dimen/text_size_13"-->
+                            <!--                            android:textColor="@color/colorTextGreyPunch"/>-->
 
                             <ImageView
                                 android:id="@+id/ivDaysTriangle"
@@ -143,12 +128,12 @@
                                 app:srcCompat="@drawable/ic_down_triangle" />
                         </RelativeLayout>
 
-
                     </androidx.cardview.widget.CardView>
 
 
                     <RelativeLayout
                         android:layout_width="0dp"
+                        android:visibility="gone"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="@dimen/dimen_10"
@@ -203,6 +188,7 @@
                     <ImageButton
                         android:id="@+id/btnSubmit"
                         style="@style/ButtonStyle"
+                        android:visibility="gone"
                         android:layout_width="0dp"
                         android:layout_height="@dimen/dimen_30"
                         android:layout_gravity="center_vertical"
@@ -212,12 +198,36 @@
                         android:text="@string/submit"
                         android:textAllCaps="false"
                         android:textSize="10sp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:layout_width="wrap_content"
+                        android:text="Date"
+                        android:textAlignment="center"
+                        style="@style/TextViewStyle"
+                        android:layout_weight="1.4"
+                        android:textSize="@dimen/text_size_12"
+                        android:layout_margin="@dimen/dimen_5"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/tvFromDate" />
+
+                    <com.google.android.material.chip.Chip
+                        android:layout_width="wrap_content"
+                        android:text="All"
+                        style="@style/TextViewStyle"
+                        android:textSize="@dimen/text_size_12"
+                        android:textAlignment="center"
+                        android:layout_weight="0.6"
+                        android:layout_margin="@dimen/dimen_5"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/selectedStageChip" />
+
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardstages"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/dimen_5"
@@ -239,6 +249,40 @@
             </androidx.recyclerview.widget.RecyclerView>
         </androidx.cardview.widget.CardView>
 
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/no_data_layout"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/dimen_50"
+                android:layout_marginStart="@dimen/dimen_10"
+                android:layout_marginEnd="@dimen/dimen_10"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/imageViewEmpty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/dimen_5"
+                    app:srcCompat="@drawable/ic_empty_task" />
+
+                <TextView
+                    android:id="@+id/tv_message"
+                    style="@style/TextViewStyle"
+                    android:layout_marginTop="@dimen/dimen_18"
+                    android:gravity="center"
+                    android:textColor="@color/gray" />
+            </LinearLayout>
+
+        </LinearLayout>
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_container"

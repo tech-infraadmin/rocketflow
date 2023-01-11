@@ -73,6 +73,11 @@ class UpdateProfileRequest(
     private val mobile: String, private val profileImg: String?
 )
 
+class SearchReferenceRequest(){
+    var catId: String? = ""
+    var query: String? = ""
+}
+
 class TaskRequest(
     var status: MutableList<out TaskStatus>,
     var loadBy: BuddyInfo?,

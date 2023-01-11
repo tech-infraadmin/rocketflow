@@ -1,10 +1,10 @@
 package com.rf.taskmodule.ui.tasklisting.ihaveassigned;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
@@ -16,7 +16,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,12 +23,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -131,13 +132,14 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
     private boolean isMerchantTab;
     private boolean userGeoReq = false;
 
-    public static IhaveAssignedFragment newInstance(String value, long fromDate, long toDate, boolean isMerchantTab, boolean geoReq) {
+    public static IhaveAssignedFragment newInstance(String value, long fromDate, long toDate, boolean isMerchantTab, boolean geoReq, String categoryName) {
         Bundle args = new Bundle();
         args.putString(AppConstants.Extra.EXTRA_CATEGORIES, value);
         args.putLong(AppConstants.Extra.FROM_DATE, fromDate);
         args.putLong(AppConstants.Extra.FROM_TO, toDate);
         args.putBoolean(AppConstants.Extra.GEO_FILTER,geoReq);
         args.putBoolean(AppConstants.Extra.IS_MERCHANT_TAB, isMerchantTab);
+        args.putString(AppConstants.Extra.EXTRA_CATEGORIES_NAME,categoryName);
         IhaveAssignedFragment fragment = new IhaveAssignedFragment();
         fragment.setArguments(args);
         return fragment;
@@ -163,7 +165,7 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         mIhaveAssignedViewModel = ViewModelProviders.of(this, factory).get(IhaveAssignedViewModel.class);
         return mIhaveAssignedViewModel;
     }
-
+    String categoryName = "";
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,6 +186,8 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
 
         if (getArguments() != null) {
             String str = getArguments().getString(AppConstants.Extra.EXTRA_CATEGORIES);
+            categoryName = getArguments().getString(AppConstants.Extra.EXTRA_CATEGORIES_NAME);
+            Log.e("EXTRA_CATEGORIES",""+str);
             isMerchantTab = getArguments().getBoolean(AppConstants.Extra.IS_MERCHANT_TAB, false);
             userGeoReq = getArguments().getBoolean(AppConstants.Extra.GEO_FILTER,false);
             Log.e("userGeoReq",""+userGeoReq);
@@ -492,8 +496,18 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
                     List<Task> list = taskListing.getTasks();
                     mIhaveAssignedViewModel.getTaskListLiveData().setValue(list);
                     setRecyclerView();
+
+                    if (mIhaveAssignedAdapter.getItemCount() > 0 ){
+                        mFragmentIHaveAssignedSdkBinding.noDataLayout.setVisibility(View.GONE);
+                    } else {
+                        mFragmentIHaveAssignedSdkBinding.noDataLayout.setVisibility(View.VISIBLE);
+                        mFragmentIHaveAssignedSdkBinding.tvMessage.setText("Seems,you don't have any task under "+categoryName);
+                    }
+
                     CommonUtils.showLogMessage("e", "adapter total_count =>",
                             "" + mIhaveAssignedAdapter.getItemCount());
+                    CommonUtils.showLogMessage("e", "adapter total_count =>",
+                            "" + categoryMap.toString());
                     CommonUtils.showLogMessage("e", "fetch total_count =>",
                             "" + taskListing.getPaginationData().getDataCount());
                     if (taskListing.getPaginationData().getDataCount() == mIhaveAssignedAdapter.getItemCount()) {
@@ -786,7 +800,8 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
                         calendar.set(Calendar.SECOND, 0);
                         CommonUtils.openDatePicker(getBaseActivity(), mYear, mMonth,
                                 mDay, calendar.getTimeInMillis(), 0, (view_, yearEnd, monthOfYearEnd, dayOfMonthEnd) -> {
-                                    fromDate = calendar.getTimeInMillis();
+                                    //fromDate = calendar.getTimeInMillis();
+                                    fromDateDialog = calendar.getTimeInMillis();
                                     Calendar calEnd = Calendar.getInstance();
                                     calEnd.set(Calendar.YEAR, yearEnd);
                                     calEnd.set(Calendar.MONTH, monthOfYearEnd);
@@ -794,8 +809,11 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
                                     calEnd.set(Calendar.HOUR_OF_DAY, 23);
                                     calEnd.set(Calendar.MINUTE, 59);
                                     calEnd.set(Calendar.SECOND, 0);
-                                    toDate = calEnd.getTimeInMillis();
-                                    dateChange.setText(DateTimeUtil.getParsedDate(fromDate) + " - " + DateTimeUtil.getParsedDate(toDate));
+                                    //toDate = calEnd.getTimeInMillis();
+                                    toDateDialog = calEnd.getTimeInMillis();
+                                    Log.d("selected", DateTimeUtil.getParsedDateApply(fromDate));
+                                    Log.d("selected", DateTimeUtil.getParsedDateApply(toDate));
+                                    dateChange.setText(DateTimeUtil.getParsedDate(fromDateDialog) + " - " + DateTimeUtil.getParsedDate(toDateDialog));
                                 });
 
                     });
@@ -861,6 +879,17 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         MenuItem myActionMenuItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) myActionMenuItem.getActionView();
 
+        EditText txtSearch = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        txtSearch.setHint(getResources().getString(R.string.search_hint));
+        txtSearch.setHintTextColor(Color.LTGRAY);
+        txtSearch.setTextColor(Color.WHITE);
+        ColorStateList colorStateList = ColorStateList.valueOf(Color.WHITE);
+        ViewCompat.setBackgroundTintList(txtSearch, colorStateList);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            txtSearch.setTextCursorDrawable(R.drawable.cursor);
+            txtSearch.getTextCursorDrawable().setTint(ContextCompat.getColor(requireActivity(), R.color.white));
+        }
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -894,19 +923,6 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_filter) {
-//            Intent intent = TaskFilterActivity.Companion.newIntent(getBaseActivity());
-//            if (regionId != null)
-//                intent.putExtra("regionId", regionId);
-//            if (hubIdStr != null)
-//                intent.putExtra("hubIdStr", hubIdStr);
-//            if (stateId != null)
-//                intent.putExtra("stateId", stateId);
-//            if (cityId != null)
-//                intent.putExtra("cityId", cityId);
-//            if (categoryId != null)
-//                intent.putExtra("categoryId", categoryId);
-//            intent.putExtra("from", AppConstants.TASK);
-//            startActivityForResult(intent, AppConstants.REQUEST_CODE_FILTER_USER);
             showBottomSheetDialog();
         }
         return super.onOptionsItemSelected(item);
@@ -916,7 +932,11 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
 
     TextView dateChange;
     private void showBottomSheetDialog() {
+
+
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity());
+        bottomSheetDialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
+
         bottomSheetDialog.setContentView(R.layout.bottom_sheet_dialog);
         ChipGroup dateGroup = bottomSheetDialog.findViewById(R.id.chip_group_filter_date);
         dateGroup.check(selectedRange);
@@ -935,8 +955,13 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         apply.setOnClickListener(view -> {
             int selected = taskGroup.getCheckedChipId();
             Chip chip = taskGroup.findViewById(selected);
-            Log.d("selected",chip.getTag().toString());
-            Log.d("selected",chip.getText().toString());
+
+            fromDate = fromDateDialog;
+            toDate = toDateDialog;
+
+            Log.d("selected here", DateTimeUtil.getParsedDateApply(fromDate));
+            Log.d("selected here ", DateTimeUtil.getParsedDateApply(toDate));
+
             stageId= chip.getTag().toString();
             if (getBaseActivity() != null && getBaseActivity().isNetworkConnected()) {
                 String tvDate1 = tvFromDate.getText().toString().trim();
@@ -953,6 +978,8 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
                     showLoading();
                     buddyRequest.setStageId(chip.getTag().toString());
                     buddyRequest.setUserGeoReq(userGeoReq);
+                    buddyRequest.setFrom(fromDate);
+                    buddyRequest.setTo(toDate);
                     mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
                     mFragmentIHaveAssignedSdkBinding.selectedStageChip.setText(chip.getText().toString());
                     mFragmentIHaveAssignedSdkBinding.tvFromDate.setText(dateChange.getText().toString());

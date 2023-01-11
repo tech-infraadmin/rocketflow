@@ -16,6 +16,7 @@ interface NewCreateTaskNavigator :BaseSdkNavigator {
     fun checkFleetResponse(callback: ApiCallback?, result: Any?, error: APIError?)
     override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?)
     fun handleTaskResponse(callback: ApiCallback, result: Any?, error: APIError?)
+    fun handleTDResponse(callback: ApiCallback, result: Any?, error: APIError?)
     fun upLoadFileApiResponse(callback: ApiCallback, result: Any?, error: APIError?)
     fun upLoadFileDisposeApiResponse(callback: ApiCallback, result: Any?, error: APIError?)
     fun handleRegionListResponse(callback: ApiCallback, result: Any?, error: APIError?, isStart:Boolean)

@@ -28,22 +28,29 @@
                 android:orientation="vertical"
                 android:paddingVertical="@dimen/dimen_20">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OTP Verification"
+                    style="@style/TextViewStyleBold"
+                    android:textSize="@dimen/text_size_20"/>
+
                 <EditText
+                    android:layout_marginTop="@dimen/dimen_20"
                     android:id="@+id/edOtp"
                     style="@style/EditTextStyle"
                     android:layout_gravity="center"
                     android:layout_marginHorizontal="@dimen/dimen_60"
                     android:background="@drawable/custom_edit_border_bg"
                     android:gravity="center"
-                    android:hint="@string/code"
+                    android:hint="Please Enter The OTP"
                     android:imeOptions="actionDone"
                     android:inputType="number"
                     android:paddingTop="@dimen/dimen_10"
                     android:maxLength="6"
                     android:paddingBottom="@dimen/dimen_10"
                     android:textColorHint="@color/warm_gray_2"
-                    android:textSize="@dimen/text_size_14"
-                    tools:text="000000" />
+                    android:textSize="@dimen/text_size_14" />
 
                 <LinearLayout
                     android:gravity="center_horizontal"
@@ -52,26 +59,26 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <Button
-                        android:id="@+id/btnVeriFy"
-                        style="@style/ButtonStyle"
-                        android:layout_height="@dimen/dimen_45"
-                        android:layout_marginTop="@dimen/dimen_20"
-                        android:fontFamily="@font/campton_book"
-                        android:paddingLeft="@dimen/dimen_10"
-                        android:paddingRight="@dimen/dimen_10"
-                        android:text="@string/verify_otp" />
+
 
                     <Button
-                        android:layout_marginStart="@dimen/dimen_15"
                         android:id="@+id/btnCancel"
                         style="@style/ButtonStyle"
                         android:layout_height="@dimen/dimen_45"
                         android:layout_marginTop="@dimen/dimen_20"
                         android:fontFamily="@font/campton_book"
-                        android:paddingLeft="@dimen/dimen_10"
-                        android:paddingRight="@dimen/dimen_10"
+                        android:paddingHorizontal="@dimen/dimen_10"
                         android:text="@string/cancel" />
+
+                    <Button
+                        android:layout_marginStart="@dimen/dimen_15"
+                        android:id="@+id/btnVeriFy"
+                        style="@style/ButtonStyle"
+                        android:layout_height="@dimen/dimen_45"
+                        android:layout_marginTop="@dimen/dimen_20"
+                        android:fontFamily="@font/campton_book"
+                        android:paddingHorizontal="@dimen/dimen_10"
+                        android:text="@string/verify_otp" />
 
                 </LinearLayout>
 

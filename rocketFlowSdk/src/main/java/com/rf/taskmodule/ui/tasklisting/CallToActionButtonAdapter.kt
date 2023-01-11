@@ -55,13 +55,13 @@ class CallToActionButtonAdapter (var context: Context, var mListener: TaskClickL
             ctaButtonBinding.executePendingBindings()
             if(dataModel.name.toString().toUpperCase().contains("CANCEL")||dataModel.name.toString().toUpperCase().contains("REJECT"))
             {
-                ctaButtonBinding.ctaButton.background=ContextCompat.getDrawable(context,R.drawable.cancel_button)
-                ctaButtonBinding.ctaButton.setTextColor(ContextCompat.getColor(context,R.color.red_dark4))
+               // ctaButtonBinding.ctaButton.background=ContextCompat.getDrawable(context,R.drawable.cancel_button)
+                ctaButtonBinding.ctaButton.setTextColor(ContextCompat.getColor(context,R.color.white))
             }else if(dataModel.primary){
                 ctaButtonBinding.ctaButton.background=ContextCompat.getDrawable(context,R.drawable.button_green_bg)
             }
             val displayMetrics = DisplayMetrics()
-            (context as Activity).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics)
+            (context as Activity).windowManager.getDefaultDisplay().getMetrics(displayMetrics)
             val height = displayMetrics.heightPixels
             var width = displayMetrics.widthPixels/2
             width=width- CommonUtils.dpToPixel(context,25)

@@ -93,6 +93,7 @@ class TaskDetailsFragment :
     private val REQUEST_CAMERA: Int = 101
     private var qrUrl = "na"
     var resp = "na"
+    var timeLineMore = false
     lateinit var foundWidgetItem: FoundWidgetItem
     var offside = 1
     private var recyclerCtaButton: RecyclerView? = null
@@ -138,6 +139,7 @@ class TaskDetailsFragment :
 
     private var task: Task? = null
     private var taskRef: Task? = null
+    var highList: kotlin.collections.List<StageHistoryData> = kotlin.collections.ArrayList()
 
     lateinit var showDynamicFormDataAdapter: ShowDynamicFormDataAdapter
 
@@ -237,7 +239,7 @@ class TaskDetailsFragment :
 
         //rvDynamicForm.adapter = showDynamicFormDataAdapter
 
-        // addGeoFenceUtil = AddGeoFenceUtil(baseActivity, preferencesHelper)
+        addGeoFenceUtil = AddGeoFenceUtil(baseActivity, preferencesHelper)
         tvLabelTakeAction!!.setOnClickListener {
             sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
@@ -355,6 +357,11 @@ class TaskDetailsFragment :
                         )
                 }
 
+                mActivityNewTaskDetailBinding.tvTimelineMore.setOnClickListener {
+                    timeLineMore = true
+                    setAdapter()
+                }
+
 
             }
 
@@ -411,9 +418,15 @@ class TaskDetailsFragment :
                             tvTaskId.text = task!!.clientTaskId!!
                         }
                         perFormTimerReminder(task)
-                        perFormLocationReminder(task)
+                        try {
+                            perFormLocationReminder(task)
+                        } catch (e: java.lang.Exception) {
+                            e.printStackTrace()
+                        }
+
                         if (task!!.trackingState != null) {
-                            handleTracking(task!!.trackingState!!, task!!.taskId!!)
+                            //stop tracking
+                            // handleTracking(task!!.trackingState!!, task!!.taskId!!)
                         }
 
                         if (task!!.multiReferedTask != null) {
@@ -424,11 +437,15 @@ class TaskDetailsFragment :
                                     //getDataHere
                                     refCall = true
                                     api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
-                                    mNewTaskViewModel.getTaskById(
-                                        httpManager,
-                                        AcceptRejectRequest(task!!.multiReferedTask!![0].toString()),
-                                        api
-                                    )
+                                    if (task!!.multiReferedTask!!.size > 0) {
+                                        if (task!!.multiReferedTask!![0] != null) {
+                                            mNewTaskViewModel.getTaskById(
+                                                httpManager,
+                                                AcceptRejectRequest(task!!.multiReferedTask!![0]),
+                                                api
+                                            )
+                                        }
+                                    }
                                 } else {
                                     mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
                                 }
@@ -586,8 +603,15 @@ class TaskDetailsFragment :
                                     }
                                 }
                             }
+                            highList = list
+                            setAdapter()
 
-                            timeLineAdapter.addData(list)
+
+                        }
+
+                        Log.d("timeline", timeLineAdapter.itemCount.toString())
+                        if (timeLineAdapter.itemCount < 1) {
+                            mActivityNewTaskDetailBinding.llTimeline.visibility = View.GONE
                         }
 
                     } else {
@@ -622,8 +646,7 @@ class TaskDetailsFragment :
                                 )
                                 startActivity(intent)
                             }
-                        }
-                        else {
+                        } else {
                             mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
                         }
                         refCall = false
@@ -746,6 +769,35 @@ class TaskDetailsFragment :
                 }
 
             }
+        }
+    }
+
+    fun setAdapter() {
+        val list: List<StageHistoryData> = highList
+        Log.e("ListSize", "${list.size}")
+        if (timeLineMore == false) {
+            mActivityNewTaskDetailBinding.tvTimelineMore.visibility = View.VISIBLE
+            var tempList: ArrayList<StageHistoryData> = ArrayList()
+            if (list.size < 1){
+                mActivityNewTaskDetailBinding.tvTimelineMore.visibility = View.GONE
+            }
+            else if (list.size == 1) {
+                mActivityNewTaskDetailBinding.tvTimelineMore.visibility = View.GONE
+                tempList.add(list[0])
+            }
+            else{
+                if (list.size == 2)
+                    mActivityNewTaskDetailBinding.tvTimelineMore.visibility = View.GONE
+                tempList.add(list[0])
+                tempList.add(list[1])
+            }
+            val listTemp = tempList.toList()
+            timeLineAdapter.addData(listTemp)
+            mActivityNewTaskDetailBinding.rvFields.visibility = View.VISIBLE
+        } else {
+            mActivityNewTaskDetailBinding.tvTimelineMore.visibility = View.GONE
+            timeLineAdapter.addData(list)
+            mActivityNewTaskDetailBinding.rvFields.visibility = View.VISIBLE
         }
     }
 
@@ -1055,7 +1107,7 @@ class TaskDetailsFragment :
                     var startDate = task.endTime
                     var needReminder = true
                     var needMainSerVice = false
-                    var taskId = task.taskId
+                    this.taskId = task.taskId
                     if (task.description != null)
                         desc = task.description!!
                     if (task.destination != null && task.destination!!.address != null)
@@ -1337,6 +1389,8 @@ class TaskDetailsFragment :
                 return 2
             } else {
                 Log.e("CTAid", "Verified B")
+                Log.e("CTAid", callToActions.id.toString())
+                Log.e("CTAid", taskId.toString())
                 ctaMode = mode
                 val sendCtaOtpRequest = SendCtaOtpRequest(callToActions.id.toString(), taskId)
                 mNewTaskViewModel.sendCtaOtp(httpManager, sendCtaOtpRequest)

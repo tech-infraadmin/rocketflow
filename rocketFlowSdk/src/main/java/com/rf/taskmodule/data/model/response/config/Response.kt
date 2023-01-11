@@ -796,6 +796,8 @@ class FleetDetail : Serializable {
     var inventoryId: String? = null
 }
 
+class SearchRefResponse(var data: Map<String,String>? = null): BaseResponse(), Serializable
+
 class TaskListing(var tasks: List<Task>? = null, var paginationData: PagingData? = null) :
     BaseResponse(), Serializable
 

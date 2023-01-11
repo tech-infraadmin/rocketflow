@@ -146,6 +146,7 @@
                     android:text="Date"
                     android:textAlignment="center"
                     style="@style/TextViewStyle"
+                    android:textSize="@dimen/text_size_12"
                     android:layout_weight="1.4"
                     android:layout_margin="@dimen/dimen_5"
                     android:layout_height="wrap_content"
@@ -157,6 +158,7 @@
                     style="@style/TextViewStyle"
                     android:textAlignment="center"
                     android:layout_weight="0.6"
+                    android:textSize="@dimen/text_size_12"
                     android:layout_margin="@dimen/dimen_5"
                     android:layout_height="wrap_content"
                     android:id="@+id/selectedStageChip" />
@@ -186,6 +188,41 @@
             </androidx.recyclerview.widget.RecyclerView>
         </androidx.cardview.widget.CardView>
 
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/no_data_layout"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/dimen_50"
+                android:layout_marginStart="@dimen/dimen_10"
+                android:layout_marginEnd="@dimen/dimen_10"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/imageViewEmpty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/dimen_5"
+                    app:srcCompat="@drawable/ic_empty_task" />
+
+                <TextView
+                    android:id="@+id/tv_message"
+                    style="@style/TextViewStyle"
+                    android:layout_marginTop="@dimen/dimen_18"
+                    android:gravity="center"
+                    android:textColor="@color/gray" />
+            </LinearLayout>
+
+       </LinearLayout>
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_container"
             android:layout_width="match_parent"
@@ -200,6 +237,7 @@
                 android:paddingBottom="@dimen/dimen_80"
                 android:scrollbars="vertical"
                 tools:listitem="@layout/item_row_task_list_sdk" />
+
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </LinearLayout>
 </layout>

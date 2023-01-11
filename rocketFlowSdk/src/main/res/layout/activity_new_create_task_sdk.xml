@@ -99,7 +99,8 @@
                                     style="@style/Widget.AppCompat.Spinner.DropDown"
                                     android:layout_width="match_parent"
                                     android:layout_height="@dimen/dimen_50"
-                                    android:spinnerMode="dropdown" />
+                                    android:spinnerMode="dropdown"
+                                    tools:ignore="SpeakableTextPresentCheck" />
 
                             </androidx.cardview.widget.CardView>
                         </LinearLayout>
@@ -182,6 +183,107 @@
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
+                    <!--Scanner Reference-->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cv_scanner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dimen_10"
+                        android:elevation="@dimen/dimen_8"
+                        android:visibility="visible"
+                        android:layout_marginHorizontal="@dimen/dimen_15"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardUseCompatPadding="true"
+                        app:contentPadding="@dimen/dimen_8">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_Scanner"
+                                style="@style/TextViewStyle"
+                                android:paddingStart="@dimen/dimen_10"
+                                android:focusable="false"
+                                android:focusableInTouchMode="true"
+                                android:fontFamily="@font/campton_semi_bold"
+                                android:text="Reference Task ID"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/text_size_16" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:weightSum="2"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <AutoCompleteTextView
+                                    android:layout_gravity="center_vertical"
+                                    android:id="@+id/et_scanner"
+                                    style="@style/EditTextStyle"
+                                    android:layout_width="0dp"
+                                    android:paddingVertical="@dimen/dimen_5"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginHorizontal="@dimen/dimen_10"
+                                    android:layout_weight="1.7"
+                                    android:paddingStart="@dimen/dimen_10"
+                                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                                <ImageView
+                                    android:layout_marginTop="@dimen/dimen_5"
+                                    android:layout_gravity="center_vertical"
+                                    android:id="@+id/iv_searchRef"
+                                    android:layout_weight="0.3"
+                                    android:src="@drawable/qr_code"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+
+                            </LinearLayout>
+
+
+                            <RelativeLayout
+                                android:id="@+id/rl_reference"
+                                android:visibility="gone"
+                                android:paddingVertical="@dimen/dimen_5"
+                                android:paddingHorizontal="@dimen/dimen_10"
+                                android:background="@drawable/custom_edit_border_bg"
+                                android:layout_marginTop="@dimen/dimen_10"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <TextView
+                                    android:layout_alignParentTop="true"
+                                    android:layout_alignParentStart="true"
+                                    android:id="@+id/tv_client_task_id"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    tools:text="ID: 12"
+                                    style="@style/TextViewStyleBold"/>
+
+                                <TextView
+                                    android:layout_alignParentStart="true"
+                                    android:layout_below="@+id/tv_client_task_id"
+                                    android:id="@+id/tv_reference_created_by"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    tools:text="Created By: Test User"
+                                    style="@style/TextViewStyleBold"/>
+
+                                <ImageView
+                                    android:id="@+id/iv_reference_task"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_arrow_right_orrange"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_centerVertical="true"/>
+
+                            </RelativeLayout>
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
                     <FrameLayout
                         android:id="@+id/container_second"
                         android:layout_width="match_parent"
@@ -197,88 +299,6 @@
                         android:paddingLeft="@dimen/dimen_15"
                         android:paddingRight="@dimen/dimen_15"
                         android:paddingBottom="@dimen/dimen_15">
-
-                        <!--Scanner Reference-->
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/cv_scanner"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/dimen_10"
-                            android:elevation="@dimen/dimen_8"
-                            android:visibility="visible"
-                            app:cardBackgroundColor="@color/white"
-                            app:cardUseCompatPadding="true"
-                            app:contentPadding="@dimen/dimen_8">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:id="@+id/tv_Scanner"
-                                    style="@style/TextViewStyle"
-                                    android:drawablePadding="@dimen/dimen_8"
-                                    android:drawableStart="@drawable/ic_three_dots"
-                                    android:focusable="false"
-                                    android:focusableInTouchMode="true"
-                                    android:fontFamily="@font/campton_semi_bold"
-                                    android:text="Reference Task ID"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_16" />
-
-                                <EditText
-                                    android:id="@+id/et_scanner"
-                                    style="@style/EditTextStyle"
-                                    android:layout_marginTop="@dimen/dimen_10"
-                                    android:layout_marginHorizontal="@dimen/dimen_10"
-                                    android:drawableEnd="@drawable/qr_code"
-                                    android:drawablePadding="@dimen/dimen_1"
-                                    android:padding="@dimen/dimen_2"
-                                    android:paddingStart="@dimen/dimen_10"
-                                    android:layout_width="match_parent"/>
-
-
-                                <RelativeLayout
-                                    android:id="@+id/rl_reference"
-                                    android:visibility="gone"
-                                    android:paddingVertical="@dimen/dimen_5"
-                                    android:paddingHorizontal="@dimen/dimen_10"
-                                    android:background="@drawable/custom_edit_border_bg"
-                                    android:layout_marginTop="@dimen/dimen_10"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content">
-
-                                    <TextView
-                                        android:layout_alignParentTop="true"
-                                        android:layout_alignParentStart="true"
-                                        android:id="@+id/tv_client_task_id"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        tools:text="ID: 12"
-                                        style="@style/TextViewStyleBold"/>
-
-                                    <TextView
-                                        android:layout_alignParentStart="true"
-                                        android:layout_below="@+id/tv_client_task_id"
-                                        android:id="@+id/tv_reference_created_by"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        tools:text="Created By: Test User"
-                                        style="@style/TextViewStyleBold"/>
-
-                                    <ImageView
-                                        android:id="@+id/iv_reference_task"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:src="@drawable/ic_arrow_right_orrange"
-                                        android:layout_alignParentEnd="true"
-                                        android:layout_centerVertical="true"/>
-
-                                </RelativeLayout>
-                            </LinearLayout>
-
-                        </androidx.cardview.widget.CardView>
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/tilTaskId"
@@ -1367,16 +1387,16 @@
 
                                 <EditText
                                     android:id="@+id/et_visit_time"
+                                    style="@style/EditTextStyle"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    style="@style/EditTextStyle"
+                                    android:autofillHints="hello"
                                     android:clickable="true"
-                                    android:textColor="@color/black"
                                     android:drawableEnd="@drawable/ic_calendar"
-                                    android:inputType="none"
-                                    tools:ignore="Deprecated"
                                     android:focusable="false"
-                                    android:autofillHints="hello" />
+                                    android:inputType="none"
+                                    android:textColor="@color/black"
+                                    tools:ignore="Deprecated,SpeakableTextPresentCheck" />
 
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
@@ -2985,12 +3005,13 @@
                         android:id="@+id/btnCLick"
                         style="@style/EnableDisableButtonStyle"
                         android:layout_width="match_parent"
-                        android:layout_marginTop="@dimen/dimen_5"
                         android:layout_marginLeft="@dimen/dimen_15"
+                        android:layout_marginTop="@dimen/dimen_5"
                         android:layout_marginRight="@dimen/dimen_15"
                         android:focusable="false"
                         android:focusableInTouchMode="true"
                         android:textColor="@color/white"
+                        tools:ignore="TextContrastCheck"
                         tools:text="@string/app_name" />
                 </LinearLayout>
 

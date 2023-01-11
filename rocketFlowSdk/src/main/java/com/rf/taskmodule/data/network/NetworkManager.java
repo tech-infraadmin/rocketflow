@@ -87,6 +87,8 @@ public interface NetworkManager {
 
     void getTaskById(ApiCallback apiCallBack, HttpManager httpManager, Object data, Api api);
 
+    void searchReferenceTask(ApiCallback apiCallback, HttpManager httpManager, Api api);
+
     void rejectTask(@NotNull ApiCallback apiCallBack, @NotNull HttpManager httpManager, @NotNull Object request, @NotNull Api api);
 
     void deleteBuddy(ApiCallback apiCallback, HttpManager httpManager, Api api, Object data);

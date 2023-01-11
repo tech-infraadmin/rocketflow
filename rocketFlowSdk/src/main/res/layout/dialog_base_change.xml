@@ -9,7 +9,18 @@
     android:orientation="vertical"
     android:padding="@dimen/dimen_5">
 
+    <TextView
+        android:layout_marginTop="@dimen/dimen_10"
+        style="@style/TextViewStyleBold"
+        android:textAlignment="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_20"
+        android:text="Select Variant"/>
+
     <androidx.appcompat.widget.AppCompatEditText
+        android:layout_marginTop="@dimen/dimen_10"
         android:id="@+id/passwordBase"
         style="@style/EditTextStyle"
         android:layout_width="match_parent"
@@ -88,7 +99,7 @@
             android:textSize="@dimen/text_size_13"
             android:background="@drawable/bg_stroke_grey"
             android:text="Save"
-            android:textColor="@color/colorPrimary" />
+            android:textColor="@color/white" />
 
     </LinearLayout>
 

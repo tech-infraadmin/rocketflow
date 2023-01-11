@@ -209,17 +209,17 @@
 
         <Button
             android:id="@+id/cancel_button"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_margin="@dimen/dimen_5"
+            android:layout_weight="1"
             android:text="Cancel" />
 
         <Button
             android:id="@+id/apply_button"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/dimen_5"
             android:layout_weight="1"

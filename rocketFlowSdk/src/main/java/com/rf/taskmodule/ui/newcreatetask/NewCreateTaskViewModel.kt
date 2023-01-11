@@ -23,6 +23,8 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
 
     private lateinit var httpManager: HttpManager
     private lateinit var api: Api
+    val api1 = TrackiSdkApplication.getApiMap()[ApiType.SEARCH_REFERENCE_ELIGIBLE_TASKS]!!
+    val base = api1.url
 
     var geoId: String = ""
     var date: String = ""
@@ -140,16 +142,59 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
         SlotDataAPI().hitApi()
     }
 
+    fun getTaskDetails(httpManager: HttpManager, taskId: String?) {
+        this.httpManager = httpManager
+        GetTaskDetails(taskId).hitApi()
+    }
+
+    inner class GetTaskDetails(var taskId: String?) :
+        ApiCallback {
+
+        override fun onResponse(result: Any?, error: APIError?) {
+            if (navigator != null)
+                navigator.handleTDResponse(this@GetTaskDetails, result, error)
+        }
+
+        override fun hitApi() {
+            if (dataManager != null) {
+                val api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]!!
+                var request= AcceptRejectRequest(taskId!!)
+                if (dataManager != null)
+                    dataManager.getTaskById(this, httpManager, request, api)
+            }
+        }
+
+        override fun isAvailable() = true
+
+        override fun onNetworkErrorClose() {
+        }
+
+        override fun onRequestTimeOut(callBack: ApiCallback) {
+            if (navigator != null)
+                navigator.showTimeOutMessage(callBack)
+        }
+
+        override fun onLogout() {
+        }
+    }
+
 
     open fun checkFleet(httpManager: HttpManager?) {
         this.httpManager = httpManager!!
         FleetListingAPI().hitApi()
     }
 
-    open fun getTaskList(httpManager: HttpManager?, api: Api, request: TaskRequest?) {
+    open fun getSearchReferenceList(httpManager: HttpManager?, api: Api, request: SearchReferenceRequest?) {
         this.httpManager = httpManager!!
-        this.api = api
-        TaskList(request!!).hitApi()
+
+        if (request != null) {
+            this.api = TrackiSdkApplication.getApiMap()[ApiType.SEARCH_REFERENCE_ELIGIBLE_TASKS]!!
+
+            Log.e("checkUrl","Base => ${base}\n CatId => ${request.catId}\n Query => ${request.query}")
+            this.api.url = "${base}${request.catId}/${request.query}"
+            Log.e("checkUrl","${this.api.url}")
+            TaskList(request!!).hitApi()
+        }
     }
 
     open fun checkBuddy(httpManager: HttpManager?) {
@@ -157,16 +202,15 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
         BuddyListingAPI().hitApi()
     }
 
-    inner class TaskList(var taskRequest: TaskRequest) :
+    inner class TaskList(var taskRequest: SearchReferenceRequest) :
         ApiCallback {
         override fun onResponse(result: Any?, error: APIError?) {
             if (navigator != null) navigator.handleTaskResponse(this, result, error)
         }
 
         override fun hitApi() {
-            if (dataManager != null) dataManager.getTasksList(
-                this, httpManager,
-                taskRequest, api
+            if (dataManager != null) dataManager.searchReferenceTask(
+                this, httpManager,api
             )
         }
 
@@ -176,7 +220,7 @@ open class NewCreateTaskViewModel(dataManager: DataManager, schedulerProvider: S
 
         override fun onNetworkErrorClose() {}
         override fun onRequestTimeOut(callBack: ApiCallback) {
-            if (getNavigator() != null) getNavigator().showTimeOutMessage(callBack)
+            if (navigator != null) navigator.showTimeOutMessage(callBack)
         }
 
         override fun onLogout() {}
