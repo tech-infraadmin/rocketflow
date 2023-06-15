@@ -59,7 +59,7 @@ public final class AppConstants {
     public static final String CHANGE_SEETINGS = "Settings";
     public static final String CLOSE = "Close";
     public static final String ALERT_REQUEST_TIME_OUT = "Request time out, Please try again";
-    public static final String Access_denied = "Access denied";
+    public static final String Access_denied = "Access Denied";
     public static final String Initialisation_Failed = "Initialisation Failed";
     public static final String Initialisation_Failed_msg = "Initialisation Failed, Please check your configurations";
     public static final String ALERT_TRY_AGAIN = "Try Again";

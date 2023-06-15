@@ -1158,26 +1158,50 @@ public final class CommonUtils {
 
                                 break;
                             case "401":// Access denied
-                                new AlertDialog.Builder(context)
-                                        .setMessage(response.getResponseMsg())
-                                        .setTitle(AppConstants.Access_denied)
-                                        .setCancelable(false)
-                                        .setNegativeButton(AppConstants.CLOSE, (dialog, which) -> {
-                                            dialog.dismiss();
-                                            ((BaseSdkActivity) context).finish();
-                                        })
-                                        .show();
+                                final Dialog dialog = new Dialog(context);
+                                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                dialog.setCancelable(false);
+                                dialog.setContentView(R.layout.access_denied);
+
+                                Button dialogButton = (Button) dialog.findViewById(R.id.button3);
+                                TextView title = (TextView) dialog.findViewById(R.id.textView7);
+                                TextView msg = (TextView) dialog.findViewById(R.id.textView6);
+                                title.setText(AppConstants.Access_denied);
+                                msg.setText(response.getResponseMsg());
+                                dialogButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                        ((BaseSdkActivity) context).finish();
+                                    }
+                                });
+                                Window window = dialog.getWindow();
+                                window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                dialog.show();
                                 break;
                             case "500":// Initialisation Failed
-                                new AlertDialog.Builder(context)
-                                        .setMessage(response.getResponseMsg())
-                                        .setTitle(AppConstants.Initialisation_Failed)
-                                        .setCancelable(false)
-                                        .setNegativeButton(AppConstants.CLOSE, (dialog, which) -> {
-                                            dialog.dismiss();
-                                            ((BaseSdkActivity) context).finish();
-                                        })
-                                        .show();
+                                final Dialog dialog1 = new Dialog(context);
+                                dialog1.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                dialog1.setCancelable(false);
+                                dialog1.setContentView(R.layout.access_denied);
+
+                                Button dialogButton1 = (Button) dialog1.findViewById(R.id.button3);
+                                TextView title1 = (TextView) dialog1.findViewById(R.id.textView7);
+                                TextView msg1 = (TextView) dialog1.findViewById(R.id.textView6);
+                                title1.setText(AppConstants.Initialisation_Failed);
+                                msg1.setText(response.getResponseMsg());
+                                dialogButton1.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog1.dismiss();
+                                        ((BaseSdkActivity) context).finish();
+                                    }
+                                });
+                                Window window1 = dialog1.getWindow();
+                                window1.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                                dialog1.show();
+
                                 break;
                            /* case "300"://invalid otp for dynamic form
                                 //needs to be handle inside dynamic activity.
