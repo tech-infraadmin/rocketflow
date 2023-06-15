@@ -119,14 +119,13 @@ class ProductOrderAdapter(private var mList: ArrayList<ProductOrder>?) :
                     listOrderDetais.add(orderInnerData)
                 }
                 if (listOrderDetais.isNotEmpty()) {
-                    mBinding.tvProductName.background =
-                        ContextCompat.getDrawable(context!!, R.drawable.bg_blue_button_round_corner)
-                    mBinding.tvProductName.setTextColor(
-                        ContextCompat.getColor(
-                            context!!,
-                            R.color.white
-                        )
-                    )
+                    //mBinding.tvProductName.background = ContextCompat.getDrawable(context!!, R.drawable.bg_blue_button_round_corner)
+//                    mBinding.tvProductName.setTextColor(
+//                        ContextCompat.getColor(
+//                            context!!,
+//                            R.color.white
+//                        )
+//                    )
                     mBinding.tvProductName.setOnClickListener {
                         openDialogShowMap(listOrderDetais, lists)
                     }

@@ -2,11 +2,6 @@ package com.rocketflow.sdk
 
 import android.content.Context
 import androidx.annotation.Keep
-import com.rf.taskmodule.data.DataManager
-import com.rf.taskmodule.data.local.prefs.PreferencesHelper
-import com.rf.taskmodule.data.network.HttpManager
-import com.rf.taskmodule.data.network.NetworkManager
-import com.rf.taskmodule.utils.CommonUtils
 import com.trackthat.lib.TrackThat
 
 @Keep
@@ -46,8 +41,11 @@ class RocketFlyer private constructor(){
         /**
          *  call to initialize
          */
-        fun initialize(sdkInitToken: String) {
-            RocketFlyerBuilder.getRFInstance()!!.initialize(sdkInitToken)
+        fun initialize(
+            sdkInitToken: String,
+            context: Context
+        ) {
+            RocketFlyerBuilder.getRFInstance()!!.initialize(sdkInitToken,context)
         }
 
         /**

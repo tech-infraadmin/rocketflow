@@ -9,10 +9,15 @@
     <!--<color name="colorPrimary">#056cc3</color>-->
     <!--<color name="colorPrimaryDark">#084e8a</color>-->
     <!--<color name="colorPrimaryDark_10">#1A084e8a</color>-->
+    <color name="background">#dddddd</color>
+
     <color name="blue">#3581F3</color>
     <color name="blue_1">#1e81ce</color>
     <color name="brown">#9E682A</color>
-
+    <color name="purple">#a020f0</color>
+    <color name="pink">#D81B60</color>
+    <color name="cyan">#00BCD4</color>
+    <color name="blue_gray">#607D8B</color>
     <!--<color name="light_blue">#1894fe</color>-->
     <!--<color name="light_blue_1">#1a91f7</color>-->
     <color name="light_blue_2">#49a0ea</color>

@@ -17,38 +17,49 @@ android {
     }
 
     buildTypes {
-        debug {
-            buildConfigField("String", "BASE_URL", '"https://qa2.rocketflyer.in/api/secure/tracki/"')
-        }
-
-        qa {
-            debuggable false
-            shrinkResources false
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "BASE_URL", '"https://qa2.rocketflyer.in/rfapi/secure/tracki/"')
-        }
-
-        uat {
+        uatFlow {
             debuggable true
             shrinkResources false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "BASE_URL", '"https://uat.rocketflyer.in/rfapi/secure/tracki/"')
         }
-        staging {
-            debuggable false
+        releaseFlow {
+            debuggable true
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BASE_URL", '"https://api.rocketflow.in/rfapi/secure/tracki/"')
+        }
+
+        uatBiz {
+            debuggable true
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BASE_URL", '"https://uat.rocketflyer.in/rfapi/secure/tracki/"')
+        }
+        releaseBiz {
+            debuggable true
             shrinkResources false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "BASE_URL", '"https://api.rocketflow.in/rfapi/secure/tracki/"')
         }
         release {
-            debuggable false
-            shrinkResources false
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable true
             buildConfigField("String", "BASE_URL", '"https://api.rocketflow.in/rfapi/secure/tracki/"')
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        uat {
+            debuggable true
+            buildConfigField("String", "BASE_URL", '"https://uat.rocketflyer.in/rfapi/secure/tracki/"')
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            buildConfigField("String", "BASE_URL", '"https://api.rocketflow.in/rfapi/secure/tracki/"')
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -72,6 +83,7 @@ dependencies {
 
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.2'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.2'
+    implementation 'com.squareup.retrofit2:converter-jackson:2.7.2'
 
     // Core library
     implementation 'androidx.appcompat:appcompat:1.1.0'
@@ -90,8 +102,11 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:2.2.19"
 
     //TrackThat SDK
-    implementation "org.bitbucket.brahmarf:trackthat-core-sdk:2.0.1"
+   // implementation "org.bitbucket.brahmarf:trackthat-core-sdk:2.0.5"
     implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+    implementation "org.bitbucket.brahmarf:trackthat-core-sdk:2.0.1"
 
     def work_version = "2.0.0"
     // (Java only)
@@ -152,6 +167,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0-alpha05'
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
+
 
 
 

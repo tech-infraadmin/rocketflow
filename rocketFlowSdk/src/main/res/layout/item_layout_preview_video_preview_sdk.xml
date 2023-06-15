@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.rf.taskmodule.ui.dynamicform.dynamicfragment.FormVideoPreviewModel" />
+
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/dimen_10"
+                android:background="@color/windowBackgroundColor"
+                android:drawableLeft="@drawable/ic_technology"
+                android:drawablePadding="@dimen/dimen_8"
+                android:fontFamily="@font/campton_semi_bold"
+                android:padding="@dimen/dimen_10"
+                android:paddingLeft="@dimen/dimen_5"
+                android:paddingTop="@dimen/dimen_5"
+                android:paddingBottom="@dimen/dimen_5"
+                android:text="@{viewModel.title}"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_16"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Rahul Abrol" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/dimen_20"
+                android:layout_marginRight="@dimen/dimen_20"
+                android:layout_marginBottom="@dimen/dimen_20"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_120"
+                    android:layout_alignParentRight="true">
+
+                    <ImageView
+                        android:id="@+id/ivVideo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#30000000" />
+
+                    <ImageView
+                        android:id="@+id/ivPlay"
+                        android:layout_width="@dimen/dimen_40"
+                        android:layout_height="@dimen/dimen_40"
+                        android:layout_centerInParent="true"
+                        app:srcCompat="@drawable/ic_multimedia_play" />
+
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

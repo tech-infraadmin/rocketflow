@@ -81,7 +81,7 @@
                         style="@style/TextViewStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/reg_no"
+                        android:text="Name"
                         android:textSize="@dimen/text_size_12" />
 
                     <TextView
@@ -142,7 +142,7 @@
                         style="@style/TextViewStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/upc_name"
+                        android:text="Id"
                         android:textSize="@dimen/text_size_12" />
 
                     <TextView

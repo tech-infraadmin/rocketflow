@@ -9,67 +9,223 @@
 
         <variable
             name="viewModel"
-             type="com.rf.taskmodule.ui.taskdetails.TaskDetailsActivityViewModel" />
+            type="com.rf.taskmodule.ui.taskdetails.TaskDetailsActivityViewModel" />
+
+        <variable
+            name="data"
+            type="com.rf.taskmodule.data.model.response.config.TaskResponse" />
 
     </data>
-
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/llMain"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/bg_recycler_view"
-        android:orientation="vertical"
-        tools:context="taskmodule.ui.taskdetails.NewTaskDetailsActivity">
+        android:layout_height="wrap_content"
+        android:visibility="visible">
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/coordinatorLayout"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@color/bg_recycler_view"
+            android:orientation="vertical"
+            tools:context="taskmodule.ui.taskdetails.NewTaskDetailsActivity">
 
-            <com.google.android.material.appbar.AppBarLayout
-                android:layout_width="match_parent"
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_view_container"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="visible">
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    style="@style/Toolbar"
-                    app:contentInsetLeft="0dp"
-                    app:contentInsetStart="0dp"
-                    app:contentInsetStartWithNavigation="0dp"
-                    app:titleTextColor="@color/white"
-                    tools:title="@string/tasks" />
-
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tabLayout"
-                    style="@style/AppTab"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:background="@color/white"
-                    android:visibility="visible"
-                    app:tabGravity="center"
-                    app:tabMode="scrollable" />
 
-            </com.google.android.material.appbar.AppBarLayout>
+                    android:orientation="vertical">
 
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/vpTask"
+                    <include layout="@layout/taskdetails_placeholder_layout" />
+
+                    <include layout="@layout/data_placeholder_layout" />
+
+                    <include layout="@layout/data_placeholder_layout" />
+
+                    <include layout="@layout/data_placeholder_layout" />
+
+                    <include layout="@layout/data_placeholder_layout" />
+
+                    <include layout="@layout/data_placeholder_layout" />
+
+                    <include layout="@layout/data_placeholder_layout" />
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:id="@+id/coordinatorLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/white"
-                android:clipToPadding="false"
-                android:visibility="visible"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-            <FrameLayout
-                android:visibility="gone"
-                android:id="@+id/fragment_container"
-                android:background="@color/white"
-                android:clipToPadding="false"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <com.google.android.material.appbar.AppBarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible">
+
+                    <com.google.android.material.appbar.CollapsingToolbarLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fitsSystemWindows="true"
+                        app:contentScrim="?attr/colorAccent"
+                        app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                        app:titleEnabled="false">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/top_header_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="?attr/actionBarSize"
+                            android:background="?attr/colorAccent"
+                            android:visibility="visible">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/id_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <ImageView
+                                    android:id="@+id/ivReffId"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerVertical="true"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginTop="8dp"
+                                    android:layout_marginBottom="8dp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:srcCompat="@drawable/ic_current_stage"
+                                    app:tint="@color/white" />
+
+                                <TextView
+                                    android:id="@+id/textViewId"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:fontFamily="@font/campton_book"
+                                    android:text="@{data.taskDetail.clientTaskId}"
+                                    android:textColor="@color/white"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toBottomOf="@+id/ivReffId"
+                                    app:layout_constraintStart_toEndOf="@+id/ivReffId"
+                                    app:layout_constraintTop_toTopOf="@+id/ivReffId" />
+
+                                <com.google.android.material.chip.Chip
+                                    android:id="@+id/textView18"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:backgroundTint="@color/green"
+                                    android:text="@{data.taskDetail.currentStage.name}"
+                                    android:textAlignment="textEnd"
+                                    android:textColor="@color/white"
+                                    android:fontFamily="@font/campton_semi_bold"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold|italic"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintHorizontal_bias="1.0"
+                                    app:layout_constraintStart_toEndOf="@+id/textViewId"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:id="@+id/constraintLayout3"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/id_layout">
+
+                                <androidx.recyclerview.widget.RecyclerView
+                                    android:id="@+id/recyclerView"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_margin="@dimen/dimen_5"
+                                    android:orientation="horizontal"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintRight_toRightOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.appcompat.widget.Toolbar
+                            android:id="@+id/toolbar"
+                            style="@style/Toolbar"
+                            android:layout_height="?attr/actionBarSize"
+                            android:layout_gravity="top"
+                            android:background="?attr/colorAccent"
+                            app:contentInsetLeft="0dp"
+                            app:contentInsetStart="0dp"
+                            app:contentInsetStartWithNavigation="0dp"
+                            app:layout_collapseMode="pin"
+                            app:titleTextColor="@color/white"
+                            tools:ignore="MissingPrefix"
+                            tools:title="@string/tasks" />
+
+                    </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/tabLayout"
+                        style="@style/AppTab"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start"
+                        android:background="@color/windowBackgroundColor"
+                        android:visibility="visible"
+                        app:tabGravity="start"
+                        app:tabIconTint="@color/tab_color_selector"
+                        app:tabInlineLabel="true"
+                        app:tabMode="scrollable"
+                        app:tabSelectedTextColor="@color/blue"
+                        app:tabTextColor="@color/black" />
+
+                </com.google.android.material.appbar.AppBarLayout>
+
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/vpTask"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:clipToPadding="false"
+                    android:visibility="visible"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </LinearLayout>
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/coradinatorLL"
+            android:layout_width="match_parent"
+            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="@dimen/dimen_10">
+
+            <include
+                android:id="@+id/bottomSheet"
+                layout="@layout/task_details_cta_view_sdk" />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-    </LinearLayout>
+    </RelativeLayout>
 </layout>

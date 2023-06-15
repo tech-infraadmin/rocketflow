@@ -18,6 +18,7 @@ import com.rf.taskmodule.databinding.LayoutEmptyCategoryViewSdkBinding
 import com.rf.taskmodule.ui.base.BaseSdkViewHolder
 import com.rf.taskmodule.ui.selectorder.CatalogProduct
 import com.rf.taskmodule.utils.CommonUtils
+import com.rf.taskmodule.utils.Log
 import com.rf.taskmodule.utils.TrackiToast
 import java.util.*
 
@@ -84,8 +85,8 @@ class CartItemAdapter(var context: Context) :
         notifyDataSetChanged()
     }
 
-    fun getAllList(): List<CatalogProduct> {
-        return mFilteredList!!
+    fun getAllList(): ArrayList<CatalogProduct>? {
+        return mFilteredList
     }
 
     fun removeAt(position: Int, listSize: Int) {
@@ -112,6 +113,9 @@ class CartItemAdapter(var context: Context) :
             var data: CatalogProduct? = mFilteredList!![position]
             if (data != null) {
                 binding.data = data
+
+
+
                 binding.addProduct.setOnClickListener {
                     if (!data.addInOrder) {
                         data.addInOrder = true
@@ -171,13 +175,42 @@ class CartItemAdapter(var context: Context) :
 
                 }
 
+                if (data.deleteOption == true){
+                    binding.ivDeleteDimension.visibility = View.VISIBLE
+                    binding.ivDeleteDimension.setOnClickListener {
+                        mListener!!.deleteDimensionProduct(data,data.subUnit?.get(0)?.order!!)
+                    }
+                }
+                else{
+                    binding.ivDeleteDimension.visibility = View.GONE
+                }
+
+                if (data.dimensionEnabled == true || data.enableDimension == true){
+                    binding.addProduct.visibility = View.GONE
+                    binding.llcounter.visibility = View.GONE
+                    binding.ivEditPrice.visibility = View.GONE
+                    binding.tvSellingPrice.text = "₹ ${data.subUnit?.get(0)?.actualPrice.toString()}"
+                    binding.tvMainPrice.text = "₹ ${data.subUnit?.get(0)?.actualPrice.toString()}"
+                }
+                else{
+                    if (data.addInOrder == true){
+                        binding.addProduct.visibility = View.GONE
+                    }
+                    else{
+                        binding.addProduct.visibility = View.VISIBLE
+                    }
+                    binding.llcounter.visibility = View.VISIBLE
+                    binding.tvMainPrice.text = "₹ ${data.price}"
+                    binding.tvSellingPrice.text = "₹ ${data.sellingPrice}"
+
+                }
+
 
                 binding.addProduct.setOnClickListener {
                     if (!data.addInOrder) {
                         data.addInOrder = true
                         data.noOfProduct = data.noOfProduct + 1
                         binding.tvProductCounter.text = data.noOfProduct.toString()
-
                     }
                     notifyDataSetChanged()
                     if (mListener != null) {
@@ -209,6 +242,7 @@ class CartItemAdapter(var context: Context) :
                         }
                         if (data.noOfProduct == 0){
                             removeAt(position,mList!!.size)
+
                         }
                     }
                 }
@@ -298,6 +332,7 @@ class CartItemAdapter(var context: Context) :
         fun addProduct(data: CatalogProduct,position: Int)
         fun viewProduct(data: CatalogProduct)
         fun removeProduct(data: CatalogProduct, position: Int)
+        fun deleteDimensionProduct(data:CatalogProduct, order: Int)
     }
 
     inner class EmptyViewHolder(var binding: LayoutEmptyCategoryViewSdkBinding) :

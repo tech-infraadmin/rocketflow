@@ -21,8 +21,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 
-class OrderCodeActivity : BaseSdkActivity<ActivityOrderCodeSdkBinding, OrderCodeViewModel>(),
-    OrderCodeNavigator {
+class OrderCodeActivity : BaseSdkActivity<ActivityOrderCodeSdkBinding, OrderCodeViewModel>(), OrderCodeNavigator {
 
     var orderCodeViewModel: OrderCodeViewModel? = null
 

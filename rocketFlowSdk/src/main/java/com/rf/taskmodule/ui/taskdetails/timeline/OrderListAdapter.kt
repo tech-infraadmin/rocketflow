@@ -14,6 +14,7 @@ import com.rf.taskmodule.databinding.ItemMyEarningEmptySdkBinding
 import com.rf.taskmodule.databinding.ItemRowOrderSdkBinding
 import com.rf.taskmodule.ui.base.BaseSdkViewHolder
 import com.rf.taskmodule.ui.earnings.MyEarningsEmptyItemViewModel
+import com.rf.taskmodule.utils.Log
 import com.rf.taskmodule.utils.TrackiToast
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,7 +30,6 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
     private var context: Context? = null
 
     var onItemClick: ((OrderItemsInfo) -> Unit)? = null
-
 
     companion object {
         private const val VIEW_TYPE_EMPTY = 0
@@ -121,7 +121,7 @@ class OrderListAdapter(private var mList: ArrayList<OrderDetails>?) : RecyclerVi
                 val adapter = OrderInventoryListAdapter((lists.orderItemsInfo)!!)
                 mBinding.adapter = adapter
                 adapter.onItemClick = { item ->
-                    // do something with your item
+                    Log.d("TAG", item.productName)
                     onItemClick?.invoke(item)
                 }
             }

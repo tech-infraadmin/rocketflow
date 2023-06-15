@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="@dimen/dimen_5"
+        app:cardElevation="@dimen/dimen_0"
+        app:cardUseCompatPadding="true"
+        app:contentPadding="@dimen/dimen_5">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dimen_10"
+            android:orientation="vertical"
+            android:padding="@dimen/dimen_3">
+
+            <RelativeLayout
+                android:id="@+id/rlStartTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/imageStartTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:background="@color/background" />
+
+                <RelativeLayout
+                    android:id="@+id/rlInnerStartDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/tvCounterTime"
+                    android:layout_toRightOf="@+id/imageStartTime"
+                    android:paddingLeft="@dimen/dimen_10"
+                    android:paddingTop="@dimen/dimen_4"
+                    android:paddingBottom="@dimen/dimen_4">
+
+                    <TextView
+                        android:id="@+id/labelStartTime"
+                        style="@style/TextViewStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/background"
+                        android:fontFamily="@font/campton_light"
+                        android:textColor="@color/colorTextGreyPunch"
+                        android:textSize="@dimen/text_size_12" />
+
+                    <TextView
+                        android:id="@+id/tvStartAt"
+                        style="@style/TextViewStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/labelStartTime"
+                        android:background="@color/background"
+                        android:fontFamily="@font/campton_book"
+                        android:textColor="@color/colorTextGreyPunch"
+                        android:textSize="@dimen/text_size_13" />
+
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/tvCounterTime"
+                    style="@style/TextViewStyle"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@color/background"
+                    android:drawablePadding="@dimen/dimen_7"
+                    android:gravity="center_vertical"
+                    android:textAllCaps="false"
+                    android:textColor="@color/yellow_punch_btn"
+                    android:textSize="@dimen/text_size_14" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rlEndTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <RelativeLayout
+                    android:id="@+id/rlInnerEndDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="@dimen/dimen_10"
+                    android:paddingTop="@dimen/dimen_4"
+                    android:paddingBottom="@dimen/dimen_4">
+
+                    <TextView
+                        android:id="@+id/labelEndTime"
+                        style="@style/TextViewStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/background"
+                        android:fontFamily="@font/campton_light"
+                        android:textColor="@color/colorTextGreyPunch"
+                        android:textSize="@dimen/text_size_12" />
+
+
+                    <TextView
+                        android:id="@+id/tvEndAt"
+                        style="@style/TextViewStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/labelEndTime"
+                        android:background="@color/background"
+                        android:fontFamily="@font/campton_book"
+                        android:textColor="@color/colorTextGreyPunch"
+                        android:textSize="@dimen/text_size_13" />
+
+                    <TextView
+                        style="@style/TextViewStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/dimen_50"
+                        android:layout_marginRight="5dp"
+                        android:background="@color/background"
+                        android:paddingLeft="@dimen/dimen_10"
+                        android:paddingTop="@dimen/dimen_5"
+                        android:paddingRight="@dimen/dimen_10"
+                        android:paddingBottom="@dimen/dimen_5"
+                        android:textColor="@color/white" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rlReffrenceId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <RelativeLayout
+                    android:id="@+id/rlReffrance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="@dimen/dimen_10"
+                    android:paddingTop="@dimen/dimen_4"
+                    android:paddingBottom="@dimen/dimen_4">
+
+                    <TextView
+                        android:id="@+id/labelReffrance"
+                        style="@style/TextViewStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/background"
+                        android:fontFamily="@font/campton_light"
+                        android:textColor="@color/colorTextGreyPunch"
+                        android:textSize="@dimen/text_size_12" />
+
+
+                    <TextView
+                        android:id="@+id/tvReffranceId"
+                        style="@style/TextViewStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/labelReffrance"
+                        android:background="@color/background"
+                        android:fontFamily="@font/campton_semi_bold"
+                        android:textColor="@color/colorTextGreyPunch"
+                        android:textSize="@dimen/text_size_13" />
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/viewLine"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/dimen_8"
+                android:layout_marginRight="@dimen/dimen_12"
+                android:layout_marginBottom="@dimen/dimen_4"
+                android:background="@color/windowBackgroundColor" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:id="@+id/rlCall"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/rlAssigned"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/rlPerson"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:paddingLeft="@dimen/dimen_10"
+                        android:paddingTop="@dimen/dimen_4"
+                        android:paddingRight="@dimen/dimen_10"
+                        android:paddingBottom="@dimen/dimen_4">
+
+                        <View
+                            android:id="@+id/ivImage"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginTop="5dp"
+                            android:background="@color/background"
+                            android:visibility="visible"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/tvPersonRole"
+                            app:srcCompat="@drawable/ic_my_profile" />
+
+
+                        <TextView
+                            android:id="@+id/tvPersonRole"
+                            style="@style/TextViewStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/background"
+                            android:fontFamily="@font/campton_light"
+                            android:textColor="@color/colorTextGreyPunch"
+                            android:textSize="@dimen/text_size_12"
+                            app:layout_constraintStart_toStartOf="@+id/rlPerson"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tvPersonName"
+                            style="@style/TextViewStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/tvPersonRole"
+                            android:layout_marginStart="5dp"
+                            android:background="@color/background"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/campton_book"
+                            android:maxLines="1"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13"
+                            app:layout_constraintBottom_toBottomOf="@+id/ivImage"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/ivImage"
+                            app:layout_constraintTop_toTopOf="@+id/ivImage" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="50dp"
+                    android:background="@color/light_gray"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/rlCall"
+                    app:layout_constraintStart_toStartOf="@+id/rlAssigned"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <RelativeLayout
+                    android:id="@+id/rlAssigned"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/rlCall"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/rlAssignedRl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentEnd="true"
+                        android:paddingLeft="@dimen/dimen_10"
+                        android:paddingTop="@dimen/dimen_4"
+                        android:paddingRight="@dimen/dimen_10"
+                        android:paddingBottom="@dimen/dimen_4">
+
+                        <View
+                            android:id="@+id/ivAssignedProfile"
+                            android:layout_width="20dp"
+
+                            android:layout_height="@dimen/dimen_20"
+                            android:layout_centerVertical="true"
+                            android:layout_marginTop="5dp"
+                            android:background="@color/background"
+                            android:visibility="visible"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/tvAssignedTitle"
+                            app:srcCompat="@drawable/ic_my_profile" />
+
+
+                        <TextView
+                            android:id="@+id/tvAssignedTitle"
+                            style="@style/TextViewStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/background"
+                            android:fontFamily="@font/campton_light"
+                            android:textColor="@color/colorTextGreyPunch"
+                            android:textSize="@dimen/text_size_12"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tvAssignedName"
+                            style="@style/TextViewStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/tvAssignedTitle"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginBottom="3dp"
+                            android:background="@color/background"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/campton_book"
+                            android:maxLines="1"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/text_size_13"
+                            app:layout_constraintBottom_toBottomOf="@+id/ivAssignedProfile"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/ivAssignedProfile"
+                            app:layout_constraintTop_toTopOf="@+id/ivAssignedProfile" />
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </RelativeLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

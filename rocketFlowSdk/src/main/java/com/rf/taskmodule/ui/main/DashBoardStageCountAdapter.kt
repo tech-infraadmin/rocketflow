@@ -62,10 +62,9 @@ class DashBoardStageCountAdapter(private var mList: ArrayList<DashBoardBoxItem>?
             mList!!.clear()
             notifyDataSetChanged()
         }
-
     }
 
-    override fun getItemViewType(position: Int) = if (mList != null && !mList!!.isEmpty()) {
+    override fun getItemViewType(position: Int) = if (mList != null && mList!!.isNotEmpty()) {
         VIEW_TYPE_NOTIFICATION_SIMPLE
         /* if (mList!![position].type == NotificationType.SIMPLE) {
            VIEW_TYPE_NOTIFICATION_SIMPLE

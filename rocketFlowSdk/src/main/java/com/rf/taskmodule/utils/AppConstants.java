@@ -6,7 +6,7 @@ public final class AppConstants {
     public static final String CORE_BASE_URL = "https://api.rocketflow.in/rfapi/";
     public static final String BASE_URL = CORE_BASE_URL+"secure/tracki/";
 
-    public static final String UAT_CORE_BASE_URL = "https://uat.rocketflyer.in/rfapi/";
+    public static final String UAT_CORE_BASE_URL = "https://api.rocketflow.in/rfapi/";
     public static final String UAT_BASE_URL = UAT_CORE_BASE_URL+"secure/tracki/";
 
     public static final String TRACKI_ENCRYPT_DECRYPT_IV = "tracki9990731159";
@@ -59,7 +59,11 @@ public final class AppConstants {
     public static final String CHANGE_SEETINGS = "Settings";
     public static final String CLOSE = "Close";
     public static final String ALERT_REQUEST_TIME_OUT = "Request time out, Please try again";
+    public static final String Access_denied = "Access denied";
+    public static final String Initialisation_Failed = "Initialisation Failed";
+    public static final String Initialisation_Failed_msg = "Initialisation Failed, Please check your configurations";
     public static final String ALERT_TRY_AGAIN = "Try Again";
+    public static final String Access_denied_msg = "Unable to fetch team for given branch, please contact supposrt team";
     public static final String UNABLE_TO_PROCESS_REQUEST = "Unable to process the request. please try after some time";
     public static final String ALERT_SERVER_UPGRADE_IN_PROGRESS = "We are upgrading our server, Please try again after some time";
     public static final String MSG_REQUEST_TIME_OUT_TYR_AGAIN = "Request timeout, Please try again";
@@ -107,6 +111,7 @@ public final class AppConstants {
     public static final int REQUEST_CODE_DYNAMIC_FORM = 1024;
     public static final int REQUEST_CODE_TAG_INVENTORY = 1025;
     public static final int REQUEST_CODE_SCAN = 1032;
+    public static final int REQUEST_QR_SCAN = 8564;
     public static final int REQUEST_CODE_UNIT_INFO = 1028;
     public static final int SERVICE_ID_1 = 10001;
     public static final int SERVICE_ID_2 = 10002;

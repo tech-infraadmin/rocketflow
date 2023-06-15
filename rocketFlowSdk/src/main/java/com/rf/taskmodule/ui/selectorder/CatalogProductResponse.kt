@@ -51,18 +51,39 @@ data class ProductStock(
 ):Parcelable
 
 @Parcelize
+data class SubUnit(
+    var actualPrice: Float? = 0F,
+    var dimension: DimensionProduct? = null,
+    var order: Int? = 0,
+    var sellingPrice: Float? = 0F
+): Parcelable
+
+@Parcelize
+data class DimensionProduct(
+    var area: Float? = 0F,
+    var length: Float? = 0F,
+    var width: Float? = 0F,
+): Parcelable
+
+@Parcelize
 data class CatalogProduct(
+    var subId: String? = "0",
     var active: Boolean? = null,
     var added: Boolean? = null,
     var img: String? = null,
+    var totalAmt: Float? = 0F,
     var image: String? = null,
     var categoryName: String? = null,
     var name: String? = null,
     var pid: String? = null,
+    var deleteOption: Boolean? = false,
+    var subUID: String? = null,
     var price: Float? = null,
     var cid: String? = null,
     var cname: String? = null,
     var unitValue: Float? = null,
+    var enableDimension: Boolean? = false,
+    var dimensionEnabled: Boolean? = false,
     var qty: Int? = null,
     var sellingPrice: Float? = null,
     var unitType: String? = null,
@@ -77,7 +98,8 @@ data class CatalogProduct(
     var addInOrder: Boolean = false,
     var upcNumber: String?=null,
     var prodInfoMap: Map<String,String>?=null,
-    var dfData: List<DynamicFormData>?=null
+    var dfData: List<DynamicFormData>?=null,
+    var subUnit:ArrayList<SubUnit>? = null
 ): Parcelable {
 
     override fun equals(obj: Any?): Boolean {

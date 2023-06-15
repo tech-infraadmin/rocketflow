@@ -28,7 +28,8 @@ import com.rf.taskmodule.utils.Log
 import com.rf.taskmodule.utils.TrackiToast
 import kotlin.collections.ArrayList
 
-class UserListNewActivity : BaseSdkActivity<ActivityUserListNewSdkBinding, UserListNewViewModel>(), UserListNewNavigator, UserListNewAdapter.onUserSelected{
+class UserListNewActivity : BaseSdkActivity<ActivityUserListNewSdkBinding, UserListNewViewModel>(),
+    UserListNewNavigator, UserListNewAdapter.onUserSelected {
 
     lateinit var mUserListViewModel: UserListNewViewModel
 
@@ -38,7 +39,7 @@ class UserListNewActivity : BaseSdkActivity<ActivityUserListNewSdkBinding, UserL
     lateinit var adapter: UserListNewAdapter
 
     lateinit var searchView: SearchView
-    
+
     var listSelectedUsers = ArrayList<String>()
 
     private var mLayoutManager: LinearLayoutManager? = null
@@ -46,6 +47,8 @@ class UserListNewActivity : BaseSdkActivity<ActivityUserListNewSdkBinding, UserL
     lateinit var binding: ActivityUserListNewSdkBinding
     var roleIds: String = "na"
     var users: String = ""
+    var taskId: String = ""
+    var targetInfo: String = ""
     lateinit var request: ExecuteUpdateRequest
     lateinit var usersList: ArrayList<UserData>
 
@@ -63,15 +66,16 @@ class UserListNewActivity : BaseSdkActivity<ActivityUserListNewSdkBinding, UserL
         adapter.setListener(this)
 
         mUserListViewModel.navigator = this
-        
-        if (intent.hasExtra("roleIds"))
-        {
+
+        if (intent.hasExtra("roleIds")) {
+            taskId = intent.getStringExtra("taskId").toString()
             roleIds = intent.getStringExtra("roleIds").toString()
+            targetInfo = intent.getStringExtra("targetInfo").toString()
             getUsers()
             request = intent.getSerializableExtra("request") as ExecuteUpdateRequest
         }
-        
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
@@ -86,8 +90,8 @@ class UserListNewActivity : BaseSdkActivity<ActivityUserListNewSdkBinding, UserL
         })
         binding.btnUsersSubmit.setOnClickListener {
 
-            if (listSelectedUsers.size > 0){
-                for (i in 0 until listSelectedUsers.size){
+            if (listSelectedUsers.size > 0) {
+                for (i in 0 until listSelectedUsers.size) {
                     users += if (i > 0)
                         ",${listSelectedUsers[i]}"
                     else
@@ -98,23 +102,22 @@ class UserListNewActivity : BaseSdkActivity<ActivityUserListNewSdkBinding, UserL
                 dynamicFormData.value = users
                 var list = ArrayList<DynamicFormData>()
                 list.add(dynamicFormData)
-                val taskData = TaskData(request.ctaId,list,request.timestamp)
+                val taskData = TaskData(request.ctaId, list, request.timestamp)
                 request.taskData = taskData
                 showLoading()
-                mUserListViewModel.executeUpdates(httpManager,request)
+                mUserListViewModel.executeUpdates(httpManager, request)
 
-            }
-            else{
-                TrackiToast.Message.showShort(this,"Please select atleast one user")
+            } else {
+                TrackiToast.Message.showShort(this, "Please select atleast one user")
             }
         }
 
 
     }
 
-    private fun getUsers(){
-        Log.e("getUsers","$roleIds")
-        mUserListViewModel.getUserList(httpManager,roleIds,null,null,true)
+    private fun getUsers() {
+        Log.e("getUsers", "$roleIds")
+        mUserListViewModel.getUserList(httpManager, roleIds, null, null, true, targetInfo, taskId)
     }
 
     private fun setRecyclerView() {
@@ -150,18 +153,19 @@ class UserListNewActivity : BaseSdkActivity<ActivityUserListNewSdkBinding, UserL
     }
 
 
-
-
     override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
         if (CommonUtils.handleResponse(callback, error, result, this@UserListNewActivity)) {
             val jsonConverter: JSONConverter<UserListResponse> =
                 JSONConverter()
-            var response: UserListResponse = jsonConverter.jsonToObject(result.toString(), UserListResponse::class.java) as UserListResponse
+            var response: UserListResponse = jsonConverter.jsonToObject(
+                result.toString(),
+                UserListResponse::class.java
+            ) as UserListResponse
             if (response.data != null) {
                 setRecyclerView()
                 val userList = response.data as ArrayList<UserData>
-                Log.e("listUserList","$userList")
+                Log.e("listUserList", "$userList")
                 usersList = response.data as ArrayList<UserData>
                 adapter.addItems(usersList)
             } else {
@@ -185,14 +189,13 @@ class UserListNewActivity : BaseSdkActivity<ActivityUserListNewSdkBinding, UserL
             result.toString(),
             ResponseBasic2::class.java
         )
-        if (responseBasic != null){
-            if (responseBasic.successful == true){
+        if (responseBasic != null) {
+            if (responseBasic.successful == true) {
                 finish()
                 //startActivity(Intent(this,MainActivity::class.java))
             }
-        }
-        else{
-            TrackiToast.Message.showShort(this,"Problem in Server Please try later")
+        } else {
+            TrackiToast.Message.showShort(this, "Problem in Server Please try later")
         }
     }
 

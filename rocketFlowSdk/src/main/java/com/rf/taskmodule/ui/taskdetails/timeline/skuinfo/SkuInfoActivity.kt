@@ -179,9 +179,7 @@ open class SkuInfoActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, SkuInfoV
         if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID))
             ctaId = intent.getStringExtra(AppConstants.Extra.EXTRA_CTA_ID)
 
-        CommonUtils.showLogMessage("d", "ctaId", ctaId)
-
-        var viewProgress = binding.viewProgress
+        var viewProgress = binding.viewProgressNew
         titleText = viewProgress.findViewById<TextView>(R.id.tvTitle)
         currentStatusText = viewProgress!!.findViewById<TextView>(R.id.currentStatusText)
         percentageText = viewProgress!!.findViewById<TextView>(R.id.tvPercentage)
@@ -189,10 +187,7 @@ open class SkuInfoActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, SkuInfoV
         rlSubmittingData = viewProgress!!.findViewById<RelativeLayout>(R.id.rlSubmittingData)
         rlProgress = viewProgress!!.findViewById<RelativeLayout>(R.id.rlProgress)
 
-        showDynamicFormDataAdapter =
-            DynamicAdapter(
-                ArrayList()
-            )
+        showDynamicFormDataAdapter = DynamicAdapter(ArrayList())
         showDynamicFormDataAdapter.setAdapterListener(this)
         showDynamicFormDataAdapter.setIsEditable(true,httpManager)
         rvDynamicForm = binding.rvDynamicFormsMini
@@ -638,7 +633,7 @@ open class SkuInfoActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, SkuInfoV
             if (hashMapFileRequest.isNotEmpty()) {
                 if (NetworkUtils.isNetworkConnected(this)) {
                     if (NetworkUtils.isConnectedFast(this)) {
-                        binding.viewProgress.visibility = View.VISIBLE
+                        binding.viewProgressNew.visibility = View.VISIBLE
                         CommonUtils.makeScreenDisable(this)
                         fileUploadCounter = 0
                         nestedScrollView.postDelayed(
@@ -1184,7 +1179,7 @@ open class SkuInfoActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, SkuInfoV
                     var location =
                         com.rf.taskmodule.ui.addplace.Location(latLong!!.latitude, latLong.longitude)
                     location.locationId = place.id!!
-                    var hubLocation = com.rf.taskmodule.ui.addplace.HubLocation(location, 0)
+                    var hubLocation = com.rf.taskmodule.ui.addplace.HubLocation(location, 0.0F)
                     hubLocation.address = place.name
                     var jsonConverter =
                         JSONConverter<HubLocation>()
@@ -1243,7 +1238,7 @@ open class SkuInfoActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, SkuInfoV
                     Log.e(TAG, "progressUploadText=> $progressUploadText")
                     Log.e(TAG, "percentage=> $percentage")
                     runOnUiThread {
-                        progressBar!!.progress = percentage
+                        progressBar?.progress = percentage
                         percentageText!!.text = "$percentage %"
                         currentStatusText!!.text = progressUploadText
                     }
@@ -1253,7 +1248,7 @@ open class SkuInfoActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, SkuInfoV
                     //get hashMap from adapter and match the name with key of maps
                     // if found then replace entered value with url of image
                     runOnUiThread {
-                        rlProgress!!.visibility = View.GONE
+                        rlProgress?.visibility = View.GONE
                         rlSubmittingData!!.visibility = View.VISIBLE
                     }
                     if (mainData?.isNotEmpty()!!) {
@@ -1287,7 +1282,7 @@ open class SkuInfoActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, SkuInfoV
                 /*For Error*/1 -> {
                 if (count == 0) {
                     runOnUiThread {
-                        binding.viewProgress.visibility = View.GONE
+                        binding.viewProgressNew.visibility = View.GONE
                         CommonUtils.makeScreenClickable(this@SkuInfoActivity)
                     }
                     count++

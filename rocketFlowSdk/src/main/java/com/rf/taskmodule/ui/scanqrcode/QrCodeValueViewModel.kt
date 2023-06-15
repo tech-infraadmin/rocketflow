@@ -21,8 +21,46 @@ class QrCodeValueViewModel (dataManager: DataManager, schedulerProvider: Schedul
 
     private lateinit var httpManager: HttpManager
 
+    fun loginUsingQr(httpManager: HttpManager, id: String, loginToken: String, accessId: String) {
+        this.httpManager = httpManager
+        LoginUsingQr(id,loginToken,accessId).hitApi()
+    }
 
+    inner class LoginUsingQr(var id: String, var loginToken: String,val accessId: String) : ApiCallback {
 
+        override fun onResponse(result: Any?, error: APIError?) {
+            Log.e("qrResp","$result - error=>${error?.errorType}")
+            navigator.handleLoginQrCodeResponse(this, result, error)
+        }
+
+        override fun hitApi() {
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.LOGIN_USING_QR)) {
+                val apiMain = TrackiSdkApplication.getApiMap()[ApiType.LOGIN_USING_QR]!!
+                val api = Api()
+                api.name = ApiType.LOGIN_USING_QR
+                api.timeOut = apiMain.timeOut
+                api.url = apiMain.url!!+"?encCode="+id+"&tracki-ai="+accessId+"&login-token="+loginToken
+                Log.e("dataManager","$dataManager  api=>${apiMain.url}")
+                if(dataManager!=null){
+                    dataManager.getQrCodeLogin(this, httpManager, api)
+                }
+            }
+        }
+
+        override fun isAvailable(): Boolean {
+            return true
+        }
+
+        override fun onNetworkErrorClose() {
+        }
+
+        override fun onRequestTimeOut(callBack: ApiCallback) {
+            navigator.showTimeOutMessage(callBack)
+        }
+
+        override fun onLogout() {
+        }
+    }
     fun getQrCodeValue(httpManager: HttpManager, id: String) {
         this.httpManager = httpManager
         GetQrCodeValue(id).hitApi()

@@ -13,6 +13,7 @@ import com.rf.taskmodule.data.network.ApiCallback
 import com.rf.taskmodule.data.network.HttpManager
 import com.rf.taskmodule.ui.base.BaseSdkViewModel
 import com.rf.taskmodule.utils.ApiType
+import com.rf.taskmodule.utils.Log
 import com.rf.taskmodule.utils.rx.AppSchedulerProvider
 import com.rf.taskmodule.utils.rx.SchedulerProvider
 import java.net.URLEncoder
@@ -82,10 +83,13 @@ class SkuInfoPreviewViewModel(dataManager: DataManager, schedulerProvider: Sched
         }
 
         override fun hitApi() {
+            Log.d("getApiMap",TrackiSdkApplication.getApiMap().toString())
             if(TrackiSdkApplication.getApiMap().containsKey(ApiType.UNIT_INFO_LISTING)) {
                 val api = TrackiSdkApplication.getApiMap()[ApiType.UNIT_INFO_LISTING]
                 if(dataManager != null)
                     dataManager.getUnitInfo(this, httpManager, unitInfoRequest, api)
+            }else{
+                Log.d("getApiMap","UNIT_INFO_LISTING not available")
             }
         }
 

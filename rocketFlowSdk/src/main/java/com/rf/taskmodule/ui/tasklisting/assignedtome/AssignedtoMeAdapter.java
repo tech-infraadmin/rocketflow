@@ -49,6 +49,7 @@ public class AssignedtoMeAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
     public void setReffLabel(String reffranceLabel) {
         this.reffranceLabel = reffranceLabel;
     }
+
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
     }
@@ -124,9 +125,11 @@ public class AssignedtoMeAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
         }
         return null;
     }
-   public List<Task> getList(){
-       return mResponseList;
-   }
+
+    public List<Task> getList() {
+        return mResponseList;
+    }
+
     public void clearItems() {
         mResponseList.clear();
         notifyDataSetChanged();
@@ -150,38 +153,37 @@ public class AssignedtoMeAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
         public void onBind(int position) {
             final Task task = mResponseList.get(position);
             TaskAssignToMeViewModel itemViewModel = new TaskAssignToMeViewModel(task,
-                    this, context, preferencesHelper,categoryId);
+                    this, context, preferencesHelper, categoryId);
             mBinding.setViewModel(itemViewModel);
-            Boolean isVendorVisible=false;
-            Boolean isPointOfContactVisible=false;
-            Boolean isAssignedToVisible=false;
-            if(categoryId!=null)
-            {
+            Boolean isVendorVisible = false;
+            Boolean isPointOfContactVisible = false;
+            Boolean isAssignedToVisible = false;
+            if (categoryId != null) {
                 //START_LOCATION, END_LOCATION, SELECT_BUDDY, SELECT_CLIENT, START_TIME, END_TIME, POINT_OF_CONTACT, TASK_NAME,
                 //        TASK_TYPE, DESCRIPTION, SELECT_FLEET, SELECT_CITY
-                String startLocationLabel=CommonUtils.getAllowFieldLabelName("START_LOCATION",categoryId,preferencesHelper);
-                String systemLocationLabel=CommonUtils.getAllowFieldLabelName("SYSTEM_LOCATION",categoryId,preferencesHelper);
-                if(!startLocationLabel.isEmpty()){
+                String startLocationLabel = CommonUtils.getAllowFieldLabelName("START_LOCATION", categoryId, preferencesHelper);
+                String systemLocationLabel = CommonUtils.getAllowFieldLabelName("SYSTEM_LOCATION", categoryId, preferencesHelper);
+                if (!startLocationLabel.isEmpty()) {
                     mBinding.labelStartLocation.setText(startLocationLabel);
                 }
-                if(!systemLocationLabel.isEmpty()){
+                if (!systemLocationLabel.isEmpty()) {
                     mBinding.labelStartLocation.setText(systemLocationLabel);
                 }
-                String taskId=CommonUtils.getAllowFieldLabelName("TASK_ID",categoryId,preferencesHelper);
-                if(!taskId.isEmpty()){
+                String taskId = CommonUtils.getAllowFieldLabelName("TASK_ID", categoryId, preferencesHelper);
+                if (!taskId.isEmpty()) {
                     mBinding.labelId.setText(taskId);
                 }
 
-                String endLocationName=CommonUtils.getAllowFieldLabelName("END_LOCATION",categoryId,preferencesHelper);
-                if(!endLocationName.isEmpty()){
+                String endLocationName = CommonUtils.getAllowFieldLabelName("END_LOCATION", categoryId, preferencesHelper);
+                if (!endLocationName.isEmpty()) {
                     mBinding.labelEndLocation.setText(endLocationName);
                 }
-                String startTime=CommonUtils.getAllowFieldLabelName("START_TIME",categoryId,preferencesHelper);
-                if(!startTime.isEmpty()){
+                String startTime = CommonUtils.getAllowFieldLabelName("START_TIME", categoryId, preferencesHelper);
+                if (!startTime.isEmpty()) {
                     mBinding.labelScheduledAt.setText(startTime);
                 }
-                String endTime=CommonUtils.getAllowFieldLabelName("END_TIME",categoryId,preferencesHelper);
-                if(!endTime.isEmpty()){
+                String endTime = CommonUtils.getAllowFieldLabelName("END_TIME", categoryId, preferencesHelper);
+                if (!endTime.isEmpty()) {
                     mBinding.labelEndAt.setText(endTime);
                 }
             }
@@ -197,47 +199,44 @@ public class AssignedtoMeAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
 
             if (task.getAssigneeDetail() != null && task.getAssigneeDetail().getProfileImage() != null)
                 //Glide.with(context).load(task.getAssigneeDetail().getProfileImage()).placeholder(R.drawable.ic_social_media).apply(new RequestOptions().circleCrop()).error(R.drawable.ic_social_media).into(mBinding.ivVendor);
-            if (task.getAssigneeDetail() != null) {
-                isVendorVisible=true;
-                mBinding.rlVendor.setVisibility(View.VISIBLE);
-                mBinding.tvRole.setText("Initiated By");
-                if (task.getAssigneeDetail().getMobile() != null) {
-                    mBinding.tvMobile.setText(task.getAssigneeDetail().getMobile());
-                    mBinding.rlCall.setOnClickListener(new View.OnClickListener() {
+                if (task.getAssigneeDetail() != null) {
+                    isVendorVisible = true;
+                    mBinding.rlVendor.setVisibility(View.VISIBLE);
+                    mBinding.tvRole.setText("Initiated By");
+                    if (task.getAssigneeDetail().getMobile() != null) {
+                        mBinding.tvMobile.setText(task.getAssigneeDetail().getMobile());
+                        mBinding.rlCall.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                String mobile = task.getAssigneeDetail().getMobile();
+                                CommonUtils.openDialer(context, mobile);
+                            }
+                        });
+                    }
+                    if (task.getAssigneeDetail().getName() != null) {
+                        mBinding.tvName.setText(task.getAssigneeDetail().getName());
+                    }
+                    if (task.getStartTime() == 0L)
+                        mBinding.rlSchedule.setVisibility(View.GONE);
+
+                    mBinding.rlChat.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            String mobile = task.getAssigneeDetail().getMobile();
-                            CommonUtils.openDialer(context, mobile);
+                            mListener.onChatClick(task.getAssigneeDetail().getBuddyId(), task.getAssigneeDetail().getName());
+
                         }
                     });
+
                 }
-                if (task.getAssigneeDetail().getName() != null) {
-                    mBinding.tvName.setText(task.getAssigneeDetail().getName());
-                }
-                if (task.getStartTime() == 0L)
-                    mBinding.rlSchedule.setVisibility(View.GONE);
-
-                mBinding.rlChat.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mListener.onChatClick(task.getAssigneeDetail().getBuddyId(), task.getAssigneeDetail().getName());
-
-                    }
-                });
-
-            }
             if (task.getContact() != null) {
-                isPointOfContactVisible=true;
+                isPointOfContactVisible = true;
                 mBinding.tvContactName.setText(task.getContact().getName());
-                mBinding.tvContactMobile.setText(task.getContact().getMobileNumber());
+                mBinding.tvContactMobile.setText(task.getContact().getMobile());
                 mBinding.rlPointOfContact.setVisibility(View.VISIBLE);
-                mBinding.rlCallContactPerson.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (task.getContact().getMobileNumber() != null) {
-                            String mobile = task.getContact().getMobileNumber();
-                            CommonUtils.openDialer(context, mobile);
-                        }
+                mBinding.rlCallContactPerson.setOnClickListener(view -> {
+                    if (task.getContact().getMobile() != null) {
+                        String mobile = task.getContact().getMobile();
+                        CommonUtils.openDialer(context, mobile);
                     }
                 });
             }
@@ -249,11 +248,11 @@ public class AssignedtoMeAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
                 }
             });
             if (task.getBuddyDetail() != null) {
-                isAssignedToVisible=true;
+                isAssignedToVisible = true;
                 mBinding.rlAssignedTo.setVisibility(View.VISIBLE);
                 if (task.getBuddyDetail().getProfileImage() != null && !task.getBuddyDetail().getProfileImage().isEmpty())
                     //Glide.with(context).load(task.getBuddyDetail().getProfileImage()).placeholder(R.drawable.ic_social_media).apply(new RequestOptions().circleCrop()).error(R.drawable.ic_social_media).into(mBinding.ivAssignedTo);
-                mBinding.tvAssignedToRole.setText("Assigned To");
+                    mBinding.tvAssignedToRole.setText("Assigned To");
                 if (task.getBuddyDetail().getName() != null)
                     mBinding.tvAssignedToName.setText(task.getBuddyDetail().getName());
                 if (task.getBuddyDetail().getMobile() != null) {
@@ -289,8 +288,8 @@ public class AssignedtoMeAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
 
             if (task.getReferenceId() != null && !task.getReferenceId().isEmpty()) {
                 mBinding.rlVehicleInfo.setVisibility(View.VISIBLE);
-                if(reffranceLabel.isEmpty())
-                    reffranceLabel="Reference Id";
+                if (reffranceLabel.isEmpty())
+                    reffranceLabel = "Reference Id";
                 mBinding.tvLabelVehicleNumber.setText(reffranceLabel + " :");
                 mBinding.tvVehicleNumber.setText(task.getReferenceId());
 
@@ -314,7 +313,7 @@ public class AssignedtoMeAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
 //                        CommonUtils.openGoogleMapWithOneLocation(context, geoCoordinates.getLatitude(), geoCoordinates.getLongitude());
 //                    }
 
-                    if (task.getSource() != null && task.getSource().getLocation() != null){
+                    if (task.getSource() != null && task.getSource().getLocation() != null) {
                         CommonUtils.showLogMessage("e", "source point map", "source start points map");
                         GeoCoordinates geoCoordinates = task.getSource().getLocation();
                         CommonUtils.openGoogleMapWithOneLocation(context, geoCoordinates.getLatitude(), geoCoordinates.getLongitude());
@@ -345,42 +344,42 @@ public class AssignedtoMeAdapter extends RecyclerView.Adapter<BaseSdkViewHolder>
                     }
                 }
             });
-             mBinding.ivExpandDate.setOnClickListener(new View.OnClickListener() {
-                 @Override
-                 public void onClick(View v) {
-                     if(mBinding.llAllDateData.getVisibility()==View.VISIBLE){
-                         mBinding.llAllDateData.setVisibility(View.GONE);
-                         mBinding.ivExpandDate.setImageResource(R.drawable.ic_expand_down_arrow);
-                     }else{
-                         mBinding.llAllDateData.setVisibility(View.VISIBLE);
-                         mBinding.ivExpandDate.setImageResource(R.drawable.ic_expand_up);
-                     }
-                 }
-             });
+            mBinding.ivExpandDate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mBinding.llAllDateData.getVisibility() == View.VISIBLE) {
+                        mBinding.llAllDateData.setVisibility(View.GONE);
+                        mBinding.ivExpandDate.setImageResource(R.drawable.ic_expand_down_arrow);
+                    } else {
+                        mBinding.llAllDateData.setVisibility(View.VISIBLE);
+                        mBinding.ivExpandDate.setImageResource(R.drawable.ic_expand_up);
+                    }
+                }
+            });
             mBinding.ivExpandLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mBinding.llLocations.getVisibility()==View.VISIBLE){
+                    if (mBinding.llLocations.getVisibility() == View.VISIBLE) {
                         mBinding.llLocations.setVisibility(View.GONE);
                         mBinding.ivExpandLocation.setImageResource(R.drawable.ic_expand_down_arrow);
-                    }else{
+                    } else {
                         mBinding.llLocations.setVisibility(View.VISIBLE);
                         mBinding.ivExpandLocation.setImageResource(R.drawable.ic_expand_up);
                     }
                 }
             });
-            if(!isVendorVisible&&!isPointOfContactVisible&&!isAssignedToVisible){
+            if (!isVendorVisible && !isPointOfContactVisible && !isAssignedToVisible) {
                 mBinding.cardContacts.setVisibility(View.GONE);
-            }else{
+            } else {
                 mBinding.cardContacts.setVisibility(View.VISIBLE);
             }
             mBinding.ivExpandContact.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mBinding.llContacts.getVisibility()==View.VISIBLE){
+                    if (mBinding.llContacts.getVisibility() == View.VISIBLE) {
                         mBinding.llContacts.setVisibility(View.GONE);
                         mBinding.ivExpandContact.setImageResource(R.drawable.ic_expand_down_arrow);
-                    }else{
+                    } else {
                         mBinding.llContacts.setVisibility(View.VISIBLE);
                         mBinding.ivExpandContact.setImageResource(R.drawable.ic_expand_up);
                     }

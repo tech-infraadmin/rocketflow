@@ -53,6 +53,7 @@
                 android:layout_weight="0.50"
                 android:gravity="center"
                 android:orientation="vertical">
+
                 <TextView
                     style="@style/TextViewStyle"
                     android:layout_width="match_parent"
@@ -61,6 +62,7 @@
                     android:layout_marginLeft="@dimen/dimen_10"
                     android:layout_marginRight="@dimen/dimen_10"
                     android:fontFamily="@font/campton_semi_bold"
+                    android:text="@{data.name}"
                     android:textSize="@dimen/text_size_14"
                     tools:text="Haldi Ram Nut Craker" />
 
@@ -72,6 +74,7 @@
                     android:layout_marginLeft="@dimen/dimen_10"
                     android:layout_marginRight="@dimen/dimen_10"
                     android:fontFamily="@font/campton_book"
+                    android:text="@{data.categoryName}"
                     android:textSize="@dimen/text_size_14"
                     tools:text="Haldi Ram Nut Craker" />
 
@@ -83,6 +86,7 @@
                     android:layout_marginLeft="@dimen/dimen_10"
                     android:layout_marginRight="@dimen/dimen_10"
                     android:fontFamily="@font/campton_light"
+                    android:text="@{data.upcNumber}"
                     android:textColor="@color/gray"
                     android:textSize="@dimen/text_size_12"
                     tools:text="UPC N0. :  4528525" />
@@ -97,10 +101,10 @@
                     android:layout_marginTop="@dimen/dimen_10"
                     android:layout_marginRight="@dimen/dimen_10"
                     android:fontFamily="@font/campton_book"
+                    android:text="@{`MRP `+data.price+` INR`}"
                     android:textSize="@dimen/text_size_13"
                     android:visibility="gone"
                     tools:text="MRP 50 INR" />
-
 
             </LinearLayout>
 
@@ -112,14 +116,16 @@
 
                 <Button
                     android:id="@+id/addProduct"
-                    style="@style/ButtonStokeStyle"
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/dimen_40"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginBottom="@dimen/dimen_10"
+                    android:text="Add"
+                    android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="@dimen/text_size_12" />
-
 
             </RelativeLayout>
         </LinearLayout>

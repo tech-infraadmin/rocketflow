@@ -23,6 +23,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.Nullable
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -32,7 +33,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.rocketflow.sdk.RocketFlyer
 import com.rf.taskmodule.BR
 import com.rf.taskmodule.R
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper
@@ -53,12 +53,17 @@ import com.rf.taskmodule.ui.taskdetails.timeline.ProductMapAdapter
 import com.rf.taskmodule.ui.tasklisting.PaginationListener
 import com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START
 import com.rf.taskmodule.utils.*
+import com.rocketflow.sdk.RocketFlyer
 import com.trackthat.lib.models.BaseResponse
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlin.random.Random
 
 
 open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, SelectOrderViewModel>(),
     SubCategoryAdapter.OnSubCategorySelected, SelectProductAdapter.OnProductAddListener,
-    View.OnClickListener, SelectOrderNavigator {
+    View.OnClickListener, SelectOrderNavigator, DimeListAdapter.OnProductRemoveListener {
     private var linkOption: LinkOptions? = null
     private var linkingType: TaggingType? = null
     private var ctaId: String? = null
@@ -67,13 +72,20 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
     lateinit var binding: ActivitySelectOrderSdkBinding
     lateinit var selectProductAdapter: SelectProductAdapter
     lateinit var stageAdapter: SubCategoryAdapter
+    lateinit var tvProdDimension: TextView
     private var taskId: String? = null
+    private var dimeList: ArrayList<CatalogProduct> = ArrayList()
     private var target: String? = null
     private var flavourId: String? = null
+
+    lateinit var adapterDime: DimeListAdapter
+
+    private lateinit var recViewDime: RecyclerView
 
     lateinit var selectOrderViewModel: SelectOrderViewModel
 
     open var savedOrderMap: HashMap<String, CatalogProduct>? = null
+    open var savedOrderMap2: HashMap<String, CatalogProduct>? = null
 
     lateinit var mPref: PreferencesHelper
     lateinit var httpManager: HttpManager
@@ -113,13 +125,24 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
         httpManager = RocketFlyer.httpManager()!!
         mPref = RocketFlyer.preferenceHelper()!!
 
+        tvProdDimension = binding.tvProdDimension
+        tvProdDimension.visibility = View.GONE
+
+        adapterDime = DimeListAdapter(this)
+        selectProductAdapter = SelectProductAdapter(this)
+
+        /*tvProdDimension.setOnClickListener {
+            if (dimeList.isNotEmpty()) {
+                showDialogDimeList()
+            }
+        }*/
+
         binding.btnPlaceOrder.setOnClickListener(this)
-        val sharedPreferences = getSharedPreferences("backAlpha",Context.MODE_PRIVATE)
-        val check = sharedPreferences.getBoolean("back",false)
-        Log.e("backAlpha","$check")
-        if (check){
+        val sharedPreferences = getSharedPreferences("backAlpha", Context.MODE_PRIVATE)
+        val check = sharedPreferences.getBoolean("back", false)
+        if (check) {
             onBackPressed()
-            sharedPreferences.edit().putBoolean("back",false).apply()
+            sharedPreferences.edit().putBoolean("back", false).apply()
         }
         if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORIES)) {
             var categoryMap: Map<String, String>? = null
@@ -152,9 +175,10 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
 
         if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID))
             ctaId = intent.getStringExtra(AppConstants.Extra.EXTRA_CTA_ID)
+        dimeList.clear()
         getSavedMap()
         stageAdapter = SubCategoryAdapter(this)
-        selectProductAdapter = SelectProductAdapter(this)
+
         if (categoryId != null) {
             getInventoryConfig(categoryId!!)
             CommonUtils.showLogMessage("e", "flavourId", flavourId)
@@ -194,7 +218,7 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
             }
         }
         binding.ivSearch.setOnClickListener {
-            var keyword = binding.etSearch.text.toString()
+            val keyword = binding.etSearch.text.toString()
             if (keyword.isNotEmpty()) {
                 globalSearch = true
                 binding.rvCategory.visibility = View.GONE
@@ -205,9 +229,7 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
                 TrackiToast.Message.showShort(this, "Please enter Code/Name")
             }
 
-
         }
-
 
     }
 
@@ -265,7 +287,7 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
             rvProducts!!.adapter = selectProductAdapter
         }
 
-        rvProducts!!.addOnScrollListener(object :PaginationListener(mLayoutManager!!) {
+        rvProducts!!.addOnScrollListener(object : PaginationListener(mLayoutManager!!) {
             override fun loadMoreItems() {
                 this@SelectOrderActivity.isLoading = true
                 if (cid != null) {
@@ -305,39 +327,109 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
 
     override fun onCategorySelected(data: CataLogProductCategory) {
         if (data.cid != null)
-            currentPage =PAGE_START
+            currentPage = PAGE_START
         getProductFromFromServer(data.cid!!)
 
     }
 
 
     private fun getSavedMap() {
-        Log.e("inMap","1")
         if (mPref.userDetail != null && mPref.userDetail.userId != null) {
-            Log.e("inMap","2")
+
             if (CommonUtils.getTotalItemCount(mPref.userDetail.userId!!, mPref) > 0) {
                 if (mPref.productInCartWRC != null && mPref.productInCartWRC!!
                         .containsKey(mPref.userDetail.userId)
                 ) {
-                    Log.e("inMap","3")
-                    savedOrderMap = mPref.getProductInCartWRC()!![mPref.userDetail.userId]
+                    savedOrderMap = mPref.productInCartWRC!![mPref.userDetail.userId]
+                }
+                if (mPref.productInCart2 != null && mPref.productInCart2.containsKey(mPref.userDetail.userId)) {
+                    savedOrderMap2 = mPref.productInCart2!![mPref.userDetail.userId]
                 }
             } else {
+                savedOrderMap2 = HashMap()
                 savedOrderMap = HashMap()
             }
         }
     }
 
+    private fun showDialogDimeList() {
+        val dialogDime = Dialog(this@SelectOrderActivity)
+        dialogDime.setContentView(R.layout.layout_rec_dime)
+        val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
+        lp.copyFrom(dialogDime.window?.attributes)
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialogDime.window?.attributes = lp
+        dialogDime.setCanceledOnTouchOutside(true)
+        dialogDime.setCancelable(true)
+
+        recViewDime = dialogDime.findViewById(R.id.rv_dime)
+        val ivClose = dialogDime.findViewById<ImageView>(R.id.iv_close_dime)
+        recViewDime.adapter = adapterDime
+        dimeList.clear()
+        getSavedMap()
+
+        ivClose.setOnClickListener {
+            dialogDime.dismiss()
+        }
+
+        var tempMap = HashMap<String, CatalogProduct>()
+        if (savedOrderMap2 != null){
+            val valuesTemp = savedOrderMap2!!.values
+            Log.e("check","$valuesTemp")
+            for (i in valuesTemp.indices){
+                val element = valuesTemp.elementAt(i)
+                val listTemp = element.subUnit
+                if (listTemp != null) {
+                    tempMap = seperateList(element,listTemp)
+                }
+
+            }
+        }
+        adapterDime.setMap(tempMap)
+        if (!dialogDime.isShowing)
+            dialogDime.show()
+
+    }
+
+    private fun seperateList(item: CatalogProduct,listTemp: ArrayList<SubUnit>): HashMap<String, CatalogProduct> {
+        val tempMap = HashMap<String, CatalogProduct>()
+        for (job in listTemp){
+
+            val uid = "${item.subId}-${getRandomNumberString()}"
+            val listTemp2 = ArrayList<SubUnit>()
+            listTemp2.add(job)
+
+            val cProduct: CatalogProduct = item.copy(pid=item.subUID, subId = uid, price = job.actualPrice, subUnit = listTemp2)
+
+            tempMap[uid] = cProduct
+        }
+        return tempMap
+    }
+
+    @SuppressLint("SetTextI18n")
     override fun addProduct(data: CatalogProduct, position: Int) {
+        val uid: String = data.pid.toString()
         if (linkingType != null && linkingType == TaggingType.SINGLE && linkOption != null && linkOption == LinkOptions.DIRECT) {
-            Log.e("position", "" + position)
+
             savedOrderMap = HashMap()
+            savedOrderMap2 = HashMap()
+
             if (data.addInOrder) {
-                savedOrderMap!![data.pid!!] = data
+                savedOrderMap!![uid] = data
+                savedOrderMap2!![uid] = data
+                //save to cart
+                saveToCart2(savedOrderMap!!)
+                saveToCart(savedOrderMap2!!)
+//
             } else {
-                if (savedOrderMap!!.contains(data.pid)) {
-                    savedOrderMap!!.remove(data.pid)
-//                    Log.e("remove product", data.name)
+                if (savedOrderMap!!.contains(uid)) {
+                    savedOrderMap!!.remove(uid)
+                    savedOrderMap2!!.remove(uid)
+                    //save to cart
+                    saveToCart(savedOrderMap!!)
+                    saveToCart2(savedOrderMap2!!)
                 }
             }
             for (index in selectProductAdapter.getAllList().indices) {
@@ -351,43 +443,235 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
             if (savedOrderMap == null) {
                 savedOrderMap = HashMap()
             }
+            if (savedOrderMap2 == null) {
+                savedOrderMap2 = HashMap()
+            }
             if (data.addInOrder) {
-                savedOrderMap!![data.pid!!] = data
+                if (data.enableDimension == true || data.dimensionEnabled == true) {
+                    val dialogDime = Dialog(this@SelectOrderActivity)
+                    dialogDime.setContentView(R.layout.layout_dimension_box)
+                    val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
+                    lp.copyFrom(dialogDime.window?.attributes)
+                    lp.width = WindowManager.LayoutParams.MATCH_PARENT
+                    lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+
+                    dialogDime.window?.attributes = lp
+                    dialogDime.setCanceledOnTouchOutside(false)
+                    dialogDime.setCancelable(false)
+                    val etLength = dialogDime.findViewById<EditText>(R.id.et_length)
+                    val etBreadth = dialogDime.findViewById<EditText>(R.id.et_breadth)
+                    val etArea = dialogDime.findViewById<EditText>(R.id.et_area)
+                    val etPrice = dialogDime.findViewById<EditText>(R.id.et_price)
+                    val btnAdd = dialogDime.findViewById<AppCompatButton>(R.id.btn_addDim)
+
+                    etArea.setText("1.0")
+                    etPrice.setText("₹ ${data.sellingPrice.toString()}")
+
+                    dialogDime.findViewById<EditText>(R.id.et_measure).setText(data.unitType)
+
+                    etLength.addTextChangedListener(object : TextWatcher {
+                        override fun beforeTextChanged(
+                            p0: CharSequence?,
+                            p1: Int,
+                            p2: Int,
+                            p3: Int
+                        ) {
+
+                        }
+
+                        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                        }
+
+                        @SuppressLint("SetTextI18n")
+                        override fun afterTextChanged(p0: Editable?) {
+                            val breadth = etBreadth.text.toString()
+                            val length = etLength.text.toString()
+                            if (length != "" && breadth != "" && length.isNotEmpty() && breadth.isNotEmpty()) {
+                                etArea.setText((breadth.toDouble() * length.toDouble()).toString())
+                                etPrice.setText(
+
+                                    "₹ ${
+                                        etArea.text.toString()
+                                            .toFloat() * data.sellingPrice.toString()
+                                            .toFloat()
+                                    }"
+
+                                )
+                            }
+                        }
+
+                    })
+
+                    etBreadth.addTextChangedListener(object : TextWatcher {
+                        override fun beforeTextChanged(
+                            p0: CharSequence?,
+                            p1: Int,
+                            p2: Int,
+                            p3: Int
+                        ) {
+
+                        }
+
+                        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                        }
+
+                        @SuppressLint("SetTextI18n")
+                        override fun afterTextChanged(p0: Editable?) {
+                            val length = etLength.text.toString()
+                            val breadth = etBreadth.text.toString()
+                            if (length != "" && breadth != "" && length.isNotEmpty() && breadth.isNotEmpty()) {
+                                etArea.setText((breadth.toFloat() * length.toFloat()).toString())
+                                etPrice.setText(
+                                    "₹ ${
+                                        etArea.text.toString()
+                                            .toFloat() * data.sellingPrice.toString()
+                                            .toFloat()
+                                    }"
+                                )
+                            }
+                        }
+
+                    })
+
+                    btnAdd.setOnClickListener {
+                        val length = etLength.text.toString()
+                        val breadth = etBreadth.text.toString()
+                        val area = etArea.text.toString()
+                        val price = etPrice.text.toString()
+
+                        if (length.isEmpty()) {
+                            TrackiToast.Message.showShort(this, "Enter Length")
+                        } else if (breadth.isEmpty()) {
+                            TrackiToast.Message.showShort(this, "Enter Breadth")
+                        } else if (area.isEmpty()) {
+                            TrackiToast.Message.showShort(this, "Area Field is Empty")
+                        } else if (price.isEmpty()) {
+                            TrackiToast.Message.showShort(this, "Price Field is Empty")
+                        } else {
+                            val uid1 = "${uid}-${getRandomNumberString()}"
+                            val dimensionProduct = DimensionProduct(
+                                area.toFloat(),
+                                length.toFloat(),
+                                breadth.toFloat()
+                            )
+                            val newPrice = price.drop(2)
+                            val subUnit =
+                                SubUnit(
+                                    newPrice.toFloat(),
+                                    dimensionProduct,
+                                    1,
+                                    data.sellingPrice.toString().toFloat()
+                                )
+
+                            val list1 = ArrayList<SubUnit>()
+                            list1.add(subUnit)
+                            val listSubTemp = data.subUnit
+                            if (listSubTemp != null) {
+                                for (item in listSubTemp) {
+                                    list1.add(item)
+                                }
+                            }
+
+                            var priceTotalI = 0F
+                            for(u in list1){
+                                priceTotalI += u.actualPrice!!.toFloat()
+                            }
+
+                            val dataTemp = data
+                            dataTemp.pid = uid
+                            dataTemp.enableDimension = true
+                            dataTemp.price = priceTotalI
+                            dataTemp.subId = uid1
+                            dataTemp.subUID = uid
+                            dataTemp.subUnit = list1
+
+
+                            val dataTemp1 = data.copy(pid = uid, enableDimension = true, price = priceTotalI, subId = uid1, subUID = uid, subUnit = list1)
+
+                            savedOrderMap!![uid] = dataTemp1
+                            savedOrderMap2!![uid] = dataTemp
+                            //save to cart
+                            saveToCart(savedOrderMap!!)
+                            saveToCart2(savedOrderMap2!!)
+
+
+                            dialogDime.dismiss()
+                            tvProdDimension.visibility = View.INVISIBLE
+
+                        }
+                    }
+                    if (!dialogDime.isShowing)
+                        dialogDime.show()
+
+                } else {
+                    data.enableDimension = false
+                    savedOrderMap!![uid] = data
+                    savedOrderMap2!![uid] = data
+                    //save to cart
+                    saveToCart(savedOrderMap!!)
+                    saveToCart2(savedOrderMap2!!)
+                }
             } else {
-                if (savedOrderMap!!.contains(data.pid)) {
-                    savedOrderMap!!.remove(data.pid)
-//                    Log.e("remove product", data.name)
+                if (savedOrderMap!!.contains(uid)) {
+                    savedOrderMap!!.remove(uid)
+                    savedOrderMap2!!.remove(uid)
+                    //save to cart
+                    saveToCart(savedOrderMap!!)
+                    saveToCart2(savedOrderMap2!!)
                 }
             }
 
         }
-        var saveOrderInCart = HashMap<String, Map<String, CatalogProduct>>()
-        if (mPref.getProductInCartWRC() != null)
-            saveOrderInCart.putAll(mPref.getProductInCartWRC()!!)
-        saveOrderInCart[mPref.userDetail.userId!!] = savedOrderMap!!
-        mPref.saveProductInCartWRC(saveOrderInCart)
-        var jsonConverter2 =
-            JSONConverter<Map<String, Map<String, CatalogProduct>>>()
-        var str2 = jsonConverter2.objectToJson(mPref.getProductInCartWRC())
-//        Log.e("map_addProduct", str2)
 
 
         invalidateOptionsMenu()
-        var jsonConverter =
+
+    }
+
+    private fun saveToCart2(savedOrderMap1: HashMap<String, CatalogProduct>) {
+        val saveOrderInCart2 = HashMap<String, Map<String, CatalogProduct>>()
+        if (mPref.productInCart2 != null)
+            saveOrderInCart2.putAll(mPref.productInCart2!!)
+        saveOrderInCart2[mPref.userDetail.userId!!] = savedOrderMap1
+        mPref.saveProductInCart2(saveOrderInCart2)
+
+        //print cart map
+        val jsonConverter =
             JSONConverter<HashMap<String, CatalogProduct>>()
-        var str = jsonConverter.objectToJson(savedOrderMap)
-        Log.e("map", str)
-        if (savedOrderMap!!.isNotEmpty())
+
+        val str = jsonConverter.objectToJson(savedOrderMap1)
+    }
+
+    private fun saveToCart(savedOrderMap1: HashMap<String, CatalogProduct>) {
+        val saveOrderInCart = HashMap<String, Map<String, CatalogProduct>>()
+        if (mPref.productInCartWRC != null)
+            saveOrderInCart.putAll(mPref.productInCartWRC!!)
+        saveOrderInCart[mPref.userDetail.userId!!] = savedOrderMap1
+        mPref.saveProductInCartWRC(saveOrderInCart)
+
+        //print cart map
+        val jsonConverter =
+            JSONConverter<HashMap<String, CatalogProduct>>()
+        val str = jsonConverter.objectToJson(savedOrderMap1)
+
+        //set visibility of view cart button
+        if (savedOrderMap1.isNotEmpty())
             binding.llButton.visibility = View.VISIBLE
         else {
             binding.llButton.visibility = View.GONE
         }
-
     }
 
 
     override fun removeProduct(data: CatalogProduct, position: Int) {
 
+    }
+
+    open fun getRandomNumberString(): String? {
+        val number = Random.nextInt(999999)
+        return String.format("%06d", number)
     }
 
 
@@ -403,7 +687,7 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
         paginationRequest!!.offset = (currentPage - 1) * 10
         paginationRequest!!.dataCount = 10
         if (globalSearch) {
-            var keyword = binding.etSearch.text.toString()
+            val keyword = binding.etSearch.text.toString()
             paginationRequest!!.keyword = keyword
             selectOrderViewModel.getProductByKeyWord(
                 categoryId,
@@ -412,6 +696,7 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
                 httpManager,
                 paginationRequest
             )
+
         } else {
             this.cid = cid
             selectOrderViewModel.getProduct(
@@ -447,14 +732,11 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
         }
 
         var count = 0
-        var jsonConverter =
-            JSONConverter<Map<String, Map<String, CatalogProduct>>>()
-        var str = jsonConverter.objectToJson(mPref.productInCartWRC)
-        Log.e("map_menu", str)
+
         if (mPref.userDetail != null && mPref.userDetail.userId != null)
             count = CommonUtils.getTotalItemCount(mPref.userDetail.userId!!, mPref)
-        menuItem.setIcon(buildCounterDrawable(count, R.drawable.ic_cart))
-        qrCode.icon = buildCounterDrawable(0,R.drawable.ic_qr_code)
+        menuItem.icon = buildCounterDrawable(count, R.drawable.ic_cart)
+        qrCode.icon = buildCounterDrawable(0, R.drawable.ic_qr_code)
         return true
     }
 
@@ -474,7 +756,6 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
 
     fun onSuccess() {
         val returnIntent = Intent()
-//            returnIntent.putExtra("result", result)
         setResult(Activity.RESULT_OK, returnIntent)
         finish()
     }
@@ -482,19 +763,19 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
     fun onLinkInventorySucess() {
         if (mPref.userDetail != null && mPref.userDetail!!.userId != null) {
             if (CommonUtils.getTotalItemCount(mPref.userDetail!!.userId!!, mPref) > 0) {
-                if (mPref.getProductInCartWRC() != null && mPref.getProductInCartWRC()!!
+                if (mPref.productInCartWRC != null && mPref.productInCartWRC!!
                         .containsKey(mPref.userDetail!!.userId!!)
                 ) {
 
-                    var saveOrderInCart = HashMap<String, Map<String, CatalogProduct>>()
-                    if (mPref.getProductInCartWRC() != null)
-                        saveOrderInCart.putAll(mPref.getProductInCartWRC()!!)
+                    val saveOrderInCart = HashMap<String, Map<String, CatalogProduct>>()
+                    if (mPref.productInCartWRC != null)
+                        saveOrderInCart.putAll(mPref.productInCartWRC!!)
                     saveOrderInCart.remove(mPref.userDetail!!.userId!!)
                     mPref.saveProductInCartWRC(saveOrderInCart)
-                    var jsonConverter2 =
+                    val jsonConverter2 =
                         JSONConverter<Map<String, Map<String, CatalogProduct>>>()
-                    var str2 = jsonConverter2.objectToJson(mPref.getProductInCartWRC())
-                    Log.e("delete_map", str2)
+                    val str2 = jsonConverter2.objectToJson(mPref.getProductInCartWRC())
+
 
                 }
             }
@@ -518,6 +799,7 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
             if (resultCode == Activity.RESULT_OK) {
                 onSuccess()
             } else {
+                dimeList.clear()
                 getSavedMap()
                 invalidateOptionsMenu()
                 selectProductAdapter.clearList()
@@ -539,10 +821,8 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
                 fleetId = data!!.getStringExtra(AppConstants.Extra.EXTRA_FLEET_ID)
                 var linkRequest = LinkInventoryRequest()
                 if (savedOrderMap != null && savedOrderMap!!.isNotEmpty()) {
-//                    var map = HashMap<String, Int>()
                     var map = ArrayList<SelectedProduct>()
                     for (data in savedOrderMap!!.values) {
-                        // map[data.pid!!] = data.noOfProduct
                         var product = SelectedProduct()
                         product.productId = data.pid
                         product.quantity = data.noOfProduct
@@ -647,7 +927,7 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
             TrackiToast.Message.showShort(this, getString(R.string.cart_is_empty_please_add_item))
             return
         }
-        var list = savedOrderMap!!
+        val list = savedOrderMap!!
         if (linkingType != null && linkingType == TaggingType.SINGLE
             && linkOption != null && linkOption == LinkOptions.DIRECT
         ) {
@@ -703,7 +983,8 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
     override fun getViewModel(): SelectOrderViewModel {
         val factory = RocketFlyer.dataManager()?.let { SelectOrderViewModel.Factory(it) } // Factory
         if (factory != null) {
-            selectOrderViewModel = ViewModelProvider(this, factory)[SelectOrderViewModel::class.java]
+            selectOrderViewModel =
+                ViewModelProvider(this, factory)[SelectOrderViewModel::class.java]
         }
         return selectOrderViewModel!!
     }
@@ -777,14 +1058,6 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
                 setRecyclerView()
                 selectProductAdapter!!.addItems(list)
                 binding.rlSearch.visibility = View.VISIBLE
-                CommonUtils.showLogMessage(
-                    "e", "adapter total_count =>",
-                    "" + selectProductAdapter.itemCount
-                )
-                CommonUtils.showLogMessage(
-                    "e", "fetch total_count =>",
-                    "" + responseMain.count
-                )
                 isLastPage = selectProductAdapter.itemCount >= responseMain.count
 
             } else {
@@ -873,17 +1146,17 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
                     )
                 }
 
-            }else{
+            } else {
                 hideLoading()
-                binding.rlSearch.visibility=View.GONE
+                binding.rlSearch.visibility = View.GONE
                 selectProductAdapter!!.addItems(ArrayList())
                 setRecyclerView()
             }
 
 
-        }else{
+        } else {
             hideLoading()
-            binding.rlSearch.visibility=View.GONE
+            binding.rlSearch.visibility = View.GONE
             selectProductAdapter!!.addItems(ArrayList())
             setRecyclerView()
         }
@@ -896,7 +1169,7 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
                 // TODO Code for order tagging
                 return
             } else {
-                var list = selectProductAdapter.getAllList().filter { it.addInOrder }
+                val list = selectProductAdapter.getAllList().filter { it.addInOrder }
                 if (list.isNotEmpty()) {
                     var product = list[0]
                     if (product.prodInfoMap != null && product.prodInfoMap!!.isNotEmpty())
@@ -947,19 +1220,16 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
                     if (listCategory.contains(workFlowCategories)) {
                         val position: Int = listCategory.indexOf(workFlowCategories)
                         if (position != -1) {
-                            val myCatData: WorkFlowCategories = listCategory.get(position)
-                            // userGeoReq=myCatData.getAllowGeography();
+                            val myCatData: WorkFlowCategories = listCategory[position]
                             if (myCatData.inventoryConfig != null && myCatData.inventoryConfig!!.approvalType != null && myCatData.inventoryConfig!!.approvalType == ApprovalType.MANUAL
                                 && myCatData.inventoryConfig!!.approvalOn != null && myCatData.inventoryConfig!!.approvalOn == ApprovalOn.SUB_TASK
                             ) {
                                 linkRequest.createSubTask = true
-                                var subTaskConfig = myCatData.subTaskConfig
+                                val subTaskConfig = myCatData.subTaskConfig
                                 if (subTaskConfig != null && subTaskConfig.categories!!.isNotEmpty()) {
-                                    // linkRequest.subCategoryId = subTaskConfig.categories!![0]
                                     linkRequest.subTaskCategory = subTaskConfig.categories!![0]
                                     linkRequest.parentTaskId = taskId
                                 }
-
                             }
                             if (myCatData.inventoryConfig != null && myCatData.inventoryConfig!!.flavorId != null && myCatData.inventoryConfig!!.flavorId!!.isNotEmpty()) {
                                 linkRequest.flavorId = myCatData.inventoryConfig!!.flavorId
@@ -976,7 +1246,7 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
                 }
                 val jsonConverter: JSONConverter<LinkInventoryRequest> =
                     JSONConverter()
-                var strRequest = jsonConverter.objectToJson(linkRequest)
+                val strRequest = jsonConverter.objectToJson(linkRequest)
                 CommonUtils.showLogMessage("e", "strRequest", strRequest);
                 showLoading()
                 selectOrderViewModel.linkInventory(httpManager, linkRequest)
@@ -1161,7 +1431,6 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
     }
 
 
-
     fun popupShowHubs(list: ArrayList<LocData>) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -1192,7 +1461,7 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
                 geoId = data.id
                 binding.tvHubs.text = data.name
                 if (cid != null) {
-                    currentPage =PAGE_START
+                    currentPage = PAGE_START
                     getProductFromFromServer(cid!!)
                 }
             }
@@ -1265,26 +1534,89 @@ open class SelectOrderActivity : BaseSdkActivity<ActivitySelectOrderSdkBinding, 
 
     override fun onResume() {
         super.onResume()
+        dimeList.clear()
         getSavedMap()
-        val sharedPreferences = getSharedPreferences("backAlpha",Context.MODE_PRIVATE)
-        val check = sharedPreferences.getBoolean("back",false)
-        Log.e("backAlpha","$check")
-        if (check){
+        val sharedPreferences = getSharedPreferences("backAlpha", Context.MODE_PRIVATE)
+        val check = sharedPreferences.getBoolean("back", false)
+        if (check) {
             onBackPressed()
-            sharedPreferences.edit().putBoolean("back",false).apply()
+            sharedPreferences.edit().putBoolean("back", false).apply()
         }
     }
 
     override fun onRestart() {
         super.onRestart()
+        dimeList.clear()
         getSavedMap()
-        val sharedPreferences = getSharedPreferences("backAlpha",Context.MODE_PRIVATE)
-        val check = sharedPreferences.getBoolean("back",false)
-        Log.e("backAlpha","$check")
-        if (check){
+        val sharedPreferences = getSharedPreferences("backAlpha", Context.MODE_PRIVATE)
+        val check = sharedPreferences.getBoolean("back", false)
+        if (check) {
             onBackPressed()
-            sharedPreferences.edit().putBoolean("back",false).apply()
+            sharedPreferences.edit().putBoolean("back", false).apply()
         }
+    }
+
+    override fun deleteProduct(data: CatalogProduct) {
+        if (data.noOfProduct > 1) {
+            val arrayTemp1 = data.subUnit
+
+            if (arrayTemp1 != null) {
+                val tempData1 = savedOrderMap!![data.subUID]
+                val arrayTemp2 = tempData1?.subUnit
+
+                val newTempArray = ArrayList<SubUnit>()
+                if (arrayTemp2 != null) {
+                    for (item in arrayTemp2) {
+                        if (item != arrayTemp1!![0]) {
+                            newTempArray.add(item)
+                        }
+                    }
+                }
+                val data1 = data.copy(noOfProduct = data.noOfProduct - 1)
+                data1.subUnit = newTempArray
+
+                //map2
+                val tempDatab1 = savedOrderMap2!![data.pid]
+
+                Log.e("check","$tempDatab1")
+
+
+                val data2 = data.copy(noOfProduct = data.noOfProduct - 1, pid = tempDatab1?.pid)
+                data2.subUnit = newTempArray
+
+                savedOrderMap!![data.subUID.toString()] = data1
+                savedOrderMap2!![data.pid.toString()] = data2
+            }
+        } else {
+            savedOrderMap!!.remove(data.subUID.toString())
+            savedOrderMap2?.remove(data.pid)
+        }
+
+        val list = ArrayList<CatalogProduct>()
+        selectProductAdapter.mList.forEach {
+            if (it.pid == data.pid) {
+                it.noOfProduct = it.noOfProduct - 1
+            }
+            list.add(it)
+        }
+        selectProductAdapter.clearList()
+        selectProductAdapter.addItems(list)
+
+        val adapter = DimeListAdapter(this)
+        adapter.clearList()
+        adapter.setMap(savedOrderMap2!!)
+        recViewDime.adapter = adapter
+
+        saveToCart2(savedOrderMap2!!)
+        saveToCart(savedOrderMap!!)
+        startActivity(intent)
+
+    }
+
+    override fun viewDimeProducts() {
+
+        showDialogDimeList()
+
     }
 
 

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rf.taskmodule.R;
 import com.rf.taskmodule.data.model.AlarmInfo;
 import com.rf.taskmodule.data.model.DataObject;
 import com.rf.taskmodule.data.model.request.SaveFilterData;
@@ -22,6 +23,8 @@ import com.rf.taskmodule.data.model.response.config.OverstoppingConfig;
 import com.rf.taskmodule.data.model.response.config.ProfileInfo;
 import com.rf.taskmodule.data.model.response.config.ProjectCategories;
 import com.rf.taskmodule.data.model.response.config.RoleConfigData;
+import com.rf.taskmodule.data.model.response.config.Service;
+import com.rf.taskmodule.data.model.response.config.Subscription;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
 import com.rf.taskmodule.utils.ApiType;
@@ -82,11 +85,14 @@ import static com.rf.taskmodule.utils.AppConstants.PREF_KEY_FLAVOUR_MAP;
 public class AppPreferencesHelper implements PreferencesHelper {
     public static final String PREF_KEY_MERCHANT_NAME = "PREF_KEY_MERCHANT_NAME";
 
+    public static final String PREF_PREF_KEY_THEME = "PREF_KEY_THEME";
     public static final String PREF_VERIFIED_CTAS = "PREF_VERIFIED_CTAS";
 
     public static final String PREF_KEY_BACK_MODE = "PREF_KEY_BACK_MODE";
 
     public static final String PREF_BASE_MODE = "PREF_BASE_MODE";
+
+    private static final String PREF_KEY_SERVICES = "PREF_KEY_SERVICES";
 
     public static final String PREF_KEY_ONLINE_STATUS = "PREF_KEY_ONLINE_STATUS";
     public static final String PREF_KEY_TOGGLE_FEATURE = "PREF_KEY_TOGGLE_FEATURE";
@@ -178,6 +184,12 @@ public class AppPreferencesHelper implements PreferencesHelper {
     public static final String PREF_KEY_SELECTED_HUB_ID="PREF_KEY_SELECTED_HUB_ID";
     public static final String PREF_KEY_ROLE_CONFIG="PREF_KEY_ROLE_CONFIG";
     public static final String PREF_KEY_SAVED_CART="PREF_KEY_SAVED_CART";
+
+    public static final String PREF_KEY_SAVED_CART2="PREF_KEY_SAVED_CART2";
+
+    public static final String PREF_KEY_SUBSCRIPTION_ENABLED = "PREF_KEY_SUBSCRIPTION_ENABLED";
+
+    public static final String PREF_KEY_SUBSCRIPTION_PACK = "PREF_KEY_SUBSCRIPTION_PACK";
 
     private static final String PREF_KEY_SDK_CLIENT_ID = "PREF_KEY_SDK_CLIENT_ID";
 
@@ -1433,6 +1445,44 @@ public class AppPreferencesHelper implements PreferencesHelper {
     }
 
     @Override
+    public void saveProductInCart2(Map<String, Map<String, CatalogProduct>> map) {
+        mPrefs.edit().putString(PREF_KEY_SAVED_CART2, new Gson().toJson(map)).apply();
+    }
+
+    @Override
+    public HashMap<String, HashMap<String, CatalogProduct>> getProductInCart2() {
+        String c = mPrefs.getString(PREF_KEY_SAVED_CART2, null);
+        if (c == null) {
+            return null;
+        }
+        HashMap<String,HashMap<String,CatalogProduct>> dataHashMap = new Gson().fromJson(c, new TypeToken<HashMap<String,HashMap<String,CatalogProduct>>>() {
+        }.getType());
+        return dataHashMap;
+    }
+
+    @Override
+    public void setSubscriptionEnabled(Boolean subscription) {
+        mPrefs.edit().putBoolean(PREF_KEY_SUBSCRIPTION_ENABLED, subscription).apply();
+    }
+
+    @Override
+    public Boolean getSubscriptionEnabled() {
+        return mPrefs.getBoolean(PREF_KEY_SUBSCRIPTION_ENABLED, false);
+    }
+
+    @Override
+    public void setSubscriptionPack(Subscription subscription) {
+        mPrefs.edit().putString(PREF_KEY_SUBSCRIPTION_PACK, new Gson().toJson(subscription)).apply();
+    }
+
+    @Override
+    public Subscription getSubscriptionPack() {
+        return new Gson()
+                .fromJson(mPrefs.getString(PREF_KEY_SUBSCRIPTION_PACK, null),
+                        Subscription.class);
+    }
+
+    @Override
     public void saveWorkFlowCategoriesList(List<WorkFlowCategories> workFlowCategoriesList) {
         mPrefs.edit().putString(PREF_KEY_WORKFLOW_CATEGORIES, new Gson().toJson(workFlowCategoriesList)).apply();
     }
@@ -1481,6 +1531,32 @@ public class AppPreferencesHelper implements PreferencesHelper {
         }
         return new Gson().fromJson(c, new TypeToken<List<ProjectCategories> >() {
         }.getType());
+    }
+
+    @Override
+    public void saveServices(List<Service> services) {
+        mPrefs.edit().putString(PREF_KEY_SERVICES, new Gson().toJson(services)).apply();
+    }
+
+    @Override
+    public List<Service> getServices() {
+        Type listType = new TypeToken<List<Service>>() {}.getType();
+        List<Service> services = new Gson().fromJson(mPrefs.getString(PREF_KEY_SERVICES, null), listType);
+        return services;
+    }
+
+    @Override
+    public void saveTheme(int currentTheme) {
+        mPrefs.edit().putInt(PREF_PREF_KEY_THEME, currentTheme).apply();
+    }
+
+    @Override
+    public int getCurrentTheme() {
+        if (BuildConfig.BUILD_TYPE == "releaseBiz" || BuildConfig.BUILD_TYPE == "uatBiz") {
+            return mPrefs.getInt(PREF_PREF_KEY_THEME, R.style.AppThemeGreen);
+        } else {
+            return mPrefs.getInt(PREF_PREF_KEY_THEME, R.style.AppTheme);
+        }
     }
 
     public enum PreferencesKeys {

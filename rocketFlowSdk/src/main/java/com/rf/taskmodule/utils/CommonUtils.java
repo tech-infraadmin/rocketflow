@@ -280,9 +280,9 @@ public final class CommonUtils {
     public static final int PendingIntentFlag = PendingIntent.FLAG_MUTABLE;
     public static final int PendingIntentFlagNoCreate = PendingIntentFlag;
     public static final int PendingIntentFlagCancelCurrent = PendingIntentFlag;
-    
+
     public static Map<String, ArrayList<String>> stringListHashMap = new ConcurrentHashMap<>();
-    public static String errorString =null;
+    public static String errorString = null;
     private static Dialog errorDialog;
 
     public CommonUtils() {
@@ -297,8 +297,7 @@ public final class CommonUtils {
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.getDecorView().getWindowInsetsController().setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
-        }
-        else{
+        } else {
             window.getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
                             | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -1064,6 +1063,7 @@ public final class CommonUtils {
         return color;
     }
 
+
     @NonNull
     public static String setCustomFontTypeSpan(Context context, String
             source, int startIndex, int endIndex, int font) {
@@ -1080,7 +1080,6 @@ public final class CommonUtils {
         boolean success = false;
         try {
             BaseResponse response = new Gson().fromJson(String.valueOf(object), BaseResponse.class);
-            Log.d("BaseResponse",response.toString());
             if (callBack.isAvailable()) {
                 if (apiError != null) {
                    /* Activity baseActivity = (Activity) context;
@@ -1152,11 +1151,33 @@ public final class CommonUtils {
                             case "211"://invalid login token
                                 response.getResponseMsg();
                                 TrackiToast.Message.showShort(context, response.getResponseMsg());
-                                Intent intent=new Intent("com.rocketflow.sdk.Logout");
+                                Intent intent = new Intent("com.rocketflow.sdk.Logout");
                                 context.sendBroadcast(intent);
                                 break;
                             case "205"://invalid accessId
 
+                                break;
+                            case "401":// Access denied
+                                new AlertDialog.Builder(context)
+                                        .setMessage(response.getResponseMsg())
+                                        .setTitle(AppConstants.Access_denied)
+                                        .setCancelable(false)
+                                        .setNegativeButton(AppConstants.CLOSE, (dialog, which) -> {
+                                            dialog.dismiss();
+                                            ((BaseSdkActivity) context).finish();
+                                        })
+                                        .show();
+                                break;
+                            case "500":// Initialisation Failed
+                                new AlertDialog.Builder(context)
+                                        .setMessage(response.getResponseMsg())
+                                        .setTitle(AppConstants.Initialisation_Failed)
+                                        .setCancelable(false)
+                                        .setNegativeButton(AppConstants.CLOSE, (dialog, which) -> {
+                                            dialog.dismiss();
+                                            ((BaseSdkActivity) context).finish();
+                                        })
+                                        .show();
                                 break;
                            /* case "300"://invalid otp for dynamic form
                                 //needs to be handle inside dynamic activity.
@@ -1205,7 +1226,8 @@ public final class CommonUtils {
                 }*/
                 }
             }
-        } catch (com.google.gson.JsonSyntaxException | NullPointerException | IllegalStateException exception) {
+        } catch (com.google.gson.JsonSyntaxException | NullPointerException |
+                 IllegalStateException exception) {
             //TrackiToast.Message.showShort(context, exception.getMessage());
             TrackiToast.Message.showShort(context, "Seems server is not available to process this request,please try after some time");
             exception.printStackTrace();
@@ -1826,16 +1848,16 @@ public final class CommonUtils {
 //        }
         preferencesHelper.saveRefreshConfig(configResponse.getRefreshConfig());
         if (Boolean.FALSE.equals(configResponse.getRefreshConfig())) {
-            Log.d("Config", "Don't Save");
+            Log.d("Config", "Don't Save copyConfig");
             Gson gson = new Gson();
             ConfigResponse config = gson.fromJson(String.valueOf(preferencesHelper.getConfigResponse()), ConfigResponse.class);
-            copyConfigResponse(config,from,jsonobject,preferencesHelper,context);
-        }else{
-            Log.d("Config","Config Save");
+            copyConfigResponse(config, from, jsonobject, preferencesHelper, context);
+        } else {
+            Log.d("Config", "Config Save copyConfig");
             Gson gson = new Gson();
             String json = gson.toJson(configResponse);
             preferencesHelper.saveConfigResponse(json);
-            copyConfigResponse(configResponse,from,jsonobject,preferencesHelper,context);
+            copyConfigResponse(configResponse, from, jsonobject, preferencesHelper, context);
         }
     }
 
@@ -1895,20 +1917,22 @@ public final class CommonUtils {
 //        }
         preferencesHelper.saveRefreshConfig(configResponse.getRefreshConfig());
         if (Boolean.FALSE.equals(configResponse.getRefreshConfig())) {
-            Log.d("Config", "Don't Save");
+            Log.d("Config", "Don't Save task");
             Gson gson = new Gson();
             ConfigResponse config = gson.fromJson(String.valueOf(preferencesHelper.getConfigResponse()), ConfigResponse.class);
-            saveConfigResponse(config,from,jsonobject,preferencesHelper,context);
-        }else{
-            Log.d("Config","Config Save");
+            saveConfigResponse(config, from, jsonobject, preferencesHelper, context);
+        } else {
+            Log.d("Config", "Config Save task");
             Gson gson = new Gson();
             String json = gson.toJson(configResponse);
             preferencesHelper.saveConfigResponse(json);
-            saveConfigResponse(configResponse,from,jsonobject,preferencesHelper,context);
+            saveConfigResponse(configResponse, from, jsonobject, preferencesHelper, context);
         }
     }
 
     private static void saveConfigResponse(ConfigResponse configResponse, String from, String jsonobject, PreferencesHelper preferencesHelper, Context context) {
+
+
         preferencesHelper.saveFilterMap(null);
         if (configResponse.getLookups() != null) {
             TrackiSdkApplication.setLookups(configResponse.getLookups());
@@ -1916,6 +1940,14 @@ public final class CommonUtils {
 
         if (configResponse.getDynamicForms() != null) {
             TrackiSdkApplication.setDynamicFormsNews(configResponse.getDynamicForms());
+        }
+
+        if (configResponse.getSubscriptionEnabled() != null) {
+            preferencesHelper.setSubscriptionEnabled(configResponse.getSubscriptionEnabled());
+
+            if (configResponse.getSubscriptionEnabled() == true) {
+                preferencesHelper.setSubscriptionPack(configResponse.getSubscriptionInfo());
+            }
         }
 
 //        if (configResponse.getTaskCancellationReasons() != null &&
@@ -1926,6 +1958,10 @@ public final class CommonUtils {
 //            }
 //            TrackiApplication.setReasonList(reasonsList);
 //        }
+
+        if (configResponse.getServices() != null) {
+            preferencesHelper.saveServices(configResponse.getServices());
+        }
 
         SdkConfig sdkConfig = configResponse.getSdkConfig();
         if (sdkConfig != null) {
@@ -1977,6 +2013,7 @@ public final class CommonUtils {
         }
 
         AppConfig appConfig = configResponse.getAppConfig();
+
         if (appConfig != null) {
             if (appConfig.getRoles() != null) {
                 preferencesHelper.saveRoleConfigDataList(appConfig.getRoles());
@@ -2092,7 +2129,7 @@ public final class CommonUtils {
                 //check for the state of the config,alarm & hub locations.
                 if (appConfig.getIdleTrackingInfo() != null && appConfig.getIdleTrackingInfo().getMode() != null && appConfig.getIdleTrackingInfo().getMode().equals("ON_SHIFT") && preferencesHelper.getIsIdealTrackingEnable()) {
                     //if (preferencesHelper.getOldShiftMap() != null)
-                        //ShiftHandlingUtil.checkAlarms(context, preferencesHelper);
+                    //ShiftHandlingUtil.checkAlarms(context, preferencesHelper);
                 }
 
                 //DeprecationAndExpiration screen = configResponse.getAppConfig().getAppVersionInfo();
@@ -2196,7 +2233,7 @@ public final class CommonUtils {
 //            activity.startActivity(intent);
 //            activity.finish();
         } else if (nextScreen == NextScreen.DEVICE_CHANGE_SOFT_POPUP) {
-            Log.e("CHANGE","DEVICE_CHANGE_SOFT_POPUP");
+            Log.e("CHANGE", "DEVICE_CHANGE_SOFT_POPUP");
 //            Intent intent = DeviceChangeActivity.Companion.newIntent(activity);
 //            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //            intent.putExtra("title","Device Change Detected");
@@ -2207,7 +2244,7 @@ public final class CommonUtils {
 //            activity.finish();
 
         } else if (nextScreen == NextScreen.DEVICE_CHANGE_HARD_POPUP) {
-            Log.e("CHANGE","DEVICE_CHANGE_HARD_POPUP");
+            Log.e("CHANGE", "DEVICE_CHANGE_HARD_POPUP");
 //            Intent intent = DeviceChangeActivity.Companion.newIntent(activity);
 //            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //            intent.putExtra("title","Device Change Detected");
@@ -2268,12 +2305,11 @@ public final class CommonUtils {
 
         btn.setOnClickListener(v -> {
             dialog.dismiss();
-            if (soft == true){
-                otpgoToNext(activity,NextScreen.HOME,mobile);
-            }
-            else{
-                SharedPreferences prefs = activity.getSharedPreferences("DeviceChange",Context.MODE_PRIVATE);
-                prefs.edit().putBoolean("deviceChangeRequestInitiated",true).apply();
+            if (soft == true) {
+                otpgoToNext(activity, NextScreen.HOME, mobile);
+            } else {
+                SharedPreferences prefs = activity.getSharedPreferences("DeviceChange", Context.MODE_PRIVATE);
+                prefs.edit().putBoolean("deviceChangeRequestInitiated", true).apply();
                 activity.finish();
             }
         });
@@ -2281,66 +2317,67 @@ public final class CommonUtils {
         if (!dialog.isShowing()) dialog.show();
     }
 
-    public static Config getFlavourConfigFromFlavourId(String flavorid, PreferencesHelper preferencesHelper){
-        if(preferencesHelper==null||preferencesHelper.getFlavourMap()==null||preferencesHelper.getFlavourMap().size()==0)
+    public static Config getFlavourConfigFromFlavourId(String flavorid, PreferencesHelper preferencesHelper) {
+        if (preferencesHelper == null || preferencesHelper.getFlavourMap() == null || preferencesHelper.getFlavourMap().size() == 0)
             return null;
-        if(!preferencesHelper.getFlavourMap().containsKey(flavorid))
+        if (!preferencesHelper.getFlavourMap().containsKey(flavorid))
             return null;
-        Flavour flavour=preferencesHelper.getFlavourMap().get(flavorid);
-        if(flavour==null)
+        Flavour flavour = preferencesHelper.getFlavourMap().get(flavorid);
+        if (flavour == null)
             return null;
 
         return flavour.getConfig();
     }
 
-    public static String getDfIdFromFlavourId(String flavorid, PreferencesHelper preferencesHelper){
-        String rquired=null;
-        if(preferencesHelper==null||preferencesHelper.getFlavourMap()==null||preferencesHelper.getFlavourMap().size()==0)
+    public static String getDfIdFromFlavourId(String flavorid, PreferencesHelper preferencesHelper) {
+        String rquired = null;
+        if (preferencesHelper == null || preferencesHelper.getFlavourMap() == null || preferencesHelper.getFlavourMap().size() == 0)
             return null;
-        if(!preferencesHelper.getFlavourMap().containsKey(flavorid))
+        if (!preferencesHelper.getFlavourMap().containsKey(flavorid))
             return null;
-        Flavour flavour=preferencesHelper.getFlavourMap().get(flavorid);
-        if(flavour==null)
+        Flavour flavour = preferencesHelper.getFlavourMap().get(flavorid);
+        if (flavour == null)
             return null;
-        if(flavour.getConfig()==null)
+        if (flavour.getConfig() == null)
             return rquired;
-        else{
-            if(flavour.getConfig().getDf()&&flavour.getConfig().getDfId()!=null){
-                rquired=flavour.getConfig().getDfId();
+        else {
+            if (flavour.getConfig().getDf() && flavour.getConfig().getDfId() != null) {
+                rquired = flavour.getConfig().getDfId();
                 return rquired;
-            }else{
+            } else {
                 return rquired;
             }
         }
     }
 
 
-    public static AllowedField getFlavourField(String flavorid, String key, PreferencesHelper preferencesHelper){
-        AllowedField rquired=null;
-        if(preferencesHelper==null||preferencesHelper.getFlavourMap()==null||preferencesHelper.getFlavourMap().size()==0)
+    public static AllowedField getFlavourField(String flavorid, String key, PreferencesHelper preferencesHelper) {
+        AllowedField rquired = null;
+        if (preferencesHelper == null || preferencesHelper.getFlavourMap() == null || preferencesHelper.getFlavourMap().size() == 0)
             return null;
-        if(!preferencesHelper.getFlavourMap().containsKey(flavorid))
+        if (!preferencesHelper.getFlavourMap().containsKey(flavorid))
             return null;
-        Flavour flavour=preferencesHelper.getFlavourMap().get(flavorid);
-        if(flavour==null)
+        Flavour flavour = preferencesHelper.getFlavourMap().get(flavorid);
+        if (flavour == null)
             return null;
-        if(flavour.getConfig()==null)
+        if (flavour.getConfig() == null)
             return null;
-        if(flavour.getConfig().getAllowedFields()==null||flavour.getConfig().getAllowedFields().size()==0)
+        if (flavour.getConfig().getAllowedFields() == null || flavour.getConfig().getAllowedFields().size() == 0)
             return null;
-        List<AllowedField> filedList=flavour.getConfig().getAllowedFields();
-        AllowedField search=new AllowedField();
+        List<AllowedField> filedList = flavour.getConfig().getAllowedFields();
+        AllowedField search = new AllowedField();
         search.setField(key);
-        if(filedList.contains(search)){
-            int index=filedList.indexOf(search);
-            if(index!=-1){
-                rquired=filedList.get(index);
+        if (filedList.contains(search)) {
+            int index = filedList.indexOf(search);
+            if (index != -1) {
+                rquired = filedList.get(index);
                 rquired.setVisible(!filedList.get(index).getSkipVisibilty());
             }
         }
         return rquired;
 
     }
+
     public static boolean isBigDate(String todaydate, String givendate) {
         boolean check = false;
         try {
@@ -2351,12 +2388,6 @@ public final class CommonUtils {
 //        Date date2 = sdf.parse("2010-01-31");
             Date date1 = sdf.parse(todaydate);
             Date date2 = sdf.parse(givendate);
-            Log.e("todaydate", todaydate);
-            Log.e("givendate", givendate);
-
-            System.out.println(sdf.format(date1));
-            System.out.println(sdf.format(date2));
-
             if (date1.after(date2)) {
                 Log.e("Result", "Date1 is after Date2");
                 check = true;
@@ -2379,24 +2410,24 @@ public final class CommonUtils {
         return check;
     }
 
-    public static Field getTaskAllowedField(String flavorid,String key,PreferencesHelper preferencesHelper){
-        Field rquired=null;
-        if(preferencesHelper==null||preferencesHelper.getWorkFlowCategoriesListChannel()==null||preferencesHelper.getWorkFlowCategoriesListChannel().size()==0)
+    public static Field getTaskAllowedField(String flavorid, String key, PreferencesHelper preferencesHelper) {
+        Field rquired = null;
+        if (preferencesHelper == null || preferencesHelper.getWorkFlowCategoriesListChannel() == null || preferencesHelper.getWorkFlowCategoriesListChannel().size() == 0)
             return null;
-        if(!preferencesHelper.getWorkFlowCategoriesListChannel().containsKey(flavorid))
+        if (!preferencesHelper.getWorkFlowCategoriesListChannel().containsKey(flavorid))
             return null;
-        ChannelConfig channelConfig=preferencesHelper.getWorkFlowCategoriesListChannel().get(flavorid);
-        if(channelConfig==null)
+        ChannelConfig channelConfig = preferencesHelper.getWorkFlowCategoriesListChannel().get(flavorid);
+        if (channelConfig == null)
             return null;
-        if(channelConfig.getFields()==null||channelConfig.getFields().size()==0)
+        if (channelConfig.getFields() == null || channelConfig.getFields().size() == 0)
             return null;
-        List<Field> filedList=channelConfig.getFields();
-        Field search=new Field();
+        List<Field> filedList = channelConfig.getFields();
+        Field search = new Field();
         search.setField(key);
-        if(filedList.contains(search)){
-            int index=filedList.indexOf(search);
-            if(index!=-1){
-                rquired=filedList.get(index);
+        if (filedList.contains(search)) {
+            int index = filedList.indexOf(search);
+            if (index != -1) {
+                rquired = filedList.get(index);
                 rquired.setVisible(!filedList.get(index).getSkipVisibilty());
             }
         }
@@ -2634,7 +2665,7 @@ public final class CommonUtils {
     }
 
     public static FoundWidgetItem getFormByFormIdContainsWidget(String formId, DataType type) {
-        FoundWidgetItem fwi=new FoundWidgetItem();
+        FoundWidgetItem fwi = new FoundWidgetItem();
         DynamicFormsNew dynamicFormsNew = null;
         List<DynamicFormsNew> form = TrackiSdkApplication.getDynamicFormsNews();
         if (form == null || form.size() == 0) {
@@ -2647,17 +2678,16 @@ public final class CommonUtils {
                 break;
             }
         }
-        if(dynamicFormsNew!=null&&dynamicFormsNew.getFields()!=null) {
+        if (dynamicFormsNew != null && dynamicFormsNew.getFields() != null) {
             for (int j = 0; j < dynamicFormsNew.getFields().size(); j++) {
-                FormData formData=dynamicFormsNew.getFields().get(j);
-                if(formData.getType()!=null&&formData.getType()==type){
+                FormData formData = dynamicFormsNew.getFields().get(j);
+                if (formData.getType() != null && formData.getType() == type) {
                     fwi.setPresent(true);
                     fwi.setPostion(j);
                     fwi.setName(formData.getName());
                 }
             }
         }
-
 
 
         return fwi;
@@ -3196,7 +3226,6 @@ public final class CommonUtils {
         if (guide > 0) {
             chunkList.add(arrayToChunk.subList(index, index + guide));
         }
-        System.out.println("Chunked Array: " + chunkList.toString());
         return chunkList;
     }
 
@@ -3444,7 +3473,6 @@ public final class CommonUtils {
         if (guide > 0) {
             chunkList.add(arrayToChunk.subList(index, index + guide));
         }
-        System.out.println("Chunked Array: " + chunkList.toString());
         return chunkList;
     }
 
@@ -3593,9 +3621,9 @@ public final class CommonUtils {
                         button.setTextSize(14);
                         button.setOnClickListener(v -> {
                             // used to perform the action when view is clicked.
-                            Button b = (Button)v;
+                            Button b = (Button) v;
                             String buttonText = b.getText().toString();
-                            mListener.onExecuteUpdates((String) v.getTag(),task, buttonText);
+                            mListener.onExecuteUpdates((String) v.getTag(), task, buttonText);
                         });
                         //add first child of this parent
                         flexboxLayout.addView(button);
@@ -3693,7 +3721,7 @@ public final class CommonUtils {
 
     }
 
-    public static List<Field> getAllowedFields(ArrayList<String> fieldsList, String categoryId, PreferencesHelper preferencesHelper){
+    public static List<Field> getAllowedFields(ArrayList<String> fieldsList, String categoryId, PreferencesHelper preferencesHelper) {
         List<Field> allowedFieldsList = new ArrayList();
         List<Field> newList = new ArrayList<>();
         List<WorkFlowCategories> workFlowCategoriesList = preferencesHelper.getWorkFlowCategoriesList();
@@ -3711,7 +3739,7 @@ public final class CommonUtils {
         }
 
 
-        for(int i=0;i<fieldsList.size();i++) {
+        for (int i = 0; i < fieldsList.size(); i++) {
             Field lfield = new Field();
             lfield.setField(fieldsList.get(i));
             if (allowedFieldsList.contains(lfield)) {
@@ -3735,7 +3763,6 @@ public final class CommonUtils {
                     if (i.getCategoryId().equals(categoryId)) {
                         if (i.getChannelConfig() != null && i.getChannelConfig().getFields() != null && !i.getChannelConfig().getFields().isEmpty())
                             allowedFieldsList = i.getChannelConfig().getFields();
-
                     }
             }
         }
@@ -3752,22 +3779,36 @@ public final class CommonUtils {
 
     }
 
-    public static String getAssigneeLabel( String categoryId, PreferencesHelper preferencesHelper) {
+    public static String getAssigneeLabel(String categoryId, PreferencesHelper preferencesHelper) {
         String lableName = "";
         List<WorkFlowCategories> workFlowCategoriesList = preferencesHelper.getWorkFlowCategoriesList();
         if (!workFlowCategoriesList.isEmpty()) {
             for (WorkFlowCategories i : workFlowCategoriesList) {
                 if (i.getCategoryId() != null && categoryId != null)
                     if (i.getCategoryId().equals(categoryId)) {
-                        if (i.getChannelConfig() != null && i.getChannelConfig().getChannelSetting()!= null && i.getChannelConfig().getChannelSetting().getCreationConfig()!=null
-                                && i.getChannelConfig().getChannelSetting().getCreationConfig().getAssigneeLabel()!=null)
-                            lableName =i.getChannelConfig().getChannelSetting().getCreationConfig().getAssigneeLabel();
-
+                        if (i.getChannelConfig() != null && i.getChannelConfig().getChannelSetting() != null && i.getChannelConfig().getChannelSetting().getCreationConfig() != null
+                                && i.getChannelConfig().getChannelSetting().getCreationConfig().getAssigneeLabel() != null)
+                            lableName = i.getChannelConfig().getChannelSetting().getCreationConfig().getAssigneeLabel();
                     }
             }
         }
+        return lableName;
 
+    }
 
+    public static String getRequestedByLabel(String categoryId, PreferencesHelper preferencesHelper) {
+        String lableName = "";
+        List<WorkFlowCategories> workFlowCategoriesList = preferencesHelper.getWorkFlowCategoriesList();
+        if (!workFlowCategoriesList.isEmpty()) {
+            for (WorkFlowCategories i : workFlowCategoriesList) {
+                if (i.getCategoryId() != null && categoryId != null)
+                    if (i.getCategoryId().equals(categoryId)) {
+                        if (i.getChannelConfig() != null && i.getChannelConfig().getChannelSetting() != null && i.getChannelConfig().getChannelSetting().getCreationConfig() != null
+                                && i.getChannelConfig().getChannelSetting().getCreationConfig().getRequestedByLabel() != null)
+                            lableName = i.getChannelConfig().getChannelSetting().getCreationConfig().getRequestedByLabel();
+                    }
+            }
+        }
         return lableName;
 
     }
@@ -3779,9 +3820,9 @@ public final class CommonUtils {
             for (WorkFlowCategories i : workFlowCategoriesList) {
                 if (i.getCategoryId() != null && categoryId != null)
                     if (i.getCategoryId().equals(categoryId)) {
-                        if (i.getChannelConfig() != null && i.getChannelConfig().getChannelSetting()!= null && i.getChannelConfig().getChannelSetting().getCreationConfig()!=null
-                                && i.getChannelConfig().getChannelSetting().getCreationConfig().getBuddyLabel()!=null)
-                            lableName =i.getChannelConfig().getChannelSetting().getCreationConfig().getBuddyLabel();
+                        if (i.getChannelConfig() != null && i.getChannelConfig().getChannelSetting() != null && i.getChannelConfig().getChannelSetting().getCreationConfig() != null
+                                && i.getChannelConfig().getChannelSetting().getCreationConfig().getBuddyLabel() != null)
+                            lableName = i.getChannelConfig().getChannelSetting().getCreationConfig().getBuddyLabel();
 
                     }
             }
@@ -3791,7 +3832,6 @@ public final class CommonUtils {
         return lableName;
 
     }
-
 
 
     public static Boolean getHighLightExpiry(String categoryId, PreferencesHelper preferencesHelper) {

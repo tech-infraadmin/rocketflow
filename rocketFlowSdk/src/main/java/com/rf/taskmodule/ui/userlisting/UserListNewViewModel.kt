@@ -15,6 +15,10 @@ import com.rf.taskmodule.ui.base.BaseSdkViewModel
 import com.rf.taskmodule.utils.ApiType
 import com.rf.taskmodule.utils.rx.AppSchedulerProvider
 import com.rf.taskmodule.utils.rx.SchedulerProvider
+import org.json.JSONObject
+
+
+
 
 class UserListNewViewModel (dataManager: DataManager, schedulerProvider: SchedulerProvider) :
         BaseSdkViewModel<UserListNewNavigator>(dataManager, schedulerProvider) {
@@ -27,17 +31,21 @@ class UserListNewViewModel (dataManager: DataManager, schedulerProvider: Schedul
         roleId: String?,
         type: String?,
         attendanceReq: AttendanceReq?,
-        new: Boolean = false
+        new: Boolean = false,
+        targetInfo: String,
+        taskId: String
     ) {
         this.httpManager = httpManager
-        GetUserList(roleId, type, attendanceReq, new).hitApi()
+        GetUserList(roleId, type, attendanceReq, new,targetInfo,taskId).hitApi()
     }
 
     inner class GetUserList(
         var roleId: String?,
         var type: String?,
         var attendanceReq: AttendanceReq?,
-        var new: Boolean
+        var new: Boolean,
+        private val targetInfo: String,
+        val taskId: String
     ) : ApiCallback {
 
         override fun onResponse(result: Any?, error: APIError?) {
@@ -46,9 +54,18 @@ class UserListNewViewModel (dataManager: DataManager, schedulerProvider: Schedul
         }
 
         override fun hitApi() {
-            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.GET_USERS)) {
-                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.GET_USERS]!!
+            if (TrackiSdkApplication.getApiMap().containsKey(ApiType.ASSIGNMENT_ELIGIBLE_USERS)) {
+                val oldApi = TrackiSdkApplication.getApiMap()[ApiType.ASSIGNMENT_ELIGIBLE_USERS]!!
+
                 val userGetRequest = UserGetRequest()
+                userGetRequest.taskId = taskId
+                val targetInfo = JSONObject(targetInfo)
+                if (targetInfo != null) {
+                    if (targetInfo.has("geoFilter"))
+                        userGetRequest.geoFilter = targetInfo.getBoolean("geoFilter")
+                    if (targetInfo.has("geoPref"))
+                        userGetRequest.geoPref = targetInfo.getString("geoPref")
+                }
                 val api = oldApi
                 if (new) {
                     Log.e("urlCheck", "${api.url}")

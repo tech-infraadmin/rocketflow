@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- <uses-feature android:name="android.hardware.telephony" android:required="false" /> -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <uses-feature
         android:name="android.hardware.sensor.accelerometer"
         android:required="true" />
@@ -28,6 +29,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -62,101 +64,92 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="31">
-
         <activity
-            android:name="taskmodule.ui.PlayVideoVerticallyActivity"
+            android:name=".ui.availabilitycalender.calendartasklisting.CalendarTaskListingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.availabilitycalender.AvailabilityCalenderActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.tasklisting.TaskActivity"
+            android:name=".utils.PlayVideoVerticallyActivity"
+            android:exported="false"
             android:screenOrientation="portrait"
-            android:exported="true"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.taskdetails.TaskDetailActivity"
+            android:name=".ui.tasklisting.TaskActivity"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:exported="true"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.newcreatetask.NewCreateTaskActivity"
+            android:name=".ui.taskdetails.TaskDetailActivity"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:exported="true"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.taskdetails.NewTaskDetailsActivity"
+            android:name=".ui.newcreatetask.NewCreateTaskActivity"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:exported="true"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.userlisting.UserListNewActivity"
+            android:name=".ui.taskdetails.NewTaskDetailsActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing" />
+        <activity
+            android:name=".ui.userlisting.UserListNewActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.dynamicform.DynamicFormActivity"
+            android:name=".ui.dynamicform.DynamicFormActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustPan" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.webview.WebViewActivity"
+            android:name=".ui.webview.WebViewActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
+            android:name=".ordercode.OrderCodeActivity"
             android:exported="false"
-            android:name="com.rf.taskmodule.ordercode.OrderCodeActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateVisible|adjustResize"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.category.AddProductCategoryActivity"
+            android:name=".ui.category.AddProductCategoryActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.category.ProductCategoryListActivity"
+            android:name=".ui.category.ProductCategoryListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.products.AddProductActivity"
+            android:name=".ui.products.AddProductActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.taskdetails.timeline.skuinfo.SkuInfoActivity"
+            android:name=".ui.taskdetails.timeline.skuinfo.SkuInfoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.taskdetails.timeline.skuinfopreview.SkuInfoPreviewActivity"
+            android:name=".ui.taskdetails.timeline.skuinfopreview.SkuInfoPreviewActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.fleetlisting.FleetListingActivity"
+            android:name=".ui.fleetlisting.FleetListingActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.addfleet.AddFleetActivity"
+            android:name=".ui.addfleet.AddFleetActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.buddylisting.BuddyListingActivity"
+            android:name=".ui.buddylisting.BuddyListingActivity"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustNothing"
-            android:exported="true">
+            android:windowSoftInputMode="stateHidden|adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -166,61 +159,52 @@
                 android:resource="@xml/searchable"
                 android:value=".ui.buddylisting.BuddyListingActivity" />
         </activity>
-
         <activity
-            android:name="com.rf.taskmodule.ui.addbuddy.ContactListActivity"
+            android:name=".ui.addbuddy.ContactListActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.addbuddy.AddBuddyActivity"
+            android:name=".ui.addbuddy.AddBuddyActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.buddyprofile.BuddyProfileActivity"
+            android:name=".ui.buddyprofile.BuddyProfileActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.selectorder.SelectOrderActivity"
+            android:name=".ui.selectorder.SelectOrderActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.main.filter.TaskFilterActivity"
+            android:name=".ui.main.filter.TaskFilterActivity"
             android:screenOrientation="portrait" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.main.filter.BuddyFilterActivity"
+            android:name=".ui.main.filter.BuddyFilterActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.cart.CartActivity"
+            android:name=".ui.cart.CartActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.scanqrcode.ScanQrAndBarCodeActivity"
+            android:name=".ui.scanqrcode.ScanQrAndBarCodeActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.rf.taskmodule.ui.scanqrcode.ProductScan"
+            android:name=".ui.scanqrcode.ProductScan"
             android:exported="true"
             android:screenOrientation="portrait" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.scanqrcode.ScanQrCodeActivity"
+            android:name=".ui.scanqrcode.ScanQrCodeActivity"
             android:screenOrientation="portrait" />
 
         <receiver
-            android:name="com.rf.taskmodule.ui.geofencing.GeofenceBroadcastReceiver"
+            android:name=".ui.geofencing.GeofenceBroadcastReceiver"
             android:enabled="true"
             android:exported="true" />
 
         <provider
-            android:name="com.rf.taskmodule.RFSDKFileProvider"
+            android:name=".RFSDKFileProvider"
             android:authorities="${applicationId}.tracki.provider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -229,18 +213,18 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name="com.rf.taskmodule.ui.webview.PaymentViewActivity"
+        <activity
+            android:name=".ui.webview.PaymentViewActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
-            android:name="com.rf.taskmodule.ui.main.MainSDKActivity"
-            android:screenOrientation="portrait"
+            android:name=".ui.main.MainSDKActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
-
-
-
+        <activity
+            android:name=".ui.facility.ServicesSDKActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

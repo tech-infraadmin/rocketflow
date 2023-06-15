@@ -25,8 +25,6 @@ import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
 import com.rf.taskmodule.data.network.ApiCallback;
 import com.rf.taskmodule.ui.base.BaseSdkActivity;
 
-import static com.rf.taskmodule.utils.StartLocationAlert.REQUEST_CHECK_SETTINGS;
-
 /**
  * Created by rahul on 13/11/18
  */
@@ -37,7 +35,6 @@ public class ErrorScreenHelper {
     public final static int LOCATION_SERVICE_ERROR = 3;
     public Dialog dialog;
     private BaseSdkActivity baseActivity;
-
 
 
     public ErrorScreenHelper(Context context) {
@@ -66,8 +63,8 @@ public class ErrorScreenHelper {
                     if (dialog.getWindow() != null) {
                         dialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                     }
-                    if(!baseActivity.isFinishing())
-                    dialog.show();
+                    if (!baseActivity.isFinishing())
+                        dialog.show();
                 }
                 break;
                 case NO_INTERNET_ERROR: {
@@ -80,11 +77,11 @@ public class ErrorScreenHelper {
                     if (dialog.getWindow() != null) {
                         dialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                     }
-                    if(!baseActivity.isFinishing())
-                    dialog.show();
+                    if (!baseActivity.isFinishing())
+                        dialog.show();
                 }
                 break;
-                case LOCATION_SERVICE_ERROR:{
+                case LOCATION_SERVICE_ERROR: {
                     dialog.setContentView(R.layout.layout_enable_location_sdk);
                     Button btnRetry = dialog.findViewById(R.id.btnEnableNow);
                     btnRetry.setOnClickListener(v -> {
@@ -94,13 +91,14 @@ public class ErrorScreenHelper {
                     if (dialog.getWindow() != null) {
                         dialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                     }
-                    if(!baseActivity.isFinishing())
-                    dialog.show();
+                    if (!baseActivity.isFinishing())
+                        dialog.show();
                 }
                 break;
             }
         }
     }
+
     public void displayLocation(int errorType) {
         if (baseActivity != null && !baseActivity.isFinishing()) {
             switch (errorType) {
@@ -111,7 +109,7 @@ public class ErrorScreenHelper {
                     Button btnRetry = dialog.findViewById(R.id.btnEnableNow);
                     btnRetry.setOnClickListener(v -> {
                         try {
-                           settingRequest(baseActivity);
+                            settingRequest(baseActivity);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -120,16 +118,17 @@ public class ErrorScreenHelper {
                     if (dialog.getWindow() != null) {
                         dialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                     }
-                    if(!baseActivity.isFinishing())
-                       dialog.show();
+                    if (!baseActivity.isFinishing())
+                        dialog.show();
                 }
                 break;
             }
         }
     }
+
     public void changeAccessId(PreferencesHelper preferencesHelper) {
         if (baseActivity != null && !baseActivity.isFinishing()) {
-           // CommonUtils.showLogMessage("e","Dilog","yes");
+            // CommonUtils.showLogMessage("e","Dilog","yes");
             dialog.setContentView(R.layout.layout_change_accessid_sdk);
             dialog.setCancelable(false);
             dialog.setCanceledOnTouchOutside(false);
@@ -137,7 +136,7 @@ public class ErrorScreenHelper {
             ImageView ivCancel = dialog.findViewById(R.id.ivCancel);
             EditText etAccessId = dialog.findViewById(R.id.etAccessId);
             etAccessId.setText(preferencesHelper.getAccessId());
-            CommonUtils.showLogMessage("e","accessid",preferencesHelper.getAccessId());
+            CommonUtils.showLogMessage("e", "accessid", preferencesHelper.getAccessId());
             ivCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -150,9 +149,11 @@ public class ErrorScreenHelper {
             dialog.show();
         }
     }
+
     protected void setFlags(Intent intent) {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
     }
+
     private LocationSettingsRequest.Builder getLocationRequest() {
 
         LocationRequest mLocationRequestBalancedPowerAccuracy = LocationRequest.create();
@@ -167,7 +168,7 @@ public class ErrorScreenHelper {
         builder.setAlwaysShow(true); //this is the key ingredient and it means-
         // we will allow only two options yes and no
         // ,never option will not be shown.
-        CommonUtils.showLogMessage("e","Loacation Updates","Location");
+        CommonUtils.showLogMessage("e", "Loacation Updates", "Location");
         return builder;
     }
 
@@ -181,8 +182,8 @@ public class ErrorScreenHelper {
                 // All location settings are satisfied. The client can initialize location
                 // requests here.
                 if (response != null && response.getLocationSettingsStates().isGpsPresent()) {
-                    if(dialog!=null)
-                     dialog.dismiss();
+                    if (dialog != null)
+                        dialog.dismiss();
                 }
             } catch (ApiException exception) {
                 switch (exception.getStatusCode()) {

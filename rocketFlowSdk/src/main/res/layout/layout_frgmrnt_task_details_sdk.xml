@@ -9,15 +9,15 @@
 
         <variable
             name="viewModel"
-             type="com.rf.taskmodule.ui.taskdetails.NewTaskDetailsViewModel" />
+            type="com.rf.taskmodule.ui.taskdetails.NewTaskDetailsViewModel" />
 
         <variable
             name="data"
             type="com.rf.taskmodule.ui.tasklisting.assignedtome.TaskAssignToMeViewModel" />
 
         <variable
-            name="timeLineAdapter"
-             type="com.rf.taskmodule.ui.taskdetails.TaskTimeLineAdapter" />
+            name="timeServicesAdapter"
+            type="com.rf.taskmodule.ui.taskdetails.TaskServicesAdapter" />
     </data>
 
     <RelativeLayout
@@ -54,7 +54,6 @@
                         android:text="@{data.expiryText}"
                         android:textColor="@color/white" />
 
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/dimen_1"
@@ -66,89 +65,13 @@
                         android:visibility="gone" />
                 </RelativeLayout>
 
+
                 <LinearLayout
                     android:id="@+id/llCurrentState"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/white"
                     android:orientation="vertical">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/windowBackgroundColor"
-                        android:orientation="horizontal"
-                        android:paddingLeft="@dimen/dimen_15">
-
-                        <ImageView
-                            android:id="@+id/ivReffId"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_gravity="center_vertical"
-                            app:srcCompat="@drawable/ic_current_stage" />
-
-                        <TextView
-                            android:id="@+id/tvTaskId"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginRight="@dimen/dimen_5"
-                            android:layout_toLeftOf="@+id/tvCounterTime"
-                            android:layout_toRightOf="@+id/ivReffId"
-                            android:fontFamily="@font/campton_book"
-                            android:paddingLeft="@dimen/dimen_5"
-                            android:paddingTop="@dimen/dimen_10"
-                            android:paddingBottom="@dimen/dimen_10"
-                            android:text="@string/current_state"
-                            android:textColor="@color/black" />
-
-                        <TextView
-                            android:id="@+id/tvCounterTime"
-                            style="@style/TextViewStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_marginRight="@dimen/dimen_10"
-                            android:drawablePadding="@dimen/dimen_7"
-                            android:gravity="center_vertical"
-                            android:text="@{data.countDownTimerText}"
-                            android:textAllCaps="false"
-                            android:textColor="@color/yellow_punch_btn"
-                            android:textSize="@dimen/text_size_14"
-                            android:visibility="@{data.countDownTimerVisible ? View.VISIBLE : View.GONE}"
-                            tools:text="50 sec left" />
-
-                        <!--<LinearLayout
-                            android:id="@+id/llDetails"
-                            android:visibility="visible"
-                            android:layout_alignParentRight="true"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                           android:layout_centerVertical="true"
-                            android:layout_marginRight="@dimen/dimen_10"
-                            android:background="@drawable/button_yellow_bg"
-                            >
-
-                            <TextView
-                                style="@style/TextViewStyle"
-                                android:paddingTop="@dimen/dimen_5"
-                                android:paddingBottom="@dimen/dimen_5"
-                                android:paddingLeft="@dimen/dimen_10"
-                                android:paddingRight="@dimen/dimen_10"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/details"
-                                android:textColor="@color/white" />
-                            <ImageView
-                                android:tint="@color/white"
-                                android:layout_marginRight="@dimen/dimen_10"
-                                android:layout_gravity="center_vertical"
-                                android:src="@drawable/ic_arrow_right"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
-                        </LinearLayout>-->
-                    </RelativeLayout>
 
                     <RelativeLayout
                         android:id="@+id/rlStatus"
@@ -159,84 +82,16 @@
                             android:id="@+id/rlInnerStatus"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:paddingTop="@dimen/dimen_15"
-                            android:paddingBottom="@dimen/dimen_10">
-
-                            <TextView
-                                android:id="@+id/labelStatus"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="@dimen/dimen_10"
-                                android:fontFamily="@font/campton_light"
-                                android:gravity="center_vertical"
-                                android:paddingLeft="@dimen/dimen_10"
-                                android:text="@string/loc_status"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="@dimen/text_size_14" />
-
-                            <TextView
-                                android:id="@+id/tvCurrentState"
-                                style="@style/TextViewStyle"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelStatus"
-                                android:layout_marginLeft="@dimen/dimen_10"
-                                android:layout_marginRight="@dimen/dimen_4"
-                                android:layout_toLeftOf="@+id/btnDetails"
-                                android:fontFamily="@font/campton_book"
-                                android:paddingLeft="@dimen/dimen_10"
-                                android:paddingRight="@dimen/dimen_10"
-                                android:text="@{data.task.currentStage.name}"
-                                android:textColor="@color/green"
-                                android:textSize="@dimen/text_size_14"
-                                android:textStyle="bold"
-                                tools:text="@string/current_state" />
+                            android:layout_centerVertical="true">
 
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/rvDynamicFormsMini"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_below="@id/tvCurrentState"
-                                android:layout_marginTop="10dp"
-                                tools:listitem="@layout/item_dynamic_form_signature_sdk" />
-
-                            <ImageView
-                                android:id="@+id/ivCurrentStageLocation"
-                                android:layout_width="@dimen/dimen_25"
-                                android:layout_height="@dimen/dimen_25"
-                                android:layout_below="@id/rvDynamicFormsMini"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:layout_marginRight="@dimen/dimen_8"
-                                android:layout_toLeftOf="@+id/btnDetails"
-                                android:visibility="gone"
-                                app:srcCompat="@drawable/ic_app_location" />
-
-                            <ImageView
-                                android:id="@+id/btnDetails"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:layout_marginRight="@dimen/dimen_8"
-                                android:onClick="@{()->data.onItemClick()}"
-                                android:paddingLeft="@dimen/dimen_8"
-                                android:paddingRight="@dimen/dimen_8"
-                                android:src="@drawable/ic_arrow_right"
-                                android:visibility="gone" />
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentBottom="true" />
                         </RelativeLayout>
                     </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/dimen_1"
-                        android:layout_below="@+id/rlInnerStatus"
-                        android:layout_marginLeft="@dimen/dimen_10"
-                        android:layout_marginTop="@dimen/dimen_10"
-                        android:layout_marginRight="@dimen/dimen_10"
-                        android:background="@color/semi_gray_5" />
-
                 </LinearLayout>
 
                 <LinearLayout
@@ -273,10 +128,11 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/white">
+                        android:background="@color/white"
+                        android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="@dimen/dimen_15"
                             android:fontFamily="@font/campton_light"
@@ -285,164 +141,91 @@
                             android:textColor="@color/black"
                             android:textSize="@dimen/text_size_14"
                             tools:text="HR56566" />
-                    </LinearLayout>
 
+                        <TextView
+                            android:id="@+id/tvCounterTime"
+                            style="@style/TextViewStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:drawablePadding="@dimen/dimen_7"
+                            android:gravity="center_vertical"
+                            android:text="@{data.countDownTimerText}"
+                            android:textAllCaps="false"
+                            android:textColor="@color/yellow_punch_btn"
+                            android:textSize="@dimen/text_size_14"
+                            android:visibility="@{data.countDownTimerVisible ? View.VISIBLE : View.GONE}"
+                            tools:text="50 sec left" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <!--..-->
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/rlAmount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="@{data.pocVisible ? View.VISIBLE : View.GONE}">
+                    android:background="@color/white"
+                    android:padding="@dimen/dimen_10"
+                    android:visibility="@{data.paymentVisible ? View.VISIBLE : View.GONE}">
 
-                    <LinearLayout
+                    <ImageView
+                        android:id="@+id/ivMoney"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:visibility="visible"
+                        app:srcCompat="@drawable/ic_new_money" />
+
+                    <RelativeLayout
+                        android:id="@+id/rlInnerMoney"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/windowBackgroundColor"
-                        android:orientation="horizontal"
-                        android:paddingLeft="@dimen/dimen_15">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            app:srcCompat="@drawable/ic_created_by_sort" />
+                        android:layout_alignParentEnd="true"
+                        android:layout_toEndOf="@+id/ivMoney"
+                        android:paddingLeft="@dimen/dimen_10"
+                        android:paddingTop="@dimen/dimen_4"
+                        android:paddingBottom="@dimen/dimen_4">
 
                         <TextView
-                            android:id="@+id/tvLabelPoc"
+                            android:id="@+id/tvLabelAmount"
+                            style="@style/TextViewStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/campton_light"
+                            android:text="@string/amount_txt"
+                            android:textColor="@color/colorTextGreyPunch"
+                            android:textSize="@dimen/text_size_12" />
+
+                        <TextView
+                            android:id="@+id/tvAmount"
+                            style="@style/TextViewStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/tvLabelAmount"
                             android:fontFamily="@font/campton_book"
-                            android:paddingLeft="@dimen/dimen_5"
-                            android:paddingTop="@dimen/dimen_10"
-                            android:paddingBottom="@dimen/dimen_10"
-                            android:text="@string/point_of_contact"
-                            android:textColor="@color/black" />
-                    </LinearLayout>
+                            android:text="@{data.paymentText}"
+                            android:textColor="@color/colorGreenAmount"
+                            android:textSize="@dimen/text_size_13"
+                            tools:text="230 RS" />
 
-                    <RelativeLayout
-                        android:id="@+id/rlPoc"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:visibility="@{data.pocVisible ? View.VISIBLE : View.GONE}">
-
-                        <RelativeLayout
-                            android:id="@+id/rlPocName"
-                            android:layout_width="match_parent"
+                        <TextView
+                            style="@style/TextViewStyle"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:padding="@dimen/dimen_10">
-
-                            <TextView
-                                android:id="@+id/labelPocName"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/campton_light"
-                                android:text="@string/name"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="@dimen/text_size_14" />
-
-                            <TextView
-                                android:id="@+id/tvPocName"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelPocName"
-                                android:fontFamily="@font/campton_book"
-                                android:text="@{data.pocName}"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                tools:text="Gaurav Aggarwal" />
-
-
-                        </RelativeLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/dimen_1"
-                            android:layout_below="@+id/rlPocName"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:layout_marginTop="@dimen/dimen_10"
                             android:layout_marginRight="@dimen/dimen_10"
-                            android:background="@color/semi_gray_5" />
+                            android:paddingLeft="@dimen/dimen_10"
+                            android:paddingTop="@dimen/dimen_3"
+                            android:paddingRight="@dimen/dimen_10"
+                            android:paddingBottom="@dimen/dimen_3"
+                            android:text="@{data.paymentStatusText}"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_size_12"
+                            android:visibility="@{data.paymentStatusVisible ? View.VISIBLE : View.GONE}"
+                            app:setColorFilterData="@{data.paymentStatusText}" />
+
                     </RelativeLayout>
-
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:visibility="@{data.pocMobileVisible ? View.VISIBLE : View.GONE}">
-
-                        <RelativeLayout
-                            android:id="@+id/rlPocMobile"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:padding="@dimen/dimen_10">
-
-                            <TextView
-                                android:id="@+id/labelPocMobile"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/campton_light"
-                                android:text="@string/mobile_number"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="@dimen/text_size_14" />
-
-                            <TextView
-                                android:id="@+id/tvPocMobile"
-                                style="@style/TextViewStyle"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelPocMobile"
-                                android:layout_toLeftOf="@+id/pocCallOption"
-                                android:fontFamily="@font/campton_book"
-                                android:text="@{data.pocMobile}"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                tools:text="Gaurav Aggarwal" />
-
-                            <RelativeLayout
-                                android:id="@+id/pocCallOption"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_centerVertical="true">
-
-
-                                <ImageView
-                                    android:id="@+id/ivPocCall"
-                                    android:layout_width="@dimen/dimen_25"
-                                    android:layout_height="@dimen/dimen_25"
-                                    android:layout_centerVertical="true"
-                                    android:layout_marginLeft="@dimen/dimen_10"
-                                    android:layout_marginRight="@dimen/dimen_10"
-                                    android:background="@drawable/ic_phone_usage"
-                                    android:onClick="@{()->data.onCallClick(data.pocMobile)}" />
-                            </RelativeLayout>
-
-
-                        </RelativeLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/dimen_1"
-                            android:layout_below="@+id/rlPocMobile"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:layout_marginTop="@dimen/dimen_10"
-                            android:layout_marginRight="@dimen/dimen_10"
-                            android:background="@color/semi_gray_5" />
-                    </RelativeLayout>
-
-                </LinearLayout>
-
+                </RelativeLayout>
 
                 <!--..-->
                 <LinearLayout
@@ -503,7 +286,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -523,7 +306,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/campton_book"
                             android:paddingLeft="@dimen/dimen_5"
-                            android:paddingTop="@dimen/dimen_10"
+                            android:paddingTop="@dimen/dimen_5"
                             android:paddingBottom="@dimen/dimen_10"
                             android:text="@string/inventory_orders"
                             android:textColor="@color/black" />
@@ -546,7 +329,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/white"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="@{data.scheduledAtAndEndTimeVisible ? View.VISIBLE : View.GONE}">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -573,113 +357,10 @@
                     </LinearLayout>
 
                     <RelativeLayout
-                        android:id="@+id/rlStartDate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            android:weightSum="2"
-                            android:id="@+id/llInnerStartDate"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <RelativeLayout
-                                android:layout_weight="1"
-                                android:id="@+id/rlInnerStartDate"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:layout_marginLeft="@dimen/dimen_10"
-                                android:padding="@dimen/dimen_10">
-
-                                <TextView
-                                    android:id="@+id/labelCreatedAt"
-                                    style="@style/TextViewStyle"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/campton_light"
-                                    android:text="@string/created_at"
-                                    android:textColor="@color/colorTextGreyPunch"
-                                    android:textSize="@dimen/text_size_14" />
-
-                                <TextView
-                                    android:id="@+id/tvCreatedAt"
-                                    style="@style/TextViewStyle"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_below="@+id/labelCreatedAt"
-                                    android:fontFamily="@font/campton_book"
-                                    android:text="@{data.createdAt}"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_14"
-                                    tools:text="19 April 2020 ," />
-
-                                <TextView
-                                    android:id="@+id/tvTime"
-                                    style="@style/TextViewStyle"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_below="@+id/labelCreatedAt"
-                                    android:layout_alignBaseline="@+id/tvCreatedAt"
-                                    android:layout_marginLeft="@dimen/dimen_4"
-                                    android:layout_toRightOf="@+id/tvCreatedAt"
-                                    android:fontFamily="@font/campton_book"
-                                    android:text="@{data.createdTimeAt}"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_14"
-                                    tools:text="06:36 Am" />
-                            </RelativeLayout>
-
-                            <LinearLayout
-                                app:encCodeUrl="@{data.encCodeUrl}"
-                                android:id="@+id/ll_qr_code"
-                                android:layout_weight="1"
-                                android:gravity="center_vertical"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical">
-
-                                <ImageView
-                                    android:id="@+id/iv_qr_code"
-                                    android:layout_width="@dimen/dimen_40"
-                                    android:layout_height="@dimen/dimen_40"
-                                    android:layout_gravity="center_horizontal"
-                                    android:layout_marginStart="@dimen/dimen_5"
-                                    android:layout_marginTop="@dimen/dimen_5"
-                                    android:scaleType="fitXY"
-                                    android:src="@drawable/qr_code"
-                                    android:visibility="visible" />
-
-                                <TextView
-                                    android:layout_gravity="center_horizontal"
-                                    android:textSize="@dimen/text_size_12"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Touch to Expand"
-                                    android:textColor="@color/colorPrimary"
-                                    style="@style/TextViewStyle"/>
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/dimen_1"
-                            android:layout_below="@+id/llInnerStartDate"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:layout_marginTop="@dimen/dimen_10"
-                            android:layout_marginRight="@dimen/dimen_10"
-                            android:background="@color/semi_gray_5" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
                         android:id="@+id/rlSchedule"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="@{data.scheduledAtVisible ? View.VISIBLE : View.GONE}">
-
 
                         <RelativeLayout
                             android:id="@+id/rlDate"
@@ -744,7 +425,6 @@
                         android:layout_height="wrap_content"
                         android:visibility="@{data.endTimeVisible ? View.VISIBLE : View.GONE}">
 
-
                         <RelativeLayout
                             android:id="@+id/rlEndDate"
                             android:layout_width="match_parent"
@@ -803,6 +483,46 @@
                     </RelativeLayout>
 
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/cardServices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/windowBackgroundColor"
+                        android:orientation="horizontal"
+                        android:paddingLeft="@dimen/dimen_15">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            app:srcCompat="@drawable/ic_time_line_sort" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/campton_book"
+                            android:paddingLeft="@dimen/dimen_5"
+                            android:paddingTop="@dimen/dimen_10"
+                            android:paddingBottom="@dimen/dimen_10"
+                            android:text="Services"
+                            android:textColor="@color/black" />
+
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_services"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:adapter="@{timeServicesAdapter}"
+                        android:orientation="vertical"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -1010,225 +730,11 @@
 
                 </LinearLayout>
 
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="@{data.createdByVisible ? View.VISIBLE : View.GONE}">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/windowBackgroundColor"
-                        android:orientation="horizontal"
-                        android:paddingLeft="@dimen/dimen_15">
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            app:srcCompat="@drawable/ic_created_by_sort" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/campton_book"
-                            android:paddingLeft="@dimen/dimen_5"
-                            android:paddingTop="@dimen/dimen_10"
-                            android:paddingBottom="@dimen/dimen_10"
-                            android:text="@string/created_by"
-                            android:textColor="@color/black" />
-                    </LinearLayout>
-
-                    <RelativeLayout
-                        android:id="@+id/rlCreatedBy"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:visibility="@{data.assigneeNameVisible ? View.VISIBLE : View.GONE}">
-
-                        <RelativeLayout
-                            android:id="@+id/rlCreatedByName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:padding="@dimen/dimen_10">
-
-                            <TextView
-                                android:id="@+id/labelCreatedByName"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/campton_light"
-                                android:text="@string/name"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="@dimen/text_size_14" />
-
-                            <TextView
-                                android:id="@+id/tvCreatedByName"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelCreatedByName"
-                                android:fontFamily="@font/campton_book"
-                                android:text="@{data.assigneeName}"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                tools:text="Gaurav Aggarwal" />
-
-
-                        </RelativeLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/dimen_1"
-                            android:layout_below="@+id/rlCreatedByName"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:layout_marginTop="@dimen/dimen_10"
-                            android:layout_marginRight="@dimen/dimen_10"
-                            android:background="@color/semi_gray_5" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:visibility="@{data.assigneeEmailVisible ? View.VISIBLE : View.GONE}">
-
-                        <RelativeLayout
-                            android:id="@+id/rlCreatedByEmail"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:padding="@dimen/dimen_10">
-
-                            <TextView
-                                android:id="@+id/labelCreatedByEmail"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/campton_light"
-                                android:text="@string/email_id"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="@dimen/text_size_14" />
-
-                            <TextView
-                                android:id="@+id/tvCreatedByEmail"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelCreatedByEmail"
-                                android:fontFamily="@font/campton_book"
-                                android:text="@{data.assigneeEmail}"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                tools:text="Gaurav Aggarwal" />
-
-
-                        </RelativeLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/dimen_1"
-                            android:layout_below="@+id/rlCreatedByEmail"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:layout_marginTop="@dimen/dimen_10"
-                            android:layout_marginRight="@dimen/dimen_10"
-                            android:background="@color/semi_gray_5" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:visibility="@{data.assigneeMobileVisible ? View.VISIBLE : View.GONE}">
-
-                        <RelativeLayout
-                            android:id="@+id/rlCreatedByMobile"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:padding="@dimen/dimen_10">
-
-                            <TextView
-                                android:id="@+id/labelCreatedByMobile"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/campton_light"
-                                android:text="@string/mobile_number"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="@dimen/text_size_14" />
-
-                            <TextView
-                                android:id="@+id/tvCreatedByMobile"
-                                style="@style/TextViewStyle"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelCreatedByMobile"
-                                android:layout_toLeftOf="@+id/createdByCallChatOption"
-                                android:fontFamily="@font/campton_book"
-                                android:text="@{data.assigneeMobile}"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                tools:text="Gaurav Aggarwal" />
-
-                            <RelativeLayout
-                                android:id="@+id/createdByCallChatOption"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_centerVertical="true">
-
-                                <ImageView
-                                    android:id="@+id/ivCreatedByChat"
-                                    android:layout_width="@dimen/dimen_25"
-                                    android:layout_height="@dimen/dimen_25"
-                                    android:layout_centerVertical="true"
-                                    android:background="@drawable/ic_feedback"
-                                    android:onClick="@{()->data.onChatStart(data.assigneeChatId,data.assigneeName)}"
-                                    android:visibility="@{data.assigneeChatVisible ? View.VISIBLE : View.GONE}" />
-
-                                <ImageView
-                                    android:id="@+id/ivCreatedByCall"
-                                    android:layout_width="@dimen/dimen_25"
-                                    android:layout_height="@dimen/dimen_25"
-                                    android:layout_centerVertical="true"
-                                    android:layout_marginLeft="@dimen/dimen_10"
-                                    android:layout_marginRight="@dimen/dimen_10"
-                                    android:layout_toRightOf="@+id/ivCreatedByChat"
-                                    android:background="@drawable/ic_phone_usage"
-                                    android:onClick="@{()->data.onCallClick(data.assigneeMobile)}" />
-                            </RelativeLayout>
-
-
-                        </RelativeLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/dimen_1"
-                            android:layout_below="@+id/rlCreatedByMobile"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:layout_marginTop="@dimen/dimen_10"
-                            android:layout_marginRight="@dimen/dimen_10"
-                            android:background="@color/semi_gray_5" />
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-                <!--            ..-->
-
-                <!--....-->
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="@{data.assignedToDetailsVisible ? View.VISIBLE : View.GONE}">
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1431,7 +937,6 @@
                                     android:visibility="@{data.assignedToSelf ? View.GONE : View.VISIBLE}" />
                             </RelativeLayout>
 
-
                         </RelativeLayout>
 
                         <View
@@ -1444,14 +949,14 @@
                             android:background="@color/semi_gray_5" />
                     </RelativeLayout>
 
-
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/llCreateddate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="@{data.requestedUserVisible ? View.VISIBLE : View.GONE}">
+                    android:background="@color/white"
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1464,304 +969,160 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            app:srcCompat="@drawable/ic_client_sort" />
+                            app:srcCompat="@drawable/ic_date_time" />
 
                         <TextView
-                            android:id="@+id/tvClientsDetails"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/campton_book"
                             android:paddingLeft="@dimen/dimen_5"
                             android:paddingTop="@dimen/dimen_10"
                             android:paddingBottom="@dimen/dimen_10"
-                            android:text="@string/client_details"
+                            android:text="Creation Date/Time"
                             android:textColor="@color/black" />
                     </LinearLayout>
 
-                    <RelativeLayout
+                    <LinearLayout
+                        android:id="@+id/rlStartDate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:visibility="@{data.requestedUserVisible ? View.VISIBLE : View.GONE}">
-
-                        <RelativeLayout
-                            android:id="@+id/rlRequestedByName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:padding="@dimen/dimen_10">
-
-                            <TextView
-                                android:id="@+id/labelRequestedByName"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/campton_light"
-                                android:text="@string/name"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="@dimen/text_size_14" />
-
-                            <TextView
-                                android:id="@+id/tvRequestedByName"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelRequestedByName"
-                                android:fontFamily="@font/campton_book"
-                                android:text="@{data.requestedUserName}"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                tools:text="Gaurav Aggarwal" />
-
-
-                        </RelativeLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/dimen_1"
-                            android:layout_below="@+id/rlRequestedByName"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:layout_marginTop="@dimen/dimen_10"
-                            android:layout_marginRight="@dimen/dimen_10"
-                            android:background="@color/semi_gray_5" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:visibility="@{data.requestedUserEmailVisible ? View.VISIBLE : View.GONE}">
-
-                        <RelativeLayout
-                            android:id="@+id/rlRequestedByEmail"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:padding="@dimen/dimen_10">
-
-                            <TextView
-                                android:id="@+id/labelRequestedByEmail"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/campton_light"
-                                android:text="@string/email_id"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="@dimen/text_size_14" />
-
-                            <TextView
-                                android:id="@+id/tvRequestedByEmail"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelRequestedByEmail"
-                                android:fontFamily="@font/campton_book"
-                                android:text="@{data.requestedUserEmail}"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                tools:text="Gaurav Aggarwal" />
-
-
-                        </RelativeLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/dimen_1"
-                            android:layout_below="@+id/rlRequestedByEmail"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:layout_marginTop="@dimen/dimen_10"
-                            android:layout_marginRight="@dimen/dimen_10"
-                            android:background="@color/semi_gray_5" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:visibility="@{data.requestedUserMobileVisible ? View.VISIBLE : View.GONE}">
-
-                        <RelativeLayout
-                            android:id="@+id/rlRequestedByMobile"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:padding="@dimen/dimen_10">
-
-                            <TextView
-                                android:id="@+id/labelRequestedByMobile"
-                                style="@style/TextViewStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/campton_light"
-                                android:text="@string/mobile_number"
-                                android:textColor="@color/colorTextGreyPunch"
-                                android:textSize="@dimen/text_size_14" />
-
-                            <TextView
-                                android:id="@+id/tvRequestedByMobile"
-                                style="@style/TextViewStyle"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_below="@+id/labelRequestedByMobile"
-                                android:layout_toLeftOf="@+id/requestedByCallChatOption"
-                                android:fontFamily="@font/campton_book"
-                                android:text="@{data.requestedUserMobile}"
-                                android:textColor="@color/black"
-                                android:textSize="@dimen/text_size_14"
-                                tools:text="Gaurav Aggarwal" />
-
-                            <RelativeLayout
-                                android:id="@+id/requestedByCallChatOption"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:layout_centerVertical="true">
-
-                                <ImageView
-                                    android:id="@+id/ivRequestedByChat"
-                                    android:layout_width="@dimen/dimen_25"
-                                    android:layout_height="@dimen/dimen_25"
-                                    android:layout_centerVertical="true"
-                                    android:background="@drawable/ic_feedback"
-                                    android:onClick="@{()->data.onChatStart(data.requestedUserChatId,data.requestedUserName)}"
-                                    android:visibility="@{data.requestedUserChatVisible ? View.VISIBLE : View.GONE}" />
-
-                                <ImageView
-                                    android:id="@+id/ivRequestedByCall"
-                                    android:layout_width="@dimen/dimen_25"
-                                    android:layout_height="@dimen/dimen_25"
-                                    android:layout_centerVertical="true"
-                                    android:layout_marginLeft="@dimen/dimen_10"
-                                    android:layout_marginRight="@dimen/dimen_10"
-                                    android:layout_toRightOf="@+id/ivRequestedByChat"
-                                    android:background="@drawable/ic_phone_usage"
-                                    android:onClick="@{()->data.onCallClick(data.requestedUserMobile)}" />
-                            </RelativeLayout>
-
-
-                        </RelativeLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/dimen_1"
-                            android:layout_below="@+id/rlRequestedByMobile"
-                            android:layout_marginLeft="@dimen/dimen_10"
-                            android:layout_marginTop="@dimen/dimen_10"
-                            android:layout_marginRight="@dimen/dimen_10"
-                            android:background="@color/semi_gray_5" />
-                    </RelativeLayout>
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/ll_timeline"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:orientation="vertical">
 
                         <LinearLayout
+                            android:id="@+id/llInnerStartDate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@color/windowBackgroundColor"
                             android:orientation="horizontal"
-                            android:paddingLeft="@dimen/dimen_15">
+                            android:weightSum="2">
 
-                            <ImageView
+                            <RelativeLayout
+                                android:id="@+id/rlInnerStartDate"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                app:srcCompat="@drawable/ic_time_line_sort" />
+                                android:layout_centerVertical="true"
+                                android:layout_marginLeft="@dimen/dimen_10"
+                                android:layout_weight="1"
+                                android:padding="@dimen/dimen_10">
 
-                            <TextView
+                                <TextView
+                                    android:id="@+id/labelCreatedAt"
+                                    style="@style/TextViewStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/campton_light"
+                                    android:text="@string/created_at"
+                                    android:textColor="@color/colorTextGreyPunch"
+                                    android:textSize="@dimen/text_size_14" />
+
+                                <TextView
+                                    android:id="@+id/tvCreatedAt"
+                                    style="@style/TextViewStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/labelCreatedAt"
+                                    android:fontFamily="@font/campton_book"
+                                    android:text="@{data.createdAt}"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14"
+                                    tools:text="19 April 2020 ," />
+
+                                <TextView
+                                    android:id="@+id/tvTime"
+                                    style="@style/TextViewStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/labelCreatedAt"
+                                    android:layout_alignBaseline="@+id/tvCreatedAt"
+                                    android:layout_marginLeft="@dimen/dimen_4"
+                                    android:layout_toRightOf="@+id/tvCreatedAt"
+                                    android:fontFamily="@font/campton_book"
+                                    android:text="@{data.createdTimeAt}"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14"
+                                    tools:text="06:36 Am" />
+                            </RelativeLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ll_qr_code"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/campton_book"
-                                android:paddingLeft="@dimen/dimen_5"
-                                android:paddingTop="@dimen/dimen_10"
-                                android:paddingBottom="@dimen/dimen_10"
-                                android:text="@string/time_line"
-                                android:textColor="@color/black" />
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:orientation="vertical"
+                                app:encCodeUrl="@{data.encCodeUrl}">
 
+                                <ImageView
+                                    android:id="@+id/iv_qr_code"
+                                    android:layout_width="@dimen/dimen_40"
+                                    android:layout_height="@dimen/dimen_40"
+                                    android:layout_gravity="center_horizontal"
+                                    android:layout_marginStart="@dimen/dimen_5"
+                                    android:layout_marginTop="@dimen/dimen_5"
+                                    android:scaleType="fitXY"
+                                    android:src="@drawable/qr_code"
+                                    android:visibility="visible" />
+
+                                <TextView
+                                    style="@style/TextViewStyle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:text="Touch to Expand"
+                                    android:textColor="@color/colorPrimary"
+                                    android:textSize="@dimen/text_size_12" />
+
+                            </LinearLayout>
 
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/tv_timeline_more"
-                            style="@style/TextViewStyleBold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:layout_marginBottom="@dimen/dimen_20"
-                            android:layout_marginRight="@dimen/dimen_20"
-                            android:text="View More"
-                            android:textColor="@color/blue"
-                            android:textSize="@dimen/text_size_13"
-                            android:visibility="visible" />
-
-                    </RelativeLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_Fields"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:adapter="@{timeLineAdapter}"
-                        android:orientation="vertical"
-                        android:layout_marginBottom="@dimen/dimen_40"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:listitem="@layout/item_time_line_sdk" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/dimen_1"
+                            android:layout_below="@+id/llInnerStartDate"
+                            android:layout_marginLeft="@dimen/dimen_10"
+                            android:layout_marginTop="@dimen/dimen_10"
+                            android:layout_marginRight="@dimen/dimen_10"
+                            android:background="@color/semi_gray_5" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <RelativeLayout
-                    android:layout_gravity="center_horizontal"
                     android:id="@+id/rl_reference"
-                    android:visibility="gone"
-                    android:paddingVertical="@dimen/dimen_5"
-                    android:background="@drawable/custom_edit_border_bg"
-                    android:layout_marginVertical="@dimen/dimen_20"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginVertical="@dimen/dimen_20"
+                    android:background="@drawable/custom_edit_border_bg"
+                    android:paddingVertical="@dimen/dimen_5"
+                    android:visibility="gone">
 
                     <TextView
-                        android:layout_marginVertical="@dimen/dimen_10"
-                        android:layout_marginHorizontal="@dimen/dimen_20"
-                        android:layout_alignParentStart="true"
+                        android:id="@+id/ref_title"
+                        style="@style/TextViewStyleBold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/colorPrimary"
+                        android:layout_alignParentStart="true"
+                        android:layout_marginHorizontal="@dimen/dimen_20"
+                        android:layout_marginVertical="@dimen/dimen_10"
                         android:text="@string/click_here_to_see_referenced_task"
-                        style="@style/TextViewStyleBold"/>
+                        android:textColor="@color/colorPrimary" />
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvReferences"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/ref_title"
+                        android:layout_marginStart="@dimen/dimen_10"
+                        android:layout_marginTop="@dimen/dimen_10"
+                        android:layout_marginEnd="@dimen/dimen_10"
+                        android:layout_marginBottom="@dimen/dimen_10"
+                        android:background="@color/bg_recycler_view"
+                        android:clipToPadding="false"
+                        android:orientation="vertical"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
                 </RelativeLayout>
-
-
             </LinearLayout>
-
-
         </androidx.core.widget.NestedScrollView>
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/coradinatorLL"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="@dimen/dimen_10">
-
-            <!-- Adding bottom sheet after main content -->
-            <include
-                android:id="@+id/bottomSheet"
-                layout="@layout/task_details_cta_view_sdk" />
-
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
     </RelativeLayout>
-
 </layout>

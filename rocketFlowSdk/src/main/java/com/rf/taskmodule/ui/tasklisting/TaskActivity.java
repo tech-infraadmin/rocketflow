@@ -154,118 +154,9 @@ public class TaskActivity extends BaseSdkActivity<ActivityTaskSdkBinding, TaskVi
 
         mActivityTaskSdkBinding.coordinatorLayout.setVisibility(View.VISIBLE);
         setUp();
-
-
-//        if(preferencesHelper!=null && preferencesHelper.getLoginToken()!=null
-//                && !preferencesHelper.getLoginToken().isEmpty()) {
-//            hitConfig();
-//        }else{
-//            String sdkClintId = preferencesHelper!=null
-//                    && preferencesHelper.getSDKClientID()!=null
-//                    && !preferencesHelper.getSDKClientID().isEmpty()?preferencesHelper.getSDKClientID():"sahshahsss";
-//            hitLoginSDKToken(sdkClintId);
-//        }
     }
 
-//    private void hitLoginSDKToken(String sdkClintId){
-//        showLoading();
-//        mTaskViewModel.sdkToken(sdkClintId, RocketFlyer.Companion.httpManager(), new SyncCallback() {
-//            @Override
-//            public void hitApi() {
-//                //SyncCallback.super.hitApi();z
-//            }
-//
-//            @Override
-//            public void onRequestTimeOut(@NonNull ApiCallback callBack) {
-//                //SyncCallback.super.onRequestTimeOut(callBack);
-//                hideLoading();
-//            }
-//
-//            @Override
-//            public void onLogout() {
-//                hideLoading();
-//            }
-//
-//            @Override
-//            public void onNetworkErrorClose() {
-//                hideLoading();
-//            }
-//
-//            @Override
-//            public void onResponse(Object result, @Nullable APIError error) {
-//                hideLoading();
-//                if (CommonUtils.handleResponse(this, error, result, TaskActivity.this)) {
-//                    if (result == null) {
-//                        return;
-//                    }
-//                    Gson gson = new Gson();
-//                    SDKToken token = gson.fromJson(String.valueOf(result), SDKToken.class);
-//                    if(token!=null){
-//                        CommonUtils.saveSDKAccessToken( token, preferencesHelper);
-//                    }
-//                     hitConfig();
-//
-//                }else{
-//                    //CommonUtils.showPermanentSnackBar(findViewById(R.id.rlMain), AppConstants.ALERT_TRY_AGAIN,mSplashViewModel);
-//                }
-//            }
-//
-//            @Override
-//            public boolean isAvailable() {
-//                return true;
-//            }
-//        });
-//    }
-//
-//    private void hitConfig(){
-//        showLoading();
-//        mTaskViewModel.hitConfigApi(RocketFlyer.Companion.httpManager(), new SyncCallback() {
-//            @Override
-//            public void hitApi() {
-//                //SyncCallback.super.hitApi();
-//            }
-//
-//            @Override
-//            public void onRequestTimeOut(@NonNull ApiCallback callBack) {
-//                //SyncCallback.super.onRequestTimeOut(callBack);
-//                hideLoading();
-//            }
-//
-//            @Override
-//            public void onLogout() {
-//                hideLoading();
-//            }
-//
-//            @Override
-//            public void onNetworkErrorClose() {
-//                hideLoading();
-//            }
-//
-//            @Override
-//            public void onResponse(Object result, @Nullable APIError error) {
-//                hideLoading();
-//                if (CommonUtils.handleResponse(this, error, result, TaskActivity.this)) {
-//                    if (result == null) {
-//                        return;
-//                    }
-//                    Gson gson = new Gson();
-//                    ConfigResponse configResponse = gson.fromJson(String.valueOf(result), ConfigResponse.class);
-//
-//                    CommonUtils.saveConfigDetails(TaskActivity.this, configResponse, preferencesHelper, "1");
-//                    mActivityTaskSdkBinding.coordinatorLayout.setVisibility(View.VISIBLE);
-//                    setUp();
-//
-//                }else{
-//                    //CommonUtils.showPermanentSnackBar(findViewById(R.id.rlMain), AppConstants.ALERT_TRY_AGAIN,mSplashViewModel);
-//                }
-//            }
-//
-//            @Override
-//            public boolean isAvailable() {
-//                return true;
-//            }
-//        });
-//    }
+
 String categoryName = "";
     @SuppressLint("RestrictedApi")
     private void setUp() {
@@ -361,15 +252,7 @@ String categoryName = "";
 
             if(channelConfigMap==null){
                 channelConfigMap = new HashMap<>();
-
                 ChannelSetting setting = new ChannelSetting();
-//                setting.setAllowCreation(true);
-//                setting.setTaskExecution(true);
-//                setting.setCreationTitle("Demo");
-//                setting.setExecutionTitle("DEmo");
-//                setting.setCreationMode(CreationMode.DIRECT);
-
-
                 ChannelConfig config = new ChannelConfig();
                 config.setChannelSetting(setting);
                 channelConfigMap.put(categoryId,config);
@@ -386,16 +269,13 @@ String categoryName = "";
                             merchantTabLabel=channelSetting.getMerchantTaskLabel();
                         fragments.add(new TabDataClass(IhaveAssignedFragment.newInstance(categoryMap, fromDate, toDate,true,userGeoReq,categoryName), merchantTabLabel));
                         mPagerAdapter.setFragments(fragments);
-                        // tabLayout.getTabAt(0).select();
                         viewPager.setAdapter(mPagerAdapter);
                         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
                         tabLayout.setTabMode(TabLayout.MODE_FIXED);
                         tabLayout.setupWithViewPager(viewPager);
-
                         viewPager.setOffscreenPageLimit(tabLayout.getTabCount());
                         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
                         viewPager.setCurrentItem(0, true);
-
                     }
                     if (channelSetting.getAllowCreation() != null && channelSetting.getAllowCreation()
                             && channelSetting.getTaskExecution() != null && channelSetting.getTaskExecution()) {
@@ -496,10 +376,7 @@ String categoryName = "";
                         }
 
                     }
-
                 }
-
-
             }
             if (fragments.size() > 1) {
                 tabLayout.setVisibility(View.VISIBLE);
@@ -507,16 +384,11 @@ String categoryName = "";
                 tabLayout.setVisibility(View.GONE);
             }
         }
-
-
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.ivCreateTask) {
-//            if(preferencesHelper.getIsTrackingLiveTrip()&&categoryId.equals(preferencesHelper.getActiveTaskCategoryId())){
-//                TrackiToast.Message.showShort(this, AppConstants.MSG_ONGOING_TASK_SAME_CATGEORY);
-//            }else {
                 if (isTagInventory) {
                     Intent intent = SelectOrderActivity.Companion.newIntent(this);
                     DashBoardBoxItem dashBoardBoxItem = new DashBoardBoxItem();
@@ -600,62 +472,14 @@ String categoryName = "";
 
     @Override
     public void chatAssignClick(String buddyId, String buddyname) {
-        //initSocket();
-        //connectSocket(this);
-//        try {
-//            ++connectionCounter;
-//            if (webSocketManager != null && webSocketManager.isConnected()) {
-//                showLoading();
-//                webSocketManager.connectPacket(buddyId);
-//            }
-//
-//        } catch (Exception e) {
-//
-//            e.printStackTrace();
-//        }
-        /*finally {
-            if(connectionCounter>=3){
-                Toast.makeText(this, "Connection not established please try after some time", Toast.LENGTH_SHORT).show();
-            }
-        }*/
-
         this.buddyId = buddyId;
         this.buddyName = buddyname;
-//        ArrayList list = new ArrayList<String>();
-//         list.add(buddyId);
-//        webSocketManager.openCreateRoom(list, null, true, 10);
     }
 
     @Override
     public void chatIHaveClick(String buddyId, String buddyname) {
-
-        //initSocket();
-        //connectSocket(this);
-//        try {
-//            ++connectionCounter;
-//            if (webSocketManager != null && webSocketManager.isConnected()) {
-//                showLoading();
-//                webSocketManager.connectPacket(buddyId);
-//            }
-//
-//        } catch (Exception e) {
-//
-//            e.printStackTrace();
-//
-//        }
-        /*finally {
-            Log.e("tag",connectionCounter+"");
-            if(connectionCounter>=3){
-                Toast.makeText(this, "Connection not established please try after some time", Toast.LENGTH_SHORT).show();
-            }
-        }*/
-
-
         this.buddyId = buddyId;
         this.buddyName = buddyname;
-        /*ArrayList list = new ArrayList<String>();
-        list.add(buddyId);
-        webSocketManager.openCreateRoom(list, null, true, 10);*/
     }
 
     @Override
@@ -668,73 +492,14 @@ String categoryName = "";
         }
     }
 
-//    @Override
-//    public void onSocketResponse(int eventName, BaseModel baseModel) {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-////               Log.e("TaskActivity", "onSocketResponse() called");
-////               Log.e("TaskActivity", "eventName =>" + eventName);
-////               Log.e("TaskActivity", "baseModel =>" + baseModel);
-//                hideLoading();
-//                if (eventName == 4) {
-//                    OpenCreateRoomModel openCreateRoomModel = (OpenCreateRoomModel) baseModel;
-//                    String roomId = openCreateRoomModel.getRoomId();
-//                    ArrayList list = new ArrayList<String>();
-//                    list.add(buddyId);
-//                    startActivity(ChatActivity.Companion.newIntent(TaskActivity.this)
-//                            .putExtra(AppConstants.Extra.EXTRA_SELECTED_BUDDY, list)
-//                            .putExtra(AppConstants.Extra.EXTRA_BUDDY_NAME, buddyName)
-//                            .putExtra(AppConstants.Extra.EXTRA_IS_CREATE_ROOM, false)
-//                            .putExtra(AppConstants.Extra.EXTRA_ROOM_ID, roomId));
-//                } else if (eventName == 1) {
-//                    connectionCounter = 0;
-//                    //connection hashMap
-//                    ArrayList connectionInfoList = new ArrayList<ConnectionInfo>();
-//                    //buddy message hashMap
-//                    ArrayList buddyList = new ArrayList<Buddy>();
-//                    Map map = new HashMap<String, String>();
-//                    ConnectionResponse connectionResponse = (ConnectionResponse) baseModel;
-//
-//                    ArrayList list = new ArrayList<String>();
-//                    list.add(buddyId);
-//                    webSocketManager.openCreateRoom(list, null, true, 10);
-//
-//                }
-//            }
-//        });
-//    }
-//
-//    @Override
-//    public void onOpen() {
-////        ArrayList list = new ArrayList<String>();
-////        list.add(buddyId);
-////        webSocketManager.openCreateRoom(list, null, true, 10);
-//    }
-//
-//    @Override
-//    public void closed() {
-//        webSocketManager = null;
-//        Log.e("close call", "close call");
-//    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        if (webSocketManager != null) {
-//            webSocketManager.disconnect();
-//            webSocketManager = null;
-//        }
-
     }
 
     @Override
     protected void onResume() {
-        //initSocket();
-        //connectSocket(this);
         super.onResume();
-
     }
 
     @Override
@@ -755,7 +520,6 @@ String categoryName = "";
                 showLoading();
                 mTaskViewModel.checkBuddy(httpManager);
             } else {
-                // Intent intent=CreateTaskActivity.Companion.newIntent(this);
                 Intent intent = NewCreateTaskActivity.Companion.newIntent(this);
                 intent.putExtra(AppConstants.Extra.FROM, "taskListing");
                 intent.putExtra(AppConstants.Extra.EXTRA_BUDDY_LIST_CALLING_FROM_DASHBOARD_MENU, true);
@@ -769,7 +533,6 @@ String categoryName = "";
     public void networkAvailable() {
         if(snackBar!=null)
             snackBar.dismiss();
-
     }
 
     @Override

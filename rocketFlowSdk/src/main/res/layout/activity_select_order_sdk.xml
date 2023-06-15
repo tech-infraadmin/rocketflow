@@ -26,12 +26,10 @@
             app:elevation="@dimen/dimen_0">
 
             <androidx.appcompat.widget.Toolbar
+            android:background="?attr/colorAccent"
                 android:id="@+id/toolbar"
                 style="@style/Toolbar"
-                android:background="@color/white"
                 app:contentInsetStartWithNavigation="0dp"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleTextColor="@color/white"
                 tools:title="">
 
             </androidx.appcompat.widget.Toolbar>
@@ -195,8 +193,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginRight="@dimen/dimen_5"
-                        android:tint="@color/colorPrimary"
-                        app:srcCompat="@drawable/ic_down_triangle" />
+                        app:srcCompat="@drawable/ic_down_triangle"
+                        app:tint="@color/colorPrimary" />
                 </LinearLayout>
             </RelativeLayout>
 
@@ -213,6 +211,16 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="5"
                 tools:listitem="@layout/list_item_stage_sdk" />
+            
+            
+            <TextView
+                android:layout_marginTop="@dimen/dimen_20"
+                android:id="@+id/tv_prod_dimension"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textColor="@color/blue"
+                android:text="Click Here for Products List"/>
 
 
             <androidx.recyclerview.widget.RecyclerView

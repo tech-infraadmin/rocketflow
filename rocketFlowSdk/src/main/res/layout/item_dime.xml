@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="data"
+            type="com.rf.taskmodule.ui.selectorder.CatalogProduct" />
+
+        <variable
+        name="subUnit"
+        type="com.rf.taskmodule.ui.selectorder.SubUnit" />
+
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardMain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="@dimen/dimen_10"
+        app:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/dimen_10"
+            android:paddingBottom="@dimen/dimen_10"
+            android:paddingLeft="@dimen/dimen_10"
+            android:paddingRight="@dimen/dimen_10"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:id="@+id/llImage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25">
+
+                <ImageView
+                    android:id="@+id/ivProducts"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_100"
+                    app:load_catalog_product="@{data.img}"
+                    app:srcCompat="@drawable/ic_picture" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llTxtData"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.45"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextViewStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/dimen_10"
+                    android:layout_marginRight="@dimen/dimen_10"
+                    android:text="@{data.name}"
+                    android:fontFamily="@font/campton_semi_bold"
+                    android:textSize="@dimen/text_size_14"
+                    tools:text="Haldi Ram Nut Craker" />
+
+                <TextView
+                    style="@style/TextViewStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/dimen_10"
+                    android:layout_marginRight="@dimen/dimen_10"
+                    android:text="@{data.enableDimension == false ?``+data.unitValue+` `+data.unitType.toLowerCase(): ``+subUnit.dimension.area+` `+data.unitType.toLowerCase()}"
+                    android:textColor="@color/gray"
+                    android:fontFamily="@font/campton_light"
+                    android:textSize="@dimen/text_size_12"
+                    tools:text="200 gm" />
+
+
+                <TextView
+                    style="@style/TextViewStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/dimen_10"
+                    android:layout_marginTop="@dimen/dimen_10"
+                    android:layout_marginRight="@dimen/dimen_10"
+                    android:fontFamily="@font/campton_book"
+                    android:text="@{`₹ `+subUnit.actualPrice}"
+                    android:textSize="@dimen/text_size_13"
+                    tools:text="MRP 50 INR" />
+
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/del_prod"
+                    android:backgroundTint="@color/blue_light_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dimen_40"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="@dimen/dimen_10"
+                    android:text="@string/delete"
+                    android:textColor="@color/red_dark3"
+                    android:textSize="@dimen/text_size_12"/>
+
+
+
+            </RelativeLayout>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>

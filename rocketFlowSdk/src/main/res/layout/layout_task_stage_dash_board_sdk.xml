@@ -166,8 +166,7 @@
                                 android:textSize="@dimen/text_size_14"
                                 android:visibility="visible"
                                 tools:text="gsdygyugdugudusdshahgsadgysgdygsygyugsygysysg" />
-
-
+                            
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
@@ -461,9 +460,9 @@
                                     android:layout_gravity="center_vertical"
                                     android:layout_weight="2"
                                     android:background="?attr/selectableItemBackground"
-                                    android:tint="@color/blue"
                                     android:visibility="visible"
-                                    app:srcCompat="@drawable/ic_reload" />
+                                    app:srcCompat="@drawable/ic_reload"
+                                    app:tint="@color/blue" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -533,6 +532,36 @@
                         </RelativeLayout>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/shimmer_view_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <include layout="@layout/data_placeholder_layout" />
+
+                        <include layout="@layout/data_placeholder_layout" />
+
+                        <include layout="@layout/data_placeholder_layout" />
+
+                        <include layout="@layout/data_placeholder_layout" />
+
+                        <include layout="@layout/data_placeholder_layout" />
+
+                        <include layout="@layout/data_placeholder_layout" />
+
+                        <include layout="@layout/data_placeholder_layout" />
+                    </LinearLayout>
+
+                </com.facebook.shimmer.ShimmerFrameLayout>
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardViewTabNew"

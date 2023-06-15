@@ -665,7 +665,7 @@
                         android:textColor="@color/white"
                         android:textSize="@dimen/text_size_12"
                         android:visibility="@{viewModel.paymentStatusVisible ? View.VISIBLE : View.GONE}"
-                        app:colorFilter="@{viewModel.paymentStatusText}" />
+                        app:setColorFilterData="@{viewModel.paymentStatusText}" />
 
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>

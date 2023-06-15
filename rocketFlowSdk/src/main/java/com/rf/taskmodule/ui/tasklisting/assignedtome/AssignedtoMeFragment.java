@@ -52,6 +52,7 @@ import com.rf.taskmodule.data.model.response.config.Api;
 import com.rf.taskmodule.data.model.response.config.ChannelConfig;
 import com.rf.taskmodule.data.model.response.config.ChannelSetting;
 import com.rf.taskmodule.data.model.response.config.DashBoardBoxItem;
+import com.rf.taskmodule.data.model.response.config.Service;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.model.response.config.TaskListing;
 import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
@@ -134,7 +135,7 @@ public class AssignedtoMeFragment extends BaseSdkFragment<FragmentAssignedToMeSd
     private AppCompatSpinner locationSpinner;
     private CardView cardLocation;
 
-    private BroadcastReceiver refreshTaskListReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver refreshTaskListReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
@@ -214,7 +215,7 @@ public class AssignedtoMeFragment extends BaseSdkFragment<FragmentAssignedToMeSd
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // setHasOptionsMenu(true);
+         setHasOptionsMenu(true);
 
         httpManager = RocketFlyer.Companion.httpManager();
         preferencesHelper = RocketFlyer.Companion.preferenceHelper();
@@ -303,6 +304,7 @@ public class AssignedtoMeFragment extends BaseSdkFragment<FragmentAssignedToMeSd
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d("activity","onViewCreated");
         mFragmentAssignedToMeSdkBinding = getViewDataBinding();
         if (getArguments() != null) {
             String str = getArguments().getString(AppConstants.Extra.EXTRA_CATEGORIES);
@@ -316,8 +318,7 @@ public class AssignedtoMeFragment extends BaseSdkFragment<FragmentAssignedToMeSd
                 categoryId = categoryMap.get("categoryId");
             fromDate = getArguments().getLong(AppConstants.Extra.FROM_DATE);
             toDate = getArguments().getLong(AppConstants.Extra.FROM_TO);
-            showHideFilter(categoryId);
-
+           // showHideFilter(categoryId);
         }
         setUp();
         List<TaskStatus> statusList = new ArrayList<>();
@@ -423,6 +424,7 @@ public class AssignedtoMeFragment extends BaseSdkFragment<FragmentAssignedToMeSd
     @Override
     public void onResume() {
         super.onResume();
+        Log.d("activity","onResume");
         if (!getUserVisibleHint()) {
             return;
         }
@@ -467,6 +469,7 @@ public class AssignedtoMeFragment extends BaseSdkFragment<FragmentAssignedToMeSd
             mAssignedtoMeAdapter.clearItems();
             showLoading();
             buddyRequest.setUserGeoReq(userGeoReq);
+            mFragmentAssignedToMeSdkBinding.shimmerViewContainer.setVisibility(View.VISIBLE);
             mAssignedToMeViewModel.getTaskList(httpManager, api, buddyRequest);
         }
 
@@ -711,20 +714,17 @@ public class AssignedtoMeFragment extends BaseSdkFragment<FragmentAssignedToMeSd
                 if (position != -1) {
                     WorkFlowCategories myCatData = listCategory.get(position);
                     setHasOptionsMenu(myCatData.getAllowGeography());
-
                 }
             }
-
         }
     }
 
     @Override
     public void handleResponse(@Nullable ApiCallback callback, @Nullable Object result, @Nullable APIError error) {
         hideLoading();
-        // Stopping swipe refresh
         mSwipeRefreshLayout.setRefreshing(false);
         isLoading = false;
-
+        mFragmentAssignedToMeSdkBinding.shimmerViewContainer.setVisibility(View.GONE);
         if (CommonUtils.handleResponse(callback, error, result, getBaseActivity())) {
             if (null != getBaseActivity()) {
                 getBaseActivity().runOnUiThread(() -> {
@@ -1073,14 +1073,35 @@ public class AssignedtoMeFragment extends BaseSdkFragment<FragmentAssignedToMeSd
 
 
     int selectedRange = R.id.chip_custom;
+    ArrayList<String> serviceIds = new ArrayList();
 
     TextView dateChange;
     private void showBottomSheetDialog() {
+        WorkFlowCategories workFlowCategories = new WorkFlowCategories();
+
+        List<WorkFlowCategories> workFlowCategoriesList= preferencesHelper.getWorkFlowCategoriesList();
+        for (int i = 0; i < workFlowCategoriesList.size(); i++) {
+            if (workFlowCategoriesList.get(i).getCategoryId().equals(categoryId)) {
+                workFlowCategories = workFlowCategoriesList.get(i);
+            }
+        }
 
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity());
         bottomSheetDialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
 
         bottomSheetDialog.setContentView(R.layout.bottom_sheet_dialog);
+
+        TextView tvService = bottomSheetDialog.findViewById(R.id.text_service);
+        ChipGroup taskServices = bottomSheetDialog.findViewById(R.id.chip_group_filter_services);
+
+        if (workFlowCategories.getServiceConfig() != null) {
+            tvService.setVisibility(View.VISIBLE);
+            tvService.setText(workFlowCategories.getServiceConfig().getLabel());
+            addTaskServicesChips(taskServices);
+        } else {
+            tvService.setVisibility(View.GONE);
+        }
+
         ChipGroup dateGroup = bottomSheetDialog.findViewById(R.id.chip_group_filter_date);
         dateGroup.check(selectedRange);
 
@@ -1088,7 +1109,7 @@ public class AssignedtoMeFragment extends BaseSdkFragment<FragmentAssignedToMeSd
         addTaskListChips(taskGroup);
 
         dateChange = bottomSheetDialog.findViewById(R.id.tvFromDateDialog);
-        String tvDate = mFragmentAssignedToMeSdkBinding.tvFromDate.getText().toString().trim();
+        String tvDate = tvFromDate.getText().toString().trim();
         dateChange.setText(tvDate);
         dateChange.setOnClickListener(view -> openDatePicker(dateChange));
 
@@ -1096,57 +1117,76 @@ public class AssignedtoMeFragment extends BaseSdkFragment<FragmentAssignedToMeSd
         cancel.setOnClickListener(view -> bottomSheetDialog.dismiss());
         Button apply = bottomSheetDialog.findViewById(R.id.apply_button);
         apply.setOnClickListener(view -> {
-
-            fromDate = fromDateDialog;
-            toDate = toDateDialog;
-
             int selected = taskGroup.getCheckedChipId();
             Chip chip = taskGroup.findViewById(selected);
-            Log.d("selected", DateTimeUtil.getParsedDateApply(fromDate));
-            Log.d("selected", DateTimeUtil.getParsedDateApply(toDate));
-            stageId= chip.getTag().toString();
+            List<Integer> selectedServices = taskServices.getCheckedChipIds();
+            serviceIds.clear();
+            for (int i = 0; i < selectedServices.size(); i++) {
+                Chip chipService = taskServices.findViewById(selectedServices.get(i));
+                serviceIds.add(chipService.getTag().toString());
+            }
+
+            if (fromDateDialog != 0) {
+                fromDate = fromDateDialog;
+            }
+            if (toDateDialog != 0) {
+                toDate = toDateDialog;
+            }
+
+            Log.d("selected here", DateTimeUtil.getParsedDateApply(fromDate));
+            Log.d("selected here ", DateTimeUtil.getParsedDateApply(toDate));
+
+            if (stageId != null) {
+                stageId = chip.getTag().toString();
+            }
             if (getBaseActivity() != null && getBaseActivity().isNetworkConnected()) {
-                String refrenceId = etSearch.getText().toString().trim();
-                String tvDate1 = mFragmentAssignedToMeSdkBinding.tvFromDate.getText().toString().trim();
+                String tvDate1 = tvFromDate.getText().toString().trim();
+                api = TrackiSdkApplication.getApiMap().get(ApiType.TASKS);
                 if (!tvDate1.isEmpty()) {
-                    if (fromDate <= toDate){
-                        if (!refrenceId.isEmpty()) {
-                            if(rvAssignedToMe!=null)
-                                rvAssignedToMe.setVisibility(View.GONE);
-                            buddyRequest.setReferenceId(refrenceId);
-                            mAssignedtoMeAdapter.clearItems();
-                            buddyRequest.setFrom(fromDate);
-                            buddyRequest.setTo(toDate);
-                            buddyRequest.setUserGeoReq(userGeoReq);
-                            showLoading();
-                            mAssignedToMeViewModel.getTaskList(httpManager, api, buddyRequest);
-                        } else {
-                            if(rvAssignedToMe!=null)
-                                rvAssignedToMe.setVisibility(View.GONE);
-                            buddyRequest.setReferenceId(null);
-                            mAssignedtoMeAdapter.clearItems();
-                            showLoading();
-                            buddyRequest.setFrom(fromDate);
-                            buddyRequest.setTo(toDate);
-                            buddyRequest.setUserGeoReq(userGeoReq);
-                            mAssignedToMeViewModel.getTaskList(httpManager, api, buddyRequest);
-                            mFragmentAssignedToMeSdkBinding.selectedStageChip.setText(chip.getText().toString());
-                            mFragmentAssignedToMeSdkBinding.tvFromDate.setText(dateChange.getText().toString());
-                        }
-                    }else {
-                        if (getBaseActivity() != null)
-                            TrackiToast.Message.showShort(getBaseActivity(), "From Date can't be greater than To Date");
+                    if (mAssignedtoMeAdapter.getList() != null) {
+                        if (rvAssignedToMe != null)
+                            rvAssignedToMe.setVisibility(View.GONE);
+                        mAssignedtoMeAdapter.clearItems();
+                    } else {
+                        if (rvAssignedToMe != null)
+                            rvAssignedToMe.setVisibility(View.GONE);
                     }
+                    showLoading();
+                    buddyRequest.setStageId(chip.getTag().toString());
+                    buddyRequest.setUserGeoReq(userGeoReq);
+                    buddyRequest.setFrom(fromDate);
+                    buddyRequest.setTo(toDate);
+                    buddyRequest.setServiceIds(serviceIds);
+                    mAssignedToMeViewModel.getTaskList(httpManager, api, buddyRequest);
+                    mFragmentAssignedToMeSdkBinding.selectedStageChip.setText(chip.getText().toString());
+                    mFragmentAssignedToMeSdkBinding.tvFromDate.setText(dateChange.getText().toString());
                 } else {
                     TrackiToast.Message.showShort(requireContext(), "Please select to date");
                 }
             }
-
             bottomSheetDialog.dismiss();
         });
         bottomSheetDialog.show();
-
         sedateListener(dateGroup);
+    }
+
+    private void addTaskServicesChips(ChipGroup taskServices) {
+        List<Service> listCategory = preferencesHelper.getServices();
+        if (listCategory!=null) {
+            for (int i = 0; i < listCategory.size(); i++) {
+                Service myCatData = listCategory.get(i);
+                if (Boolean.TRUE.equals(myCatData.getSelected())) {
+                    Chip mChip1 = (Chip) this.getLayoutInflater().inflate(R.layout.layout_chip, null, false);
+                    mChip1.setText(myCatData.getName());
+                    mChip1.setTag(myCatData.getId());
+                    mChip1.setId(View.generateViewId());
+                    taskServices.addView(mChip1);
+                    if (serviceIds.contains(myCatData.getId())) {
+                        taskServices.check(mChip1.getId());
+                    }
+                }
+            }
+        }
     }
 
     long fromDateDialog = fromDate;

@@ -3,6 +3,8 @@ package com.rf.taskmodule.data.model.request
 import android.os.Parcelable
 import com.rf.taskmodule.data.model.response.config.DynamicFormData
 import com.rf.taskmodule.data.model.response.config.*
+import com.rf.taskmodule.ui.cart.SubUnitC
+import com.rf.taskmodule.ui.selectorder.SubUnit
 import com.rf.taskmodule.ui.tasklisting.PagingData
 import com.rf.taskmodule.utils.*
 import kotlinx.android.parcel.Parcelize
@@ -78,12 +80,22 @@ class SearchReferenceRequest(){
     var query: String? = ""
 }
 
+class TaskRequestCalendar(
+    var id : String? = null,
+    var from: Long? = null,
+    var to: Long? = null,
+    var limit: Int? = null,
+    var page: Int? = null,
+    var type: String? = null,
+)
+
 class TaskRequest(
     var status: MutableList<out TaskStatus>,
     var loadBy: BuddyInfo?,
     var properties: Map<String, String>?
 ) {
     var catIds: ArrayList<String>? = null
+    var serviceIds: ArrayList<String>? = null
     var categoryId: String? = null
     var stageId: String? = null
     var parentTaskId: String? = null
@@ -132,7 +144,8 @@ class CreateTaskRequest(
     var field5: String?,
     var field6: String?,
     var field7: String?,
-    var field8: String?
+    var field8: String?,
+    var serviceIds: ArrayList<String>?
 ) : Serializable {
     var taskData: TaskData? = null
     var categoryId: String? = null
@@ -148,9 +161,25 @@ class CreateTaskRequest(
     // var location:GeoLocation?=null
 }
 
+
+data class HubCoordinates(
+    var coordinates: ArrayList<Double>? = ArrayList(),
+    var latitude: Double? = null,
+    var locationId: String? = null,
+    var longitude: Double? = null
+)
+data class SystemHubRequest(
+    var catId: String? = "",
+    var coords: HubCoordinates,
+    var pid: String? ="",
+    var radius: Double? = 0.00,
+    var source: String? = AdvancedConfigSource.NEAR_BY_HUBS.source
+)
 data class TimeSlot(
     var date: String? = null,
-    var slot: String? = null
+    var slot: String? = null,
+    var availType: String = "GEO",
+    var entityId: String? = null,
 ) : Serializable
 
 class GetManualLocationRequest {
@@ -471,15 +500,15 @@ data class LinkInventoryRequest(
 /*
         var products:Map<String,Int>?=null
 */
-    var products: List<SelectedProduct>? = null
+    var products: ArrayList<SelectedProduct>? = null
 )
 
 data class SelectedProduct(
     var price: Float? = 0f,
     var productId: String? = null,
     var quantity: Int? = 0,
-    var dynamicPricing: Boolean = false,
-
+    var dimensionEnabled: Boolean? = false,
+    var subUnit: ArrayList<SubUnitC>? = null
     )
 
 data class TransactionRequest(

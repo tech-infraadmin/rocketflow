@@ -15,7 +15,6 @@ import android.os.Handler
 import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.AppCompatButton
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,8 +23,8 @@ import androidx.work.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
-import com.rocketflow.sdk.RocketFlyer
 import com.rf.taskmodule.BR
 import com.rf.taskmodule.R
 import com.rf.taskmodule.TrackiSdkApplication
@@ -42,21 +41,20 @@ import com.rf.taskmodule.data.network.HttpManager
 import com.rf.taskmodule.databinding.ItemDynamicFormVideoSdkBinding
 import com.rf.taskmodule.databinding.LayoutFrgmrntTaskDetailsSdkBinding
 import com.rf.taskmodule.ordercode.OrderCodeActivity
+import com.rf.taskmodule.ui.addplace.Hub
+import com.rf.taskmodule.ui.addplace.LocationListResponse
 import com.rf.taskmodule.ui.base.BaseSdkFragment
-//import com.rf.taskmodule.ui.chat.ChatActivity
 import com.rf.taskmodule.ui.common.DoubleButtonDialog
 import com.rf.taskmodule.ui.common.OnClickListener
 import com.rf.taskmodule.ui.custom.GlideApp
 import com.rf.taskmodule.ui.custom.socket.*
 import com.rf.taskmodule.ui.dynamicform.DynamicFormActivity
 import com.rf.taskmodule.ui.dynamicform.DynamicFormActivity.Companion.newIntent
-//import com.rf.taskmodule.ui.messages.MessagesActivity
+import com.rf.taskmodule.ui.dynamicform.dynamicfragment.*
 import com.rf.taskmodule.ui.newcreatetask.NewCreateTaskActivity
-//import com.rf.taskmodule.ui.scanqrcode.ScanQrAndBarCodeActivity
 import com.rf.taskmodule.ui.selectorder.SelectOrderActivity
 import com.rf.taskmodule.ui.taskdetails.*
 import com.rf.taskmodule.ui.taskdetails.timeline.skuinfo.SkuInfoActivity
-import com.rf.taskmodule.ui.taskdetails.timeline.skuinfopreview.SkuInfoPreviewActivity
 import com.rf.taskmodule.ui.tasklisting.TaskClickListener
 import com.rf.taskmodule.ui.tasklisting.assignedtome.TaskAssignToMeViewModel
 import com.rf.taskmodule.ui.userlisting.UserListNewActivity
@@ -65,7 +63,7 @@ import com.rf.taskmodule.ui.webview.WebViewActivity
 import com.rf.taskmodule.utils.*
 import com.rf.taskmodule.utils.AppConstants.Extra
 import com.rf.taskmodule.utils.geofence.AddGeoFenceUtil
-//import com.rf.taskmodule.utils.geofence.AddGeoFenceUtil
+import com.rocketflow.sdk.RocketFlyer
 import com.trackthat.lib.TrackThat
 import com.trackthat.lib.internal.network.TrackThatCallback
 import com.trackthat.lib.models.ErrorResponse
@@ -73,14 +71,10 @@ import com.trackthat.lib.models.SuccessResponse
 import com.trackthat.lib.models.TrackthatLocation
 import kotlinx.android.synthetic.main.item_dynamic_form_time_sdk.*
 import kotlinx.android.synthetic.main.layout_frgmrnt_task_details_sdk.*
-import com.rf.taskmodule.ui.addplace.Hub
-import com.rf.taskmodule.ui.addplace.LocationListResponse
-import com.rf.taskmodule.ui.dynamicform.dynamicfragment.*
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
-
 
 class TaskDetailsFragment :
     BaseSdkFragment<LayoutFrgmrntTaskDetailsSdkBinding, NewTaskDetailsViewModel>(),
@@ -90,6 +84,8 @@ class TaskDetailsFragment :
 
     private var ecRequest: ExecuteUpdateRequest = ExecuteUpdateRequest("", "", 0L, null, null)
 
+    lateinit var adapter: ReferencesPreviewListAdapter
+    private var listRefTask: ArrayList<Task> = ArrayList()
     private val REQUEST_CAMERA: Int = 101
     private var qrUrl = "na"
     var resp = "na"
@@ -106,19 +102,14 @@ class TaskDetailsFragment :
     private var mobile: String? = null
     private var mediaPlayer: MediaPlayer? = null
     private var listBuddy = ArrayList<Buddy>()
-
     private var ctaActivate = false
     private var ctaMode: String = ""
     private var verificationId: String = ""
     var ctaTitle = ""
     lateinit var mNewTaskViewModel: NewTaskDetailsViewModel
-
     lateinit var rvDynamicForm: RecyclerView
-
     lateinit var rvFields: RecyclerView
-
     var paymentUrl = ""
-
     var scannerFieldName: String? = null
     var scannerFieldValue: String? = null
     private var dynamicFragment: DynamicFragment? = null
@@ -130,21 +121,17 @@ class TaskDetailsFragment :
     private var dynamicFormsNew: DynamicFormsNew? = null
     private var isEditable: Boolean = false
     private var isHideButton: Boolean = false
-
     lateinit var httpManager: HttpManager
     lateinit var preferencesHelper: PreferencesHelper
+
     //var addGeoFenceUtil: AddGeoFenceUtil? = null
-
     private lateinit var mActivityNewTaskDetailBinding: LayoutFrgmrntTaskDetailsSdkBinding
-
     private var task: Task? = null
     private var taskRef: Task? = null
     var highList: kotlin.collections.List<StageHistoryData> = kotlin.collections.ArrayList()
-
-    lateinit var showDynamicFormDataAdapter: ShowDynamicFormDataAdapter
-
+    lateinit var showDynamicFormDataAdapter: ShowDynamicFormDataPreviewAdapter
+    val listFormFields = ArrayList<TaskData>()
     var addGeoFenceUtil: AddGeoFenceUtil? = null
-
     var taskId: String? = null
     private var api: Api? = null
     private var taskResponse: TaskResponse? = null
@@ -164,9 +151,7 @@ class TaskDetailsFragment :
     private var FROM: String? = null
     private var refCall: Boolean? = false
     private val formList = ArrayList<String>()
-
     var slotDataResponse: SlotDataResponse = SlotDataResponse()
-
     private var timePosition = 0
     private var keyPosition = 0
     private var dayPosition = 0
@@ -177,12 +162,11 @@ class TaskDetailsFragment :
     private var hubIdFinal = ""
     private var hubs: List<Hub> = ArrayList()
     private var hub: Hub? = null
-
     private var fieldArrayList = ArrayList<String>()
     private var allowedFields = ArrayList<Field>()
-
     private lateinit var timeLineAdapter: TaskTimeLineAdapter
-
+    private lateinit var timeServicesAdapter: TaskServicesAdapter
+    lateinit var bottomSheet: View
     private val TAG = "TaskDetailsFragment"
 
     override fun getBindingVariable(): Int {
@@ -217,49 +201,62 @@ class TaskDetailsFragment :
         httpManager = RocketFlyer.httpManager()!!
         preferencesHelper = RocketFlyer.preferenceHelper()!!
         //container = mActivityNewTaskDetailBinding.container
-        timeLineAdapter = TaskTimeLineAdapter(this)
-        mActivityNewTaskDetailBinding.timeLineAdapter = timeLineAdapter
-        val colayout = mActivityNewTaskDetailBinding.coradinatorLL as CoordinatorLayout
-        var bottomSheet = colayout.findViewById<View>(R.id.bottomSheet)
+        // timeLineAdapter = TaskTimeLineAdapter(this)
+        timeServicesAdapter = TaskServicesAdapter(this)
+
+        //mActivityNewTaskDetailBinding.timeLineAdapter = timeLineAdapter
+        mActivityNewTaskDetailBinding.timeServicesAdapter = timeServicesAdapter
+
+        bottomSheet = requireActivity().findViewById(R.id.bottomSheet)
         recyclerCtaButton = bottomSheet.findViewById(R.id.recyclerCtaButton)
         tvLabelTakeAction = bottomSheet.findViewById(R.id.tvLabelTakeAction)
-        sheetBehavior = BottomSheetBehavior.from(bottomSheet!!)
+        sheetBehavior = BottomSheetBehavior.from(bottomSheet)
         sheetBehavior.isHideable = false
         sheetBehavior.isFitToContents = false
         sheetBehavior.setPeekHeight(CommonUtils.dpToPixel(activity, 80), true)
         sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        getTaskData()
-        expandCollapse()
 
-        showDynamicFormDataAdapter = ShowDynamicFormDataAdapter(ArrayList())
+        showDynamicFormDataAdapter = ShowDynamicFormDataPreviewAdapter(listFormFields)
 
         rvDynamicForm = mActivityNewTaskDetailBinding.rvDynamicFormsMini
         rvDynamicForm.layoutManager = LinearLayoutManager(baseActivity)
         rvDynamicForm.adapter = showDynamicFormDataAdapter
 
-        //rvDynamicForm.adapter = showDynamicFormDataAdapter
-
         addGeoFenceUtil = AddGeoFenceUtil(baseActivity, preferencesHelper)
         tvLabelTakeAction!!.setOnClickListener {
             sheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
+
+        adapter = ReferencesPreviewListAdapter(requireActivity(), listRefTask)
+        mActivityNewTaskDetailBinding.rvReferences.adapter = adapter
+
+        getTaskData(true)
+        expandCollapse()
     }
 
     companion object {
-        fun newInstance(taskId: String?, categoryId: String?, FROM: String?): TaskDetailsFragment? {
+        fun newInstance(
+            taskId: String?,
+            categoryId: String?,
+            FROM: String?,
+            taskResponse: String = ""
+        ): TaskDetailsFragment? {
             val args = Bundle()
             args.putString(Extra.EXTRA_TASK_ID, taskId)
             args.putString(Extra.EXTRA_CATEGORY_ID, categoryId)
             args.putString(Extra.FROM, FROM)
+            if (taskResponse != "") {
+                args.putString("taskResponse", taskResponse)
+            }
             val fragment = TaskDetailsFragment()
             fragment.arguments = args
             return fragment
         }
-
     }
 
 
-    private fun getTaskData() {
+    private fun getTaskData(check: Boolean) {
+
         if (arguments != null) {
 
             if (requireArguments().getString(Extra.EXTRA_TASK_ID) != null) {
@@ -271,12 +268,21 @@ class TaskDetailsFragment :
             if (requireArguments().getString(Extra.EXTRA_CATEGORY_ID) != null) {
                 categoryId = requireArguments().getString(Extra.EXTRA_CATEGORY_ID)
             }
-            Log.d("categoryId", categoryId)
-            showLoading()
-            api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
-            if (api != null && ::mNewTaskViewModel.isInitialized)
-                mNewTaskViewModel.getTaskById(httpManager, AcceptRejectRequest(taskId!!), api)
 
+            api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
+
+            if (requireArguments().containsKey("taskResponse") && check) {
+                taskResponse = Gson().fromJson(
+                    requireArguments().getString("taskResponse"),
+                    TaskResponse::class.java
+                )
+                Log.d("task_response", taskResponse?.taskDetail?.products.toString())
+                setData()
+            } else {
+                showLoading()
+                if (api != null && ::mNewTaskViewModel.isInitialized)
+                    mNewTaskViewModel.getTaskById(httpManager, AcceptRejectRequest(taskId!!), api)
+            }
 
             if (categoryId != null) {
                 val startLocationLabel =
@@ -300,17 +306,10 @@ class TaskDetailsFragment :
                     categoryId,
                     preferencesHelper
                 )
-                if (!reffenceId.isEmpty()) {
+                if (reffenceId.isNotEmpty()) {
                     tvLabelRefferenceId.text = reffenceId
                 }
-                val pocLabel = CommonUtils.getAllowFieldLabelName(
-                    "POINT_OF_CONTACT",
-                    categoryId,
-                    preferencesHelper
-                )
-                if (!pocLabel.isEmpty()) {
-                    tvLabelPoc.text = pocLabel
-                }
+
                 val descLabel =
                     CommonUtils.getAllowFieldLabelName("DESCRIPTION", categoryId, preferencesHelper)
                 if (!descLabel.isEmpty()) {
@@ -322,6 +321,7 @@ class TaskDetailsFragment :
                     categoryId,
                     preferencesHelper
                 )
+
                 if (!endLocationName.isEmpty()) {
                     labelEndLocation.text = endLocationName
                 }
@@ -335,17 +335,12 @@ class TaskDetailsFragment :
                 if (!endTime.isEmpty()) {
                     labelEndAt.text = endTime
                 }
-                val assigneeLabel =
-                    CommonUtils.getAssigneeLabel(categoryId, preferencesHelper)
-                if (!assigneeLabel.isEmpty()) {
-                    tvClientsDetails.text = assigneeLabel
-                }
+
                 val buddyLabel =
                     CommonUtils.getBuddyLabel(categoryId, preferencesHelper)
                 if (!buddyLabel.isEmpty()) {
                     tvAssignedTolable.text = buddyLabel
                 }
-
 
                 mActivityNewTaskDetailBinding.llQrCode.setOnClickListener {
                     if (qrUrl != "na")
@@ -356,17 +351,24 @@ class TaskDetailsFragment :
                             ).putExtra("qrUrl", qrUrl)
                         )
                 }
-
-                mActivityNewTaskDetailBinding.tvTimelineMore.setOnClickListener {
-                    timeLineMore = true
-                    setAdapter()
-                }
-
-
             }
-
-
         }
+    }
+
+    fun getAllowedFields(categoryId: String?): List<Field> {
+        var allowedFieldsList: List<Field>? = ArrayList()
+        val workFlowCategoriesList: List<WorkFlowCategories> =
+            preferencesHelper.workFlowCategoriesList
+        if (!workFlowCategoriesList.isNullOrEmpty()) {
+            for (i in workFlowCategoriesList) {
+                if (i.categoryId != null && categoryId != null)
+                    if (i.categoryId == categoryId) {
+                        if (i.channelConfig != null && i.channelConfig!!.fields != null && i.channelConfig!!.fields!!.isNotEmpty())
+                            allowedFieldsList = i.channelConfig!!.fields
+                    }
+            }
+        }
+        return allowedFieldsList!!
     }
 
     fun setMargin(dp: Int) {
@@ -378,290 +380,387 @@ class TaskDetailsFragment :
 
 
     override fun handleResponse(callback: ApiCallback, result: Any?, error: APIError?) {
-
         try {
-
-
+            hideLoading()
             if (CommonUtils.handleResponse(callback, error, result, baseActivity)) {
-
                 taskResponse = Gson().fromJson("$result", TaskResponse::class.java)
-                if (taskResponse != null) {
-
-                    if (refCall == false) {
-
-                        task = taskResponse!!.taskDetail
-                        if (categoryId.isNullOrEmpty())
-                            categoryId = task?.categoryId
-                        val itemViewModel =
-                            TaskAssignToMeViewModel(
-                                task,
-                                this, baseActivity, preferencesHelper, categoryId
-                            )
-                        mActivityNewTaskDetailBinding.data = itemViewModel
-                        llMain.visibility = View.VISIBLE
-                        hideLoading()
-                        var isShow = CommonUtils.handleCallToActionsNew(
-                            baseActivity,
-                            task,
-                            recyclerCtaButton,
-                            this
-                        )
-                        if (isShow) {
-                            tvLabelTakeAction!!.visibility = View.VISIBLE
-                            setMargin(50)
-
-                        } else {
-                            tvLabelTakeAction!!.visibility = View.GONE
-                            setMargin(0)
-                        }
-                        if (task!!.clientTaskId != null && task!!.clientTaskId!!.isNotEmpty()) {
-                            tvTaskId.text = task!!.clientTaskId!!
-                        }
-                        perFormTimerReminder(task)
-                        try {
-                            perFormLocationReminder(task)
-                        } catch (e: java.lang.Exception) {
-                            e.printStackTrace()
-                        }
-
-                        if (task!!.trackingState != null) {
-                            //stop tracking
-                            // handleTracking(task!!.trackingState!!, task!!.taskId!!)
-                        }
-
-                        if (task!!.multiReferedTask != null) {
-                            if (task!!.multiReferedTask!!.size > 0) {
-                                if (task!!.multiReferedTask!![0] != "") {
-                                    mActivityNewTaskDetailBinding.rlReference.visibility =
-                                        View.VISIBLE
-                                    //getDataHere
-                                    refCall = true
-                                    api = TrackiSdkApplication.getApiMap()[ApiType.GET_TASK_BY_ID]
-                                    if (task!!.multiReferedTask!!.size > 0) {
-                                        if (task!!.multiReferedTask!![0] != null) {
-                                            mNewTaskViewModel.getTaskById(
-                                                httpManager,
-                                                AcceptRejectRequest(task!!.multiReferedTask!![0]),
-                                                api
-                                            )
-                                        }
-                                    }
-                                } else {
-                                    mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
-                                }
-                            } else {
-                                mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
-                            }
-                        } else {
-                            mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
-                        }
-
-                        if (task!!.orderDetails != null && task!!.orderDetails!!.isNotEmpty()) {
-                            cardOrders.visibility = View.VISIBLE
-                            val adapter = OrderListAdapter(task!!.orderDetails)
-                            rvOrderList.adapter = adapter
-                            adapter.onItemClick = { item ->
-                                val intent = SkuInfoPreviewActivity.newIntent(requireActivity())
-                                intent.putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-                                intent.putExtra(Extra.EXTRA_PRODUCT_ID, item.productId.toString())
-                                intent.putExtra(
-                                    Extra.EXTRA_PRODUCT_NAME,
-                                    item.productName.toString()
-                                )
-                                startActivityForResult(
-                                    intent,
-                                    AppConstants.REQUEST_CODE_TAG_INVENTORY
-                                )
-                            }
-                        } else if (task!!.products != null && task!!.products!!.isNotEmpty()) {
-                            cardOrders.visibility = View.VISIBLE
-                            tvInventoriesLabel.text = getString(R.string.inventory_label)
-                            val adapter = ProductOrderAdapter(task!!.products)
-                            rvOrderList.adapter = adapter
-                        } else {
-                            cardOrders.visibility = View.GONE
-                        }
-                        ivPinStartLocation.setOnClickListener {
-
-                            if (task!!.source != null && task!!.source!!.location != null) {
-                                CommonUtils.showLogMessage(
-                                    "e",
-                                    "source point map",
-                                    "source start points map"
-                                )
-                                val geoCoordinates = task!!.source!!.location
-                                CommonUtils.openGoogleMapWithOneLocation(
-                                    context,
-                                    geoCoordinates!!.latitude,
-                                    geoCoordinates.longitude
-                                )
-                            }
-
-                        }
-
-                        Log.e("code", "check => ${task!!.encCodeUrl}")
-                        if (task!!.encCodeUrl != null) {
-                            qrUrl = task!!.encCodeUrl.toString()
-                            GlideApp.with(baseActivity).load(qrUrl)
-                                .into(mActivityNewTaskDetailBinding.ivQrCode)
-                        } else {
-
-                            mActivityNewTaskDetailBinding.llQrCode.visibility = View.GONE
-                        }
-                        ivPinEndLocation.setOnClickListener {
-
-                            if (task!!.destination != null && task!!.destination!!.location != null) {
-                                CommonUtils.showLogMessage(
-                                    "e",
-                                    "destination point map",
-                                    "source start points map"
-                                )
-                                val geoCoordinates = task!!.destination!!.location
-                                CommonUtils.openGoogleMapWithOneLocation(
-                                    context,
-                                    geoCoordinates!!.latitude,
-                                    geoCoordinates.longitude
-                                )
-                            }
-
-                        }
-
-                        if (task!!.trackable) {
-                            ivCurrentStageLocation.visibility = View.VISIBLE
-//                        ivCurrentStageLocation.visibility = View.GONE
-                            ivCurrentStageLocation.setOnClickListener {
-                                if (FROM.equals(AppConstants.Extra.ASSIGNED_TO_ME)) {
-                                    startActivity(
-                                        TaskDetailActivity.Companion.newIntent(baseActivity)
-                                            .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-                                    );
-                                } else {
-                                    if (preferencesHelper.userDetail != null && preferencesHelper.userDetail.userId != null && !preferencesHelper.userDetail!!.userId!!.isEmpty()) {
-                                        val navigation = Navigation()
-                                        val actionConfig = ActionConfig()
-                                        val userId = preferencesHelper.userDetail.userId
-                                        actionConfig.actionUrl =
-                                            task!!.trackingUrl + "&userId=" + userId
-                                        // actionConfig.actionUrl = task!!.trackingUrl
-                                        navigation.actionConfig = actionConfig
-                                        navigation.title = "Tracking Details"
-                                        startActivity(
-                                            WebViewActivity.newIntent(baseActivity)
-                                                .putExtra(
-                                                    AppConstants.Extra.EXTRA_WEB_INFO,
-                                                    navigation
-                                                )
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        rlAssignedToTrack.setOnClickListener(View.OnClickListener {
-                            if (FROM.equals(AppConstants.Extra.ASSIGNED_TO_ME)) {
-                                startActivity(
-                                    TaskDetailActivity.Companion.newIntent(baseActivity)
-                                        .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
-                                );
-                            } else {
-                                if (preferencesHelper.userDetail != null && preferencesHelper.userDetail.userId != null && !preferencesHelper.userDetail!!.userId!!.isEmpty()) {
-                                    val navigation = Navigation()
-                                    val actionConfig = ActionConfig()
-                                    val userId = preferencesHelper.userDetail.userId
-                                    actionConfig.actionUrl =
-                                        task!!.trackingUrl + "&userId=" + userId
-                                    // actionConfig.actionUrl = task!!.trackingUrl
-                                    navigation.actionConfig = actionConfig
-                                    navigation.title = "Tracking Details"
-                                    startActivity(
-                                        WebViewActivity.newIntent(baseActivity)
-                                            .putExtra(AppConstants.Extra.EXTRA_WEB_INFO, navigation)
-                                    )
-                                }
-                            }
-                        })
-
-                        if (task!!.stageHistory != null && task!!.stageHistory!!.isNotEmpty()) {
-                            val list = ArrayList(task!!.stageHistory!!)
-                                .sortedWith(compareByDescending<StageHistoryData> { it.timeStamp }
-                                )
-                            val history = list[list.size - 1]
-
-                            if (history != null) {
-                                if (history.dfdId != null) {
-                                    formId = history.dfdId
-                                    if (formId != null && formId!!.isNotEmpty()) {
-                                        var data = GetTaskDataRequest()
-                                        data.dfdId = history.dfdId
-                                        dynamicFormsNew = CommonUtils.getFormByFormId(formId!!)
-                                        if (dynamicFormsNew != null && dynamicFormsNew!!.version != null) {
-                                            data.dfVersion =
-                                                Integer.valueOf(dynamicFormsNew!!.version!!)
-                                        }
-                                        data.taskId = taskId
-                                        mNewTaskViewModel.getTaskData(httpManager, data)
-
-                                    }
-                                }
-                            }
-                            highList = list
-                            setAdapter()
-
-
-                        }
-
-                        Log.d("timeline", timeLineAdapter.itemCount.toString())
-                        if (timeLineAdapter.itemCount < 1) {
-                            mActivityNewTaskDetailBinding.llTimeline.visibility = View.GONE
-                        }
-
-                    } else {
-
-                        if (taskResponse!!.taskDetail != null) {
-                            mActivityNewTaskDetailBinding.rlReference.visibility = View.VISIBLE
-                            taskRef = taskResponse!!.taskDetail
-
-                            mActivityNewTaskDetailBinding.rlReference.setOnClickListener {
-                                val intent =
-                                    Intent(requireContext(), NewTaskDetailsActivity::class.java)
-                                intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskRef!!.taskId)
-                                intent.putExtra(
-                                    AppConstants.Extra.EXTRA_ALLOW_SUB_TASK,
-                                    taskRef!!.allowSubTask
-                                )
-                                intent.putExtra(
-                                    AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID,
-                                    taskRef!!.subCategoryIds
-                                )
-                                intent.putExtra(
-                                    AppConstants.Extra.EXTRA_PARENT_REF_ID,
-                                    taskRef!!.referenceId
-                                )
-                                intent.putExtra(
-                                    AppConstants.Extra.EXTRA_CATEGORY_ID,
-                                    taskRef!!.categoryId
-                                )
-                                intent.putExtra(
-                                    AppConstants.Extra.FROM,
-                                    AppConstants.Extra.ASSIGNED_TO_ME
-                                )
-                                startActivity(intent)
-                            }
-                        } else {
-                            mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
-                        }
-                        refCall = false
-                    }
-
-                }
-
+                setData()
+                val jsonString = GsonBuilder().serializeSpecialFloatingPointValues().create()
+                    .toJson(taskResponse)
+                (activity as NewTaskDetailsActivity).updateData(jsonString)
             } else {
                 hideLoading()
             }
-
         } catch (e: Exception) {
             e.printStackTrace()
             Log.e(TaskDetailActivity.TAG, "Exception Inside handleResponse(): $e")
         }
+    }
+
+    private fun setData() {
+        if (taskResponse != null) {
+            listFormFields.clear()
+            if (refCall == false) {
+                task = taskResponse!!.taskDetail
+                if (categoryId.isNullOrEmpty())
+                    categoryId = task?.categoryId
+                val itemViewModel =
+                    TaskAssignToMeViewModel(task, this, baseActivity, preferencesHelper, categoryId)
+                mActivityNewTaskDetailBinding.data = itemViewModel
+                llMain.visibility = View.VISIBLE
+                val isShow = CommonUtils.handleCallToActionsNew(
+                    baseActivity,
+                    task,
+                    recyclerCtaButton,
+                    this
+                )
+                if (isShow) {
+                    tvLabelTakeAction!!.visibility = View.VISIBLE
+                    setMargin(50)
+                } else {
+                    tvLabelTakeAction!!.visibility = View.GONE
+                    setMargin(0)
+                }
+                perFormTimerReminder(task)
+                try {
+                    perFormLocationReminder(task)
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                }
+
+                //1 to 15 fields
+                setFieldsData(task)
+
+
+                if (task!!.trackingState != null) {
+                    //stop tracking
+                    // handleTracking(task!!.trackingState!!, task!!.taskId!!)
+                }
+
+                if (task!!.multiReferedTask != null) {
+                    if (task!!.multiReferedTask!!.size > 0) {
+                        if (!task!!.multiReferedTask!![0].isNullOrEmpty()) {
+                            mActivityNewTaskDetailBinding.rlReference.visibility = View.VISIBLE
+                            //getDataHere
+                            task!!.multiReferedTask?.forEach { item ->
+                                val task = Task()
+                                task.taskId = item
+                                task.clientTaskId = item
+                                listRefTask.add(task)
+                            }
+                            adapter.notifyDataSetChanged()
+                        } else {
+                            mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
+                        }
+                    } else {
+                        mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
+                    }
+                } else {
+                    mActivityNewTaskDetailBinding.rlReference.visibility = View.GONE
+                }
+
+                if (task!!.products != null && task!!.products!!.isNotEmpty()) {
+                    cardOrders.visibility = View.VISIBLE
+                    tvInventoriesLabel.text = getString(R.string.inventory_label)
+                    val adapter = ProductOrderAdapter(task!!.products)
+                    rvOrderList.adapter = adapter
+                } else {
+                    cardOrders.visibility = View.GONE
+                }
+
+                ivPinStartLocation.setOnClickListener {
+
+                    if (task!!.source != null && task!!.source!!.location != null) {
+                        CommonUtils.showLogMessage(
+                            "e",
+                            "source point map",
+                            "source start points map"
+                        )
+                        val geoCoordinates = task!!.source!!.location
+                        CommonUtils.openGoogleMapWithOneLocation(
+                            context,
+                            geoCoordinates!!.latitude,
+                            geoCoordinates.longitude
+                        )
+                    }
+                }
+
+                Log.e("code", "check => ${task!!.encCodeUrl}")
+                if (task!!.encCodeUrl != null) {
+                    qrUrl = task!!.encCodeUrl.toString()
+                    GlideApp.with(baseActivity).load(qrUrl)
+                        .into(mActivityNewTaskDetailBinding.ivQrCode)
+                } else {
+
+                    mActivityNewTaskDetailBinding.llQrCode.visibility = View.GONE
+                }
+                ivPinEndLocation.setOnClickListener {
+
+                    if (task!!.destination != null && task!!.destination!!.location != null) {
+                        CommonUtils.showLogMessage(
+                            "e",
+                            "destination point map",
+                            "source start points map"
+                        )
+                        val geoCoordinates = task!!.destination!!.location
+                        CommonUtils.openGoogleMapWithOneLocation(
+                            context,
+                            geoCoordinates!!.latitude,
+                            geoCoordinates.longitude
+                        )
+                    }
+                }
+
+                rlAssignedToTrack.setOnClickListener(View.OnClickListener {
+                    if (FROM.equals(Extra.ASSIGNED_TO_ME)) {
+                        startActivity(
+                            TaskDetailActivity.Companion.newIntent(baseActivity)
+                                .putExtra(Extra.EXTRA_TASK_ID, task!!.taskId)
+                        );
+                    } else {
+                        if (preferencesHelper.userDetail != null && preferencesHelper.userDetail.userId != null && !preferencesHelper.userDetail!!.userId!!.isEmpty()) {
+                            val navigation = Navigation()
+                            val actionConfig = ActionConfig()
+                            val userId = preferencesHelper.userDetail.userId
+                            actionConfig.actionUrl =
+                                task!!.trackingUrl + "&userId=" + userId
+                            // actionConfig.actionUrl = task!!.trackingUrl
+                            navigation.actionConfig = actionConfig
+                            navigation.title = "Tracking Details"
+                            startActivity(
+                                WebViewActivity.newIntent(baseActivity)
+                                    .putExtra(AppConstants.Extra.EXTRA_WEB_INFO, navigation)
+                            )
+                        }
+                    }
+                })
+
+                if (task!!.stageHistory != null && task!!.stageHistory!!.isNotEmpty()) {
+                    val list =
+                        ArrayList(task!!.stageHistory!!).sortedWith(compareByDescending<StageHistoryData> { it.timeStamp })
+                    val history = list[list.size - 1]
+                    if (history != null) {
+                        if (history.dfdId != null) {
+                            formId = history.dfdId
+                            if (formId != null && formId!!.isNotEmpty()) {
+                                val data = GetTaskDataRequest()
+                                data.dfdId = history.dfdId
+                                dynamicFormsNew = CommonUtils.getFormByFormId(formId!!)
+                                if (dynamicFormsNew != null && dynamicFormsNew!!.version != null) {
+                                    data.dfVersion =
+                                        Integer.valueOf(dynamicFormsNew!!.version!!)
+                                }
+                                data.taskId = taskId
+                                mNewTaskViewModel.getTaskData(httpManager, data)
+                            }
+                        }
+                    }
+                }
+
+                if (task!!.serviceIds != null && task!!.serviceIds!!.isNotEmpty()) {
+                    mActivityNewTaskDetailBinding.cardServices.visibility = View.VISIBLE
+                    val list = ArrayList(task!!.serviceIds!!)
+                    val listServices: List<Service> =
+                        ArrayList(preferencesHelper.services).filter { item ->
+                            list.contains(item.id)
+                        }
+                    timeServicesAdapter.addData(listServices)
+                } else {
+                    mActivityNewTaskDetailBinding.cardServices.visibility = View.GONE
+                }
+
+
+            }
+        }
+    }
+
+    private fun setFieldsData(task: Task?) {
+        val listFields = ArrayList<TaskData>()
+        android.util.Log.d(TAG, "getTaskData: " + getAllowedFields(categoryId))
+        val llallowedFields = getAllowedFields(categoryId)
+
+        val FIELD1 = Field(field = NewCreateTaskActivity.FIELD.FIELD1.name)
+        if (llallowedFields.contains(FIELD1)) {
+            val position = llallowedFields.indexOf(FIELD1)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD1.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field1
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD2 = Field(field = NewCreateTaskActivity.FIELD.FIELD2.name)
+        if (llallowedFields.contains(FIELD2)) {
+            val position = llallowedFields.indexOf(FIELD2)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD2.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field2
+                listFields.add(taskData)
+            }
+        }
+
+
+        val FIELD3 = Field(field = NewCreateTaskActivity.FIELD.FIELD3.name)
+        if (llallowedFields.contains(FIELD3)) {
+            val position = llallowedFields.indexOf(FIELD3)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD3.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field3
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD4 = Field(field = NewCreateTaskActivity.FIELD.FIELD4.name)
+        if (llallowedFields.contains(FIELD4)) {
+            val position = llallowedFields.indexOf(FIELD4)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD4.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field4
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD5 = Field(field = NewCreateTaskActivity.FIELD.FIELD5.name)
+        if (llallowedFields.contains(FIELD5)) {
+            val position = llallowedFields.indexOf(FIELD5)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD5.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field5
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD6 = Field(field = NewCreateTaskActivity.FIELD.FIELD6.name)
+        if (llallowedFields.contains(FIELD6)) {
+            val position = llallowedFields.indexOf(FIELD6)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD6.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field6
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD7 = Field(field = NewCreateTaskActivity.FIELD.FIELD7.name)
+        if (llallowedFields.contains(FIELD7)) {
+            val position = llallowedFields.indexOf(FIELD7)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD7.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field7
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD8 = Field(field = NewCreateTaskActivity.FIELD.FIELD8.name)
+        if (llallowedFields.contains(FIELD8)) {
+            val position = llallowedFields.indexOf(FIELD8)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD8.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field8
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD9 = Field(field = NewCreateTaskActivity.FIELD.FIELD9.name)
+        if (llallowedFields.contains(FIELD9)) {
+            val position = llallowedFields.indexOf(FIELD9)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD9.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field9
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD10 = Field(field = NewCreateTaskActivity.FIELD.FIELD10.name)
+        if (llallowedFields.contains(FIELD10)) {
+            val position = llallowedFields.indexOf(FIELD10)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD10.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field10
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD11 = Field(field = NewCreateTaskActivity.FIELD.FIELD11.name)
+        if (llallowedFields.contains(FIELD11)) {
+            val position = llallowedFields.indexOf(FIELD11)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD11.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field11
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD12 = Field(field = NewCreateTaskActivity.FIELD.FIELD12.name)
+        if (llallowedFields.contains(FIELD12)) {
+            val position = llallowedFields.indexOf(FIELD12)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD12.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field12
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD13 = Field(field = NewCreateTaskActivity.FIELD.FIELD13.name)
+        if (llallowedFields.contains(FIELD13)) {
+            val position = llallowedFields.indexOf(FIELD13)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD13.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field13
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD14 = Field(field = NewCreateTaskActivity.FIELD.FIELD14.name)
+        if (llallowedFields.contains(FIELD14)) {
+            val position = llallowedFields.indexOf(FIELD14)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD14.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field14
+                listFields.add(taskData)
+            }
+        }
+
+        val FIELD15 = Field(field = NewCreateTaskActivity.FIELD.FIELD15.name)
+        if (llallowedFields.contains(FIELD15)) {
+            val position = llallowedFields.indexOf(FIELD15)
+            if (position != -1 && !llallowedFields[position].skipVisibilty) {
+                val taskData = TaskData()
+                taskData.key = FIELD15.field.toString()
+                taskData.label = llallowedFields[position].label
+                taskData.value = task?.field15
+                listFields.add(taskData)
+            }
+        }
+        listFormFields.addAll(listFields)
+        showDynamicFormDataAdapter.notifyDataSetChanged()
     }
 
     override fun handleSlotResponse(callback: ApiCallback, result: Any?, error: APIError?) {
@@ -675,35 +774,35 @@ class TaskDetailsFragment :
         switchCtaMode(ctaMode)
     }
 
-    override fun handleGetTaskDataResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+    override fun handleGetTaskDataResponse(
+        callback: ApiCallback,
+        result: Any?,
+        error: APIError?
+    ) {
         hideLoading()
 
         if (CommonUtils.handleResponse(callback, error, result, context)) {
-            val getTaskDataResponse = Gson().fromJson<GetTaskDataResponse>(
+            val getTaskDataResponse = Gson().fromJson(
                 result.toString(),
                 GetTaskDataResponse::class.java
             )
-            var data: List<TaskData>? = null
             if (getTaskDataResponse != null && getTaskDataResponse.successful) {
-
                 if (getTaskDataResponse.data != null) {
-                    data = getTaskDataResponse.data!!
-                    getTaskDataResponse.data!!.let {
-                        var list1 = ArrayList<TaskData>()
-                        list1.addAll(it as ArrayList<TaskData>)
-                        showDynamicFormDataAdapter.addData(list1)
-
-                    }
+                    listFormFields.addAll(getTaskDataResponse.data!! as ArrayList<TaskData>)
+                    showDynamicFormDataAdapter.notifyDataSetChanged()
                 }
                 if (getTaskDataResponse.dfdId != null) {
                     dfdId = getTaskDataResponse.dfdId!!
                 }
             }
-
         }
     }
 
-    override fun handlePaymentUrlResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+    override fun handlePaymentUrlResponse(
+        callback: ApiCallback,
+        result: Any?,
+        error: APIError?
+    ) {
         hideLoading()
 
 
@@ -740,7 +839,10 @@ class TaskDetailsFragment :
                     if (response.responseMsg != null) {
                         TrackiToast.Message.showShort(requireActivity(), response.responseMsg)
                     } else {
-                        TrackiToast.Message.showShort(requireActivity(), "Invalid Verification ID")
+                        TrackiToast.Message.showShort(
+                            requireActivity(),
+                            "Invalid Verification ID"
+                        )
                     }
 
                 } else if (response.responseCode == "451") {
@@ -753,51 +855,28 @@ class TaskDetailsFragment :
                         )
                     }
 
+                } else {
+                    ctaActivate = response.successful
+                    verificationId = response.verificationId.toString()
+
+                    if (response.successful) {
+                        TrackiToast.Message.showShort(requireActivity(), response.responseMsg)
+
+                        val listNew = preferencesHelper.verifiedCtas
+                        var check = "${callToActions?.id.toString()}$taskId"
+                        Log.e("CTAid1", "$check")
+                        listNew.add(check)
+                        preferencesHelper.verifiedCtas = listNew
+                        switchCtaMode(ctaMode)
+                    } else {
+                        TrackiToast.Message.showShort(
+                            requireContext(),
+                            "Server is busy. Please try later"
+                        )
+                    }
                 }
-                ctaActivate = response.successful
-                verificationId = response.verificationId.toString()
-
-                if (response.successful) {
-                    TrackiToast.Message.showShort(requireActivity(), response.responseMsg)
-
-                    val listNew = preferencesHelper.verifiedCtas
-                    var check = "${callToActions?.id.toString()}$taskId"
-                    Log.e("CTAid1", "$check")
-                    listNew.add(check)
-                    preferencesHelper.verifiedCtas = listNew
-                    switchCtaMode(ctaMode)
-                }
 
             }
-        }
-    }
-
-    fun setAdapter() {
-        val list: List<StageHistoryData> = highList
-        Log.e("ListSize", "${list.size}")
-        if (timeLineMore == false) {
-            mActivityNewTaskDetailBinding.tvTimelineMore.visibility = View.VISIBLE
-            var tempList: ArrayList<StageHistoryData> = ArrayList()
-            if (list.size < 1){
-                mActivityNewTaskDetailBinding.tvTimelineMore.visibility = View.GONE
-            }
-            else if (list.size == 1) {
-                mActivityNewTaskDetailBinding.tvTimelineMore.visibility = View.GONE
-                tempList.add(list[0])
-            }
-            else{
-                if (list.size == 2)
-                    mActivityNewTaskDetailBinding.tvTimelineMore.visibility = View.GONE
-                tempList.add(list[0])
-                tempList.add(list[1])
-            }
-            val listTemp = tempList.toList()
-            timeLineAdapter.addData(listTemp)
-            mActivityNewTaskDetailBinding.rvFields.visibility = View.VISIBLE
-        } else {
-            mActivityNewTaskDetailBinding.tvTimelineMore.visibility = View.GONE
-            timeLineAdapter.addData(list)
-            mActivityNewTaskDetailBinding.rvFields.visibility = View.VISIBLE
         }
     }
 
@@ -806,17 +885,19 @@ class TaskDetailsFragment :
         result: Any?,
         error: APIError?
     ) {
+
         if (CommonUtils.handleResponse(apiCallback, error, result, baseActivity)) {
             if (result != null) {
                 val response = Gson().fromJson("$result", BaseResponse::class.java)
                 TrackiToast.Message.showShort(requireActivity(), response.responseMsg)
                 if (response.successful) {
-
                     showOtpDialog(response!!.mobile.toString())
-
-
                 } else {
                     ctaActivate = false
+                    TrackiToast.Message.showShort(
+                        requireContext(),
+                        "Server is busy. Please try later"
+                    )
                 }
             }
         }
@@ -1025,7 +1106,6 @@ class TaskDetailsFragment :
             dialog.dismiss()
         }
 
-
         dialog.show()
 
     }
@@ -1231,7 +1311,8 @@ class TaskDetailsFragment :
         try {
             var jsonConverter =
                 JSONConverter<CtaInventoryConfig>()
-            ctaInventoryConfig = jsonConverter.jsonToObject(this, CtaInventoryConfig::class.java)
+            ctaInventoryConfig =
+                jsonConverter.jsonToObject(this, CtaInventoryConfig::class.java)
         } catch (e: JsonParseException) {
             return ctaInventoryConfig
         }
@@ -1406,10 +1487,12 @@ class TaskDetailsFragment :
             "Ext" -> {
                 mNewTaskViewModel.executeUpdates(httpManager, ecRequest, api!!)
             }
+
             TRAGETINFO.BOOK_SLOT.name -> {
                 ctaTitle = callToActions!!.name.toString()
                 bookSlot()
             }
+
             "assignExec" -> {
                 val request = ExecuteUpdateRequest(
                     taskId!!, ctaID!!,
@@ -1437,9 +1520,9 @@ class TaskDetailsFragment :
                             listIds[i]
                     }
                     intent.putExtra("roleIds", rIds)
-
+                    intent.putExtra("taskId", taskId)
+                    intent.putExtra("targetInfo", callToActions!!.targetInfo!!.targetInfo)
                     intent.putExtra("request", ecRequest as ExecuteUpdateRequest)
-
                     context?.startActivity(intent)
                     requireActivity().finish()
 
@@ -1448,6 +1531,7 @@ class TaskDetailsFragment :
                     TrackiToast.Message.showShort(context, "No Id Found Or Not Synced")
                 }
             }
+
             "CREATE_TASK" -> {
                 val request = ExecuteUpdateRequest(
                     taskId!!, ctaID!!,
@@ -1474,6 +1558,7 @@ class TaskDetailsFragment :
                 }
                 startActivityForResult(intent, AppConstants.REQUEST_CODE_CREATE_TASK)
             }
+
             "TAG3" -> {
                 val request = ExecuteUpdateRequest(
                     taskId!!, ctaID!!,
@@ -1483,6 +1568,7 @@ class TaskDetailsFragment :
                 offside = 2
                 checkConditionsAndRequestAPI(null)
             }
+
             "TAG2" -> {
                 val request = ExecuteUpdateRequest(
                     taskId!!, ctaID!!,
@@ -1550,6 +1636,7 @@ class TaskDetailsFragment :
                     )
                 }
             }
+
             "UNIT_INFO" -> {
                 val request = ExecuteUpdateRequest(
                     taskId!!, ctaID!!,
@@ -1566,6 +1653,7 @@ class TaskDetailsFragment :
                     )
                 }
             }
+
             "withoutDialog" -> {
                 val request = ExecuteUpdateRequest(
                     taskId!!, ctaID!!,
@@ -1589,6 +1677,7 @@ class TaskDetailsFragment :
 
                 }
             }
+
             "payment" -> {
 
                 val request = ExecuteUpdateRequest(
@@ -1604,6 +1693,7 @@ class TaskDetailsFragment :
                 mNewTaskViewModel.getPaymentUrl(httpManager, paymentRequest)
                 ctaActivate = false
             }
+
             "dynaForm" -> {
                 val request = ExecuteUpdateRequest(
                     taskId!!, ctaID!!,
@@ -1625,6 +1715,7 @@ class TaskDetailsFragment :
                     }
                 }
             }
+
             "TAG_INVENTORY" -> {
                 val request = ExecuteUpdateRequest(
                     taskId!!, ctaID!!,
@@ -1743,7 +1834,11 @@ class TaskDetailsFragment :
 
                 if (callToActions!!.targetInfo != null && callToActions!!.targetInfo!!.target == TRAGETINFO.CREATE_TASK) {
 
-                    checkCtaActivation(callToActions!!.enableOtp!!, callToActions!!, "CREATE_TASK")
+                    checkCtaActivation(
+                        callToActions!!.enableOtp!!,
+                        callToActions!!,
+                        "CREATE_TASK"
+                    )
 
                 } else {
                     perFormCtaAction()
@@ -1817,7 +1912,10 @@ class TaskDetailsFragment :
                             val locationType =
                                 conditionItem.properties!![AppConstants.LOCATION_TYPE]
                             if (locationType != null) {
-                                if (locationType.equals(AppConstants.START, ignoreCase = true) &&
+                                if (locationType.equals(
+                                        AppConstants.START,
+                                        ignoreCase = true
+                                    ) &&
                                     task!!.source != null
                                 ) {
                                     geoCoordinates = task!!.source!!.location
@@ -2108,13 +2206,17 @@ class TaskDetailsFragment :
                     Log.e(TAG, "checkConditionsAndRequestAPI: $conditionItem")
                     if (AppConstants.GEOFENCE == conditionItem.type) {
                         var geoCoordinates: GeoCoordinates? = GeoCoordinates()
-                        val locationType = conditionItem.properties!![AppConstants.LOCATION_TYPE]
+                        val locationType =
+                            conditionItem.properties!![AppConstants.LOCATION_TYPE]
                         if (locationType != null) {
                             if (locationType.equals(AppConstants.START, ignoreCase = true) &&
                                 task!!.source != null
                             ) {
                                 geoCoordinates = task!!.source!!.location
-                            } else if (locationType.equals(AppConstants.END, ignoreCase = true) &&
+                            } else if (locationType.equals(
+                                    AppConstants.END,
+                                    ignoreCase = true
+                                ) &&
                                 task!!.destination != null
                             ) {
                                 geoCoordinates = task!!.destination!!.location
@@ -2150,7 +2252,11 @@ class TaskDetailsFragment :
                         }
                         //reaches here if user is inside the current location.
                         conditionItem.isPassed = true
-                    } else if (AppConstants.TIMED.equals(conditionItem.type, ignoreCase = true)) {
+                    } else if (AppConstants.TIMED.equals(
+                            conditionItem.type,
+                            ignoreCase = true
+                        )
+                    ) {
                         conditionItem.isPassed = false
                         if (conditionItem.properties != null && conditionItem.properties!!.containsKey(
                                 AppConstants.TIME
@@ -2189,7 +2295,7 @@ class TaskDetailsFragment :
     ) {
         hideLoading()
         if (CommonUtils.handleResponse(apiCallback, error, result, baseActivity)) {
-            getTaskData()
+            getTaskData(false)
             Log.e("execute response", "${result.toString()}")
         }
     }
@@ -2260,7 +2366,7 @@ class TaskDetailsFragment :
                         )
                         //  Log.d("AppConstants.Extra.EXTRA_CATEGORY_ID", data!!.getStringExtra(Extra.EXTRA_CATEGORY_ID))
                         //  Log.d("AppConstants.Extra.EXTRA_TASK_ID", data.getStringExtra(Extra.EXTRA_TASK_ID))
-                        getTaskData()
+                        getTaskData(false)
                     }
                 }
     }
@@ -2271,7 +2377,11 @@ class TaskDetailsFragment :
 //        }
         if (callToActions!!.dynamicFormId != null && !callToActions!!.dynamicFormId!!.isEmpty()) {
             var mode =
-                checkCtaActivation(callToActions!!.enableOtp!!, callToActions!!, "withoutDialog")
+                checkCtaActivation(
+                    callToActions!!.enableOtp!!,
+                    callToActions!!,
+                    "withoutDialog"
+                )
 
         } else {
             try {
@@ -2285,8 +2395,6 @@ class TaskDetailsFragment :
 
     override fun openForm(dataModel: StageHistoryData) {
         if (dataModel.dfdId != null) {
-
-
             startActivityForResult(
                 DynamicFormActivity.Companion.newIntent(baseActivity)
                     .putExtra(Extra.EXTRA_FORM_TYPE, dataModel.stage!!.name)

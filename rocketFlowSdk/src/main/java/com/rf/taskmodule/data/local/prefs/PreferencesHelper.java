@@ -20,36 +20,11 @@ import com.rf.taskmodule.data.model.response.config.OverstoppingConfig;
 import com.rf.taskmodule.data.model.response.config.ProfileInfo;
 import com.rf.taskmodule.data.model.response.config.ProjectCategories;
 import com.rf.taskmodule.data.model.response.config.RoleConfigData;
+import com.rf.taskmodule.data.model.response.config.Service;
+import com.rf.taskmodule.data.model.response.config.Subscription;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
 import com.rf.taskmodule.ui.addplace.Hub;
-import com.rf.taskmodule.ui.selectorder.CatalogProduct;
-import com.rf.taskmodule.utils.ApiType;
-import com.rf.taskmodule.utils.ShiftTime;
-import com.rf.taskmodule.utils.UserType;
-
-import com.rf.taskmodule.data.model.AlarmInfo;
-import com.rf.taskmodule.data.model.DataObject;
-import com.rf.taskmodule.data.model.request.SaveFilterData;
-import com.rf.taskmodule.data.model.response.config.Api;
-import com.rf.taskmodule.data.model.response.config.ChannelConfig;
-import com.rf.taskmodule.data.model.response.config.EmergencyContact;
-import com.rf.taskmodule.data.model.response.config.Flavour;
-import com.rf.taskmodule.data.model.response.config.FormData;
-import com.rf.taskmodule.data.model.response.config.GeoCoordinates;
-import com.rf.taskmodule.data.model.response.config.GeoFenceData;
-import com.rf.taskmodule.data.model.response.config.IdleTrackingInfo;
-import com.rf.taskmodule.data.model.response.config.OverstoppingConfig;
-import com.rf.taskmodule.data.model.response.config.ProfileInfo;
-import com.rf.taskmodule.data.model.response.config.ProjectCategories;
-import com.rf.taskmodule.data.model.response.config.RoleConfigData;
-import com.rf.taskmodule.data.model.response.config.Task;
-import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
-//import com.rf.taskmodule.ui.addplace.Hub;
-//import com.rf.taskmodule.ui.login.UserAccount;
-//import com.rf.taskmodule.ui.selectorder.CatalogProduct;
-import com.rf.taskmodule.ui.addplace.Hub;
-//import com.rf.taskmodule.ui.selectorder.CatalogProduct;
 import com.rf.taskmodule.ui.selectorder.CatalogProduct;
 import com.rf.taskmodule.utils.ApiType;
 import com.rf.taskmodule.utils.ShiftTime;
@@ -66,6 +41,13 @@ import java.util.Map;
  */
 
 public interface PreferencesHelper {
+
+    void setSubscriptionEnabled(Boolean subscription);
+    Boolean getSubscriptionEnabled();
+
+    void setSubscriptionPack(Subscription subscription);
+
+    Subscription getSubscriptionPack();
 
     void setSDKClientID(String clientId);
     String getSDKClientID();
@@ -450,6 +432,10 @@ public interface PreferencesHelper {
 
     HashMap<String,HashMap<String, CatalogProduct>> getProductInCartWRC();
 
+    void saveProductInCart2(Map<String,Map<String, CatalogProduct>> map);
+
+    HashMap<String,HashMap<String, CatalogProduct>> getProductInCart2();
+
     void saveConfigVersion(String configVersion);
 
     String getConfigVersion();
@@ -466,4 +452,11 @@ public interface PreferencesHelper {
 
     ArrayList<ProjectCategories> getProjectCategoriesDataList();
 
+    void saveServices(List<Service> services);
+
+    List<Service> getServices();
+
+    void saveTheme(int currentTheme);
+
+    int getCurrentTheme();
 }

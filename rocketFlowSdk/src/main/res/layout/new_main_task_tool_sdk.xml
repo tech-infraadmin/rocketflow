@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:id="@+id/ll_topbar"
-        android:background="@color/toggleOff"
+        android:background="?attr/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -91,6 +91,22 @@
                         android:paddingRight="@dimen/dimen_10"
                         app:srcCompat="@drawable/ic_down_triangle" />
                 </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/llqrcode"
+                android:gravity="end">
+
+                <ImageView
+                    android:id="@+id/ivAvailable"
+                    android:layout_width="wrap_content"
+                    android:padding="@dimen/dimen_10"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/fab_add" />
             </LinearLayout>
 
             <LinearLayout

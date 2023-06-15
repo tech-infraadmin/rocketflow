@@ -108,12 +108,12 @@
                     android:layout_centerInParent="true"
                     android:layout_marginBottom="@dimen/dimen_10"
                     android:text="@string/add_product"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/text_size_12"
-                    android:visibility="@{data.addInOrder?View.GONE:View.VISIBLE}" />
+                    android:visibility="@{data.addInOrder ? View.GONE:View.VISIBLE}" />
 
                 <LinearLayout
-                    android:visibility="@{data.addInOrder?View.VISIBLE:View.GONE}"
+                    android:visibility="@{data.addInOrder ? View.VISIBLE:View.GONE}"
                     android:id="@+id/llcounter"
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
@@ -131,7 +131,18 @@
                         android:layout_height="@dimen/dimen_30"
                         android:background="?attr/selectableItemBackground"
                         android:gravity="center"
+                        android:visibility="@{data.enableDimension == false? View.VISIBLE : View.GONE}"
                         app:srcCompat="@drawable/ic_minus_square" />
+
+                    <ImageView
+                        android:id="@+id/ivView"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="@dimen/dimen_30"
+                        android:background="?attr/selectableItemBackground"
+                        android:gravity="center"
+                        android:visibility="@{data.enableDimension == true? View.VISIBLE : View.GONE}"
+                        app:srcCompat="@drawable/ic_calender" />
 
                     <TextView
                         android:id="@+id/tvProductCounter"

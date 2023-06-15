@@ -367,8 +367,13 @@ public class HttpManager {
         String token = app_key + cert;
         if (preferencesHelper.getAccessId() != null) {
             //accessId = AppConstants.Extra.ACCESS_ID;
-            accessId = preferencesHelper.getAccessId();
-//            accessId = "9H131AkAXg";
+
+            if (BuildConfig.BUILD_TYPE == "releaseBiz" || BuildConfig.BUILD_TYPE == "uatBiz") {
+                accessId = "9H131AkAXg";
+            } else {
+                accessId = preferencesHelper.getAccessId();
+            }
+
             token = token + accessId + t;
         }
         if (preferencesHelper.getLoginToken() != null) {
@@ -409,9 +414,16 @@ public class HttpManager {
         String deviceId = preferencesHelper.getDeviceId();
         deviceId = deviceId==null?"asdfgthjy":deviceId;
         String fcmToken = preferencesHelper.getFcmToken();
-        String accessId = preferencesHelper.getAccessId();
+        String accessId;
         //String accessId = "2YwC80gKsM";
 //        String accessId = "9H131AkAXg";
+
+        if (BuildConfig.BUILD_TYPE == "releaseBiz" || BuildConfig.BUILD_TYPE == "uatBiz") {
+            accessId = "9H131AkAXg";
+        } else {
+            accessId = preferencesHelper.getAccessId();
+        }
+
 
         boolean firstInstall = preferencesHelper.isFirstTimeInstallFlag();
         int s;
@@ -505,7 +517,6 @@ public class HttpManager {
 
                 WorkManager workManager = WorkManager.getInstance();
                 workManager.enqueue(myWorkRequest);
-//                CommonUtils.errorString=response.body().string();
             }
 
 

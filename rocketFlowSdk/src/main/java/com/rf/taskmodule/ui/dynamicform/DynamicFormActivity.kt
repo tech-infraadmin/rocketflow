@@ -585,25 +585,22 @@ class DynamicFormActivity : BaseSdkActivity<ActivityDynamicFormSdkBinding, Dynam
         override fun handleMessage(message: Message) {
             when (message.what) {
                 2 -> {
-                    var obj = message.obj as HandlerObject
+                    val obj = message.obj as HandlerObject
                     fileUploadCounter += obj.chunkSize
-                    var progressUploadText = "${fileUploadCounter}/${obj.totalSize}"
-                    var percentage = ((fileUploadCounter * 100 / obj.totalSize))
-                    Log.e(TAG, "progressUploadText=> " + progressUploadText)
-                    Log.e(TAG, "percentage=> " + percentage.toString())
+                    val progressUploadText = "${fileUploadCounter}/${obj.totalSize}"
+                    val percentage = ((fileUploadCounter * 100 / obj.totalSize))
+                    Log.e(TAG, "progressUploadText=> $progressUploadText")
+                    Log.e(TAG, "percentage=> $percentage")
                     runOnUiThread {
-                        progressBar!!.progress = percentage
+                        progressBar?.progress = percentage
                         percentageText!!.text = "$percentage %"
                         currentStatusText!!.text = progressUploadText
-
                     }
-
-
                 }
                 /*For Success */0 -> {
                 if (CommonUtils.stringListHashMap.isNotEmpty()) {
                     runOnUiThread {
-                        rlProgress!!.visibility=View.GONE
+                        rlProgress?.visibility=View.GONE
                         rlSubmittingData!!.visibility=View.VISIBLE
 
                     }

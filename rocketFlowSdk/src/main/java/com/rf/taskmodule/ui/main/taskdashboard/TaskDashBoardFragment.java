@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -70,6 +71,7 @@ import com.rf.taskmodule.data.model.response.config.ProjectCategories;
 import com.rf.taskmodule.data.model.response.config.ServiceDescr;
 import com.rf.taskmodule.data.model.response.config.StatusCoordinates;
 import com.rf.taskmodule.data.model.response.config.StatusLocation;
+import com.rf.taskmodule.data.model.response.config.Subscription;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.model.response.config.TaskListing;
 import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
@@ -78,6 +80,7 @@ import com.rf.taskmodule.data.network.ApiCallback;
 import com.rf.taskmodule.data.network.HttpManager;
 import com.rf.taskmodule.databinding.DashboardBinding;
 import com.rf.taskmodule.ui.addplace.Hub;
+import com.rf.taskmodule.ui.availabilitycalender.AvailabilityCalenderActivity;
 import com.rf.taskmodule.ui.base.BaseSdkFragment;
 import com.rf.taskmodule.ui.dynamicform.DynamicFormActivity;
 import com.rf.taskmodule.ui.main.DashBoardStageCountAdapter;
@@ -93,6 +96,7 @@ import com.rf.taskmodule.ui.tasklisting.TaskActivity;
 import com.rf.taskmodule.ui.tasklisting.TaskItemClickListener;
 import com.rf.taskmodule.ui.tasklisting.TaskListingAdapter;
 import com.rf.taskmodule.ui.tasklisting.ihaveassigned.TabDataClass;
+import com.rf.taskmodule.ui.webview.WebViewActivity;
 import com.rf.taskmodule.utils.ApiType;
 import com.rf.taskmodule.utils.AppConstants;
 import com.rf.taskmodule.utils.BuddyInfo;
@@ -134,6 +138,7 @@ import java.util.Objects;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
+import static com.rf.taskmodule.utils.AppConstants.REQUEST_QR_SCAN;
 
 public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, TaskDashBoardViewModel> implements TaskDashBoardNavigator, View.OnClickListener, DashBoardStageCountAdapter.DashBoardListener, TaskItemClickListener {
     private static final String TAG = "TaskDashBoardFragment";
@@ -159,7 +164,11 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
     private boolean userGeoReq;
     private long fromDate;
     private long toDate;
+
+    private String expiredSubscriptionMessage = "";
+    private String btnText = "Subscribe";
     private ImageView ivScanQrCode;
+    private ImageView ivAvailable;
     private ImageView ivFilter;
     private ImageView ivNavigationIcon;
     private Date today;
@@ -295,6 +304,7 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
         mMainViewModel.setNavigator(this);
         taskStageDashBoardBinding = getViewDataBinding();
 
+
         setUp();
 
         populateCategorySpinner();
@@ -303,21 +313,20 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
         setToggle(switchToggle);
 
 
-
         toggleCount = 2;
-
+        TypedValue typedValue = new TypedValue();
+        getActivity().getTheme().resolveAttribute(R.color.blue, typedValue, true);
+        int color = typedValue.data;
         Log.d("officeOnline", preferencesHelper.officeOnline() + "");
-
         Log.e("toggleFeature", "check" + preferencesHelper.toggleFeature());
-
         if (!preferencesHelper.toggleFeature() || preferencesHelper.toggleFeature() == null) {
             switchToggle.setVisibility(View.GONE);
-            setTopColor(R.color.colorPrimary);
+            //setTopColor(color);
         } else {
             switchToggle.setVisibility(View.VISIBLE);
             switchToggle.setOn(preferencesHelper.officeOnline());
             if (preferencesHelper.officeOnline()) {
-                setTopColor(R.color.colorPrimary);
+                //setTopColor(color);
             } else {
                 setTopColor(R.color.toggleOff);
             }
@@ -328,8 +337,39 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
         } else {
             mockSetup();
         }
-    }
 
+        Boolean subscriptionEnabled = preferencesHelper.getSubscriptionEnabled();
+
+
+        if (subscriptionEnabled) {
+            Subscription subscription = preferencesHelper.getSubscriptionPack();
+
+            switch (Objects.requireNonNull(subscription.getType())) {
+                case TRIAL:
+                    Log.e("Subscription", "trial1");
+                    if (Boolean.TRUE.equals(subscription.getTrialExpired())) {
+                        Log.e("Subscription", "trial2");
+                        expiredSubscriptionMessage = getString(R.string.trial_expired);
+                        btnText = getString(R.string.subscribe);
+                        showDialogSubscription(subscription.getPayUrl(), subscription.getTitle(), subscription.getMessage());
+
+                    }
+                    break;
+
+
+                case BUSINESS:
+                    Log.e("Subscription", "subs1");
+                    if (Boolean.TRUE.equals(subscription.getSubscriptionExpired())) {
+                        Log.e("Subscription", "subs2");
+                        expiredSubscriptionMessage = getString(R.string.subscription_expired);
+                        btnText = getString(R.string.renew);
+                        showDialogSubscription(subscription.getPayUrl(), subscription.getTitle(), subscription.getMessage());
+                    }
+                    break;
+            }
+        }
+
+    }
 
 
     private void setToggle(LabeledSwitch switchToggle) {
@@ -346,6 +386,51 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
                 toggleCount = 0;
             }
         });
+    }
+
+    private void showDialogSubscription(String payurl, String etitle, String emessage) {
+        final Dialog dialog = new Dialog(requireContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.layout_subscription_blocker);
+
+        TextView message = dialog.findViewById(R.id.tv_sub_message);
+        TextView title = (TextView) dialog.findViewById(R.id.tv_subs_title);
+        Button payBtn = dialog.findViewById(R.id.btn_sub_pay);
+
+        message.setText(expiredSubscriptionMessage);
+        if (emessage != null) {
+            message.setText(emessage);
+        }
+        if (etitle != null) {
+            title.setText(etitle.toString());
+        }
+
+
+        payBtn.setText(btnText);
+        Log.e("subscription", "payUrl => " + payurl);
+        if (payurl != null && !payurl.isEmpty()) {
+            Log.e("subscription", "if block");
+            payBtn.setVisibility(View.VISIBLE);
+            payBtn.setOnClickListener(view -> {
+
+                Intent intent = new Intent(requireContext(), WebViewActivity.class);
+                intent.putExtra("payUrl", payurl);
+                startActivity(intent);
+            });
+
+        } else {
+            payBtn.setVisibility(View.INVISIBLE);
+        }
+
+        if (!dialog.isShowing())
+            dialog.show();
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setGravity(Gravity.CENTER);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+
+
     }
 
     private void getCurrentLocation(Boolean forceUpdate, Boolean onMode, String time) {
@@ -426,7 +511,7 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.setStatusBarColor(ContextCompat.getColor(requireActivity(), colorId));
-        }
+        }else
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.getDecorView().getWindowInsetsController().setSystemBarsAppearance(0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
         } else {
@@ -437,8 +522,6 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
         }
-
-
         LinearLayout topBar = taskStageDashBoardBinding.toolLayoutDashboard.findViewById(R.id.ll_topbar);
         topBar.setBackgroundColor(getResources().getColor(colorId));
     }
@@ -454,6 +537,7 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
         taskCategorySpinner = toolLayOut.findViewById(R.id.spinnerTaskCategory);
         cardSpinner = toolLayOut.findViewById(R.id.cardSpinner);
         ivScanQrCode = toolLayOut.findViewById(R.id.ivScanQrCode);
+        ivAvailable = toolLayOut.findViewById(R.id.ivAvailable);
         ivFilter = toolLayOut.findViewById(R.id.ivFilter);
 
         ivCreateTask = getView().findViewById(R.id.ivCreateTask);
@@ -474,6 +558,7 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
         ivNavigationIcon = toolLayOut.findViewById(R.id.ivNavigationIcon);
         ivNavigationIcon.setOnClickListener(this);
         ivScanQrCode.setOnClickListener(this);
+        ivAvailable.setOnClickListener(this);
         ivFilter.setOnClickListener(this);
 
 
@@ -804,19 +889,17 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
         if (showMerchantTab) {
             LOADBY = "ASSIGNED_TO_MERCHANT";
         }
-        // Log.d("hitDashboardApi","hitDashboardApi 3");
-        // hitDashboardApi();
     }
 
     boolean added = false;
 
     private void changeTab(String categoryId, boolean geoReq) {
+        taskStageDashBoardBinding.shimmerViewContainer.setVisibility(View.VISIBLE);
         boolean called = false;
         if (tabLayout.getTabCount() > 0) {
             tabLayout.removeAllTabs();
         }
         List<WorkFlowCategories> listCategory = preferencesHelper.getWorkFlowCategoriesList();
-
         if (categoryId != null) {
             WorkFlowCategories workFlowCategories = new WorkFlowCategories();
             workFlowCategories.setCategoryId(categoryId);
@@ -825,7 +908,6 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
                 int position = listCategory.indexOf(workFlowCategories);
                 if (position != -1) {
                     WorkFlowCategories myCatData = listCategory.get(position);
-                    // userGeoReq=myCatData.getAllowGeography();
                     if (myCatData.getAllowGeography()) ivFilter.setVisibility(View.VISIBLE);
                     else {
                         ivFilter.setVisibility(View.GONE);
@@ -847,7 +929,6 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
                     }
                 }
             }
-
         }
         Map<String, ChannelConfig> channelConfigMap = preferencesHelper.getWorkFlowCategoriesListChannel();
         if (categoryId != null && channelConfigMap != null && channelConfigMap.containsKey(categoryId)) {
@@ -855,7 +936,7 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
             if (channelConfig != null && channelConfig.getChannelSetting() != null) {
                 channelSetting = channelConfig.getChannelSetting();
                 if (showMerchantTab) {
-                    Log.d("ASSIGNED","showMerchantTab");
+                    Log.d("ASSIGNED", "showMerchantTab");
                     String merchantTabLabel = "Request BY Merchant";
                     if (channelSetting.getMerchantTaskLabel() != null && !channelSetting.getMerchantTaskLabel().isEmpty())
                         merchantTabLabel = channelSetting.getMerchantTaskLabel();
@@ -865,9 +946,8 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
                     tabLayout.getTabAt(0).select();
                 }
                 if (channelSetting.getAllowCreation() != null && channelSetting.getAllowCreation()
-                        && channelSetting.getTaskExecution() != null && channelSetting.getTaskExecution())
-                {
-                    Log.d("ASSIGNED","one");
+                        && channelSetting.getTaskExecution() != null && channelSetting.getTaskExecution()) {
+                    Log.d("ASSIGNED", "one");
                     if (channelSetting.getExecutionTitle() != null && !channelSetting.getExecutionTitle().isEmpty()) {
                         String ASSIGNED_TO_ME = channelSetting.getExecutionTitle();
                         if (channelSetting.getExeLocation() != null && channelSetting.getExeLocation()) {
@@ -899,11 +979,9 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
 //                        LOADBY = "ASSIGNED_TO_ME";
 //                    }
                     tabLayout.getTabAt(0).select();
-                }
-                else if (channelSetting.getTaskExecution() != null && channelSetting.getTaskExecution()
-                        && (channelSetting.getAllowCreation() == null || !channelSetting.getAllowCreation()))
-                {
-                    Log.d("ASSIGNED","two");
+                } else if (channelSetting.getTaskExecution() != null && channelSetting.getTaskExecution()
+                        && (channelSetting.getAllowCreation() == null || !channelSetting.getAllowCreation())) {
+                    Log.d("ASSIGNED", "two");
                     //String ASSIGNED_TO_ME = "Assigned to Me";
                     if (channelSetting.getExecutionTitle() != null && !channelSetting.getExecutionTitle().isEmpty()) {
                         String ASSIGNED_TO_ME = channelSetting.getExecutionTitle();
@@ -927,11 +1005,9 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
 //                        }
                         tabLayout.getTabAt(0).select();
                     }
-                }
-                else if (channelSetting.getAllowCreation() != null && channelSetting.getAllowCreation()
-                        && (channelSetting.getTaskExecution() == null || !channelSetting.getTaskExecution()))
-                {
-                    Log.d("ASSIGNED","three");
+                } else if (channelSetting.getAllowCreation() != null && channelSetting.getAllowCreation()
+                        && (channelSetting.getTaskExecution() == null || !channelSetting.getTaskExecution())) {
+                    Log.d("ASSIGNED", "three");
                     //String ASSIGNED_BY_ME = "I have Assigned";
                     if (channelSetting.getCreationTitle() != null && !channelSetting.getCreationTitle().isEmpty()) {
                         String ASSIGNED_BY_ME = channelSetting.getCreationTitle();
@@ -943,12 +1019,16 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
                         } else {
                             ivCreateTask.setVisibility(View.GONE);
                         }
-                        // LOADBY = "ASSIGNED_BY_ME";
+
+                        if (showMerchantTab) {
+                            LOADBY = "ASSIGNED_TO_MERCHANT";
+                        } else {
+                            LOADBY = "ASSIGNED_BY_ME";
+                        }
+
                         tabLayout.getTabAt(0).select();
                     }
-                }
-                else
-                {
+                } else {
                     ivCreateTask.setVisibility(View.GONE);
                 }
             }
@@ -958,6 +1038,8 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
             } else {
                 if (!called) {
                     Log.d("performLocationSpinnerTask", "performLocationSpinnerTask 1");
+                    mAssignedtoMeAdapter.setAssignedToTask(LOADBY.equals("ASSIGNED_TO_ME"));
+                    mAssignedtoMeAdapter.setCategoryId(categoryId);
                     performLocationSpinnerTask();
                     called = true;
                 }
@@ -969,7 +1051,9 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
 
         if (!added) {
             if (!called) {
-                Log.d("performLocationSpinnerTask","performLocationSpinnerTask 4");
+                Log.d("performLocationSpinnerTask", "performLocationSpinnerTask 4");
+                mAssignedtoMeAdapter.setAssignedToTask(LOADBY.equals("ASSIGNED_TO_ME"));
+                mAssignedtoMeAdapter.setCategoryId(categoryId);
                 performLocationSpinnerTask();
             }
             tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -978,7 +1062,9 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
                     added = true;
                     currentPage = 1;
                     LOADBY = tab.getTag().toString();
-                    Log.d("performLocationSpinnerTask","performLocationSpinnerTask 2");
+                    mAssignedtoMeAdapter.setAssignedToTask(LOADBY.equals("ASSIGNED_TO_ME"));
+                    mAssignedtoMeAdapter.setCategoryId(categoryId);
+                    Log.d("performLocationSpinnerTask", "performLocationSpinnerTask 2");
                     performLocationSpinnerTask();
                     CommonUtils.showLogMessage("e", "LOADBY", "=>" + LOADBY);
                 }
@@ -1430,6 +1516,7 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
     public void handleResponse(@NotNull ApiCallback callback, @Nullable Object result, @Nullable APIError error) {
         hideLoading();
         isLoading = false;
+        taskStageDashBoardBinding.shimmerViewContainer.setVisibility(View.GONE);
         if (CommonUtils.handleResponse(callback, error, result, getActivity())) {
             taskStageDashBoardBinding.cardViewTabNew.setVisibility(View.VISIBLE);
             if (null != getActivity()) {
@@ -1523,7 +1610,7 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
             if (mAssignedtoMeAdapter.getList().get(0).getCurrentStage().getTerminal() == true) {
                 taskStageDashBoardBinding.newTaskCard.setVisibility(View.GONE);
             } else {
-                taskStageDashBoardBinding.newTaskCard.setVisibility(View.VISIBLE);
+                taskStageDashBoardBinding.newTaskCard.setVisibility(View.GONE);
             }
         } else {
             taskStageDashBoardBinding.cardViewTabNew.setVisibility(View.GONE);
@@ -1537,6 +1624,10 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
         int id = v.getId();
         if (id == R.id.ivScanQrCode) {
             getCameraPermission();
+        }
+        if (id == R.id.ivAvailable) {
+            //Availability calender
+            startActivity(new Intent(getActivity(), AvailabilityCalenderActivity.class));
         } else if (id == R.id.ivFilter) {
             Intent intentFilter = TaskFilterActivity.Companion.newIntent(getActivity());
             if (regionId != null) intentFilter.putExtra("regionId", regionId);
@@ -1647,6 +1738,36 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
                 Log.d("hitDashboardApi", "hitDashboardApi 9");
                 hitDashboardApi();
             }
+            case REQUEST_QR_SCAN: {
+                if (resultCode == RESULT_OK) {
+                    if (data != null && data.getBooleanExtra("QRLogin", false)) {
+                        Dialog dialog = new Dialog(getActivity());
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog.getWindow().setBackgroundDrawable(
+                                new ColorDrawable(
+                                        Color.TRANSPARENT
+                                )
+                        );
+                        dialog.setContentView(R.layout.dialog_login_success);
+                        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                        lp.copyFrom(dialog.getWindow().getAttributes());
+                        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                        lp.dimAmount = 0.8f;
+                        Window window = dialog.getWindow();
+                        window.setLayout(
+                                WindowManager.LayoutParams.MATCH_PARENT,
+                                WindowManager.LayoutParams.WRAP_CONTENT
+                        );
+                        window.setGravity(Gravity.CENTER);
+                        Button dialogButton = dialog.findViewById(R.id.button2);
+                        dialogButton.setOnClickListener(
+                                view -> dialog.dismiss()
+                        );
+                        dialog.show();
+                    }
+                }
+            }
             case AppConstants.REQUEST_CODE_FILTER_USER: {
                 if (resultCode == RESULT_OK) {
                     userGeoReq = true;
@@ -1704,7 +1825,7 @@ public class TaskDashBoardFragment extends BaseSdkFragment<DashboardBinding, Tas
     private void openScanActivity() {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("Scan", Context.MODE_PRIVATE);
         sharedPreferences.edit().putString("Scan", "Task").apply();
-        startActivity(ScanQrAndBarCodeActivity.Companion.newIntent(getActivity()));
+        startActivityForResult(ScanQrAndBarCodeActivity.Companion.newIntent(getActivity()), REQUEST_QR_SCAN);
     }
 
     @Override

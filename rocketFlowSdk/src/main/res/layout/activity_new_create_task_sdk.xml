@@ -26,6 +26,7 @@
             app:elevation="@dimen/dimen_0">
 
             <androidx.appcompat.widget.Toolbar
+            android:background="?attr/colorAccent"
                 android:id="@+id/toolbar"
                 style="@style/Toolbar"
                 app:contentInsetLeft="0dp"
@@ -56,7 +57,8 @@
                     android:layout_marginTop="@dimen/dimen_10"
                     android:layout_marginBottom="@dimen/dimen_10"
                     android:animateLayoutChanges="true"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    tools:ignore="UselessParent">
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cardViewCategoryId"
@@ -146,7 +148,7 @@
                                     android:id="@+id/et_user"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:drawableLeft="@drawable/ic_search"
+                                    android:drawableStart="@drawable/ic_search"
                                     android:drawablePadding="@dimen/dimen_5"
                                     android:fontFamily="@font/campton_book"
                                     android:hint="@string/search"
@@ -163,7 +165,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical|right"
-                                    android:layout_marginRight="@dimen/dimen_10"
+                                    android:layout_marginEnd="@dimen/dimen_10"
                                     android:visibility="gone" />
                             </FrameLayout>
 
@@ -188,10 +190,10 @@
                         android:id="@+id/cv_scanner"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/dimen_15"
                         android:layout_marginTop="@dimen/dimen_10"
                         android:elevation="@dimen/dimen_8"
                         android:visibility="visible"
-                        android:layout_marginHorizontal="@dimen/dimen_15"
                         app:cardBackgroundColor="@color/white"
                         app:cardUseCompatPadding="true"
                         app:contentPadding="@dimen/dimen_8">
@@ -204,10 +206,10 @@
                             <TextView
                                 android:id="@+id/tv_Scanner"
                                 style="@style/TextViewStyle"
-                                android:paddingStart="@dimen/dimen_10"
                                 android:focusable="false"
                                 android:focusableInTouchMode="true"
                                 android:fontFamily="@font/campton_semi_bold"
+                                android:paddingStart="@dimen/dimen_10"
                                 android:text="Reference Task ID"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/text_size_16" />
@@ -215,73 +217,85 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:weightSum="2"
                                 android:gravity="center_vertical"
-                                android:orientation="horizontal">
+                                android:orientation="horizontal"
+                                android:weightSum="2">
 
                                 <AutoCompleteTextView
-                                    android:layout_gravity="center_vertical"
                                     android:id="@+id/et_scanner"
                                     style="@style/EditTextStyle"
                                     android:layout_width="0dp"
-                                    android:paddingVertical="@dimen/dimen_5"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
                                     android:layout_marginHorizontal="@dimen/dimen_10"
                                     android:layout_weight="1.7"
+                                    android:paddingVertical="@dimen/dimen_5"
                                     android:paddingStart="@dimen/dimen_10"
                                     tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
                                 <ImageView
-                                    android:layout_marginTop="@dimen/dimen_5"
-                                    android:layout_gravity="center_vertical"
                                     android:id="@+id/iv_searchRef"
-                                    android:layout_weight="0.3"
-                                    android:src="@drawable/qr_code"
                                     android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginTop="@dimen/dimen_5"
+                                    android:layout_weight="0.3"
+                                    android:src="@drawable/qr_code" />
 
                             </LinearLayout>
 
-
-                            <RelativeLayout
-                                android:id="@+id/rl_reference"
-                                android:visibility="gone"
-                                android:paddingVertical="@dimen/dimen_5"
-                                android:paddingHorizontal="@dimen/dimen_10"
-                                android:background="@drawable/custom_edit_border_bg"
-                                android:layout_marginTop="@dimen/dimen_10"
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rvReferences"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/dimen_10"
+                                android:background="@color/bg_recycler_view"
+                                android:clipToPadding="false"
+                                android:orientation="vertical"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-                                <TextView
-                                    android:layout_alignParentTop="true"
-                                    android:layout_alignParentStart="true"
-                                    android:id="@+id/tv_client_task_id"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    tools:text="ID: 12"
-                                    style="@style/TextViewStyleBold"/>
-
-                                <TextView
-                                    android:layout_alignParentStart="true"
-                                    android:layout_below="@+id/tv_client_task_id"
-                                    android:id="@+id/tv_reference_created_by"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    tools:text="Created By: Test User"
-                                    style="@style/TextViewStyleBold"/>
-
-                                <ImageView
-                                    android:id="@+id/iv_reference_task"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:src="@drawable/ic_arrow_right_orrange"
-                                    android:layout_alignParentEnd="true"
-                                    android:layout_centerVertical="true"/>
-
-                            </RelativeLayout>
                         </LinearLayout>
 
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cv_services"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/dimen_15"
+                        android:layout_marginTop="@dimen/dimen_10"
+                        android:layout_marginRight="@dimen/dimen_15"
+                        android:visibility="gone"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardUseCompatPadding="true"
+                        app:contentPadding="@dimen/dimen_8">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="visible">
+
+                            <TextView
+                                android:id="@+id/tv_services"
+                                style="@style/TextViewStyle"
+                                android:drawablePadding="@dimen/dimen_8"
+                                android:focusable="false"
+                                android:focusableInTouchMode="true"
+                                android:fontFamily="@font/campton_semi_bold"
+                                android:text="Select Services"
+                                android:textColor="@color/black"
+                                android:textSize="@dimen/text_size_16" />
+
+                            <EditText
+                                android:id="@+id/et_services"
+                                style="@style/EditTextStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="55dp"
+                                android:layout_marginTop="@dimen/dimen_5"
+                                android:focusable="false"
+                                android:padding="@dimen/dimen_2" />
+                        </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
                     <FrameLayout
@@ -293,6 +307,7 @@
                         android:visibility="gone" />
 
                     <LinearLayout
+                        android:id="@+id/ll_allowed_fields"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -332,10 +347,9 @@
                                 <EditText
                                     android:id="@+id/edTaskId"
                                     style="@style/EditTextStyle"
-                                    android:textColor="@color/black"
-                                    android:inputType="text"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    />
+                                    android:inputType="text"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -371,10 +385,10 @@
 
                                 <EditText
                                     android:id="@+id/edTaskName"
-                                    android:textColor="@color/black"
                                     style="@style/EditTextStyle"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:inputType="textCapWords" />
+                                    android:inputType="textCapWords"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -411,9 +425,9 @@
                                 <EditText
                                     android:id="@+id/edReference"
                                     style="@style/EditTextStyle"
-                                    android:textColor="@color/black"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:inputType="textCapCharacters" />
+                                    android:inputType="textCapCharacters"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -609,7 +623,6 @@
                                 </androidx.cardview.widget.CardView>
 
 
-
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -645,12 +658,12 @@
                                 <EditText
                                     android:id="@+id/edStartDateTime"
                                     style="@style/EditTextStyle"
-                                    android:focusable="false"
-                                    android:textColor="@color/black"
                                     android:layout_marginTop="@dimen/dimen_5"
+                                    android:focusable="false"
                                     android:focusableInTouchMode="false"
                                     android:inputType="datetime"
-                                    android:onClick="@{(view)->viewModel.selectDateTime(view)}" />
+                                    android:onClick="@{(view)->viewModel.selectDateTime(view)}"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -686,12 +699,12 @@
                                 <EditText
                                     android:id="@+id/edEndDateTime"
                                     style="@style/EditTextStyle"
-                                    android:focusable="false"
-                                    android:textColor="@color/black"
                                     android:layout_marginTop="@dimen/dimen_5"
+                                    android:focusable="false"
                                     android:focusableInTouchMode="false"
                                     android:inputType="datetime"
-                                    android:onClick="@{(view)->viewModel.selectDateTime(view)}" />
+                                    android:onClick="@{(view)->viewModel.selectDateTime(view)}"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -728,13 +741,13 @@
                                     android:id="@+id/edStartLocation"
                                     style="@style/EditTextStyle"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:textColor="@color/black"
                                     android:drawableRight="@drawable/ic_pin_google_big"
                                     android:drawablePadding="@dimen/dimen_8"
                                     android:focusable="false"
                                     android:focusableInTouchMode="false"
                                     android:inputType="text"
-                                    android:onClick="@{(view)->viewModel.selectLocation(view)}" />
+                                    android:onClick="@{(view)->viewModel.selectLocation(view, 23487)}"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -770,14 +783,14 @@
                                 <EditText
                                     android:id="@+id/edEndLocation"
                                     style="@style/EditTextStyle"
-                                    android:textColor="@color/black"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:drawableRight="@drawable/ic_pin_google_big"
                                     android:drawablePadding="@dimen/dimen_8"
                                     android:focusable="false"
                                     android:focusableInTouchMode="false"
                                     android:inputType="text"
-                                    android:layout_marginTop="@dimen/dimen_5"
-                                    android:onClick="@{(view)->viewModel.selectLocation(view)}" />
+                                    android:onClick="@{(view)->viewModel.selectLocation(view,23487)}"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -842,7 +855,6 @@
                                 </androidx.cardview.widget.CardView>
 
 
-
                                 <TextView
                                     android:id="@+id/tvLabelSelectStartState"
                                     style="@style/TextViewStyle"
@@ -872,7 +884,6 @@
                                         android:spinnerMode="dropdown" />
 
                                 </androidx.cardview.widget.CardView>
-
 
 
                                 <TextView
@@ -936,7 +947,6 @@
                                 </androidx.cardview.widget.CardView>
 
 
-
                                 <LinearLayout
                                     android:id="@+id/llToggleEnableStartLoc"
                                     android:layout_width="match_parent"
@@ -959,9 +969,9 @@
                                         android:id="@+id/enableStartLocation"
                                         android:layout_width="@dimen/labeled_default_width"
                                         android:layout_height="@dimen/labeled_default_height"
-                                        app:colorBorder="@color/toggle_bg"
                                         android:scaleX="0.6"
                                         android:scaleY="0.6"
+                                        app:colorBorder="@color/toggle_bg"
                                         app:colorDisabled="@color/colorAccent"
                                         app:colorOff="@color/toggle_bg"
                                         app:colorOn="@color/white"
@@ -994,8 +1004,8 @@
                                 <EditText
                                     android:id="@+id/edEnterManualStartLocation"
                                     style="@style/EditTextStyle"
-                                    android:drawablePadding="@dimen/dimen_8"
                                     android:layout_marginTop="@dimen/dimen_5"
+                                    android:drawablePadding="@dimen/dimen_8"
                                     android:textColor="@color/black"
                                     android:visibility="visible" />
 
@@ -1007,7 +1017,7 @@
                                     android:focusable="false"
                                     android:focusableInTouchMode="false"
                                     android:inputType="text"
-                                    android:onClick="@{(view)->viewModel.selectLocation(view)}"
+                                    android:onClick="@{(view)->viewModel.selectLocation(view,23487)}"
                                     android:textColor="@color/black"
                                     android:visibility="gone" />
                             </LinearLayout>
@@ -1074,7 +1084,6 @@
                                 </androidx.cardview.widget.CardView>
 
 
-
                                 <TextView
                                     android:id="@+id/tvLabelSelectEndState"
                                     style="@style/TextViewStyle"
@@ -1104,7 +1113,6 @@
                                         android:spinnerMode="dropdown" />
 
                                 </androidx.cardview.widget.CardView>
-
 
 
                                 <TextView
@@ -1138,7 +1146,6 @@
                                 </androidx.cardview.widget.CardView>
 
 
-
                                 <TextView
                                     android:id="@+id/tvLabelSelectEndHubs"
                                     style="@style/TextViewStyle"
@@ -1170,7 +1177,6 @@
                                 </androidx.cardview.widget.CardView>
 
 
-
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
@@ -1191,9 +1197,9 @@
                                         android:id="@+id/enableEndLocation"
                                         android:layout_width="@dimen/labeled_default_width"
                                         android:layout_height="@dimen/labeled_default_height"
-                                        app:colorBorder="@color/toggle_bg"
                                         android:scaleX="0.6"
                                         android:scaleY="0.6"
+                                        app:colorBorder="@color/toggle_bg"
                                         app:colorDisabled="@color/colorAccent"
                                         app:colorOff="@color/toggle_bg"
                                         app:colorOn="@color/white"
@@ -1226,21 +1232,21 @@
                                 <EditText
                                     android:id="@+id/edEnterManualEndLocation"
                                     style="@style/EditTextStyle"
-                                    android:textColor="@color/black"
                                     android:layout_marginTop="@dimen/dimen_5"
+                                    android:textColor="@color/black"
                                     android:visibility="visible" />
 
                                 <EditText
                                     android:id="@+id/edEnterEndLocation"
                                     style="@style/EditTextStyle"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:drawableRight="@drawable/ic_pin_google_big"
                                     android:drawablePadding="@dimen/dimen_8"
                                     android:focusable="false"
-                                    android:textColor="@color/black"
                                     android:focusableInTouchMode="false"
-                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:inputType="text"
-                                    android:onClick="@{(view)->viewModel.selectLocation(view)}"
+                                    android:onClick="@{(view)->viewModel.selectLocation(view,23487)}"
+                                    android:textColor="@color/black"
                                     android:visibility="gone" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
@@ -1279,9 +1285,9 @@
                                     android:id="@+id/lLayoutOptional"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:animateLayoutChanges="true"
                                     android:focusable="true"
-                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:focusableInTouchMode="true"
                                     android:orientation="vertical"
                                     android:visibility="visible">
@@ -1291,8 +1297,8 @@
                                         style="@style/EditTextStyle"
                                         android:layout_marginTop="@dimen/dimen_4"
                                         android:hint="@string/contact_person_name"
-                                        android:textColor="@color/black"
                                         android:inputType="textCapWords"
+                                        android:textColor="@color/black"
 
                                         tools:text="@string/app_name" />
 
@@ -1300,11 +1306,11 @@
                                         android:id="@+id/edMobileNumber"
                                         style="@style/EditTextStyle"
                                         android:layout_marginTop="@dimen/dimen_4"
-                                        android:textColor="@color/black"
                                         android:drawableRight="@drawable/ic_phone_usage_yellow"
                                         android:hint="@string/mobile_number"
                                         android:inputType="number"
                                         android:maxLength="10"
+                                        android:textColor="@color/black"
                                         tools:text="9974734983" />
 
                                 </LinearLayout>
@@ -1343,13 +1349,210 @@
                                     style="@style/EditTextStyle"
                                     android:background="@drawable/custom_edit_border_bg"
                                     android:gravity="start"
-                                    android:textColor="@color/black"
                                     android:hint="@string/type_a_message"
                                     android:inputType="textMultiLine"
                                     android:lines="4"
                                     android:minLines="4"
                                     android:padding="@dimen/dimen_5"
-                                    android:singleLine="false" />
+                                    android:singleLine="false"
+                                    android:textColor="@color/black" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cv_near_by_hub"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/dimen_10"
+                            android:layout_marginBottom="@dimen/dimen_0"
+                            android:elevation="@dimen/dimen_8"
+                            android:padding="@dimen/dimen_10"
+                            android:visibility="gone"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardUseCompatPadding="true"
+                            app:contentPadding="@dimen/dimen_4">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="@dimen/dimen_10">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:visibility="gone">
+
+                                    <TextView
+                                        android:id="@+id/label_near_by_hub_location"
+                                        style="@style/TextViewStyle"
+                                        android:layout_width="wrap_content"
+                                        android:fontFamily="@font/campton_semi_bold"
+                                        android:paddingStart="@dimen/dimen_5"
+                                        android:paddingTop="@dimen/dimen_5"
+                                        android:paddingEnd="@dimen/dimen_10"
+                                        android:paddingBottom="@dimen/dimen_5"
+                                        android:text="@string/location"
+                                        android:textColor="@color/black"
+                                        android:textSize="@dimen/text_size_14" />
+
+                                    <EditText
+                                        android:id="@+id/et_near_by_hub_location"
+                                        style="@style/EditTextStyle"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:autofillHints="hello"
+                                        android:clickable="true"
+                                        android:focusable="false"
+                                        android:inputType="none"
+                                        android:textColor="@color/black"
+                                        tools:ignore="Deprecated,KeyboardInaccessibleWidget,SpeakableTextPresentCheck" />
+
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/label_near_by_hub"
+                                    style="@style/TextViewStyle"
+                                    android:layout_width="match_parent"
+                                    android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingStart="@dimen/dimen_5"
+                                    android:paddingEnd="@dimen/dimen_10"
+                                    android:paddingBottom="@dimen/dimen_5"
+                                    android:text="@string/select_hub"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/custom_spinner_border_bg"
+                                    android:orientation="horizontal"
+                                    android:weightSum="2">
+
+                                    <Spinner
+                                        android:id="@+id/sp_near_by_hub"
+                                        android:layout_width="0dp"
+                                        android:layout_height="@dimen/dimen_50"
+                                        android:layout_weight="1.7"
+                                        android:dropDownSelector="@drawable/down_filled_triangular_arrow"
+                                        android:spinnerMode="dropdown"
+                                        android:textColor="@color/black" />
+
+                                    <ImageView
+                                        android:id="@+id/iv_near_by_hub"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="@dimen/dimen_30"
+                                        android:layout_gravity="center_vertical"
+                                        android:layout_weight="0.3"
+                                        android:src="@drawable/ic_pin_google_big" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cv_logged_in_hub"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/dimen_10"
+                            android:layout_marginBottom="@dimen/dimen_0"
+                            android:elevation="@dimen/dimen_8"
+                            android:padding="@dimen/dimen_10"
+                            android:visibility="gone"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardUseCompatPadding="true"
+                            app:contentPadding="@dimen/dimen_4">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="@dimen/dimen_10">
+
+                                <TextView
+                                    android:id="@+id/label_logged_in_hub"
+                                    style="@style/TextViewStyle"
+                                    android:layout_width="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_10"
+                                    android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingLeft="@dimen/dimen_5"
+                                    android:paddingTop="@dimen/dimen_5"
+                                    android:paddingEnd="@dimen/dimen_10"
+                                    android:paddingBottom="@dimen/dimen_5"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14"
+                                    tools:text="Logged User In Hub" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="@dimen/dimen_50"
+                                    android:background="@drawable/custom_spinner_border_bg"
+                                    android:orientation="horizontal">
+
+                                    <Spinner
+                                        android:id="@+id/sp_logged_in_hub"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="@dimen/dimen_50"
+                                        android:dropDownSelector="@drawable/down_filled_triangular_arrow"
+                                        android:spinnerMode="dropdown"
+                                        android:textColor="@color/black" />
+
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cv_all_hub"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/dimen_10"
+                            android:layout_marginBottom="@dimen/dimen_0"
+                            android:elevation="@dimen/dimen_8"
+                            android:padding="@dimen/dimen_10"
+                            android:visibility="gone"
+                            app:cardBackgroundColor="@color/white"
+                            app:cardUseCompatPadding="true"
+                            app:contentPadding="@dimen/dimen_4">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="@dimen/dimen_10">
+
+                                <TextView
+                                    android:id="@+id/label_all_hub"
+                                    style="@style/TextViewStyle"
+                                    android:layout_width="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_10"
+                                    android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingLeft="@dimen/dimen_5"
+                                    android:paddingTop="@dimen/dimen_5"
+                                    android:paddingEnd="@dimen/dimen_10"
+                                    android:paddingBottom="@dimen/dimen_5"
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14"
+                                    tools:text="Logged User In Hub" />
+
+                                <androidx.appcompat.widget.LinearLayoutCompat
+                                    android:layout_width="match_parent"
+                                    android:layout_height="@dimen/dimen_50"
+                                    android:background="@drawable/custom_spinner_border_bg"
+                                    android:orientation="horizontal">
+
+                                    <Spinner
+                                        android:id="@+id/sp_all_hub"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="@dimen/dimen_50"
+                                        android:dropDownSelector="@drawable/down_filled_triangular_arrow"
+                                        android:spinnerMode="dropdown"
+                                        android:textColor="@color/black" />
+
+                                </androidx.appcompat.widget.LinearLayoutCompat>
+
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -1361,29 +1564,29 @@
                             android:layout_marginBottom="@dimen/dimen_0"
                             android:elevation="@dimen/dimen_8"
                             android:padding="@dimen/dimen_10"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardUseCompatPadding="true"
                             app:contentPadding="@dimen/dimen_4">
 
                             <LinearLayout
-                                android:padding="@dimen/dimen_10"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
-                                >
+                                android:padding="@dimen/dimen_10">
 
                                 <TextView
-                                    style="@style/TextViewStyle"
                                     android:id="@+id/label"
-                                    android:fontFamily="@font/campton_semi_bold"
-                                    android:textColor="@color/black"
-                                    android:textSize="@dimen/text_size_14"
+                                    style="@style/TextViewStyle"
                                     android:layout_width="match_parent"
+                                    android:fontFamily="@font/campton_semi_bold"
                                     android:paddingLeft="@dimen/dimen_5"
-                                    android:paddingBottom="@dimen/dimen_5"
                                     android:paddingTop="@dimen/dimen_5"
+                                    android:paddingEnd="@dimen/dimen_10"
+                                    android:paddingBottom="@dimen/dimen_5"
                                     android:text="@string/preferred_visit_date_time"
-                                    android:paddingEnd="@dimen/dimen_10" />
+                                    android:textColor="@color/black"
+                                    android:textSize="@dimen/text_size_14" />
 
                                 <EditText
                                     android:id="@+id/et_visit_time"
@@ -1435,18 +1638,19 @@
                                     android:id="@+id/etfield1text"
                                     style="@style/EditTextStyle"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:textColor="@color/black"
-                                    android:inputType="textCapWords" />
+                                    android:inputType="textCapWords"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field1spinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dimen_10"
-                            android:visibility="gone"
                             android:layout_marginBottom="@dimen/dimen_0"
                             android:elevation="@dimen/dimen_8"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardUseCompatPadding="true"
                             app:contentPadding="@dimen/dimen_4">
@@ -1461,13 +1665,13 @@
                                 <TextView
                                     android:id="@+id/tvfield1spinner"
                                     style="@style/TextViewStyle"
-                                    android:paddingLeft="@dimen/dimen_5"
-                                    android:paddingBottom="@dimen/dimen_10"
-                                    android:paddingTop="@dimen/dimen_5"
                                     android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingLeft="@dimen/dimen_5"
+                                    android:paddingTop="@dimen/dimen_5"
+                                    android:paddingBottom="@dimen/dimen_10"
+                                    android:text="field one"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_16"
-                                    android:text="field one"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     tools:text="field one" />
@@ -1500,6 +1704,7 @@
                                 </RelativeLayout>
                             </androidx.constraintlayout.widget.ConstraintLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field1number"
                             android:layout_width="match_parent"
@@ -1532,9 +1737,9 @@
                                     android:id="@+id/llfield1number"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:animateLayoutChanges="true"
                                     android:focusable="true"
-                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:focusableInTouchMode="true"
                                     android:orientation="vertical"
                                     android:visibility="visible">
@@ -1543,13 +1748,14 @@
                                         android:id="@+id/etfield1number"
                                         style="@style/EditTextStyle"
                                         android:layout_marginTop="@dimen/dimen_4"
-                                        android:textColor="@color/black"
+                                        android:inputType="number"
                                         android:maxLength="10"
-                                        android:inputType="number"/>
+                                        android:textColor="@color/black" />
 
                                 </LinearLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field1radio"
                             android:layout_width="match_parent"
@@ -1631,20 +1837,21 @@
 
                                 <EditText
                                     android:id="@+id/etfield2text"
-                                    android:textColor="@color/black"
                                     style="@style/EditTextStyle"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:inputType="textCapWords" />
+                                    android:inputType="textCapWords"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field2spinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dimen_10"
-                            android:visibility="gone"
                             android:layout_marginBottom="@dimen/dimen_0"
                             android:elevation="@dimen/dimen_8"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardUseCompatPadding="true"
                             app:contentPadding="@dimen/dimen_4">
@@ -1659,13 +1866,13 @@
                                 <TextView
                                     android:id="@+id/tvfield2spinner"
                                     style="@style/TextViewStyle"
-                                    android:paddingLeft="@dimen/dimen_5"
-                                    android:paddingBottom="@dimen/dimen_10"
-                                    android:paddingTop="@dimen/dimen_5"
                                     android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingLeft="@dimen/dimen_5"
+                                    android:paddingTop="@dimen/dimen_5"
+                                    android:paddingBottom="@dimen/dimen_10"
+                                    android:text="field one"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_16"
-                                    android:text="field one"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     tools:text="field one" />
@@ -1698,6 +1905,7 @@
                                 </RelativeLayout>
                             </androidx.constraintlayout.widget.ConstraintLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field2number"
                             android:layout_width="match_parent"
@@ -1730,9 +1938,9 @@
                                     android:id="@+id/llfield2number"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:animateLayoutChanges="true"
                                     android:focusable="true"
-                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:focusableInTouchMode="true"
                                     android:orientation="vertical"
                                     android:visibility="visible">
@@ -1740,14 +1948,15 @@
                                     <EditText
                                         android:id="@+id/etfield2number"
                                         style="@style/EditTextStyle"
-                                        android:maxLength="10"
-                                        android:textColor="@color/black"
                                         android:layout_marginTop="@dimen/dimen_4"
-                                        android:inputType="number"/>
+                                        android:inputType="number"
+                                        android:maxLength="10"
+                                        android:textColor="@color/black" />
 
                                 </LinearLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field2radio"
                             android:layout_width="match_parent"
@@ -1830,19 +2039,20 @@
                                 <EditText
                                     android:id="@+id/etfield3text"
                                     style="@style/EditTextStyle"
-                                    android:textColor="@color/black"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:inputType="textCapWords" />
+                                    android:inputType="textCapWords"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field3spinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dimen_10"
-                            android:visibility="gone"
                             android:layout_marginBottom="@dimen/dimen_0"
                             android:elevation="@dimen/dimen_8"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardUseCompatPadding="true"
                             app:contentPadding="@dimen/dimen_4">
@@ -1857,13 +2067,13 @@
                                 <TextView
                                     android:id="@+id/tvfield3spinner"
                                     style="@style/TextViewStyle"
-                                    android:paddingLeft="@dimen/dimen_5"
-                                    android:paddingBottom="@dimen/dimen_10"
-                                    android:paddingTop="@dimen/dimen_5"
                                     android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingLeft="@dimen/dimen_5"
+                                    android:paddingTop="@dimen/dimen_5"
+                                    android:paddingBottom="@dimen/dimen_10"
+                                    android:text="field one"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_16"
-                                    android:text="field one"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     tools:text="field one" />
@@ -1896,6 +2106,7 @@
                                 </RelativeLayout>
                             </androidx.constraintlayout.widget.ConstraintLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field3number"
                             android:layout_width="match_parent"
@@ -1928,9 +2139,9 @@
                                     android:id="@+id/llfield3number"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:animateLayoutChanges="true"
                                     android:focusable="true"
-                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:focusableInTouchMode="true"
                                     android:orientation="vertical"
                                     android:visibility="visible">
@@ -1938,14 +2149,15 @@
                                     <EditText
                                         android:id="@+id/etfield3number"
                                         style="@style/EditTextStyle"
-                                        android:textColor="@color/black"
-                                        android:maxLength="10"
                                         android:layout_marginTop="@dimen/dimen_4"
-                                        android:inputType="number"/>
+                                        android:inputType="number"
+                                        android:maxLength="10"
+                                        android:textColor="@color/black" />
 
                                 </LinearLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field3radio"
                             android:layout_width="match_parent"
@@ -2027,20 +2239,21 @@
 
                                 <EditText
                                     android:id="@+id/etfield4text"
-                                    android:textColor="@color/black"
                                     style="@style/EditTextStyle"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:inputType="textCapWords"/>
+                                    android:inputType="textCapWords"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field4spinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dimen_10"
-                            android:visibility="gone"
                             android:layout_marginBottom="@dimen/dimen_0"
                             android:elevation="@dimen/dimen_8"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardUseCompatPadding="true"
                             app:contentPadding="@dimen/dimen_4">
@@ -2055,13 +2268,13 @@
                                 <TextView
                                     android:id="@+id/tvfield4spinner"
                                     style="@style/TextViewStyle"
-                                    android:paddingLeft="@dimen/dimen_5"
-                                    android:paddingBottom="@dimen/dimen_10"
-                                    android:paddingTop="@dimen/dimen_5"
                                     android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingLeft="@dimen/dimen_5"
+                                    android:paddingTop="@dimen/dimen_5"
+                                    android:paddingBottom="@dimen/dimen_10"
+                                    android:text="field one"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_16"
-                                    android:text="field one"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     tools:text="field one" />
@@ -2094,6 +2307,7 @@
                                 </RelativeLayout>
                             </androidx.constraintlayout.widget.ConstraintLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field4number"
                             android:layout_width="match_parent"
@@ -2126,9 +2340,9 @@
                                     android:id="@+id/llfield4number"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:animateLayoutChanges="true"
                                     android:focusable="true"
-                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:focusableInTouchMode="true"
                                     android:orientation="vertical"
                                     android:visibility="visible">
@@ -2136,14 +2350,15 @@
                                     <EditText
                                         android:id="@+id/etfield4number"
                                         style="@style/EditTextStyle"
-                                        android:textColor="@color/black"
-                                        android:maxLength="10"
                                         android:layout_marginTop="@dimen/dimen_4"
-                                        android:inputType="number"/>
+                                        android:inputType="number"
+                                        android:maxLength="10"
+                                        android:textColor="@color/black" />
 
                                 </LinearLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field4radio"
                             android:layout_width="match_parent"
@@ -2226,19 +2441,20 @@
                                 <EditText
                                     android:id="@+id/etfield5text"
                                     style="@style/EditTextStyle"
-                                    android:textColor="@color/black"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:inputType="textCapWords" />
+                                    android:inputType="textCapWords"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field5spinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dimen_10"
-                            android:visibility="gone"
                             android:layout_marginBottom="@dimen/dimen_0"
                             android:elevation="@dimen/dimen_8"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardUseCompatPadding="true"
                             app:contentPadding="@dimen/dimen_4">
@@ -2253,13 +2469,13 @@
                                 <TextView
                                     android:id="@+id/tvfield5spinner"
                                     style="@style/TextViewStyle"
-                                    android:paddingLeft="@dimen/dimen_5"
-                                    android:paddingBottom="@dimen/dimen_10"
-                                    android:paddingTop="@dimen/dimen_5"
                                     android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingLeft="@dimen/dimen_5"
+                                    android:paddingTop="@dimen/dimen_5"
+                                    android:paddingBottom="@dimen/dimen_10"
+                                    android:text="field one"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_16"
-                                    android:text="field one"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     tools:text="field one" />
@@ -2292,6 +2508,7 @@
                                 </RelativeLayout>
                             </androidx.constraintlayout.widget.ConstraintLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field5number"
                             android:layout_width="match_parent"
@@ -2324,9 +2541,9 @@
                                     android:id="@+id/llfield5number"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:animateLayoutChanges="true"
                                     android:focusable="true"
-                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:focusableInTouchMode="true"
                                     android:orientation="vertical"
                                     android:visibility="visible">
@@ -2334,14 +2551,15 @@
                                     <EditText
                                         android:id="@+id/etfield5number"
                                         style="@style/EditTextStyle"
-                                        android:textColor="@color/black"
-                                        android:maxLength="10"
                                         android:layout_marginTop="@dimen/dimen_4"
-                                        android:inputType="number"/>
+                                        android:inputType="number"
+                                        android:maxLength="10"
+                                        android:textColor="@color/black" />
 
                                 </LinearLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field5radio"
                             android:layout_width="match_parent"
@@ -2424,19 +2642,20 @@
                                 <EditText
                                     android:id="@+id/etfield6text"
                                     style="@style/EditTextStyle"
-                                    android:textColor="@color/black"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:inputType="textCapWords" />
+                                    android:inputType="textCapWords"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field6spinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dimen_10"
-                            android:visibility="gone"
                             android:layout_marginBottom="@dimen/dimen_0"
                             android:elevation="@dimen/dimen_8"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardUseCompatPadding="true"
                             app:contentPadding="@dimen/dimen_4">
@@ -2451,13 +2670,13 @@
                                 <TextView
                                     android:id="@+id/tvfield6spinner"
                                     style="@style/TextViewStyle"
-                                    android:paddingLeft="@dimen/dimen_5"
-                                    android:paddingBottom="@dimen/dimen_10"
-                                    android:paddingTop="@dimen/dimen_5"
                                     android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingLeft="@dimen/dimen_5"
+                                    android:paddingTop="@dimen/dimen_5"
+                                    android:paddingBottom="@dimen/dimen_10"
+                                    android:text="field one"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_16"
-                                    android:text="field one"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     tools:text="field one" />
@@ -2490,6 +2709,7 @@
                                 </RelativeLayout>
                             </androidx.constraintlayout.widget.ConstraintLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field6number"
                             android:layout_width="match_parent"
@@ -2522,9 +2742,9 @@
                                     android:id="@+id/llfield6number"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:animateLayoutChanges="true"
                                     android:focusable="true"
-                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:focusableInTouchMode="true"
                                     android:orientation="vertical"
                                     android:visibility="visible">
@@ -2532,14 +2752,15 @@
                                     <EditText
                                         android:id="@+id/etfield6number"
                                         style="@style/EditTextStyle"
-                                        android:textColor="@color/black"
                                         android:layout_marginTop="@dimen/dimen_4"
+                                        android:inputType="number"
                                         android:maxLength="10"
-                                        android:inputType="number"/>
+                                        android:textColor="@color/black" />
 
                                 </LinearLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field6radio"
                             android:layout_width="match_parent"
@@ -2621,20 +2842,21 @@
 
                                 <EditText
                                     android:id="@+id/etfield7text"
-                                    android:textColor="@color/black"
                                     style="@style/EditTextStyle"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:inputType="textCapWords" />
+                                    android:inputType="textCapWords"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field7spinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dimen_10"
-                            android:visibility="gone"
                             android:layout_marginBottom="@dimen/dimen_0"
                             android:elevation="@dimen/dimen_8"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardUseCompatPadding="true"
                             app:contentPadding="@dimen/dimen_4">
@@ -2649,13 +2871,13 @@
                                 <TextView
                                     android:id="@+id/tvfield7spinner"
                                     style="@style/TextViewStyle"
-                                    android:paddingLeft="@dimen/dimen_5"
-                                    android:paddingBottom="@dimen/dimen_10"
-                                    android:paddingTop="@dimen/dimen_5"
                                     android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingLeft="@dimen/dimen_5"
+                                    android:paddingTop="@dimen/dimen_5"
+                                    android:paddingBottom="@dimen/dimen_10"
+                                    android:text="field one"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_16"
-                                    android:text="field one"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     tools:text="field one" />
@@ -2688,6 +2910,7 @@
                                 </RelativeLayout>
                             </androidx.constraintlayout.widget.ConstraintLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field7number"
                             android:layout_width="match_parent"
@@ -2720,24 +2943,25 @@
                                     android:id="@+id/llfield7number"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:animateLayoutChanges="true"
                                     android:focusable="true"
-                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:focusableInTouchMode="true"
                                     android:orientation="vertical"
                                     android:visibility="visible">
 
                                     <EditText
                                         android:id="@+id/etfield7number"
-                                        android:maxLength="10"
-                                        android:textColor="@color/black"
                                         style="@style/EditTextStyle"
                                         android:layout_marginTop="@dimen/dimen_4"
-                                        android:inputType="number"/>
+                                        android:inputType="number"
+                                        android:maxLength="10"
+                                        android:textColor="@color/black" />
 
                                 </LinearLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field7radio"
                             android:layout_width="match_parent"
@@ -2820,19 +3044,20 @@
                                 <EditText
                                     android:id="@+id/etfield8text"
                                     style="@style/EditTextStyle"
-                                    android:textColor="@color/black"
                                     android:layout_marginTop="@dimen/dimen_5"
-                                    android:inputType="textCapWords" />
+                                    android:inputType="textCapWords"
+                                    android:textColor="@color/black" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field8spinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dimen_10"
-                            android:visibility="gone"
                             android:layout_marginBottom="@dimen/dimen_0"
                             android:elevation="@dimen/dimen_8"
+                            android:visibility="gone"
                             app:cardBackgroundColor="@color/white"
                             app:cardUseCompatPadding="true"
                             app:contentPadding="@dimen/dimen_4">
@@ -2847,13 +3072,13 @@
                                 <TextView
                                     android:id="@+id/tvfield8spinner"
                                     style="@style/TextViewStyle"
-                                    android:paddingLeft="@dimen/dimen_5"
-                                    android:paddingBottom="@dimen/dimen_10"
-                                    android:paddingTop="@dimen/dimen_5"
                                     android:fontFamily="@font/campton_semi_bold"
+                                    android:paddingLeft="@dimen/dimen_5"
+                                    android:paddingTop="@dimen/dimen_5"
+                                    android:paddingBottom="@dimen/dimen_10"
+                                    android:text="field one"
                                     android:textColor="@color/black"
                                     android:textSize="@dimen/text_size_16"
-                                    android:text="field one"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     tools:text="field one" />
@@ -2886,6 +3111,7 @@
                                 </RelativeLayout>
                             </androidx.constraintlayout.widget.ConstraintLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field8number"
                             android:layout_width="match_parent"
@@ -2918,24 +3144,25 @@
                                     android:id="@+id/llfield8number"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:animateLayoutChanges="true"
                                     android:focusable="true"
-                                    android:layout_marginTop="@dimen/dimen_5"
                                     android:focusableInTouchMode="true"
                                     android:orientation="vertical"
                                     android:visibility="visible">
 
                                     <EditText
                                         android:id="@+id/etfield8number"
-                                        android:maxLength="10"
-                                        android:textColor="@color/black"
                                         style="@style/EditTextStyle"
                                         android:layout_marginTop="@dimen/dimen_4"
-                                        android:inputType="number"/>
+                                        android:inputType="number"
+                                        android:maxLength="10"
+                                        android:textColor="@color/black" />
 
                                 </LinearLayout>
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:id="@+id/field8radio"
                             android:layout_width="match_parent"
@@ -2997,12 +3224,11 @@
 
                     <include
                         android:id="@+id/viewProgress"
-                        android:visibility="gone"
-                        layout="@layout/progress_dialog_with_percentage_sdk"/>
-
+                        layout="@layout/progress_dialog_with_percentage_sdk"
+                        android:visibility="gone" />
 
                     <Button
-                        android:id="@+id/btnCLick"
+                        android:id="@+id/btnCLickSubmit"
                         style="@style/EnableDisableButtonStyle"
                         android:layout_width="match_parent"
                         android:layout_marginLeft="@dimen/dimen_15"

@@ -22,11 +22,10 @@
         app:elevation="@dimen/dimen_0">
 
       <androidx.appcompat.widget.Toolbar
+            android:background="?attr/colorAccent"
           android:id="@+id/toolbar"
           style="@style/Toolbar"
-          android:background="@color/white"
           app:contentInsetStartWithNavigation="0dp"
-          app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
           app:titleTextColor="@color/white"
           tools:title="Order">
 
@@ -363,7 +362,7 @@
                 android:visibility="gone" />
 
             <include
-                android:id="@+id/viewProgress"
+                android:id="@+id/viewProgressNew"
                 android:visibility="gone"
                 layout="@layout/progress_dialog_with_percentage_sdk"/>
 

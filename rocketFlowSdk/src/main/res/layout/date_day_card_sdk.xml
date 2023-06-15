@@ -20,7 +20,6 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cv_day"
-            android:layout_marginEnd="@dimen/dimen_10"
             app:cardElevation="@dimen/dimen_2"
             app:cardUseCompatPadding="true"
             android:layout_width="@dimen/dimen_50"

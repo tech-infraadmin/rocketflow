@@ -24,12 +24,10 @@
             app:elevation="@dimen/dimen_0">
 
             <androidx.appcompat.widget.Toolbar
+            android:background="?attr/colorAccent"
                 android:id="@+id/toolbar"
                 style="@style/ToolbarBlack"
-                android:background="@color/colorPrimary"
-                android:theme="@style/MyThemeOverlay.ActionBar"
                 app:contentInsetStartWithNavigation="0dp"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:titleTextColor="@color/white"
                 tools:title="@string/add_fleet">
 

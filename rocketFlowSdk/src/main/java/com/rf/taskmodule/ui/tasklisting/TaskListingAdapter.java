@@ -6,11 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.rf.taskmodule.data.model.response.config.ActionConfig;
 import com.rf.taskmodule.data.model.response.config.Navigation;
+import com.rf.taskmodule.data.model.response.config.Service;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.ui.tasklisting.assignedtome.AssignedtoMeEmptyItemViewModel;
 import com.rf.taskmodule.utils.AppConstants;
@@ -27,7 +29,9 @@ import com.rf.taskmodule.ui.webview.WebViewActivity;
 import com.rf.taskmodule.utils.AppConstants;
 import com.rf.taskmodule.utils.Log;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -146,8 +150,32 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
         @Override
         public void onBind(int position) {
             final Task task = mResponseList.get(position);
-            AssignTaskViewModel itemViewModel = new AssignTaskViewModel(task,
-                    this, context, preferencesHelper, categoryId, assignedToTask);
+
+            if (task.getServiceIds()!=null) {
+                if (task.getServiceIds().size() > 0) {
+                    mBinding.llServices.setVisibility(View.VISIBLE);
+                    ArrayList<Service> services = new ArrayList<>(preferencesHelper.getServices());
+                    ArrayList<Service> finalServices = new ArrayList<>();
+                    for (int i = 0; i < task.getServiceIds().size(); i++) {
+                        for (int j = 0; j < services.size(); j++) {
+                            if (task.getServiceIds().get(i).equals(services.get(j).getId())) {
+                                finalServices.add(services.get(j));
+                            }
+                        }
+                    }
+
+                    RecyclerView.LayoutManager manager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+                    mBinding.recyclerViewServices.setLayoutManager(manager);
+                    TaskServicesListAdapter taskServicesListAdapter = new TaskServicesListAdapter(finalServices);
+                    mBinding.recyclerViewServices.setAdapter(taskServicesListAdapter);
+                }else {
+                    mBinding.llServices.setVisibility(View.GONE);
+                }
+            } else {
+                mBinding.llServices.setVisibility(View.GONE);
+            }
+
+            AssignTaskViewModel itemViewModel = new AssignTaskViewModel(task, this, context, preferencesHelper, categoryId, assignedToTask);
             mBinding.setViewModel(itemViewModel);
             if (task.getTrackingUrl() != null) {
                 mBinding.imageTracking.setVisibility(View.VISIBLE);

@@ -100,7 +100,13 @@ class TaskDetailActivity : BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDet
 
     override fun getBindingVariable() = BR.viewModel
     override fun getLayoutId() = R.layout.activity_task_detail_sdk
-    override fun getViewModel() = mTaskDetailViewModel
+    override fun getViewModel(): TaskDetailViewModel {
+        val factory = RocketFlyer.dataManager()?.let { TaskDetailViewModel.Factory(it) } // Factory
+        if (factory != null) {
+            mTaskDetailViewModel = ViewModelProvider(this, factory)[TaskDetailViewModel::class.java]
+        }
+        return mTaskDetailViewModel
+    }
 
     private lateinit var ivNavigationIcon: ImageView
     private lateinit var toolbarTitle: TextView
@@ -144,16 +150,9 @@ class TaskDetailActivity : BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDet
     var mStopHandler = false
 
     private var snackBar: Snackbar?=null
-    override fun networkAvailable() {
-        if (snackBar != null) snackBar!!.dismiss()
-    }
 
-    override fun networkUnavailable() {
-        snackBar = CommonUtils.showNetWorkConnectionIssue(mActivityTaskDetailSdkBinding.llMain, getString(R.string.please_check_your_internet_connection))
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         val factory = RocketFlyer.dataManager()?.let { TaskDetailViewModel.Factory(it) } // Factory
         if (factory != null) {
@@ -169,14 +168,8 @@ class TaskDetailActivity : BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDet
         setUp()
         buttonDetail = mActivityTaskDetailSdkBinding.bottomSheetTrip.buttonDetail
         buttonDetail.setOnClickListener {
-//            if (hashMap != null && hashMap!!.isNotEmpty()) {
-//                startActivity(FormPreviewActivity.newIntent(this@TaskDetailActivity)
-//                        .putExtra(AppConstants.Extra.EXTRA_FORM_DETAILS, hashMap))
-//            }
 
         }
-
-
 
         locationSynHandler = Handler()
         val runnable: Runnable = object : Runnable {
@@ -206,7 +199,6 @@ class TaskDetailActivity : BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDet
                 }
                 getTaskByApi()
             }
-
         }
 
         if (TrackThat.checkIfTripIdIsValid(taskId!!)) {
@@ -528,6 +520,7 @@ class TaskDetailActivity : BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDet
 //        this.mMap.setMinZoomPreference(20f)
         //mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(this))
         mMap.setOnMarkerClickListener(this)
+        Log.d("taskId",taskId)
         if (TrackThat.checkIfTripIdIsValid(taskId!!)) {
             if (TrackThat.getCurrentTrackingId() != null && taskId == TrackThat.getCurrentTrackingId())
                 getLiveEvent()
@@ -624,22 +617,25 @@ class TaskDetailActivity : BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDet
     private fun setTaskDetails() {
         //  try {
         val detail = taskResponse?.taskDetail
+        Log.d("assignedToDetails", detail?.assignedToDetails.toString())
         if (detail != null) {
-            if (detail!!.assigneeDetail != null && detail!!.assigneeDetail!!.profileImage != null) {
-                Glide.with(this).load(detail!!.assigneeDetail!!.profileImage).placeholder(R.drawable.ic_social_media).apply(RequestOptions().circleCrop()).error(R.drawable.ic_social_media)
+            if (detail.assigneeDetail != null && detail.assignedToDetails?.get(0)?.profileImage != null) {
+                Glide.with(this).load(detail.assignedToDetails?.get(0)?.profileImage).placeholder(R.drawable.ic_social_media).apply(RequestOptions().circleCrop()).error(R.drawable.ic_social_media)
+                    .into(ivVendor)
+            }else if (detail.assigneeDetail != null && detail.assigneeDetail!!.profileImage != null) {
+                Glide.with(this).load(detail.assigneeDetail!!.profileImage).placeholder(R.drawable.ic_social_media).apply(RequestOptions().circleCrop()).error(R.drawable.ic_social_media)
                         .into(ivVendor)
             }
-            if (detail!!.assigneeDetail != null && detail!!.assigneeDetail!!.name != null)
-                tvName.text = detail!!.assigneeDetail!!.name
-            if (detail!!.assigneeDetail != null && detail!!.assigneeDetail!!.name != null)
-                tvName.text = detail!!.assigneeDetail!!.name
-            if (detail!!.assigneeDetail != null && detail!!.assigneeDetail!!.mobile != null) {
-                tvMobile.text = detail!!.assigneeDetail!!.mobile
-                mobile = detail!!.assigneeDetail!!.mobile
+            if (detail.assigneeDetail != null && detail.assigneeDetail!!.name != null)
+                tvName.text = detail.assignedToDetails?.get(0)?.name ?: detail.assigneeDetail!!.name
+            if (detail.assigneeDetail != null && detail.assigneeDetail!!.name != null)
+                tvName.text = detail.assignedToDetails?.get(0)?.name ?: detail.assigneeDetail!!.name
+            if (detail.assigneeDetail != null && detail.assigneeDetail!!.mobile != null) {
+                tvMobile.text = detail.assignedToDetails?.get(0)?.mobile ?: detail.assigneeDetail!!.mobile
+                mobile = detail.assignedToDetails?.get(0)?.mobile ?: detail.assigneeDetail!!.mobile
             }
-            if (detail!!.assigneeDetail != null) {
+            if (detail.assigneeDetail != null) {
                 ratingBar.rating = 4.0f
-
             }
             if (preferencesHelper.userDetail != null &&preferencesHelper.userDetail!!.userId!=null&& detail!!.assigneeDetail!= null&&detail.assigneeDetail!!.buddyId!=null) {
                 if (preferencesHelper.userDetail!!.userId.equals(detail.assigneeDetail!!.buddyId)) {
@@ -1004,7 +1000,9 @@ class TaskDetailActivity : BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDet
                 isMarker = true
             }
             if (!distinationMarker) {
+
                 if (taskDetail != null && taskDetail!!.destination != null && taskDetail!!.destination!!.location != null) {
+
                     var loc = taskDetail!!.destination!!.location
                     val destLat = loc!!.latitude
                     val destLng = loc!!.longitude
@@ -1026,7 +1024,9 @@ class TaskDetailActivity : BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDet
             }
 
             //check if marker is added into the builder
+
             if (isMarker && !isCameraZoomEventDone) {
+
                 val padding = 250 //offset from edges of the map in pixels
                 val cu = CameraUpdateFactory.newLatLngBounds(builder.build(), padding)
                 mMap.animateCamera(cu)
@@ -1395,63 +1395,6 @@ class TaskDetailActivity : BaseSdkActivity<ActivityTaskDetailSdkBinding, TaskDet
 
         fun newIntent(context: Context) = Intent(context, TaskDetailActivity::class.java)
     }
-
-
-//    override fun onSocketResponse(eventName: Int, baseModel: BaseModel?) {
-//        runOnUiThread {
-//            Log.e(TAG, "onSocketResponse() called")
-//            Log.e(TAG, "eventName =>" + eventName)
-//            Log.e(TAG, "baseModel =>" + baseModel)
-//            hideLoading()
-//            when (eventName) {
-//                4 -> {
-//
-//                    val openCreateRoomModel = baseModel as OpenCreateRoomModel
-//                    val messageList = openCreateRoomModel.messages
-//                    var roomId = openCreateRoomModel.roomId
-//                    var roomName = openCreateRoomModel.roomName
-//
-//                    val list = ArrayList<String>()
-//                    list.add(buddyId!!)
-////                    startActivity(ChatActivity.newIntent(this@TaskDetailActivity)
-////                            .putExtra(AppConstants.Extra.EXTRA_SELECTED_BUDDY, list)
-////                            .putExtra(AppConstants.Extra.EXTRA_BUDDY_NAME, name)
-////                            .putExtra(AppConstants.Extra.EXTRA_IS_CREATE_ROOM, false)
-////                            .putExtra(AppConstants.Extra.EXTRA_ROOM_ID, roomId))
-//
-//
-//                }
-//                1 -> {
-//                    //connection hashMap
-//                    val connectionInfoList = ArrayList<ConnectionInfo>()
-//                    //buddy message hashMap
-//                    val buddyList = ArrayList<Buddy>()
-//                    val map = HashMap<String, String>()
-//                    val connectionResponse = baseModel as ConnectionResponse
-//                    // check room-ids if not null then get the hashMap from buddy hashMap and populate into the
-//                    for (key in connectionResponse.connections?.keys!!) {
-//                        val value = connectionResponse.connections!![key] as ConnectionInfo
-//                        if (value.roomId != null) {
-//                            map[value.connectionId!!] = value.roomId!!
-//                            connectionInfoList.add(value)
-//                            println("connectionsId: ${value.connectionId} roomId: ${value.roomId}")
-//                        }
-//                    }
-//                    var list = ArrayList<String>()
-//                    list.add(buddyId!!)
-//                    //webSocketManager?.openCreateRoom(list, null, true, 10)
-//
-//                }
-//            }
-//        }
-//    }
-
-//    override fun onOpen() {
-//    }
-//
-//    override fun closed() {
-//      //  webSocketManager = null
-//    }
 
     override fun alert(alertEvent: AlertEvent) {
         if (dialogAllAlert != null)

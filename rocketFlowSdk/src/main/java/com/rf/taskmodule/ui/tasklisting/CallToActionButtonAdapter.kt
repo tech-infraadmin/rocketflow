@@ -46,7 +46,7 @@ class CallToActionButtonAdapter (var context: Context, var mListener: TaskClickL
         return items.size
     }
 
-    inner class CtaButtonViewHolder(var ctaButtonBinding: ItemCtaButtonSdkBinding) :
+    inner class CtaButtonViewHolder(private var ctaButtonBinding: ItemCtaButtonSdkBinding) :
             RecyclerView.ViewHolder(ctaButtonBinding.root) {
 
         fun bind(dataModel: CallToActions) {
@@ -55,24 +55,16 @@ class CallToActionButtonAdapter (var context: Context, var mListener: TaskClickL
             ctaButtonBinding.executePendingBindings()
             if(dataModel.name.toString().toUpperCase().contains("CANCEL")||dataModel.name.toString().toUpperCase().contains("REJECT"))
             {
-               // ctaButtonBinding.ctaButton.background=ContextCompat.getDrawable(context,R.drawable.cancel_button)
                 ctaButtonBinding.ctaButton.setTextColor(ContextCompat.getColor(context,R.color.white))
             }else if(dataModel.primary){
                 ctaButtonBinding.ctaButton.background=ContextCompat.getDrawable(context,R.drawable.button_green_bg)
             }
-            val displayMetrics = DisplayMetrics()
-            (context as Activity).windowManager.getDefaultDisplay().getMetrics(displayMetrics)
-            val height = displayMetrics.heightPixels
-            var width = displayMetrics.widthPixels/2
-            width=width- CommonUtils.dpToPixel(context,25)
-            var buttonParams=ctaButtonBinding.ctaButton.layoutParams
-            ctaButtonBinding.ctaButton.setLayoutParams(LinearLayout.LayoutParams(width, buttonParams.height))
 
             ctaButtonBinding.ctaButton.tag=dataModel.id
             ctaButtonBinding.ctaButton.setOnClickListener {v->
 
                 // used to perform the action when view is clicked.
-                mListener.onExecuteUpdates(v.getTag() as String, task,dataModel.name)
+                mListener.onExecuteUpdates(v.getTag() as String, task, dataModel.name)
             }
 
         }

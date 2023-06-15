@@ -9,6 +9,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.rf.taskmodule.data.model.request.QrScanRequestLogin;
+import com.rf.taskmodule.ui.scanqrcode.QrCodeValueViewModel;
 import com.rf.taskmodule.utils.ApiType;
 import com.rf.taskmodule.utils.AppConstants;
 import com.rf.taskmodule.utils.JSONConverter;
@@ -176,6 +178,11 @@ public class NetworkManagerImpl implements NetworkManager {
     @Override
     public void timeSlotData(ApiCallback apiCallback, HttpManager httpManager, Api api) {
         getApiCall(apiCallback, httpManager, api);
+    }
+
+    @Override
+    public void getTasksListCalendar(ApiCallback apiCallback, HttpManager httpManager, Object data, Api api) {
+        postApiCall(apiCallback, httpManager, api, data);
     }
 
     @Override
@@ -583,6 +590,11 @@ public class NetworkManagerImpl implements NetworkManager {
     }
 
     @Override
+    public void getSystemHubs(ApiCallback apiCallback, HttpManager httpManager, Object data, Api api){
+        postApiCall(apiCallback, httpManager, api, data);
+    }
+
+    @Override
     public void getCart(ApiCallback apiCallback, HttpManager httpManager, Object data, Api api) {
         postApiCall(apiCallback, httpManager, api, data);
     }
@@ -803,6 +815,11 @@ public class NetworkManagerImpl implements NetworkManager {
     }
 
     @Override
+    public void getQrCodeLogin(ApiCallback apiCallback, @NonNull HttpManager httpManager, @NonNull Api api) {
+        getApiCall(apiCallback,httpManager,api);
+    }
+
+    @Override
     public void getEligibleUsers(ApiCallback apiCallback, EligibleUserRequest data, HttpManager httpManager, Api api){
         postApiCall(apiCallback, httpManager, api, data);
     }
@@ -883,7 +900,6 @@ public class NetworkManagerImpl implements NetworkManager {
                         switch (Objects.requireNonNull(api.getName())) {
                             case MY_PROFILE:
                             case INVITATIONS:
-//                                response = httpManager.getURL(api);
                                 response = handleApiCache(true);
                                 break;
                             case CONFIG:
@@ -925,6 +941,7 @@ public class NetworkManagerImpl implements NetworkManager {
                             case GET_DOCUMENT_BY_ID:
                             case TASK_PRODUCT_CATEGORIES:
                             case GET_WALLET_BALANCE:
+                            case LOGIN_USING_QR:
                             case SCANNER:
                                 if (NetworkUtils.isNetworkConnected(context))
                                     response = httpManager.getURL(api);
@@ -963,6 +980,7 @@ public class NetworkManagerImpl implements NetworkManager {
                             case BOOK_TIME_SLOT:
                             case SAVE_TASK_UNITS:
                             case CTA_SEND_OTP:
+                            case UNIT_INFO_LISTING:
                             case CTA_VERIFY_OTP:
                             case ASSIGNMENT_ELIGIBLE_USERS:
                             case INIT_TASK_PAYMENT:
@@ -1012,6 +1030,7 @@ public class NetworkManagerImpl implements NetworkManager {
                             case GET_CITIES:
                             case GET_HUBS:
                             case GET_USERS:
+                            case SYSTEM_HUBS:
                             case GET_STATES:
                             case GET_TASK_INVENTORIES:
                             case LINK_INVENTORY:
@@ -1046,6 +1065,7 @@ public class NetworkManagerImpl implements NetworkManager {
                             case DAILY_STOCK_HISTORY:
                             case STOCK_HISTORY_DETAIL:
                             case ENTITY_SCANNER:
+                            case TASK_BY_ENTITY:
                             case CREATE_DOCUMENT:
                                 if (NetworkUtils.isNetworkConnected(context))
                                     response = httpManager.postURL(gson.toJson(postData), api);
@@ -1181,7 +1201,6 @@ public class NetworkManagerImpl implements NetworkManager {
                 apiError = new APIError(APIError.ErrorType.NETWORK_FAIL);
             } catch (ParseException e) {
                 Log.e(TAG, "doInBackground: " + e);
-                apiError = new APIError(APIError.ErrorType.SERVER_DOWN);
             } catch (Exception e) {
                 Log.e(TAG, "doInBackground: " + e);
                 apiError = new APIError(APIError.ErrorType.UNKNOWN_ERROR);

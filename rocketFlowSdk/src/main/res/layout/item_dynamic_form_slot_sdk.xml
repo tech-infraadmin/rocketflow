@@ -32,9 +32,9 @@
                 tools:ignore="UnusedAttribute">
 
                 <LinearLayout
-                    android:layout_gravity="center_vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:orientation="vertical"
                     android:padding="@dimen/dimen_6">
 
@@ -51,8 +51,8 @@
                         style="@style/TextViewStyleBold"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="@dimen/text_size_18"
                         android:textAlignment="center"
+                        android:textSize="@dimen/text_size_18"
                         android:visibility="gone" />
 
                     <LinearLayout
@@ -127,7 +127,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="200dp"
                             android:layout_marginTop="@dimen/dimen_5"
-                            android:horizontalSpacing="@dimen/dimen_3"
                             android:scrollbars="none"
                             android:verticalSpacing="@dimen/dimen_2"
                             tools:itemCount="9"
@@ -144,11 +143,11 @@
                             android:id="@+id/btn_done"
                             style="@style/ButtonBlueStyle"
                             android:layout_width="wrap_content"
-                            android:textSize="@dimen/text_size_12"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
                             android:layout_marginTop="@dimen/dimen_20"
-                            android:text="@string/proceed" />
+                            android:text="@string/proceed"
+                            android:textSize="@dimen/text_size_12" />
 
                     </LinearLayout>
 

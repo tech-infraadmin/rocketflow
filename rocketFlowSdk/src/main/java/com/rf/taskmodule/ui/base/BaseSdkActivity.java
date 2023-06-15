@@ -43,6 +43,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.rf.taskmodule.data.local.prefs.AppPreferencesHelper;
+import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
 import com.rf.taskmodule.data.network.ApiCallback;
 import com.rf.taskmodule.ui.buddylisting.BuddyListingActivity;
 import com.rf.taskmodule.ui.dynamicform.DynamicFormActivity;
@@ -216,7 +217,11 @@ public abstract class BaseSdkActivity<T extends ViewDataBinding, V extends BaseS
     public String getGoogleMapKey(){
         return "AIzaSyATO_5mNZJ8h6V64L6eHeZfiVjk63803ec";
     }
+    PreferencesHelper preferencesHelper;
 
+    static int THEME_BLUE = R.style.AppTheme;
+    static int THEME_GREEN = R.style.AppThemeGreen;
+    static int THEME_RED = R.style.AppThemeRed;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         performDependencyInjection();
@@ -235,6 +240,8 @@ public abstract class BaseSdkActivity<T extends ViewDataBinding, V extends BaseS
             }
         }
         super.onCreate(savedInstanceState);
+        preferencesHelper = RocketFlyer.Companion.preferenceHelper();
+        setTheme(preferencesHelper.getCurrentTheme());
 
         performDataBinding();
         geofenceUtil = new GeofenceUtil(BaseSdkActivity.this);
@@ -450,7 +457,7 @@ public abstract class BaseSdkActivity<T extends ViewDataBinding, V extends BaseS
     protected void setToolbar(Toolbar mToolbar, String title) {
         if (title != null) {
             mToolbar.setTitle(title);
-            mToolbar.setBackgroundColor(Color.parseColor("#3581F3"));
+            //mToolbar.setBackgroundColor(Color.parseColor("#3581F3"));
             mToolbar.setTitleTextColor(Color.WHITE);
             mToolbar.setTitleTextAppearance(this, R.style.CamptonBookTextAppearance);
             // centerToolbarTitle(mToolbar);

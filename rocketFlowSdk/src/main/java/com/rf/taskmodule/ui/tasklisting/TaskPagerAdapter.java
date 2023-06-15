@@ -20,6 +20,7 @@ public class TaskPagerAdapter extends FragmentStatePagerAdapter {
 
     private int mTabCount;
     private List<TabDataClass> fragments;
+
     public TaskPagerAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
         this.mTabCount = 0;
@@ -32,7 +33,7 @@ public class TaskPagerAdapter extends FragmentStatePagerAdapter {
 
     public void setFragments(List<TabDataClass> fragments) {
         this.fragments = fragments;
-        mTabCount=fragments.size();
+        mTabCount = fragments.size();
     }
 
     @NotNull

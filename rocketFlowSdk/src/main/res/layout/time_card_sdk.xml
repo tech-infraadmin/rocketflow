@@ -23,7 +23,10 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
-                android:padding="@dimen/dimen_10"
+                android:paddingLeft="@dimen/dimen_5"
+                android:paddingRight="@dimen/dimen_5"
+                android:paddingTop="@dimen/dimen_10"
+                android:paddingBottom="@dimen/dimen_10"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -33,6 +36,7 @@
                     style="@style/TextViewStyle"
                     android:textSize="@dimen/text_size_12"
                     android:id="@+id/tv_day"
+                    android:singleLine="true"
                     android:text="@{data.time}"
                     android:textColor="@color/black"
                     android:layout_width="wrap_content"

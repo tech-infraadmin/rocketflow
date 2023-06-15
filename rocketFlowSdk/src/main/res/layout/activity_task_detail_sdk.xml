@@ -115,11 +115,6 @@
             android:layout_height="match_parent"
             android:layout_marginTop="?actionBarSize">
 
-
-
-
-
-
             <!-- Adding bottom sheet after main content -->
             <include
                 android:id="@+id/bottomSheetTrip"

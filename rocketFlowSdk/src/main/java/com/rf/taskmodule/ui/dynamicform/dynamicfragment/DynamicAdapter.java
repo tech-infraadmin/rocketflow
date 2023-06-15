@@ -1,11 +1,14 @@
 package com.rf.taskmodule.ui.dynamicform.dynamicfragment;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,7 +23,6 @@ import android.net.ParseException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.TypedValue;
@@ -58,6 +60,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.gcacace.signaturepad.views.SignaturePad;
+import com.google.gson.Gson;
 import com.rf.taskmodule.R;
 import com.rf.taskmodule.TrackiSdkApplication;
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper;
@@ -106,7 +109,7 @@ import com.rf.taskmodule.databinding.ItemDynamicFormVerifyOtpSdkBinding;
 import com.rf.taskmodule.databinding.ItemDynamicFormVideoSdkBinding;
 //import com.rf.taskmodule.ui.addfleet.AddFleetActivity;
 import com.rf.taskmodule.ui.base.BaseSdkViewHolder;
-import taskmodule.ui.PlayVideoVerticallyActivity;
+import com.rf.taskmodule.utils.PlayVideoVerticallyActivity;
 //import com.rf.taskmodule.ui.custom.GlideApp;
 import com.rf.taskmodule.ui.custom.MultiSelectSpinner;
 import com.rf.taskmodule.ui.dynamicform.DynamicFormActivity;
@@ -565,6 +568,7 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
     public void setImage(int position, @NotNull FormData formData) {
         formDataList.set(position, formData);
         notifyItemChanged(position, formData);
+        notifyDataSetChanged();
     }
 
     /**
@@ -871,6 +875,8 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
             FormButtonViewModel.OnButtonClickListener {
         private ItemDynamicFormButtonSdkBinding mBinding;
 
+        FormData formData;
+
         ButtonViewHolder(ItemDynamicFormButtonSdkBinding itemView) {
             super(itemView.getRoot());
             this.mBinding = itemView;
@@ -878,11 +884,18 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
 
         @Override
         public void onBind(int position) {
-            final FormData formData = formDataList.get(position);
+            formData = formDataList.get(position);
+            Log.d("formId","formData >>>>>> >>>>>> "+formData);
+
+//            JSONConverter jsonConverter = new JSONConverter<HashMap<String, ArrayList<FormData>>>();
+//            String data = jsonConverter.objectToJson(formData);
+//            SharedPreferences sharedPreferences = context.getSharedPreferences("MySharedPref",MODE_PRIVATE);
+//            SharedPreferences.Editor myEdit = sharedPreferences.edit();
+//            myEdit.putString("formData", data);
+//            myEdit.apply();
 
             FormButtonViewModel emptyItemViewModel = new FormButtonViewModel(formData, this);
             mBinding.setViewModel(emptyItemViewModel);
-
             // Immediate Binding
             // When a variable or observable changes, the binding will be scheduled to change before
             // the next frame. There are times, however, when binding must be executed immediately.
@@ -890,10 +903,18 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
             mBinding.executePendingBindings();
             // mBinding.btnCLick.setText(formData.getValue());
 
+//            mBinding.btnCLick.setOnClickListener(view -> {
+////                Gson gson = new Gson();
+////                if (sharedPreferences.contains("formData")){
+////                    formData = gson.fromJson(sharedPreferences.getString("formData",null), FormData.class);
+////                }
+//                Log.d("formId","formData click >>>>>> >>>>>> "+ formData);
+//                onClickButton(formData);
+//            });
+
             if (!isEditable) {
                 mBinding.btnCLick.setEnabled(true);
             }
-
 
             if (adapterListener != null)
                 adapterListener.sendButtonInstance(mBinding.btnCLick, isEditable);
@@ -1475,6 +1496,7 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
             if (formData.getValue() != null && !formData.getValue().isEmpty()) {
                 fileName = formData.getValue();
                 CommonUtils.showLogMessage("e", "value", formData.getValue());
+                CommonUtils.showLogMessage("e", "value", String.valueOf(formData));
                 // fileName="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
                 ItemDynamicFormAudioSdkBinding.ivPlayRec.setBackground(ContextCompat.getDrawable(context, R.drawable.circle_audio_play));
                 ItemDynamicFormAudioSdkBinding.ivPlayRec.setEnabled(true);
@@ -3851,25 +3873,19 @@ public class DynamicAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> {
                 window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
                 window.setGravity(Gravity.CENTER);
                 Button btnCancel = dialog.findViewById(R.id.btnCancel);
-                Button btnProceed = dialog.findViewById(R.id.btnCancel);
+                Button btnProceed = dialog.findViewById(R.id.btn_done);
 
 
                 dialog.getWindow().setAttributes(lp);
-                btnCancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        CommonUtils.preventTwoClick(btnProceed);
-                        dialog.dismiss();
-                        //context.finish();
-                    }
+                btnCancel.setOnClickListener(v -> {
+                    CommonUtils.preventTwoClick(btnProceed);
+                    dialog.dismiss();
+                    //context.finish();
                 });
-                btnProceed.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        CommonUtils.preventTwoClick(btnProceed);
-                        //checkPermissionAndInitLocation();
-                    }
+                btnProceed.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    CommonUtils.preventTwoClick(btnProceed);
+                    //checkPermissionAndInitLocation();
                 });
                 if (!dialog.isShowing())
                     dialog.show();

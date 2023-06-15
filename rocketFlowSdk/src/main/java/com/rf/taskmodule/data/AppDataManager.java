@@ -33,6 +33,8 @@ import com.rf.taskmodule.data.model.response.config.OverstoppingConfig;
 import com.rf.taskmodule.data.model.response.config.ProfileInfo;
 import com.rf.taskmodule.data.model.response.config.ProjectCategories;
 import com.rf.taskmodule.data.model.response.config.RoleConfigData;
+import com.rf.taskmodule.data.model.response.config.Service;
+import com.rf.taskmodule.data.model.response.config.Subscription;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
 import com.rf.taskmodule.data.network.ApiCallback;
@@ -125,7 +127,25 @@ public class AppDataManager implements DataManager {
          return mPreferencesHelper.getSDKClientID();
     }
 
+    @Override
+    public void setSubscriptionEnabled(Boolean subscription) {
+        mPreferencesHelper.setSubscriptionEnabled(subscription);
+    }
 
+    @Override
+    public Boolean getSubscriptionEnabled() {
+        return mPreferencesHelper.getSubscriptionEnabled();
+    }
+
+    @Override
+    public void setSubscriptionPack(Subscription subscription){
+        mPreferencesHelper.setSubscriptionPack(subscription);
+    }
+
+    @Override
+    public Subscription getSubscriptionPack(){
+        return mPreferencesHelper.getSubscriptionPack();
+    }
     @Override
     public Boolean toggleFeature() {
         return mPreferencesHelper.toggleFeature();
@@ -486,6 +506,11 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
+    public void getSystemHubs(ApiCallback apiCallback, HttpManager httpManager, Object data, Api api) {
+        networkManager.getSystemHubs(apiCallback, httpManager, data, api);
+    }
+
+    @Override
     public void getConfig(HttpManager httpManager, ApiCallback callBack, String configVersion) {
         networkManager.getConfig(httpManager, callBack, configVersion);
     }
@@ -518,6 +543,11 @@ public class AppDataManager implements DataManager {
     @Override
     public void timeSlotData(ApiCallback apiCallback, HttpManager httpManager, Api api) {
         networkManager.timeSlotData(apiCallback, httpManager, api);
+    }
+
+    @Override
+    public void getTasksListCalendar(ApiCallback apiCallback, HttpManager httpManager, Object data, Api api) {
+        networkManager.getTasksListCalendar(apiCallback, httpManager, data,api);
     }
 
     @Override
@@ -1719,6 +1749,16 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
+    public void saveProductInCart2(Map<String, Map<String, CatalogProduct>> map) {
+        mPreferencesHelper.saveProductInCart2(map);
+    }
+
+    @Override
+    public HashMap<String, HashMap<String, CatalogProduct>> getProductInCart2() {
+        return mPreferencesHelper.getProductInCart2();
+    }
+
+    @Override
     public void saveWorkFlowCategoriesList(List<WorkFlowCategories> workFlowCategoriesList) {
         mPreferencesHelper.saveWorkFlowCategoriesList(workFlowCategoriesList);
     }
@@ -1787,6 +1827,11 @@ public class AppDataManager implements DataManager {
     }
 
     @Override
+    public void getQrCodeLogin(ApiCallback apiCallback, HttpManager httpManager, Api api) {
+        networkManager.getQrCodeLogin(apiCallback, httpManager, api);
+    }
+
+    @Override
     public void getEligibleUsers(ApiCallback apiCallback, EligibleUserRequest request, HttpManager httpManager, Api api) {
         networkManager.getEligibleUsers(apiCallback, request, httpManager, api);
     }
@@ -1800,6 +1845,26 @@ public class AppDataManager implements DataManager {
     @Override
     public ArrayList<ProjectCategories> getProjectCategoriesDataList() {
         return mPreferencesHelper.getProjectCategoriesDataList();
+    }
+
+    @Override
+    public void saveServices(List<Service> services) {
+        mPreferencesHelper.saveServices(services);
+    }
+
+    @Override
+    public List<Service> getServices() {
+        return mPreferencesHelper.getServices();
+    }
+
+    @Override
+    public void saveTheme(int currentTheme) {
+        mPreferencesHelper.saveTheme(currentTheme);
+    }
+
+    @Override
+    public int getCurrentTheme() {
+        return mPreferencesHelper.getCurrentTheme();
     }
 
 }

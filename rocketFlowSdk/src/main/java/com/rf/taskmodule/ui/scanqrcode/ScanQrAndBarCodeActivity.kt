@@ -1,24 +1,40 @@
 package com.rf.taskmodule.ui.scanqrcode
 
+//import com.rf.taskmodule.ui.productdetails.ProductDetailsActivity
+//import com.rf.taskmodule.ui.userdetails.UserDetailsActivity
+
 import android.Manifest
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Vibrator
 import android.util.SparseArray
+import android.view.Gravity
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.Window
+import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.vision.CameraSource
@@ -27,19 +43,24 @@ import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import com.google.gson.Gson
 import com.rf.taskmodule.BR
-import com.rocketflow.sdk.RocketFlyer
 import com.rf.taskmodule.R
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper
-import com.rf.taskmodule.data.model.response.config.*
+import com.rf.taskmodule.data.model.response.config.Task
+import com.rf.taskmodule.data.model.response.config.TaskResponse
+import com.rf.taskmodule.data.model.response.config.UpdateResponse
+import com.rf.taskmodule.data.model.response.config.UserData
 import com.rf.taskmodule.data.network.APIError
 import com.rf.taskmodule.data.network.ApiCallback
 import com.rf.taskmodule.data.network.HttpManager
 import com.rf.taskmodule.databinding.ActivityScanQrAndBarCodeSdkBinding
 import com.rf.taskmodule.ui.base.BaseSdkActivity
-//import com.rf.taskmodule.ui.productdetails.ProductDetailsActivity
+import com.rf.taskmodule.ui.selectorder.CatalogProduct
 import com.rf.taskmodule.ui.taskdetails.NewTaskDetailsActivity
-//import com.rf.taskmodule.ui.userdetails.UserDetailsActivity
-import com.rf.taskmodule.utils.*
+import com.rf.taskmodule.utils.AppConstants
+import com.rf.taskmodule.utils.CommonUtils
+import com.rf.taskmodule.utils.JSONConverter
+import com.rf.taskmodule.utils.Log
+import com.rocketflow.sdk.RocketFlyer
 import java.io.IOException
 
 
@@ -80,6 +101,8 @@ class ScanQrAndBarCodeActivity :
         binding = viewDataBinding
         httpManager = RocketFlyer.httpManager()!!
         preferencesHelper = RocketFlyer.preferenceHelper()!!
+        CommonUtils.showLogMessage("e", "BARCODE_Value", preferencesHelper.accessId)
+        CommonUtils.showLogMessage("e", "BARCODE_Value", preferencesHelper.loginToken)
         qrCodeValueViewModel.navigator = this
         val sharedPreferences: SharedPreferences =
             getSharedPreferences("Scan", MODE_PRIVATE)
@@ -106,9 +129,7 @@ class ScanQrAndBarCodeActivity :
         val detector: BarcodeDetector = BarcodeDetector.Builder(applicationContext)
             .setBarcodeFormats(Barcode.ALL_FORMATS)
             .build()
-        val cameraSource: CameraSource =
-            CameraSource.Builder(this, detector).setAutoFocusEnabled(true)
-                .setRequestedPreviewSize(1600, 1024).build()
+        val cameraSource: CameraSource = CameraSource.Builder(this, detector).setAutoFocusEnabled(true).setRequestedPreviewSize(1600, 1024).build()
         mSurfaceView!!.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 try {
@@ -149,27 +170,45 @@ class ScanQrAndBarCodeActivity :
                     (getSystemService(VIBRATOR_SERVICE) as Vibrator).vibrate(40)
 //                    ringtone()
                     playSound()
-                    var value = barcodeSparseArray.valueAt(0).displayValue
-                    CommonUtils.showLogMessage("e", "BARCODE_Value", value)
-                    runOnUiThread {
-                        if (!isClassCall) {
-                            isClassCall = true
-                            cameraSource.stop()
-                            if(from==null) {
-                                showLoading()
-                                qrCodeValueViewModel.getQrCodeValue(httpManager, value)
-                            }else{
-                                hideLoading()
-                                var resultIntent=Intent();
-                                resultIntent.putExtra("id",value)
-                                setResult(Activity.RESULT_OK,resultIntent)
-                                finish()
+                    val value = barcodeSparseArray.valueAt(0).displayValue
+                    if (value.contains("LOGIN_")) {
+                        CommonUtils.showLogMessage("e", "BARCODE_Value", value)
+                        runOnUiThread {
+                            if (!isClassCall) {
+                                isClassCall = true
+                                cameraSource.stop()
+                                if (from == null) {
+                                    showLoading()
+                                    qrCodeValueViewModel.loginUsingQr(httpManager, value, preferencesHelper.loginToken ,preferencesHelper.accessId)
+                                } else {
+                                    hideLoading()
+                                    val resultIntent = Intent();
+                                    resultIntent.putExtra("id", value)
+                                    setResult(Activity.RESULT_OK, resultIntent)
+                                    finish()
+                                }
                             }
+                        }
+                    } else {
+                        CommonUtils.showLogMessage("e", "BARCODE_Value", value)
+                        runOnUiThread {
+                            if (!isClassCall) {
+                                isClassCall = true
+                                cameraSource.stop()
+                                if (from == null) {
+                                    showLoading()
+                                    qrCodeValueViewModel.getQrCodeValue(httpManager, value)
+                                } else {
+                                    hideLoading()
+                                    val resultIntent = Intent();
+                                    resultIntent.putExtra("id", value)
+                                    setResult(Activity.RESULT_OK, resultIntent)
+                                    finish()
+                                }
 
+                            }
                         }
                     }
-
-
                 }
             }
         })
@@ -264,12 +303,10 @@ class ScanQrAndBarCodeActivity :
     }
 
     override fun handleQrCodeResponse(callback: ApiCallback, result: Any?, error: APIError?) {
-
         if (CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
-
             val jsonConverter: JSONConverter<QrCodeResponse> =
                 JSONConverter()
-            var response: QrCodeResponse = jsonConverter.jsonToObject(
+            val response: QrCodeResponse = jsonConverter.jsonToObject(
                 result.toString(),
                 QrCodeResponse::class.java
             ) as QrCodeResponse
@@ -279,9 +316,43 @@ class ScanQrAndBarCodeActivity :
             hideLoading()
             finish()
         }
-
     }
 
+    override fun handleLoginQrCodeResponse(callback: ApiCallback, result: Any?, error: APIError?) {
+        if (CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
+            hideLoading()
+            playSoundSuccess()
+            Log.d("Login",result.toString())
+        } else {
+            playSoundFailed()
+            Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
+            hideLoading()
+            finish()
+        }
+    }
+
+    private fun playSoundSuccess() {
+        mediaPlayer = MediaPlayer.create(this, R.raw.success)
+        mediaPlayer!!.start()
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (mediaPlayer != null) {
+                mediaPlayer!!.stop()
+                val resultIntent = Intent()
+                resultIntent.putExtra("QRLogin", true)
+                setResult(Activity.RESULT_OK, resultIntent)
+                finish()
+            }
+        }, 200)
+    }
+    private fun playSoundFailed() {
+        mediaPlayer = MediaPlayer.create(this, R.raw.errorsound)
+        mediaPlayer!!.start()
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (mediaPlayer != null) {
+                mediaPlayer!!.stop()
+            }
+        }, 200)
+    }
     private fun callScanDetailsApi(response: QrCodeResponse) {
         response.type?.let { type ->
             when (type) {
@@ -396,6 +467,7 @@ class ScanQrAndBarCodeActivity :
         pid: String?
     ) {
         hideLoading()
+        Log.d("openProductDetailsActivity",pid);
         if (CommonUtils.handleResponse(callback, error, result, this@ScanQrAndBarCodeActivity)) {
             openProductDetailsActivity(pid)
         }else {
@@ -404,21 +476,27 @@ class ScanQrAndBarCodeActivity :
     }
 
     private fun openProductDetailsActivity(id: String?) {
-//        var product = CatalogProduct()
-//        product.pid = id
-//        val addproduct = Intent(this, ProductDetailsActivity::class.java)
-//        addproduct.putExtra("data", product)
-//        startActivity(addproduct)
-//        finish()
+        val product = CatalogProduct()
+        product.pid = id
+        val gson = Gson()
+        val json = gson.toJson(product)
+        startActivity(Intent("com.tracki.ui.productdetails.ProductDetailsActivity").apply {
+            // you can add values(if any) to pass to the next class or avoid using `.apply`
+            putExtra("dataSDK", json)
+        })
+        finish()
     }
 
     private fun openUserDetailsActivity(data: UserData) {
-//        var intent = Intent(this, UserDetailsActivity::class.java)
-//        intent.putExtra("userData", data)
-//        intent.putExtra("from", AppConstants.EMPLOYEES)
-//        intent.putExtra("action", "view")
-//        startActivity(intent)
-//        finish()
+        val gson = Gson()
+        val json = gson.toJson(data)
+        startActivity(Intent("com.tracki.useraddresslist.UserAddressListActivity").apply {
+            // you can add values(if any) to pass to the next class or avoid using `.apply`
+            putExtra("userDataSDK", json)
+            putExtra("from", AppConstants.EMPLOYEES)
+            putExtra("action", "view")
+        })
+        finish()
     }
 
     private fun openTaskDetailsActivity(task: Task?) {

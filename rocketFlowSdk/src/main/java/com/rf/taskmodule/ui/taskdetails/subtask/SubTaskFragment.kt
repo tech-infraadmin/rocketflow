@@ -18,6 +18,7 @@ import com.rf.taskmodule.ui.tasklisting.TaskPagerAdapter
 import com.rf.taskmodule.ui.tasklisting.assignedtome.AssignedtoMeFragment
 import com.rf.taskmodule.ui.tasklisting.ihaveassigned.TabDataClass
 import com.rf.taskmodule.utils.AppConstants
+import com.rf.taskmodule.utils.Log
 import kotlinx.android.synthetic.main.layout_fragment_subtasklist_sdk.*
 
 
@@ -34,22 +35,33 @@ class SubTaskFragment : BaseSdkFragment<LayoutFragmentSubtasklistSdkBinding, Sub
     private lateinit var mBinding: LayoutFragmentSubtasklistSdkBinding
     private var fromDate: Long = 0
     private var toDate: Long = 0
-    private var allowSubTask:Boolean=false
-    private var subTaskCategoryId : ArrayList<String>?=null
+    private var allowSubTask: Boolean = false
+    private var subTaskCategoryId: ArrayList<String>? = null
     lateinit var httpManager: HttpManager
     lateinit var preferencesHelper: PreferencesHelper
 
     private val fragments: MutableList<TabDataClass> = ArrayList()
 
     var taskId: String? = null
-    private var referenceId:String?=null
+    private var referenceId: String? = null
 
     companion object {
         //allowSubTask,subTaskCategoryId
-        fun newInstance(allowSubTask: Boolean, subTaskCategoryId: ArrayList<String>?, categoryId: String?, fromDate: Long, toDate: Long, taskId: String?, referenceId: String?): SubTaskFragment? {
+        fun newInstance(
+            allowSubTask: Boolean,
+            subTaskCategoryId: ArrayList<String>?,
+            categoryId: String?,
+            fromDate: Long,
+            toDate: Long,
+            taskId: String?,
+            referenceId: String?
+        ): SubTaskFragment? {
             val args = Bundle()
             args.putBoolean(AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, allowSubTask)
-            args.putStringArrayList(AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID, subTaskCategoryId)
+            args.putStringArrayList(
+                AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID,
+                subTaskCategoryId
+            )
             args.putString(AppConstants.Extra.EXTRA_CATEGORY_ID, categoryId)
             args.putString(AppConstants.Extra.EXTRA_PAREN_TASK_ID, taskId)
             args.putString(AppConstants.Extra.EXTRA_PARENT_REF_ID, referenceId)
@@ -97,10 +109,12 @@ class SubTaskFragment : BaseSdkFragment<LayoutFragmentSubtasklistSdkBinding, Sub
     private fun getTaskData() {
         if (arguments != null) {
             var categoryId = requireArguments().getString(AppConstants.Extra.EXTRA_CATEGORY_ID)
-             taskId = requireArguments()!!.getString(AppConstants.Extra.EXTRA_PAREN_TASK_ID)
-             referenceId = requireArguments().getString(AppConstants.Extra.EXTRA_PARENT_REF_ID)
-            allowSubTask = requireArguments().getBoolean(AppConstants.Extra.EXTRA_ALLOW_SUB_TASK,false)
-            subTaskCategoryId = requireArguments().getStringArrayList(AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID)
+            taskId = requireArguments().getString(AppConstants.Extra.EXTRA_PAREN_TASK_ID)
+            Log.d("taskId", taskId)
+            referenceId = requireArguments().getString(AppConstants.Extra.EXTRA_PARENT_REF_ID)
+            allowSubTask = requireArguments().getBoolean(AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, false)
+            subTaskCategoryId =
+                requireArguments().getStringArrayList(AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID)
             if (requireArguments().getLong(AppConstants.Extra.FROM_DATE) != 0L) {
                 fromDate = requireArguments().getLong(AppConstants.Extra.FROM_DATE, 0)
             }
@@ -112,7 +126,7 @@ class SubTaskFragment : BaseSdkFragment<LayoutFragmentSubtasklistSdkBinding, Sub
                     val dashBoardBoxItem = DashBoardBoxItem()
                     dashBoardBoxItem.categoryId = data
                     dashBoardBoxItem.loadBy = "SUB_TASKS"
-                    var map = Gson().toJson(dashBoardBoxItem)
+                    val map = Gson().toJson(dashBoardBoxItem)
                     fragments.add(
                         TabDataClass(
                             AssignedtoMeFragment.newInstance(
@@ -134,8 +148,8 @@ class SubTaskFragment : BaseSdkFragment<LayoutFragmentSubtasklistSdkBinding, Sub
             vpTask.adapter = mPagerAdapter
             tabLayout.tabGravity = TabLayout.GRAVITY_FILL
             if (subTaskCategoryId != null && subTaskCategoryId!!.size < 3)
-            tabLayout.tabMode = TabLayout.MODE_FIXED
-            else{
+                tabLayout.tabMode = TabLayout.MODE_FIXED
+            else {
                 tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
             }
             tabLayout.setupWithViewPager(vpTask)
@@ -152,7 +166,8 @@ class SubTaskFragment : BaseSdkFragment<LayoutFragmentSubtasklistSdkBinding, Sub
     }
 
     fun getLabelName(categoryId: String?): String? {
-        var workFlowCategoriesList: List<WorkFlowCategories> = preferencesHelper.workFlowCategoriesList
+        var workFlowCategoriesList: List<WorkFlowCategories> =
+            preferencesHelper.workFlowCategoriesList
         var lebel: String? = null
 
         for (i in workFlowCategoriesList) {

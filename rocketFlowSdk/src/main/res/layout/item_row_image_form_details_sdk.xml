@@ -8,7 +8,7 @@
 
         <variable
             name="viewModel"
-             type="com.rf.taskmodule.ui.dynamicform.dynamicfragment.FormFileViewModel" />
+            type="com.rf.taskmodule.ui.dynamicform.dynamicfragment.FormFileViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -27,18 +27,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="vertical"
-
-            >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvTitle"
                 style="@style/TextViewStyle"
-                android:paddingLeft="@dimen/dimen_5"
-                android:paddingBottom="@dimen/dimen_5"
-                android:paddingTop="@dimen/dimen_5"
-                android:text="@{viewModel.title}"
                 android:fontFamily="@font/campton_semi_bold"
+                android:paddingLeft="@dimen/dimen_5"
+                android:paddingTop="@dimen/dimen_5"
+                android:paddingBottom="@dimen/dimen_5"
+                android:text="@{viewModel.title}"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_16"
                 app:layout_constraintStart_toStartOf="parent"
@@ -51,12 +49,12 @@
                 android:orientation="vertical">
 
                 <HorizontalScrollView
-                    android:layout_marginTop="@dimen/dimen_10"
-                    android:layout_marginBottom="@dimen/dimen_10"
-                    android:layout_marginLeft="@dimen/dimen_10"
-                    android:layout_marginRight="@dimen/dimen_10"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/dimen_10"
+                    android:layout_marginTop="@dimen/dimen_10"
+                    android:layout_marginRight="@dimen/dimen_10"
+                    android:layout_marginBottom="@dimen/dimen_10">
 
                     <LinearLayout
                         android:id="@+id/lLayout"

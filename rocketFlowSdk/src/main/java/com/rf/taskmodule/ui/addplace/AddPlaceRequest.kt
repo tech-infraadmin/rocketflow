@@ -15,7 +15,7 @@ data class AddPlaceRequest(
 @Parcelize
 data class HubLocation(
     var location: Location?,
-    var radius: Int?
+    var radius: Float? = 0.0F
 ):Parcelable{
     var address:String?=null
 }
@@ -25,5 +25,6 @@ data class Location(
     var latitude: Double?,
     var longitude: Double?
 ):Parcelable{
-    var locationId: String=""
+    var locationId: String? =""
+    var coordinates: ArrayList<Double>? = ArrayList()
 }

@@ -13,7 +13,6 @@ import com.rf.taskmodule.ui.base.BaseSdkNavigator;
  * vikas.kesharvani@rocketflyer.in
  */
 interface TaskDashBoardNavigator extends BaseSdkNavigator {
-
     void handleDashboardResponse(ApiCallback apiCallback, Object result, APIError error);
     void handleStatusResponse(ApiCallback apiCallback, Object result, APIError error);
     void handleInsightsResponse(ApiCallback apiCallback, Object result, APIError error);

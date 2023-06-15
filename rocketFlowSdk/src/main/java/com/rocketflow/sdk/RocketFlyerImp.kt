@@ -3,31 +3,36 @@ package com.rocketflow.sdk
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import com.google.gson.Gson
-import com.rocketflow.sdk.util.RFLog
 import com.rf.taskmodule.data.model.response.config.ConfigResponse
 import com.rf.taskmodule.data.model.response.config.SDKToken
 import com.rf.taskmodule.data.model.response.config.WorkFlowCategories
 import com.rf.taskmodule.data.network.APIError
+import com.rf.taskmodule.utils.CommonUtils
+import com.rocketflow.sdk.util.RFLog
 import java.lang.ref.WeakReference
+
 
 internal class RocketFlyerImp(
     context: Context
 ) : IRocketFlyer {
     private val contextRef = WeakReference(context.applicationContext)
 
-    override fun initialize(sdkInitToken: String) {
+    override fun initialize(sdkInitToken: String, context: Context) {
 
         contextRef.get()?.let {
             if (sdkInitToken.isEmpty()) throw Exception("Token cannot be null")
             RFLog.d("Token value : $sdkInitToken")
             RocketFlyerBuilder.getPrefInstance()?.sdkClientID = sdkInitToken
+            //RocketFlyerBuilder.getPrefInstance()?.loginToken = "c49f0605-e6bd-47b5-9f4b-3363e5035978"
+            //RocketFlyerBuilder.getPrefInstance()?.accessId = "3uBdUsyA0w"
             val pref = RocketFlyerBuilder.getPrefInstance()
             if(pref?.loginToken != null && pref.loginToken.isNotEmpty()) {
-                hitConfig();
+                hitConfig()
             }else{
-                hitLoginSDKToken(sdkInitToken)
+                hitLoginSDKToken(sdkInitToken,context)
             }
         }
     }
@@ -43,7 +48,9 @@ internal class RocketFlyerImp(
                     RocketFlyerBuilder.getDataManagerInstance()?.workFlowCategoriesList ?: ArrayList()
 
                 val pref = RocketFlyerBuilder.getPrefInstance()
-
+                Log.d("TAG", "start: "+ pref!!.loginToken)
+                Log.d("TAG", "start: "+ pref.loginToken)
+                Log.d("TAG", "start: $listCategory")
                 if(pref==null
                     || pref.loginToken==null
                     || pref.loginToken.isEmpty()
@@ -58,7 +65,7 @@ internal class RocketFlyerImp(
                     ConfigResponse::class.java
                 )
 
-                com.rf.taskmodule.utils.CommonUtils.saveConfigDetails(
+                CommonUtils.saveConfigDetails(
                     it,
                     configResponse,
                     RocketFlyer.preferenceHelper(),
@@ -113,7 +120,7 @@ internal class RocketFlyerImp(
                     ConfigResponse::class.java
                 )
 
-                com.rf.taskmodule.utils.CommonUtils.saveConfigDetails(
+                CommonUtils.saveConfigDetails(
                     it,
                     configResponse,
                     RocketFlyer.preferenceHelper(),
@@ -142,7 +149,7 @@ internal class RocketFlyerImp(
         Toast.makeText(context,str,Toast.LENGTH_SHORT).show()
     }
 
-    private fun hitLoginSDKToken(sdkClintId: String) {
+    private fun hitLoginSDKToken(sdkClintId: String, context: Context) {
 
         RocketFlyerBuilder.getDataManagerInstance()
             ?.getSDKLoginToken(sdkClintId,RocketFlyerBuilder.getHttpManagerInstance(), object :
@@ -166,21 +173,17 @@ internal class RocketFlyerImp(
             }
 
             override fun onResponse(result: Any?, error: APIError?) {
-                if(result==null) return
                 RFLog.d("hitLoginSDKToken : onResponse")
                 contextRef.get()?.let {
-                    if (com.rf.taskmodule.utils.CommonUtils.handleResponse(this, error, result, it)) {
+                    if (CommonUtils.handleResponse(this, error, result, context)) {
                         val gson = Gson()
                         val token = gson.fromJson(result.toString(), SDKToken::class.java)
                         if (token != null) {
-                            com.rf.taskmodule.utils.CommonUtils.saveSDKAccessToken(token, RocketFlyer.preferenceHelper())
+                            CommonUtils.saveSDKAccessToken(token, RocketFlyer.preferenceHelper())
                         }
                         hitConfig()
-                    } else {
-                        //CommonUtils.showPermanentSnackBar(findViewById(R.id.rlMain), AppConstants.ALERT_TRY_AGAIN,mSplashViewModel);
                     }
                 }
-
             }
 
             override fun isAvailable(): Boolean {
@@ -212,13 +215,24 @@ internal class RocketFlyerImp(
                 override fun onResponse(result: Any?, error: APIError?) {
                     if (result == null) return
                     contextRef.get()?.let {
-                        if (com.rf.taskmodule.utils.CommonUtils.handleResponse(this, error, result, it)) {
+                        if (CommonUtils.handleResponse(this, error, result, it)) {
                             val gson = Gson()
-                            val configResponse = gson.fromJson(
-                                result.toString(),
-                                ConfigResponse::class.java
+
+                            Log.d(
+                                CommonUtils.TAG,
+                                "saveConfigResponse: $result"
                             )
-                            com.rf.taskmodule.utils.CommonUtils.saveConfigDetails(
+
+                            val configResponse = gson.fromJson(
+                                 result.toString(),
+                                 ConfigResponse::class.java
+                             )
+
+                            Log.d(
+                                CommonUtils.TAG,
+                                "saveConfigResponse: sdkConfig ${configResponse.appConfig.toString()}"
+                            )
+                            CommonUtils.saveConfigDetails(
                                 it,
                                 configResponse,
                                 RocketFlyer.preferenceHelper(),

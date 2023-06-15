@@ -10,15 +10,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -60,6 +64,8 @@ import com.rf.taskmodule.data.model.response.config.Navigation;
 import com.rf.taskmodule.data.model.response.config.OnLineOfflineResponse;
 import com.rf.taskmodule.data.model.response.config.Place;
 import com.rf.taskmodule.data.model.response.config.ProfileInfo;
+import com.rf.taskmodule.data.model.response.config.Subscription;
+import com.rf.taskmodule.data.model.response.config.SubscriptionPlan;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.network.APIError;
 import com.rf.taskmodule.data.network.ApiCallback;
@@ -157,6 +163,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 //import dagger.android.AndroidInjector;
@@ -181,6 +188,9 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
     ShakeDetector mShakeDetector = new ShakeDetector();
 
     PreferencesHelper preferencesHelper;
+
+    private String expiredSubscriptionMessage = "";
+    private String btnText = "Subscribe";
     HttpManager httpManager;
 
 
@@ -239,12 +249,15 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
         mMainViewModel.setNavigator(this);
         Log.d("Hello", "MainActivity");
 
+
         preferencesHelper.setIsFleetAndBuddyShow(false);
         if (getIntent().hasExtra(AppConstants.Extra.TITLE)) {
             setToolbar(mActivityMainBinding.toolbar, getIntent().getStringExtra(AppConstants.Extra.TITLE));
         } else {
             setToolbar(mActivityMainBinding.toolbar, getString(R.string.dashboard));
         }
+
+
 
         addFragmentInContainer(TaskDashBoardFragment.newInstance(this));
     }
@@ -1188,7 +1201,7 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
         if (CommonUtils.handleResponse(apiCallback, error, result, this)) {
             //if logout is successful then clear sync db and recreate for new user.
             databaseHelper.onClearAndRecreateDatabase();
-            preferencesHelper.setLoginToken(null);
+           // preferencesHelper.setLoginToken(null);
             preferencesHelper.clear(AppPreferencesHelper.PreferencesKeys.NOT_ALL_FOR_EXCEPT_ACCESS_ID);
             //  CommonUtils.updateSharedContentProvider(this, preferencesHelper);
 //            Intent intent = LoginActivity.newIntent(this);

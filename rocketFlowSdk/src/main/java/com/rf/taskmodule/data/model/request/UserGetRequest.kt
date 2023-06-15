@@ -13,6 +13,9 @@ class UserGetRequest: Serializable {
     var limit: Int? = 0
     var offset: Int? = 0
     var roleId: String? = ""
+    var geoFilter: Boolean? = false
+    var geoPref: String? = null
     var roleIds: ArrayList<String>? = ArrayList()
-    var type:String? = "INTERNAL"
+    var type: String? = "INTERNAL"
+    var taskId:String? = ""
 }

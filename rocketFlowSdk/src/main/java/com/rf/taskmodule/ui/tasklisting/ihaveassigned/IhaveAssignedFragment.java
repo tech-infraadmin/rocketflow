@@ -41,6 +41,7 @@ import com.rf.taskmodule.data.model.request.TaskRequest;
 import com.rf.taskmodule.data.model.response.config.Api;
 import com.rf.taskmodule.data.model.response.config.CallToActions;
 import com.rf.taskmodule.data.model.response.config.DashBoardBoxItem;
+import com.rf.taskmodule.data.model.response.config.Service;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.model.response.config.TaskListing;
 import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
@@ -83,6 +84,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 import static com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START;
@@ -137,9 +139,9 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         args.putString(AppConstants.Extra.EXTRA_CATEGORIES, value);
         args.putLong(AppConstants.Extra.FROM_DATE, fromDate);
         args.putLong(AppConstants.Extra.FROM_TO, toDate);
-        args.putBoolean(AppConstants.Extra.GEO_FILTER,geoReq);
+        args.putBoolean(AppConstants.Extra.GEO_FILTER, geoReq);
         args.putBoolean(AppConstants.Extra.IS_MERCHANT_TAB, isMerchantTab);
-        args.putString(AppConstants.Extra.EXTRA_CATEGORIES_NAME,categoryName);
+        args.putString(AppConstants.Extra.EXTRA_CATEGORIES_NAME, categoryName);
         IhaveAssignedFragment fragment = new IhaveAssignedFragment();
         fragment.setArguments(args);
         return fragment;
@@ -165,11 +167,13 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         mIhaveAssignedViewModel = ViewModelProviders.of(this, factory).get(IhaveAssignedViewModel.class);
         return mIhaveAssignedViewModel;
     }
+
     String categoryName = "";
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setHasOptionsMenu(true);
+        setHasOptionsMenu(true);
 
         httpManager = RocketFlyer.Companion.httpManager();
         preferencesHelper = RocketFlyer.Companion.preferenceHelper();
@@ -187,17 +191,17 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         if (getArguments() != null) {
             String str = getArguments().getString(AppConstants.Extra.EXTRA_CATEGORIES);
             categoryName = getArguments().getString(AppConstants.Extra.EXTRA_CATEGORIES_NAME);
-            Log.e("EXTRA_CATEGORIES",""+str);
+            Log.e("EXTRA_CATEGORIES", "12 " + str);
             isMerchantTab = getArguments().getBoolean(AppConstants.Extra.IS_MERCHANT_TAB, false);
-            userGeoReq = getArguments().getBoolean(AppConstants.Extra.GEO_FILTER,false);
-            Log.e("userGeoReq",""+userGeoReq);
+            userGeoReq = getArguments().getBoolean(AppConstants.Extra.GEO_FILTER, false);
+            Log.e("userGeoReq", "" + userGeoReq);
             categoryMap = new Gson().fromJson(str, new TypeToken<HashMap<String, String>>() {
             }.getType());
             if (categoryMap != null && categoryMap.containsKey("categoryId"))
                 categoryId = categoryMap.get("categoryId");
             fromDate = getArguments().getLong(AppConstants.Extra.FROM_DATE);
             toDate = getArguments().getLong(AppConstants.Extra.FROM_TO);
-            showHideFilter(categoryId);
+            //  showHideFilter(categoryId);
             // CommonUtils.showLogMessage("e","categoryId",categoryMap.get("categoryId"));
         }
         if (isMerchantTab)
@@ -283,18 +287,16 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
             if (api != null) {
                 api.setAppendWithKey("ASSIGNED_BY_ME");
             }
-            if(rvIhaveAssigned!=null)
+            if (rvIhaveAssigned != null)
                 rvIhaveAssigned.setVisibility(View.GONE);
             mIhaveAssignedAdapter.clearItems();
             showLoading();
             buddyRequest.setUserGeoReq(userGeoReq);
+            mFragmentIHaveAssignedSdkBinding.shimmerViewContainer.setVisibility(View.VISIBLE);
             mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
         } else {
-//            if(getBaseActivity()!=null)
-//            TrackiToast.Message.showShort(getBaseActivity(), getString(R.string.please_check_your_internet_connection_you_are_offline_now));
 
         }
-
     }
 
 
@@ -324,28 +326,23 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
             if (label.length() > 9)
                 label = label.substring(0, 8) + "...";
             etSearch.setHint(label);
-            etSearch.setHint(label);
         }
         mButtonSubmit = mFragmentIHaveAssignedSdkBinding.btnSubmit;
         cardFromDate.setOnClickListener(this);
         mButtonSubmit.setOnClickListener(this);
-        etSearch.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
-                    Log.i(TAG, "Enter pressed");
-                    String refrenceId = etSearch.getText().toString().trim();
-                    buddyRequest.setUserGeoReq(userGeoReq);
-                    if (!refrenceId.isEmpty()) {
-                        buddyRequest.setReferenceId(refrenceId);
-                    } else {
-                        buddyRequest.setReferenceId(null);
-                    }
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                Log.i(TAG, "Enter pressed");
+                String refrenceId = etSearch.getText().toString().trim();
+                buddyRequest.setUserGeoReq(userGeoReq);
+                if (!refrenceId.isEmpty()) {
+                    buddyRequest.setReferenceId(refrenceId);
+                } else {
+                    buddyRequest.setReferenceId(null);
                 }
-                return false;
             }
+            return false;
         });
-
     }
 
     private void perFormStageTask(Map<String, String> categoryMap) {
@@ -365,7 +362,7 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
                     WorkFlowCategories myCatData = listCategory.get(position);
                     LinkedHashMap<String, String> stageNameMap = myCatData.getStageNameMap();
 
-                    if(stageNameMap==null){
+                    if (stageNameMap == null) {
                         stageNameMap = new LinkedHashMap<>();
                         //stageNameMap.put("abcde","demo3");
                         //stageNameMap.put("abcdef","demo4");
@@ -434,7 +431,7 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
             protected void loadMoreItems() {
                 isLoading = true;
                 currentPage++;
-                Log.e("userGeoReq",userGeoReq+" - check");
+                Log.e("userGeoReq", userGeoReq + " - check");
                 buddyRequest.setUserGeoReq(userGeoReq);
                 showLoading();
                 //buddyRequest.setCategoryId(categoryMap.get("categoryId"));
@@ -484,24 +481,22 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
     public void handleResponse(@NotNull ApiCallback callback, @Nullable Object result,
                                @Nullable APIError error) {
         hideLoading();
-        // Stopping swipe refresh
         isLoading = false;
         mSwipeRefreshLayout.setRefreshing(false);
-
-        if (getBaseActivity() != null){
+        mFragmentIHaveAssignedSdkBinding.shimmerViewContainer.setVisibility(View.GONE);
+        if (getBaseActivity() != null) {
             if (CommonUtils.handleResponse(callback, error, result, getBaseActivity())) {
                 getBaseActivity().runOnUiThread(() -> {
                     TaskListing taskListing = new Gson().fromJson(String.valueOf(result), TaskListing.class);
-//                stateAdapter.makeAllSelected();
                     List<Task> list = taskListing.getTasks();
                     mIhaveAssignedViewModel.getTaskListLiveData().setValue(list);
                     setRecyclerView();
 
-                    if (mIhaveAssignedAdapter.getItemCount() > 0 ){
+                    if (mIhaveAssignedAdapter.getItemCount() > 0) {
                         mFragmentIHaveAssignedSdkBinding.noDataLayout.setVisibility(View.GONE);
                     } else {
                         mFragmentIHaveAssignedSdkBinding.noDataLayout.setVisibility(View.VISIBLE);
-                        mFragmentIHaveAssignedSdkBinding.tvMessage.setText("Seems,you don't have any task under "+categoryName);
+                        mFragmentIHaveAssignedSdkBinding.tvMessage.setText("Seems,you don't have any task under " + categoryName);
                     }
 
                     CommonUtils.showLogMessage("e", "adapter total_count =>",
@@ -707,13 +702,13 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
 
 
                     mIhaveAssignedAdapter.clearItems();
-                }else{
+                } else {
                     if (rvIhaveAssigned != null)
                         rvIhaveAssigned.setVisibility(View.GONE);
                 }
                 showLoading();
-                Log.d("selected",response.getStageId());
-                Log.d("selected",response.getStageName());
+                Log.d("selected", response.getStageId());
+                Log.d("selected", response.getStageName());
                 buddyRequest.setStageId(response.getStageId());
                 buddyRequest.setUserGeoReq(userGeoReq);
                 mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
@@ -727,7 +722,7 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.tvFromDate || id == R.id.cardFromDate) {
-          //  openDatePicker(tvFromDate);
+            //  openDatePicker(tvFromDate);
         } else if (id == R.id.btnSubmit) {
             hitApiAndGetTask();
         }
@@ -742,14 +737,14 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
                     buddyRequest.setReferenceId(refrenceId);
                     buddyRequest.setUserGeoReq(userGeoReq);
                     mIhaveAssignedAdapter.clearItems();
-                    if(rvIhaveAssigned!=null)
+                    if (rvIhaveAssigned != null)
                         rvIhaveAssigned.setVisibility(View.GONE);
                     showLoading();
                     mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
                 } else {
                     buddyRequest.setReferenceId(null);
                     buddyRequest.setUserGeoReq(userGeoReq);
-                    if(rvIhaveAssigned!=null)
+                    if (rvIhaveAssigned != null)
                         rvIhaveAssigned.setVisibility(View.GONE);
                     mIhaveAssignedAdapter.clearItems();
                     showLoading();
@@ -831,10 +826,8 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
                 if (position != -1) {
                     WorkFlowCategories myCatData = listCategory.get(position);
                     setHasOptionsMenu(myCatData.getAllowGeography());
-
                 }
             }
-
         }
     }
 
@@ -893,8 +886,8 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.d("search","SearchOnQueryTextSubmit: " + query);
-                if(!searchView.isIconified()) {
+                Log.d("search", "SearchOnQueryTextSubmit: " + query);
+                if (!searchView.isIconified()) {
                     searchView.setIconified(true);
                 }
                 myActionMenuItem.collapseActionView();
@@ -911,9 +904,10 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
 
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String s) {
-                Log.d("search","SearchOnQueryTextSubmit: " + s);
+                Log.d("search", "SearchOnQueryTextSubmit: " + s);
                 return false;
             }
         });
@@ -929,15 +923,35 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
     }
 
     int selectedRange = R.id.chip_custom;
-
+    ArrayList<String> serviceIds = new ArrayList();
     TextView dateChange;
+
     private void showBottomSheetDialog() {
 
+        WorkFlowCategories workFlowCategories = new WorkFlowCategories();
+
+        List<WorkFlowCategories> workFlowCategoriesList = preferencesHelper.getWorkFlowCategoriesList();
+        for (int i = 0; i < workFlowCategoriesList.size(); i++) {
+            if (workFlowCategoriesList.get(i).getCategoryId().equals(categoryId)) {
+                workFlowCategories = workFlowCategoriesList.get(i);
+            }
+        }
 
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getActivity());
         bottomSheetDialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
-
         bottomSheetDialog.setContentView(R.layout.bottom_sheet_dialog);
+
+        TextView tvService = bottomSheetDialog.findViewById(R.id.text_service);
+        ChipGroup taskServices = bottomSheetDialog.findViewById(R.id.chip_group_filter_services);
+
+        if (workFlowCategories.getServiceConfig() != null) {
+            tvService.setVisibility(View.VISIBLE);
+            tvService.setText(workFlowCategories.getServiceConfig().getLabel());
+            addTaskServicesChips(taskServices);
+        } else {
+            tvService.setVisibility(View.GONE);
+        }
+
         ChipGroup dateGroup = bottomSheetDialog.findViewById(R.id.chip_group_filter_date);
         dateGroup.check(selectedRange);
 
@@ -955,14 +969,26 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         apply.setOnClickListener(view -> {
             int selected = taskGroup.getCheckedChipId();
             Chip chip = taskGroup.findViewById(selected);
+            List<Integer> selectedServices = taskServices.getCheckedChipIds();
+            serviceIds.clear();
+            for (int i = 0; i < selectedServices.size(); i++) {
+                Chip chipService = taskServices.findViewById(selectedServices.get(i));
+                serviceIds.add(chipService.getTag().toString());
+            }
 
-            fromDate = fromDateDialog;
-            toDate = toDateDialog;
+            if (fromDateDialog != 0) {
+                fromDate = fromDateDialog;
+            }
+            if (toDateDialog != 0) {
+                toDate = toDateDialog;
+            }
 
             Log.d("selected here", DateTimeUtil.getParsedDateApply(fromDate));
             Log.d("selected here ", DateTimeUtil.getParsedDateApply(toDate));
 
-            stageId= chip.getTag().toString();
+            if (stageId != null) {
+                stageId = chip.getTag().toString();
+            }
             if (getBaseActivity() != null && getBaseActivity().isNetworkConnected()) {
                 String tvDate1 = tvFromDate.getText().toString().trim();
                 api = TrackiSdkApplication.getApiMap().get(ApiType.TASKS);
@@ -980,6 +1006,7 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
                     buddyRequest.setUserGeoReq(userGeoReq);
                     buddyRequest.setFrom(fromDate);
                     buddyRequest.setTo(toDate);
+                    buddyRequest.setServiceIds(serviceIds);
                     mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
                     mFragmentIHaveAssignedSdkBinding.selectedStageChip.setText(chip.getText().toString());
                     mFragmentIHaveAssignedSdkBinding.tvFromDate.setText(dateChange.getText().toString());
@@ -990,12 +1017,30 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
             bottomSheetDialog.dismiss();
         });
         bottomSheetDialog.show();
-
         sedateListener(dateGroup);
     }
 
-long fromDateDialog = fromDate;
-long toDateDialog = toDate;
+    private void addTaskServicesChips(ChipGroup taskServices) {
+        List<Service> listCategory = preferencesHelper.getServices();
+        if (listCategory != null) {
+            for (int i = 0; i < listCategory.size(); i++) {
+                Service myCatData = listCategory.get(i);
+                if (Boolean.TRUE.equals(myCatData.getSelected())) {
+                    Chip mChip1 = (Chip) this.getLayoutInflater().inflate(R.layout.layout_chip, null, false);
+                    mChip1.setText(myCatData.getName());
+                    mChip1.setTag(myCatData.getId());
+                    mChip1.setId(View.generateViewId());
+                    taskServices.addView(mChip1);
+                    if (serviceIds.contains(myCatData.getId())) {
+                        taskServices.check(mChip1.getId());
+                    }
+                }
+            }
+        }
+    }
+
+    long fromDateDialog = fromDate;
+    long toDateDialog = toDate;
 
     private void sedateListener(ChipGroup dateGroup) {
         dateGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -1004,27 +1049,26 @@ long toDateDialog = toDate;
                 fromDateDialog = atStartOfDay(Calendar.getInstance().getTime()).getTime();
                 toDateDialog = atEndOfDay(Calendar.getInstance().getTime()).getTime();
                 dateChange.setText(DateTimeUtil.getParsedDate(fromDateDialog) + " - " + DateTimeUtil.getParsedDate(toDateDialog));
-            }else if (checkedId == R.id.chip_yesterday) {
+            } else if (checkedId == R.id.chip_yesterday) {
                 Date yesterdayDate = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24));
                 fromDateDialog = atStartOfDay(yesterdayDate).getTime();
                 toDateDialog = atEndOfDay(yesterdayDate).getTime();
                 dateChange.setText(DateTimeUtil.getParsedDate(fromDateDialog) + " - " + DateTimeUtil.getParsedDate(toDateDialog));
-            }else if (checkedId == R.id.chip_last_week) {
+            } else if (checkedId == R.id.chip_last_week) {
                 Calendar c = Calendar.getInstance();
                 c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
                 c.add(Calendar.DATE, -1 * 7);
                 ArrayList<Date> listDate = new ArrayList<>();
-                for (int i = 0; i < 7; i++)
-                {
+                for (int i = 0; i < 7; i++) {
                     c.add(Calendar.DAY_OF_MONTH, 1);
                     listDate.add(c.getTime());
                 }
-                Date startDate =listDate.get(0);
+                Date startDate = listDate.get(0);
                 Date endDate = listDate.get(6);
                 fromDateDialog = atStartOfDay(startDate).getTime();
                 toDateDialog = atEndOfDay(endDate).getTime();
                 dateChange.setText(DateTimeUtil.getParsedDate(fromDateDialog) + " - " + DateTimeUtil.getParsedDate(toDateDialog));
-            }else if (checkedId == R.id.chip_last_month) {
+            } else if (checkedId == R.id.chip_last_month) {
                 Calendar aCalendar = Calendar.getInstance();
                 aCalendar.add(Calendar.MONTH, -1);
                 aCalendar.set(Calendar.DATE, 1);
@@ -1034,7 +1078,7 @@ long toDateDialog = toDate;
                 fromDateDialog = atStartOfDay(firstDateOfPreviousMonth).getTime();
                 toDateDialog = atEndOfDay(lastDateOfPreviousMonth).getTime();
                 dateChange.setText(DateTimeUtil.getParsedDate(fromDateDialog) + " - " + DateTimeUtil.getParsedDate(toDateDialog));
-            }else if (checkedId == R.id.chip_custom) {
+            } else if (checkedId == R.id.chip_custom) {
                 openDatePicker(dateChange);
             }
         });
@@ -1059,6 +1103,7 @@ long toDateDialog = toDate;
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
+
     private void addTaskListChips(ChipGroup taskGroup) {
         List<WorkFlowCategories> listCategory = preferencesHelper.getWorkFlowCategoriesList();
         WorkFlowCategories workFlowCategories = new WorkFlowCategories();

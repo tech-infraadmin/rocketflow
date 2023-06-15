@@ -98,6 +98,7 @@ public class TaskAssignToMeViewModel {
     public ObservableField<Boolean> paymentVisible = new ObservableField<>(false);
     public ObservableField<Boolean> paymentStatusVisible = new ObservableField<>(false);
     public ObservableField<Boolean> scheduledAtVisible = new ObservableField<>(false);
+    public ObservableField<Boolean> scheduledAtAndEndTimeVisible = new ObservableField<>(false);
     public ObservableField<Boolean> endTimeVisible = new ObservableField<>(false);
     public ObservableField<String> endTimeText = new ObservableField<>("");
     public ObservableField<String> endTimeDateText = new ObservableField<>("");
@@ -139,6 +140,7 @@ public class TaskAssignToMeViewModel {
     public ObservableField<Boolean> assignedToChatVisible = new ObservableField<>(false);
     public ObservableField<String> assignedToChatId = new ObservableField<>("");
 
+
     // Map<String, Long> timerTask;
 
 
@@ -160,18 +162,16 @@ public class TaskAssignToMeViewModel {
             } else {
                 descriptionVisible.set(false);
             }
-            if (task.getContact() != null ) {
-                if(task.getContact().getMobileNumber()!=null&& !task.getContact().getMobileNumber().isEmpty()){
-                    pocMobile.set(task.getContact().getMobileNumber());
-                    pocMobileVisible.set(true);
-                }
-
-                if(task.getContact().getName()!=null) {
-                    pocName.set(task.getContact().getName());
-                    pocVisible.set(true);
-                }
-
-
+            if (task.getContact() != null) {
+//                if(task.getContact().getMobile()!=null&& !task.getContact().getMobile().isEmpty()){
+//                    pocMobile.set(task.getContact().getMobile());
+//                    pocMobileVisible.set(true);
+//                }
+//
+//                if(task.getContact().getName()!=null && !task.getContact().getName().equals("")) {
+//                    pocName.set(task.getContact().getName());
+//                    pocVisible.set(true);
+//                }
             } else {
                 pocVisible.set(false);
             }
@@ -216,10 +216,10 @@ public class TaskAssignToMeViewModel {
             if (task.getContact() != null) {
                 if (task.getContact().getName() != null) {
                     contact.set(task.getContact().getName());
-                } else if (task.getContact().getMobileNumber() != null) {
-                    contact.set(task.getContact().getMobileNumber());
+                } else if (task.getContact().getMobile() != null) {
+                    contact.set(task.getContact().getMobile());
                 }
-                isContactAvail.set(task.getContact().getMobileNumber() != null);
+                isContactAvail.set(task.getContact().getMobile() != null);
             }
             if (task.getBuddyDetail() != null) {
                 if (task.getBuddyDetail().getName() != null) {
@@ -288,13 +288,13 @@ public class TaskAssignToMeViewModel {
             if (task.getAssignedToDetails() != null && !task.getAssignedToDetails().isEmpty()) {
                 if (task.getAssignmentType() != null && task.getAssignmentType().equals("GROUP")) {
                     this.assignedToDetailsVisible.set(false);
-                }else{
+                } else {
                     AssigneeDetail assigneeDetail = task.getAssignedToDetails().get(0);
                     if (assigneeDetail != null) {
 
 
                         if (assigneeDetail.getName() != null && !assigneeDetail.getName().isEmpty()) {
-                            this.assignedToDetailsVisible.set(true);
+                            this.assignedToDetailsVisible.set(false);
                             this.assignedToName.set(assigneeDetail.getName());
                             this.assignedToNameVisible.set(true);
                         }
@@ -340,6 +340,7 @@ public class TaskAssignToMeViewModel {
                 this.scheduledAt.set(DateTimeUtil.getParsedDate(task.getStartTime()) + " ,");
                 this.scheduledTimeAt.set(DateTimeUtil.getParsedTime(task.getStartTime()));
                 this.scheduledAtVisible.set(true);
+                this.scheduledAtAndEndTimeVisible.set(true);
             } else {
                 this.scheduledAtVisible.set(false);
             }
@@ -377,6 +378,7 @@ public class TaskAssignToMeViewModel {
                 this.endTimeText.set(DateTimeUtil.getParsedTime(task.getEndTime()));
 
                 this.endTimeVisible.set(true);
+                this.scheduledAtAndEndTimeVisible.set(true);
             } else {
                 this.endTimeVisible.set(false);
             }
@@ -386,7 +388,7 @@ public class TaskAssignToMeViewModel {
                     if (System.currentTimeMillis() < task.getEndTime()) {
                         this.validExpiry.set(true);
                         this.expiryText.set("Valid");
-                        if (validExpiry.get()&&task.getTaskId() != null) {
+                        if (validExpiry.get() && task.getTaskId() != null) {
                             // handle task's call to action for the SYSTEM executor to execute timer based tasks.
                             if (task.getCurrentStage() != null) {
                                 List<CallToActions> callToActionList = task.getCurrentStage().getCallToActions();
@@ -433,7 +435,7 @@ public class TaskAssignToMeViewModel {
 //                            previousTime = preferencesHelper.getPendingTime().get(task.getTaskId());
 
                                     // long fTim = timeOutInSec - previousTime;
-                                    long counterEndTime = task.getEndTime() ;
+                                    long counterEndTime = task.getEndTime();
                                     if (counterEndTime > System.currentTimeMillis()) {
                                         long fTim = counterEndTime - System.currentTimeMillis();
                                         countDownTimer = new CountDownTimer(fTim, 1000) {
@@ -491,7 +493,7 @@ public class TaskAssignToMeViewModel {
             } else {
                 isFleetDetailVisible.set(false);
             }
-            if (task.getSource() != null && task.getSource().getAddress()!=null&&!task.getSource().getAddress().isEmpty()) {
+            if (task.getSource() != null && task.getSource().getAddress() != null && !task.getSource().getAddress().isEmpty()) {
                 this.taskStartLoc.set(task.getSource().getAddress());
                 this.isStartLocationVisible.set(true);
             }
@@ -505,7 +507,7 @@ public class TaskAssignToMeViewModel {
             } else {
                 paymentVisible.set(false);
             }
-            if (task.getDestination() != null&&task.getDestination().getAddress()!=null && !task.getDestination().getAddress().isEmpty()) {
+            if (task.getDestination() != null && task.getDestination().getAddress() != null && !task.getDestination().getAddress().isEmpty()) {
                 this.taskEndLoc.set(task.getDestination().getAddress());
                 this.isEndLocationVisible.set(true);
             }
@@ -623,13 +625,13 @@ public class TaskAssignToMeViewModel {
 
     @BindingAdapter("encCodeUrl")
     public static void encCodeUrl(LinearLayout view, String url) {
-        if (url!=null){
-            if (!url.isEmpty()){
+        if (url != null) {
+            if (!url.isEmpty()) {
                 view.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 view.setVisibility(View.GONE);
             }
-        }else {
+        } else {
             view.setVisibility(View.GONE);
         }
     }
@@ -644,26 +646,23 @@ public class TaskAssignToMeViewModel {
         view.startAnimation(anim);
     }
 
-    @BindingAdapter("colorFilter")
-    public static void setColorFilter(TextView view, String status) {
-        //PENDING, PAID, CANCELLED
-        if (status.equals("PENDING")) {
-            view.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.layout_bg_payments_status_pending));
-            view.setTextColor(ContextCompat.getColor(view.getContext(), R.color.light_blue_4));
-        } else if (status.equals("PAID")) {
-            view.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.layout_bg_payments_status_paid));
-            view.setTextColor(ContextCompat.getColor(view.getContext(), R.color.green));
-
-        } else if (status.equals("CANCELLED")) {
-            view.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.layout_bg_payments_status_cancel));
-            view.setTextColor(ContextCompat.getColor(view.getContext(), android.R.color.holo_red_dark));
-        } else {
-            view.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.layout_bg_payments_status));
-            view.setTextColor(ContextCompat.getColor(view.getContext(), R.color.colorPrimary));
-
-
+    @BindingAdapter("setColorFilterData")
+    public static void setColorFilterData(TextView view, String status) {
+        if (status != null) {
+            if (status.equals("PENDING")) {
+                view.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.layout_bg_payments_status_pending));
+                view.setTextColor(ContextCompat.getColor(view.getContext(), R.color.light_blue_4));
+            } else if (status.equals("PAID")) {
+                view.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.layout_bg_payments_status_paid));
+                view.setTextColor(ContextCompat.getColor(view.getContext(), R.color.green));
+            } else if (status.equals("CANCELLED")) {
+                view.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.layout_bg_payments_status_cancel));
+                view.setTextColor(ContextCompat.getColor(view.getContext(), android.R.color.holo_red_dark));
+            } else {
+                view.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.layout_bg_payments_status));
+                view.setTextColor(ContextCompat.getColor(view.getContext(), R.color.colorPrimary));
+            }
         }
-
     }
 
     @BindingAdapter("highbackground")
@@ -678,6 +677,7 @@ public class TaskAssignToMeViewModel {
         }
 
     }
+
     @BindingAdapter("highbackgroundshaped")
     public static void setHighLightBackgroundShaped(TextView view, Boolean status) {
         //PENDING, PAID, CANCELLED

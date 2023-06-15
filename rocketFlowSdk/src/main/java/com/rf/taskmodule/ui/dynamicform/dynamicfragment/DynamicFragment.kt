@@ -77,7 +77,6 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
     lateinit var showDynamicFormDataAdapter: ShowDynamicFormDataAdapter
 
 
-
     private var mDynamicViewModel: DynamicViewModel? = null
     private var mFragmentFormListSdkBinding: FragmentFormListSdkBinding? = null
 
@@ -149,10 +148,12 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
         if (arguments != null) {
             showDynamicFormDataAdapter = ShowDynamicFormDataAdapter(ArrayList())
             if (requireArguments().containsKey(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)) {
-                scannerFieldName = requireArguments().getString(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)
+                scannerFieldName =
+                    requireArguments().getString(AppConstants.Extra.EXTRA_SCANNER_FIELD_NAME)
             }
             if (requireArguments().containsKey(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)) {
-                scannerFieldValue = requireArguments().getString(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)
+                scannerFieldValue =
+                    requireArguments().getString(AppConstants.Extra.EXTRA_SCANNER_FIELD_VALUE)
             }
 
             if (requireArguments().getString("tcfId") != null) {
@@ -215,14 +216,16 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                                                                 listOfFile.add(dfile)
                                                             }
                                                         }
-                                                        if(listOfFile.isNotEmpty()){
-                                                            formData.enteredValue = previousDataList[j].enteredValue
+                                                        if (listOfFile.isNotEmpty()) {
+                                                            formData.enteredValue =
+                                                                previousDataList[j].enteredValue
                                                             formData.file = listOfFile
                                                         }
 
                                                     }
-                                                }else{
-                                                    formData.enteredValue = previousDataList[j].enteredValue
+                                                } else {
+                                                    formData.enteredValue =
+                                                        previousDataList[j].enteredValue
                                                 }
                                             }
 
@@ -236,9 +239,12 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                                     formData.widgetData = dat[i].widgetData
                                 }
 
-                                if(!scannerFieldName.isNullOrEmpty()&&!scannerFieldValue.isNullOrEmpty()&&scannerFieldName.equals( dat[i].name)){
-                                    formData.enteredValue =scannerFieldValue
-                                    formData.value =scannerFieldValue
+                                if (!scannerFieldName.isNullOrEmpty() && !scannerFieldValue.isNullOrEmpty() && scannerFieldName.equals(
+                                        dat[i].name
+                                    )
+                                ) {
+                                    formData.enteredValue = scannerFieldValue
+                                    formData.value = scannerFieldValue
                                 }
                                 formData.readOnly = dat[i].readOnly
                                 formData.minLength = dat[i].minLength
@@ -429,7 +435,7 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                 if (file != null && file.exists()) {
                     vidUri = FileProvider.getUriForFile(
                         requireContext().applicationContext,
-                        baseActivity.applicationContext.packageName+ ".provider", file
+                        baseActivity.applicationContext.packageName + ".provider", file
                     )
                     //                    uri = Uri.parse(new File(imageFilePath).toString());
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, vidUri)
@@ -469,6 +475,7 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                 actualImage = ImagePicker.getImageFileToUpload(baseActivity, resultCode, data)
                 compressImage()
             }
+
             CAMERA_PIC_REQUEST -> {
                 if (resultCode == Activity.RESULT_OK) {
                     try {
@@ -540,7 +547,7 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
 //                                    var filePath = SiliCompressor.with(baseActivity)
 //                                        .compressVideo(file.path, file.parent)
                                     var filePath = file.path;
-                                        adapter.formDataList[vidViewposition].enteredValue = filePath
+                                    adapter.formDataList[vidViewposition].enteredValue = filePath
                                     /*if (file.exists()) {
                                         if (file.delete()) {
                                             Log.e("file Deleted :", file!!.path!!)
@@ -618,15 +625,19 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                     TrackiToast.Message.showShort(baseActivity, "User Cancelled the action")
                 }
             }
+
             AUTOCOMPLETE_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     val place = Autocomplete.getPlaceFromIntent(data!!)
                     Log.i(TAG, "Place: " + place.name + ", " + place.id)
                     var latLong = place.latLng
                     var location =
-                        com.rf.taskmodule.ui.addplace.Location(latLong!!.latitude, latLong.longitude)
+                        com.rf.taskmodule.ui.addplace.Location(
+                            latLong!!.latitude,
+                            latLong.longitude
+                        )
                     location.locationId = place.id!!
-                    var hubLocation = com.rf.taskmodule.ui.addplace.HubLocation(location, 0)
+                    var hubLocation = com.rf.taskmodule.ui.addplace.HubLocation(location, 0.0F)
                     hubLocation.address = place.name
                     var jsonConverter =
                         JSONConverter<HubLocation>()
@@ -652,10 +663,11 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                 }
 
             }
-            AppConstants.REQUEST_CODE_SCAN->{
+
+            AppConstants.REQUEST_CODE_SCAN -> {
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null && data.hasExtra("id")) {
-                        var id=data.getStringExtra("id")
+                        var id = data.getStringExtra("id")
                         adapter.formDataList[position].enteredValue = id
                         CommonUtils.showLogMessage(
                             "e",
@@ -772,13 +784,14 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                                 DialogInterface.BUTTON_POSITIVE -> baseActivity.hasPermission(
                                     permissions
                                 )
+
                                 DialogInterface.BUTTON_NEGATIVE ->
                                     // proceed with logic by disabling the related features or quit the app.
                                     baseActivity.finish()
                             }
                         }
                     } else {
-                        Log.e("checkLog","module2")
+                        Log.e("checkLog", "module2")
                         TrackiToast.Message
                             .showLong(baseActivity, "Go to settings and enable permissions")
                     }
@@ -806,8 +819,8 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
             isEditable: Boolean,
             tcfId: String?,
             isHideButton: Boolean,
-             scannerFieldName: String? = null,
-             scannerFieldValue: String? = null,
+            scannerFieldName: String? = null,
+            scannerFieldValue: String? = null,
             formList: ArrayList<FormData>
         ): DynamicFragment {
             val fragment = DynamicFragment()
@@ -858,7 +871,7 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
     }
 
 
-    fun hitGetTaskDataAPI() {
+    private fun hitGetTaskDataAPI() {
         if (formId != null && formId!!.isNotEmpty()) {
             showLoading()
             var data = GetTaskDataRequest()
@@ -885,8 +898,8 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
 
                 if (getTaskDataResponse.data != null) {
                     data = getTaskDataResponse.data!!
-                    getTaskDataResponse.data!!?.let {
 
+                    getTaskDataResponse.data!!?.let {
                         showDynamicFormDataAdapter.addData(it as ArrayList<TaskData>)
                     }
                 }
@@ -911,24 +924,26 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                         }
 
                         for (i in data.indices) {
-                            val key = data.get(i).key
-                            val value = data.get(i).value
+
+                            var key = data[i].key
+                            val value = data[i].value
+
+                            if (key == null) {
+                                key = data[i].label
+                            }
+
                             for (j in formDataList.indices) {
-                                if (key!! == formDataList.get(j).name) {
+                                if (key!! == formDataList[j].name) {
                                     formDataList[j].value = value
                                     formDataList[j].enteredValue = value
                                 }
-
                             }
                         }
-
                     }
-
                 }
-
             }
-
         }
+
         adapter.setFormDataList(formDataList)
         adapter.setIsEditable(isEditable, httpManager)
         adapter.setIsHideButton(isHideButton)
@@ -998,9 +1013,12 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                                 formData.weight = formFieldData[i].weight
                                 formData.operation = formFieldData[i].operation
                                 formData.roles = formFieldData[i].roles
-                                if(!scannerFieldName.isNullOrEmpty()&&!scannerFieldValue.isNullOrEmpty()&&scannerFieldName.equals(formData.name)){
-                                    formData.enteredValue =scannerFieldValue
-                                    formData.value =scannerFieldValue
+                                if (!scannerFieldName.isNullOrEmpty() && !scannerFieldValue.isNullOrEmpty() && scannerFieldName.equals(
+                                        formData.name
+                                    )
+                                ) {
+                                    formData.enteredValue = scannerFieldValue
+                                    formData.value = scannerFieldValue
                                 }
                                 formData.includeForCalculation =
                                     formFieldData[i].includeForCalculation
@@ -1036,30 +1054,35 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                             return
                         }
                     }
+
                     DataType.TIME, DataType.DATE -> {
                         if (formData.maxRange == 0L) {
                             TrackiToast.Message.showShort(baseActivity, formData.errorMessage!!)
                             return
                         }
                     }
+
                     DataType.CONDITIONAL_DROPDOWN_STATIC -> {
                         if (formData.formItemKey == null || formData.formItemKey == "") {
                             TrackiToast.Message.showShort(baseActivity, formData.errorMessage!!)
                             return
                         }
                     }
+
                     DataType.CONDITIONAL_DROPDOWN_API -> {
                         if (formData.formItemKey == null || formData.formItemKey == "") {
                             TrackiToast.Message.showShort(baseActivity, formData.errorMessage!!)
                             return
                         }
                     }
+
                     DataType.DROPDOWN_API -> {
                         if (formData.formItemKey == null || formData.formItemKey == "") {
                             TrackiToast.Message.showShort(baseActivity, formData.errorMessage!!)
                             return
                         }
                     }
+
                     else -> {
                         val enteredValue = formData.enteredValue
                         if (enteredValue == null || enteredValue == "") {
@@ -1259,6 +1282,7 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                         }
 
                     }
+
                     DataType.TIME, DataType.DATE -> {
                         if (formData.maxRange == 0L) {
                             TrackiToast.Message.showShort(baseActivity, formData.errorMessage!!)
@@ -1267,6 +1291,7 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                         }
 
                     }
+
                     DataType.CONDITIONAL_DROPDOWN_STATIC -> {
 
 
@@ -1288,6 +1313,7 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
 
 
                     }
+
                     DataType.CONDITIONAL_DROPDOWN_API -> {
 
                         val enteredValue = formData.enteredValue
@@ -1307,6 +1333,7 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                         }
 
                     }
+
                     DataType.DROPDOWN_API -> {
 
                         val enteredValue = formData.enteredValue
@@ -1326,6 +1353,7 @@ class DynamicFragment : BaseSdkFragment<FragmentFormListSdkBinding, DynamicViewM
                         }
 
                     }
+
                     else -> {
 
                         val enteredValue = formData.enteredValue

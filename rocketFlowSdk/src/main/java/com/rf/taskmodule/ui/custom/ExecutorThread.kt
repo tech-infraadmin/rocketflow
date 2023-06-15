@@ -44,11 +44,8 @@ class ExecutorThread : HandlerThread(ExecutorThread::class.java.name) {
                 //create a batch list
                 //change batch size 2 to 1
                 val chunkedList = CommonUtils.chunkArrayList(entryMap.value, 1)
+                Log.e("ExecutorThread", "File Size =>$chunkedList")
                 Log.e("ExecutorThread","File Size =>"+chunkedList.size)
-                var jsonConverter=
-                    JSONConverter<ArrayList<List<File>>>()
-                var fileStr=jsonConverter.objectToJson(chunkedList)
-                  Log.e("ExecutorThread",fileStr)
                 for (j in chunkedList.indices) {
                     val worker = Worker(key, chunkedList[j], httpManager!!, api!!, mHandler)
                     //start the service by submit callable

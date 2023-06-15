@@ -92,12 +92,12 @@
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cardFromDate"
-                        android:layout_weight="1.4"
                         android:layout_width="0dp"
-                        android:visibility="gone"
                         android:layout_height="@dimen/dimen_30"
-                        android:layout_marginStart="@dimen/dimen_5"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/dimen_5"
+                        android:layout_weight="1.4"
+                        android:visibility="gone"
                         app:cardBackgroundColor="@color/light_gray"
                         app:cardCornerRadius="@dimen/dimen_20"
                         app:cardElevation="@dimen/dimen_0">
@@ -133,11 +133,11 @@
 
                     <RelativeLayout
                         android:layout_width="0dp"
-                        android:visibility="gone"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="@dimen/dimen_10"
-                        android:layout_weight="0.75">
+                        android:layout_weight="0.75"
+                        android:visibility="gone">
 
 
                         <androidx.cardview.widget.CardView
@@ -188,7 +188,6 @@
                     <ImageButton
                         android:id="@+id/btnSubmit"
                         style="@style/ButtonStyle"
-                        android:visibility="gone"
                         android:layout_width="0dp"
                         android:layout_height="@dimen/dimen_30"
                         android:layout_gravity="center_vertical"
@@ -197,29 +196,30 @@
                         android:background="@drawable/ic_enter"
                         android:text="@string/submit"
                         android:textAllCaps="false"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"
+                        android:visibility="gone" />
 
                     <com.google.android.material.chip.Chip
+                        android:id="@+id/tvFromDate"
+                        style="@style/TextViewStyle"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/dimen_5"
+                        android:layout_weight="1.4"
                         android:text="Date"
                         android:textAlignment="center"
-                        style="@style/TextViewStyle"
-                        android:layout_weight="1.4"
-                        android:textSize="@dimen/text_size_12"
-                        android:layout_margin="@dimen/dimen_5"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/tvFromDate" />
+                        android:textSize="@dimen/text_size_12" />
 
                     <com.google.android.material.chip.Chip
-                        android:layout_width="wrap_content"
-                        android:text="All"
+                        android:id="@+id/selectedStageChip"
                         style="@style/TextViewStyle"
-                        android:textSize="@dimen/text_size_12"
-                        android:textAlignment="center"
-                        android:layout_weight="0.6"
-                        android:layout_margin="@dimen/dimen_5"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/selectedStageChip" />
+                        android:layout_margin="@dimen/dimen_5"
+                        android:layout_weight="0.6"
+                        android:text="All"
+                        android:textAlignment="center"
+                        android:textSize="@dimen/text_size_12" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -227,12 +227,12 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardstages"
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/dimen_5"
             android:layout_marginTop="@dimen/dimen_5"
             android:layout_marginRight="@dimen/dimen_5"
+            android:visibility="gone"
             app:cardElevation="@dimen/dimen_0">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -250,18 +250,18 @@
         </androidx.cardview.widget.CardView>
 
         <LinearLayout
-            android:orientation="vertical"
             android:id="@+id/no_data_layout"
-            android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_marginTop="@dimen/dimen_50"
                 android:layout_marginStart="@dimen/dimen_10"
+                android:layout_marginTop="@dimen/dimen_50"
                 android:layout_marginEnd="@dimen/dimen_10"
                 android:gravity="center"
                 android:orientation="vertical">
@@ -284,10 +284,41 @@
 
         </LinearLayout>
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmer_view_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include layout="@layout/data_placeholder_layout" />
+
+                <include layout="@layout/data_placeholder_layout" />
+
+                <include layout="@layout/data_placeholder_layout" />
+
+                <include layout="@layout/data_placeholder_layout" />
+
+                <include layout="@layout/data_placeholder_layout" />
+
+                <include layout="@layout/data_placeholder_layout" />
+
+                <include layout="@layout/data_placeholder_layout" />
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvAssignedToMe"

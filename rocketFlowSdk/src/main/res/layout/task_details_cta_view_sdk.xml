@@ -29,6 +29,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/dimen_30"
             android:background="@drawable/view_line_indigator" />
+
         <TextView
             android:id="@+id/tvLabelTakeAction"
             style="@style/TextViewStyle"

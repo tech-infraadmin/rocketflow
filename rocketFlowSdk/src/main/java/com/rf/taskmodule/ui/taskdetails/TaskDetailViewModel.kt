@@ -38,9 +38,7 @@ import kotlin.collections.set
  * Created by rahul on 16/10/18
  */
 class TaskDetailViewModel(dataManager: DataManager, schedulerProvider: SchedulerProvider) :
-        BaseSdkViewModel<TaskDetailNavigator>(dataManager, schedulerProvider),
-    ApiCallback,
-        LocationObserver {
+        BaseSdkViewModel<TaskDetailNavigator>(dataManager, schedulerProvider), ApiCallback, LocationObserver {
 
     var isContactAvail = ObservableBoolean(false)
     var isPayoutEligible = ObservableBoolean(false)
@@ -98,11 +96,11 @@ class TaskDetailViewModel(dataManager: DataManager, schedulerProvider: Scheduler
         if (task.contact != null) {
             if (task.contact!!.name != null) {
                 setContact(task.contact?.name!!)
-            } else if (task.contact!!.mobileNumber != null) {
-                setContact(task.contact?.mobileNumber!!)
+            } else if (task.contact!!.mobile != null) {
+                setContact(task.contact?.mobile!!)
             }
 
-            if (task.contact!!.mobileNumber != null) {
+            if (task.contact!!.mobile != null) {
                 setIsContactAvail(true)
             } else {
                 setIsContactAvail(false)

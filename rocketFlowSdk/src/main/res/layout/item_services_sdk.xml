@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="data"
+            type="com.rf.taskmodule.data.model.response.config.Service" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+        <RelativeLayout
+            android:id="@+id/rlTimeLine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dimen_10"
+            android:padding="@dimen/dimen_10">
+
+            <TextView
+                android:id="@+id/tvName"
+                style="@style/TextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@{data.name}"
+                android:layout_marginStart="@dimen/dimen_15"
+                android:layout_toRightOf="@+id/btnDetails"
+                android:fontFamily="@font/campton_book"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_14"
+                tools:text="delhi" />
+
+            <ImageView
+                android:id="@+id/btnDetails"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:scaleType="centerCrop"
+                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true" />
+
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_1"
+            android:layout_below="@+id/rlTimeLine"
+            android:layout_marginLeft="@dimen/dimen_10"
+            android:layout_marginTop="@dimen/dimen_10"
+            android:layout_marginRight="@dimen/dimen_10"
+            android:background="@color/semi_gray_5" />
+
+
+    </RelativeLayout>
+</layout>

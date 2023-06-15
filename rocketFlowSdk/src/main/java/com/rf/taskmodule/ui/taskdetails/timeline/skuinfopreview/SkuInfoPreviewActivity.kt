@@ -142,6 +142,7 @@ open class SkuInfoPreviewActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, S
 
         httpManager = RocketFlyer.httpManager()!!
         preferencesHelper = RocketFlyer.preferenceHelper()!!
+        Log.d("TAG", "SkuInfoPreviewActivity")
 
         setToolbar(binding.toolbar, "Unit Info")
         handlerThread = ExecutorThread()
@@ -188,20 +189,15 @@ open class SkuInfoPreviewActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, S
         if (intent.hasExtra(AppConstants.Extra.EXTRA_CTA_ID))
             ctaId = intent.getStringExtra(AppConstants.Extra.EXTRA_CTA_ID)
 
-        CommonUtils.showLogMessage("d", "ctaId", ctaId)
+        val viewProgress = binding.viewProgressNew
+        titleText = viewProgress.findViewById(R.id.tvTitle)
+        currentStatusText = viewProgress.findViewById(R.id.currentStatusText)
+        percentageText = viewProgress.findViewById(R.id.tvPercentage)
+        progressBar = viewProgress.findViewById(R.id.pb_loading_new)
+        rlSubmittingData = viewProgress.findViewById(R.id.rlSubmittingData)
+        rlProgress = viewProgress.findViewById(R.id.rlProgress)
 
-        var viewProgress = binding.viewProgress
-        titleText = viewProgress.findViewById<TextView>(R.id.tvTitle)
-        currentStatusText = viewProgress!!.findViewById<TextView>(R.id.currentStatusText)
-        percentageText = viewProgress!!.findViewById<TextView>(R.id.tvPercentage)
-        progressBar = viewProgress!!.findViewById<ProgressBar>(R.id.pb_loading)
-        rlSubmittingData = viewProgress!!.findViewById<RelativeLayout>(R.id.rlSubmittingData)
-        rlProgress = viewProgress!!.findViewById<RelativeLayout>(R.id.rlProgress)
-
-        showDynamicFormDataAdapter =
-            DynamicAdapter(
-                ArrayList()
-            )
+        showDynamicFormDataAdapter = DynamicAdapter(ArrayList())
         showDynamicFormDataAdapter.setAdapterListener(this)
         showDynamicFormDataAdapter.setIsEditable(true,httpManager)
         rvDynamicForm = binding.rvDynamicFormsMini
@@ -324,11 +320,9 @@ open class SkuInfoPreviewActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, S
     override fun handleUploadFileResponse(callback: ApiCallback, result: Any?, error: APIError?) {
         hideLoading()
         if (CommonUtils.handleResponse(callback, error, result, this)) {
-
             if (!isOtpApiHit) {
                 val fileUrlsResponse =
                     Gson().fromJson(result.toString(), FileUrlsResponse::class.java)
-
             } else {
                 val baseResponse = Gson().fromJson(result.toString(), OtpResponse::class.java)
                 if (baseResponse.successful) {
@@ -337,9 +331,7 @@ open class SkuInfoPreviewActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, S
                     baseResponse.responseMsg?.let {
                         TrackiToast.Message.showShort(this, it)
                     }
-
                 }
-
             }
         }
     }
@@ -639,7 +631,7 @@ open class SkuInfoPreviewActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, S
             if (hashMapFileRequest.isNotEmpty()) {
                 if (NetworkUtils.isNetworkConnected(this)) {
                     if (NetworkUtils.isConnectedFast(this)) {
-                        binding.viewProgress.visibility = View.VISIBLE
+                        binding.viewProgressNew.visibility = View.VISIBLE
                         CommonUtils.makeScreenDisable(this)
                         fileUploadCounter = 0
                         nestedScrollView.postDelayed(
@@ -1097,7 +1089,7 @@ open class SkuInfoPreviewActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, S
                     var location =
                         com.rf.taskmodule.ui.addplace.Location(latLong!!.latitude, latLong.longitude)
                     location.locationId = place.id!!
-                    var hubLocation = com.rf.taskmodule.ui.addplace.HubLocation(location, 0)
+                    var hubLocation = com.rf.taskmodule.ui.addplace.HubLocation(location, 0.0F)
                     hubLocation.address = place.name
                     var jsonConverter =
                         JSONConverter<HubLocation>()
@@ -1156,7 +1148,7 @@ open class SkuInfoPreviewActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, S
                     Log.e(TAG, "progressUploadText=> $progressUploadText")
                     Log.e(TAG, "percentage=> $percentage")
                     runOnUiThread {
-                        progressBar!!.progress = percentage
+                        progressBar?.progress = percentage
                         percentageText!!.text = "$percentage %"
                         currentStatusText!!.text = progressUploadText
                     }
@@ -1166,7 +1158,7 @@ open class SkuInfoPreviewActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, S
                     //get hashMap from adapter and match the name with key of maps
                     // if found then replace entered value with url of image
                     runOnUiThread {
-                        rlProgress!!.visibility = View.GONE
+                        rlProgress?.visibility = View.GONE
                         rlSubmittingData!!.visibility = View.VISIBLE
                     }
                     if (mainData?.isNotEmpty()!!) {
@@ -1198,7 +1190,7 @@ open class SkuInfoPreviewActivity : BaseSdkActivity<ActivitySkuInfoSdkBinding, S
                 /*For Error*/1 -> {
                 if (count == 0) {
                     runOnUiThread {
-                        binding.viewProgress.visibility = View.GONE
+                        binding.viewProgressNew.visibility = View.GONE
                         CommonUtils.makeScreenClickable(this@SkuInfoPreviewActivity)
                     }
                     count++

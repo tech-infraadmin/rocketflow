@@ -32,7 +32,7 @@ import com.rf.taskmodule.ui.base.BaseSdkViewHolder
 import com.rf.taskmodule.ui.dynamicform.FormEmptyItemViewModel
 import com.rf.taskmodule.utils.CommonUtils
 import com.rf.taskmodule.utils.Log
-import taskmodule.ui.PlayVideoVerticallyActivity
+import com.rf.taskmodule.utils.PlayVideoVerticallyActivity
 import java.io.IOException
 
 

@@ -76,6 +76,15 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
     private var mDynamicViewModel: NewDynamicViewModel? = null
     private var mFragmentFormListBinding: NewDynamicFormFragmentBinding? = null
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        val rvDynamicForm = mFragmentFormListBinding?.rvDynamicForms
+        rvDynamicForm?.adapter = null
+        adapter =  DynamicAdapter(ArrayList())
+        rvDynamicForm?.adapter = adapter
+        mFragmentFormListBinding = null
+    }
+
     var positions = -1
 
     private var permissionArray =
@@ -84,7 +93,7 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
     private lateinit var formData: FormData
     private var position = -1
     private var vidViewposition = -1
-    lateinit var formDataList: ArrayList<FormData>
+    lateinit var formDataListUpdated: ArrayList<FormData>
     lateinit var productFormData: ArrayList<DynamicFormData>
     private var actualImage: File? = null
     private var compressedImage: File? = null
@@ -157,14 +166,15 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
                 //taskAction = getFormType(arguments?.getString("action")!!)
                 dynamicFormsNew = CommonUtils.getFormByFormId(formId)
                 CommonUtils.showLogMessage("e", "formId", formId)
-                var jsonConverter =
+                CommonUtils.showLogMessage("e", "formId", dynamicFormsNew.toString())
+                val jsonConverter =
                     JSONConverter<DynamicFormsNew>()
-                var data = jsonConverter.objectToJson(dynamicFormsNew)
+                val data = jsonConverter.objectToJson(dynamicFormsNew)
 
                 CommonUtils.showLogMessage("e", "form data", data.toString())
                 if (dynamicFormsNew != null) {
                     val dat = dynamicFormsNew?.fields!!
-                    formDataList = ArrayList()
+                    formDataListUpdated = ArrayList()
 
                     var fieldArrayList = ArrayList<String>()
                     var allowedFields = ArrayList<Field>()
@@ -187,7 +197,7 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
 
                     allowedFields = CommonUtils.getAllowedFields(fieldArrayList,taskId,preferencesHelper) as ArrayList<Field>
 
-                    var listFields = ArrayList<FormData>()
+                    val listFields = ArrayList<FormData>()
 
                     if (allowedFields.isNotEmpty()){
                         for (allowedField in allowedFields){
@@ -212,7 +222,7 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
                             listFields.add(formData)
 
                         }
-                        formDataList.addAll(listFields)
+                        formDataListUpdated.addAll(listFields)
                     }
                     for (i in dat.indices) {
                         val formData = FormData()
@@ -229,8 +239,8 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
                         formData.file = dat[i].file
 
                         if (preferencesHelper.formDataMap != null && preferencesHelper.formDataMap.isNotEmpty()) {
-                            var previousDataList = preferencesHelper.formDataMap[formId]
-                            if (previousDataList != null && previousDataList.isNotEmpty()) {
+                            val previousDataList = preferencesHelper.formDataMap[formId]
+                            if (!previousDataList.isNullOrEmpty()) {
                                 for (j in previousDataList.indices) {
                                     if (formData.name!! == previousDataList[j].name) {
                                         formData.value = previousDataList[j].value
@@ -241,9 +251,15 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
 
                                             if (previousDataList[j].file != null) {
                                                 var listOfFile = ArrayList<File>()
-                                                for (dfile in previousDataList[j].file!!) {
-                                                    if (dfile.exists()) {
-                                                        listOfFile.add(dfile)
+                                                if (previousDataList[j].file?.size!! > 0) {
+                                                    for (dfile in previousDataList[j].file!!) {
+                                                       try {
+                                                           if (dfile.exists()) {
+                                                               listOfFile.add(dfile)
+                                                           }
+                                                       }catch (e: java.lang.Exception){
+                                                           e.printStackTrace()
+                                                       }
                                                     }
                                                 }
                                                 if(listOfFile.isNotEmpty()){
@@ -257,23 +273,25 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
                                             formData.enteredValue = previousDataList[j].enteredValue
                                         }
                                     }
-
                                 }
+                            }else {
+                                formData.maxRange = dat[i].maxRange
+                                formData.minRange = dat[i].minRange
+                                formData.value = dat[i].value
+                                formData.widgetData = dat[i].widgetData
                             }
-
                         } else {
                             formData.maxRange = dat[i].maxRange
                             formData.minRange = dat[i].minRange
                             formData.value = dat[i].value
                             formData.widgetData = dat[i].widgetData
                         }
-
                         formData.readOnly = dat[i].readOnly
                         formData.minLength = dat[i].minLength
                         formData.weight = dat[i].weight
                         formData.roles = dat[i].roles
                         formData.dynamicSelectLookup = dat[i].dynamicSelectLookup
-                        formDataList.add(formData)
+                        formDataListUpdated.add(formData)
                     }
 
                 }
@@ -282,15 +300,13 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
                         val key = productFormData[i].key
                         val value = productFormData[i].value
 
-                        for (j in formDataList.indices) {
-                            if (key!! == formDataList.get(j).name) {
-                                formDataList[j].value = value
-                                formDataList[j].enteredValue = value
+                        for (j in formDataListUpdated.indices) {
+                            if (key!! == formDataListUpdated.get(j).name) {
+                                formDataListUpdated[j].value = value
+                                formDataListUpdated[j].enteredValue = value
                             }
-
                         }
                     }
-
                 }
             }
         } catch (e: Exception) {
@@ -301,10 +317,8 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
         val rvDynamicForm = mFragmentFormListBinding?.rvDynamicForms
         manager = LinearLayoutManager(baseActivity)
         rvDynamicForm?.layoutManager = manager
-        adapter =
-            DynamicAdapter(
-                ArrayList()
-            )
+        rvDynamicForm?.adapter = null
+        adapter =  DynamicAdapter(ArrayList())
         adapter.setAdapterListener(this)
         adapter.setPreferencesHelper(preferencesHelper)
         rvDynamicForm?.adapter = adapter
@@ -613,7 +627,7 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
                     var location =
                         com.rf.taskmodule.ui.addplace.Location(latLong!!.latitude, latLong.longitude)
                     location.locationId = place.id!!
-                    var hubLocation = com.rf.taskmodule.ui.addplace.HubLocation(location, 0)
+                    var hubLocation = com.rf.taskmodule.ui.addplace.HubLocation(location, 0.0F)
                     hubLocation.address = place.name
                     var jsonConverter =
                         JSONConverter<HubLocation>()
@@ -822,7 +836,6 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
         ): NewDynamicFormFragment {
             val fragment = NewDynamicFormFragment()
             val bundle = Bundle()
-//            bundle.putString("action", taskAction)
             bundle.putString("formId", formId)
             bundle.putString("taskId", taskId)
             bundle.putSerializable("hashMap", formList)
@@ -855,11 +868,12 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
             val executive =
                 Gson().fromJson<ExecutiveMap>(result.toString(), ExecutiveMap::class.java)
             executive?.let {
-                if (formDataList.isNotEmpty()) {
-                    val formData = formDataList[position]
+                if (formDataListUpdated.isNotEmpty()) {
+                    val formData = formDataListUpdated[position]
                     formData.apiMap = it.data
-                    formDataList[position] = formData
-                    adapter.setFormDataList(formDataList)
+                    formDataListUpdated[position] = formData
+                    adapter.setFormDataList(formDataListUpdated)
+                    Log.d("formID", "setFormDataList 1  ><<<<<<< $formDataListUpdated")
                     adapter.setIsEditable(isEditable, httpManager)
                     adapter.setIsHideButton(true)
                     // adapter.setDynamicFragmentInstance(this)
@@ -880,7 +894,7 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
             mDynamicViewModel!!.getTaskData(httpManager, data)
         } else {
             context?.let {
-                TrackiToast.Message.showLong(requireContext(), "Form Did't Bind Properly")
+                //TrackiToast.Message.showLong(requireContext(), "Form Did't Bind Properly")
             }
 
         }
@@ -908,10 +922,10 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
                           val key = data.get(i).key
                           val value = data.get(i).value
 
-                          for (j in formDataList.indices) {
-                              if (key!!.equals(formDataList.get(j).name)) {
-                                  formDataList.get(j).value = value
-                                  formDataList.get(j).enteredValue = value
+                          for (j in formDataListUpdated.indices) {
+                              if (key!!.equals(formDataListUpdated.get(j).name)) {
+                                  formDataListUpdated.get(j).value = value
+                                  formDataListUpdated.get(j).enteredValue = value
                               }
 
                           }
@@ -927,7 +941,8 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
 
       }
 
-        adapter.setFormDataList(formDataList)
+        adapter.setFormDataList(formDataListUpdated)
+        Log.d("formID", "setFormDataList 2 ><<<<<<< $formDataListUpdated")
         adapter.setIsEditable(isEditable, httpManager)
         adapter.setIsHideButton(true)
         //adapter.setDynamicFragmentInstance(this)
@@ -1058,29 +1073,22 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
                                 }
                             }
                             preferencesHelper.formDataMap = map
-                            var jsonConverter =
+                            val jsonConverter =
                                 JSONConverter<HashMap<String, ArrayList<FormData>>>()
-                            var data = jsonConverter.objectToJson(map)
-                            CommonUtils.showLogMessage(
-                                "e",
-                                "inner form data value",
-                                data.toString()
+                            val data = jsonConverter.objectToJson(map)
+                            CommonUtils.showLogMessage("e",      "inner form data value", data.toString()
                             )
                             if (checkValidation(llFiledList as ArrayList<FormData>)) {
                                 return
-
                             }
                         }
-
                     }
-
-
                 }
             }
         }
 
         if (formSubmitListener != null) {
-            var map = HashMap<String, ArrayList<FormData>>()
+            val map = HashMap<String, ArrayList<FormData>>()
             map[formId!!] = fieldList
            /* if (preferencesHelper.formDataMap != null && preferencesHelper.formDataMap.isNotEmpty()) {
                 val hmIterator: Iterator<*> = preferencesHelper.formDataMap.entries.iterator()
@@ -1091,17 +1099,19 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
                 }
             }*/
             preferencesHelper.formDataMap = map
-            var jsonConverter =
-                JSONConverter<HashMap<String, ArrayList<FormData>>>()
-            var data = jsonConverter.objectToJson(map)
-            CommonUtils.showLogMessage("e", "form data value", data.toString())
+            val jsonConverter = JSONConverter<HashMap<String, ArrayList<FormData>>>()
+            val data = jsonConverter.objectToJson(map)
+            CommonUtils.showLogMessage("e", "form data value", fieldList.toString())
+            CommonUtils.showLogMessage("e", "form data value", formDataa.toString())
+            CommonUtils.showLogMessage("e", "form data value", formDataa?.actionConfig?.action.toString()
+            )
             formSubmitListener?.onProcessClick(fieldList, formDataa?.actionConfig, formId!!, dfdId)
         }
         //submit data to activity
 
     }
 
-    override fun sendButtonInstance(button: Button?, isEditable: Boolean) {;
+    override fun sendButtonInstance(button: Button?, isEditable: Boolean) {
         this.mButton = button
         if (!isEditable)
             mButton!!.isEnabled = false
@@ -1284,11 +1294,8 @@ class NewDynamicFormFragment : BaseSdkFragment<NewDynamicFormFragmentBinding, Ne
                                 }
                             }
                         }
-
-
                     }
                 }
-
             }
         }
         return isTrue

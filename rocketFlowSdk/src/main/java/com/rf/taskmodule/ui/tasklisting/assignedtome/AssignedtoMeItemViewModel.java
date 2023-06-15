@@ -134,10 +134,10 @@ public class AssignedtoMeItemViewModel {
             if (task.getContact() != null) {
                 if (task.getContact().getName() != null) {
                     contact.set(task.getContact().getName());
-                } else if (task.getContact().getMobileNumber() != null) {
-                    contact.set(task.getContact().getMobileNumber());
+                } else if (task.getContact().getMobile() != null) {
+                    contact.set(task.getContact().getMobile());
                 }
-                isContactAvail.set(task.getContact().getMobileNumber() != null);
+                isContactAvail.set(task.getContact().getMobile() != null);
             }
             if (task.getAssigneeDetail() != null) {
                 if (!task.getAutoCreated() && !task.getAutoCancel()) {

@@ -44,16 +44,16 @@ data class AddProductRequest(
     ):Parcelable
 
 @Parcelize
-data class UnitInfo(
+data class UnitInfo (
     var packInfo: PackInfo?=null,
     var quantity: Float?=null,
     var type: String?=null
-):Parcelable
+): Parcelable
 
 @Parcelize
-data class PackInfo(
+data class PackInfo (
     var from: Long?=null,
     var to: Long?=null,
     var unitType: String?=null
-):Parcelable
+): Parcelable
 

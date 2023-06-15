@@ -1,21 +1,31 @@
 package com.rf.taskmodule.ui.webview
 
+//import com.rf.taskmodule.ui.Config
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.media.MediaPlayer
 import android.net.http.SslError
 import android.os.Bundle
+import android.os.Handler
+import android.view.Gravity
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.webkit.*
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.rocketflow.sdk.RocketFlyer
 import com.rf.taskmodule.BR
-//import com.rf.taskmodule.ui.Config
 import com.rf.taskmodule.R
 import com.rf.taskmodule.data.local.prefs.PreferencesHelper
 import com.rf.taskmodule.data.model.response.config.ConfigResponse
@@ -30,6 +40,7 @@ import com.rf.taskmodule.utils.AppConstants.Extra.EXTRA_WEB_INFO
 import com.rf.taskmodule.utils.CommonUtils
 import com.rf.taskmodule.utils.Log
 import com.rf.taskmodule.utils.NextScreen
+import com.rocketflow.sdk.RocketFlyer
 
 
 /**
@@ -39,11 +50,13 @@ class WebViewActivity : BaseSdkActivity<ActivityWebviewSdkBinding, WebViewModel>
 {
 
     lateinit var httpManager: HttpManager
+    var renewal = false
 
     lateinit var mWebViewModel: WebViewModel
 
     lateinit var prefsHelper: PreferencesHelper
 
+    private var mediaPlayer: MediaPlayer? = null
     private var mActivityWebviewBinding: ActivityWebviewSdkBinding? = null
 
     private var accessId: String? = null
@@ -97,11 +110,18 @@ class WebViewActivity : BaseSdkActivity<ActivityWebviewSdkBinding, WebViewModel>
     @SuppressLint("SetJavaScriptEnabled")
     @Throws(Exception::class)
     private fun init() {
+        renewal = false
         if (intent.hasExtra(EXTRA_WEB_INFO)) {
             navigation = intent?.getSerializableExtra(EXTRA_WEB_INFO) as Navigation
         }
         if (intent.hasExtra("webviewUrl")){
             webviewUrl = intent.getStringExtra("webviewUrl")
+        }
+
+        if (intent.hasExtra("payUrl")){
+            webviewUrl = intent.getStringExtra("payUrl")
+            setToolbar(mActivityWebviewBinding!!.toolbar,"Renewal")
+            renewal = true
         }
 
         if (intent.hasExtra("mobile")){
@@ -218,6 +238,26 @@ class WebViewActivity : BaseSdkActivity<ActivityWebviewSdkBinding, WebViewModel>
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
             contentProgressBar.visibility = View.GONE
+            if (renewal){
+                Log.e("urlSet","setfull = $url")
+                val webUrl = url
+                val web1 = webUrl?.split("/")
+                if (web1 != null) {
+                    if (web1.size>6){
+                        val web2 = web1[7]
+                        Log.e("urlSet","full url = $webUrl endpoint = $web2")
+                        if (web2 == "SUCCESS"){
+                            openSFDialog(true,this@WebViewActivity)
+                        }
+                        else if(web2 == "FAILURE"){
+                            openSFDialog(false,this@WebViewActivity)
+                        }
+                    }
+
+                }
+
+
+            }
 
         }
 
@@ -250,5 +290,63 @@ class WebViewActivity : BaseSdkActivity<ActivityWebviewSdkBinding, WebViewModel>
                 }
             }
         }
+    }
+
+    fun openSFDialog(success: Boolean, context: Context) {
+        val dialog = Dialog(context)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.dialog_payment_sdk)
+        dialog.window!!.attributes.windowAnimations = R.style.DialogZoomOutAnimation
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(false)
+        val window = dialog.window
+        window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        window.setGravity(Gravity.CENTER)
+
+        val image = dialog.findViewById<ImageView>(R.id.iv_status)
+        val proceed = dialog.findViewById<AppCompatButton>(R.id.btn_proceed)
+        val text = dialog.findViewById<TextView>(R.id.tv_payment)
+        val desc = dialog.findViewById<TextView>(R.id.tv_payment_desc)
+
+        text.visibility = View.VISIBLE
+        proceed.visibility = View.VISIBLE
+        image.visibility = View.VISIBLE
+        if (success) {
+            playSound()
+            text.text = "Payment Successful"
+            desc.text = "Congratulations, Your Transaction Was Successful. Continue and restart your app for the changes to apply."
+            text.setTextColor(context.getColor(R.color.green_google_button))
+            image.setImageDrawable(context.getDrawable(R.drawable.ic_green_tick))
+        } else {
+            playSound()
+            text.text = "Payment Unsuccessful"
+            desc.text = "Your Transaction was unsuccessful. Please try again"
+            text.setTextColor(context.getColor(R.color.red_dark5))
+            image.setImageDrawable(context.getDrawable(R.drawable.i_cross_red))
+        }
+
+        proceed.setOnClickListener {
+
+            finish()
+            finishAffinity()
+        }
+        if (!dialog.isShowing) dialog.show()
+    }
+
+    private fun playSound() {
+
+        mediaPlayer = MediaPlayer.create(context, R.raw.beep)
+        mediaPlayer!!.start()
+        Handler().postDelayed({
+            if (mediaPlayer != null) {
+                mediaPlayer!!.stop()
+            }
+        }, 2000)
+
+
     }
 }

@@ -1432,7 +1432,7 @@ class AddProductActivity : BaseSdkActivity<ActivityAddProductSdkBinding, AddProd
                     Log.e(AddProductActivity.TAG, "progressUploadText=> " + progressUploadText)
                     Log.e(AddProductActivity.TAG, "percentage=> " + percentage.toString())
                     runOnUiThread {
-                        progressBar!!.progress = percentage
+                        progressBar?.progress = percentage
                         percentageText!!.text = "$percentage %"
                         currentStatusText!!.text = progressUploadText
 
@@ -1447,7 +1447,7 @@ class AddProductActivity : BaseSdkActivity<ActivityAddProductSdkBinding, AddProd
                     //get hashMap from adapter and match the name with key of maps
                     // if found then replace entered value with url of image
                     runOnUiThread {
-                        rlProgress!!.visibility = View.GONE
+                        rlProgress?.visibility = View.GONE
                         rlSubmittingData!!.visibility = View.VISIBLE
 
                     }

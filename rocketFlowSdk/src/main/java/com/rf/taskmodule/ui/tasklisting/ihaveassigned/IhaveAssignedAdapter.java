@@ -51,13 +51,16 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
     private Context context;
     private String categoryId = null;
     private PreferencesHelper preferencesHelper;
-    private String reffranceLabel=null;
-    public  void setReffLabel(String reffranceLabel){
-        this.reffranceLabel=reffranceLabel;
+    private String reffranceLabel = null;
+
+    public void setReffLabel(String reffranceLabel) {
+        this.reffranceLabel = reffranceLabel;
     }
+
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
     }
+
     IhaveAssignedAdapter(List<Task> responseList, PreferencesHelper preferencesHelper) {
         this.mResponseList = responseList;
         this.preferencesHelper = preferencesHelper;
@@ -105,11 +108,13 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
                 return new EmptyViewHolder(emptyViewBinding);
         }
     }
-    public List<Task> getList(){
+
+    public List<Task> getList() {
         return mResponseList;
     }
+
     public void addItems(List<Task> stringList) {
-       // clearItems();
+        // clearItems();
         mResponseList.addAll(stringList);
         Set<Task> set = new TreeSet<>(new TaskComparator());
         set.addAll(mResponseList);
@@ -131,6 +136,7 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
         }
         return null;
     }
+
     public void clearItems() {
         mResponseList.clear();
     }
@@ -168,32 +174,31 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
             final Task task = mResponseList.get(position);
             itemViewModel = new TaskAssignToMeViewModel(task, this, context, preferencesHelper, categoryId);
             mBinding.setViewModel(itemViewModel);
-            Boolean isVendorVisible=false;
-            Boolean isPointOfContactVisible=false;
-            if(categoryId!=null)
-            {
-                String startLocationLabel=CommonUtils.getAllowFieldLabelName("START_LOCATION",categoryId,preferencesHelper);
-                String systemLocationLabel=CommonUtils.getAllowFieldLabelName("SYSTEM_LOCATION",categoryId,preferencesHelper);
-                if(!startLocationLabel.isEmpty()){
+            Boolean isVendorVisible = false;
+            Boolean isPointOfContactVisible = false;
+            if (categoryId != null) {
+                String startLocationLabel = CommonUtils.getAllowFieldLabelName("START_LOCATION", categoryId, preferencesHelper);
+                String systemLocationLabel = CommonUtils.getAllowFieldLabelName("SYSTEM_LOCATION", categoryId, preferencesHelper);
+                if (!startLocationLabel.isEmpty()) {
                     mBinding.labelStartLocation.setText(startLocationLabel);
                 }
-                if(!systemLocationLabel.isEmpty()){
+                if (!systemLocationLabel.isEmpty()) {
                     mBinding.labelStartLocation.setText(systemLocationLabel);
                 }
-                String taskId=CommonUtils.getAllowFieldLabelName("TASK_ID",categoryId,preferencesHelper);
-                if(!taskId.isEmpty()){
+                String taskId = CommonUtils.getAllowFieldLabelName("TASK_ID", categoryId, preferencesHelper);
+                if (!taskId.isEmpty()) {
                     mBinding.labelId.setText(taskId);
                 }
-                String endLocationName=CommonUtils.getAllowFieldLabelName("END_LOCATION",categoryId,preferencesHelper);
-                if(!endLocationName.isEmpty()){
+                String endLocationName = CommonUtils.getAllowFieldLabelName("END_LOCATION", categoryId, preferencesHelper);
+                if (!endLocationName.isEmpty()) {
                     mBinding.labelEndLocation.setText(endLocationName);
                 }
-                String startTime=CommonUtils.getAllowFieldLabelName("START_TIME",categoryId,preferencesHelper);
-                if(!startTime.isEmpty()){
+                String startTime = CommonUtils.getAllowFieldLabelName("START_TIME", categoryId, preferencesHelper);
+                if (!startTime.isEmpty()) {
                     mBinding.labelScheduledAt.setText(startTime);
                 }
-                String endTime=CommonUtils.getAllowFieldLabelName("END_TIME",categoryId,preferencesHelper);
-                if(!endTime.isEmpty()){
+                String endTime = CommonUtils.getAllowFieldLabelName("END_TIME", categoryId, preferencesHelper);
+                if (!endTime.isEmpty()) {
                     mBinding.labelEndAt.setText(endTime);
                 }
             }
@@ -207,19 +212,18 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
                     }
                 }
             });
-            if(task.getAssignmentType()!=null&&task.getAssignmentType().equals("USER"))
-            {
-                CommonUtils.showLogMessage("e","task.getAssignmentType()",task.getAssignmentType());
+            if (task.getAssignmentType() != null && task.getAssignmentType().equals("USER")) {
+                CommonUtils.showLogMessage("e", "task.getAssignmentType()", task.getAssignmentType());
 
 
-                AssigneeDetail assigneeDetail=task.getBuddyDetail();
-                if(assigneeDetail!=null){
+                AssigneeDetail assigneeDetail = task.getBuddyDetail();
+                if (assigneeDetail != null) {
                     mBinding.rlVendor.setVisibility(View.VISIBLE);
-                    isVendorVisible=true;
+                    isVendorVisible = true;
                     mBinding.tvRole.setText("Executive");
-                    if(assigneeDetail.getProfileImage()!=null)
+                    if (assigneeDetail.getProfileImage() != null)
                         Glide.with(context).load(assigneeDetail.getProfileImage()).placeholder(R.drawable.ic_social_media).apply(new RequestOptions().circleCrop()).error(R.drawable.ic_social_media).into(mBinding.ivVendor);
-                    if(assigneeDetail.getMobile()!=null){
+                    if (assigneeDetail.getMobile() != null) {
                         mBinding.tvMobile.setText(assigneeDetail.getMobile());
                         mBinding.tvMobile.setVisibility(View.VISIBLE);
                         mBinding.rlCall.setVisibility(View.VISIBLE);
@@ -231,7 +235,7 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
                             }
                         });
                     }
-                    if(assigneeDetail.getName()!=null){
+                    if (assigneeDetail.getName() != null) {
                         mBinding.tvName.setText(assigneeDetail.getName());
                     }
                     mBinding.rlChat.setVisibility(View.VISIBLE);
@@ -243,25 +247,24 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
 //                                       .putExtra(AppConstants.Extra.EXTRA_BUDDY_ID, assigneeDetail.getBuddyId())
 //                                       .putExtra(AppConstants.Extra.EXTRA_BUDDY_NAME, assigneeDetail.getName())
 //                                       .putExtra(AppConstants.Extra.FROM, AppConstants.Extra.ASSIGNED_BY_ME));
-                            mListener.onChatClick(assigneeDetail.getBuddyId(),assigneeDetail.getName());
+                            mListener.onChatClick(assigneeDetail.getBuddyId(), assigneeDetail.getName());
 
                         }
                     });
-                }else{
-                   // mBinding.rlVendor.setVisibility(View.VISIBLE);
+                } else {
+                    // mBinding.rlVendor.setVisibility(View.VISIBLE);
                 }
 
-            }
-            else if(task.getAssignmentType()!=null&&task.getAssignmentType().equals("GROUP")){
-                UserGroup userGroup=task.getUserGroup();
-              //  mBinding.rlVendor.setVisibility(View.VISIBLE);
-                if(userGroup!=null){
-                    isVendorVisible=true;
+            } else if (task.getAssignmentType() != null && task.getAssignmentType().equals("GROUP")) {
+                UserGroup userGroup = task.getUserGroup();
+                //  mBinding.rlVendor.setVisibility(View.VISIBLE);
+                if (userGroup != null) {
+                    isVendorVisible = true;
                     mBinding.rlVendor.setVisibility(View.VISIBLE);
                     mBinding.tvRole.setText("GROUP");
                     mBinding.tvMobile.setVisibility(View.GONE);
                     mBinding.rlCall.setVisibility(View.GONE);
-                    if(userGroup.getGroupName()!=null){
+                    if (userGroup.getGroupName() != null) {
                         mBinding.tvName.setText(userGroup.getGroupName());
                     }
 
@@ -269,16 +272,15 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
                 }
 
             }
-            if(task.getReferenceId()!=null&&!task.getReferenceId().isEmpty())
-            {
+            if (task.getReferenceId() != null && !task.getReferenceId().isEmpty()) {
                 mBinding.rlVehicleInfo.setVisibility(View.VISIBLE);
-                if(reffranceLabel.isEmpty())
-                    reffranceLabel="Reference Id";
-                mBinding.tvLabelVehicleNumber.setText(reffranceLabel+" :");
-                CommonUtils.showLogMessage("e","label adapter=>","=>"+reffranceLabel);
+                if (reffranceLabel.isEmpty())
+                    reffranceLabel = "Reference Id";
+                mBinding.tvLabelVehicleNumber.setText(reffranceLabel + " :");
+                CommonUtils.showLogMessage("e", "label adapter=>", "=>" + reffranceLabel);
                 mBinding.tvVehicleNumber.setText(task.getReferenceId());
 
-            }else{
+            } else {
                 mBinding.rlVehicleInfo.setVisibility(View.GONE);
             }
             mBinding.rlInnerStartLocation.setOnClickListener(new View.OnClickListener() {
@@ -297,7 +299,7 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
 //                        GeoCoordinates geoCoordinates=task.getDestination().getLocation();
 //                        CommonUtils.openGoogleMapWithOneLocation(context,geoCoordinates.getLatitude(),geoCoordinates.getLongitude());
 //                    }
-                    if (task.getSource() != null && task.getSource().getLocation() != null ) {
+                    if (task.getSource() != null && task.getSource().getLocation() != null) {
                         CommonUtils.showLogMessage("e", "source point map", "source start points map");
                         GeoCoordinates geoCoordinates = task.getSource().getLocation();
                         CommonUtils.openGoogleMapWithOneLocation(context, geoCoordinates.getLatitude(), geoCoordinates.getLongitude());
@@ -327,26 +329,23 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
                     }
                 }
             });
-            if(task.getStartTime()==0L)
+            if (task.getStartTime() == 0L)
                 mBinding.rlSchedule.setVisibility(View.GONE);
-            if(task.getContact()!=null){
-                isPointOfContactVisible=true;
+            if (task.getContact() != null) {
+                isPointOfContactVisible = true;
                 mBinding.tvContactName.setText(task.getContact().getName());
-                mBinding.tvContactMobile.setText(task.getContact().getMobileNumber());
+                mBinding.tvContactMobile.setText(task.getContact().getMobile());
                 mBinding.rlPointOfContact.setVisibility(View.VISIBLE);
-                mBinding.rlCallContactPerson.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (task.getContact().getMobileNumber() != null) {
-                            String mobile = task.getContact().getMobileNumber();
-                            CommonUtils.openDialer(context, mobile);
-                        }
+                mBinding.rlCallContactPerson.setOnClickListener(view -> {
+                    if (task.getContact().getMobile() != null) {
+                        String mobile = task.getContact().getMobile();
+                        CommonUtils.openDialer(context, mobile);
                     }
                 });
             }
-            if(!isVendorVisible&&!isPointOfContactVisible){
+            if (!isVendorVisible && !isPointOfContactVisible) {
                 mBinding.cardContacts.setVisibility(View.GONE);
-            }else{
+            } else {
                 mBinding.cardContacts.setVisibility(View.VISIBLE);
             }
             // Immediate Binding
@@ -357,10 +356,10 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
             mBinding.ivExpandDate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mBinding.llAllDateData.getVisibility()==View.VISIBLE){
+                    if (mBinding.llAllDateData.getVisibility() == View.VISIBLE) {
                         mBinding.llAllDateData.setVisibility(View.GONE);
                         mBinding.ivExpandDate.setImageResource(R.drawable.ic_expand_down_arrow);
-                    }else{
+                    } else {
                         mBinding.llAllDateData.setVisibility(View.VISIBLE);
                         mBinding.ivExpandDate.setImageResource(R.drawable.ic_expand_up);
                     }
@@ -369,10 +368,10 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
             mBinding.ivExpandLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mBinding.llLocations.getVisibility()==View.VISIBLE){
+                    if (mBinding.llLocations.getVisibility() == View.VISIBLE) {
                         mBinding.llLocations.setVisibility(View.GONE);
                         mBinding.ivExpandLocation.setImageResource(R.drawable.ic_expand_down_arrow);
-                    }else{
+                    } else {
                         mBinding.llLocations.setVisibility(View.VISIBLE);
                         mBinding.ivExpandLocation.setImageResource(R.drawable.ic_expand_up);
                     }
@@ -381,10 +380,10 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
             mBinding.ivExpandContact.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mBinding.llContacts.getVisibility()==View.VISIBLE){
+                    if (mBinding.llContacts.getVisibility() == View.VISIBLE) {
                         mBinding.llContacts.setVisibility(View.GONE);
                         mBinding.ivExpandContact.setImageResource(R.drawable.ic_expand_down_arrow);
-                    }else{
+                    } else {
                         mBinding.llContacts.setVisibility(View.VISIBLE);
                         mBinding.ivExpandContact.setImageResource(R.drawable.ic_expand_up);
                     }
@@ -393,11 +392,11 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
             mBinding.rlTrack.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(task.getTrackingUrl()!=null) {
+                    if (task.getTrackingUrl() != null) {
                         Navigation navigation = new Navigation();
                         ActionConfig actionConfig = new ActionConfig();
                         String userId = preferencesHelper.getUserDetail().getUserId();
-                        actionConfig.setActionUrl(task.getTrackingUrl()+"&userId="+userId);
+                        actionConfig.setActionUrl(task.getTrackingUrl() + "&userId=" + userId);
                         navigation.setActionConfig(actionConfig);
                         navigation.setTitle("Tracking Details");
 //                        context.startActivity(WebViewActivity.Companion.newIntent(context)
@@ -408,7 +407,7 @@ public class IhaveAssignedAdapter extends RecyclerView.Adapter<BaseSdkViewHolder
             });
 
             //handle call to actions
-           // CommonUtils.handleCallToActions(context, task, mBinding.llCallToAction, mListener);
+            // CommonUtils.handleCallToActions(context, task, mBinding.llCallToAction, mListener);
             CommonUtils.handleCallToActionsNew(context, task, mBinding.recyclerCtaButton, mListener);
         }
 

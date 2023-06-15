@@ -13,19 +13,36 @@ import kotlin.collections.ArrayList
  * Created by rahul on 12/11/18
  */
 
-class ConfigResponse: BaseResponse()  {
-    var sdkConfig: SdkConfig? = null
-    var appConfig: AppConfig? = null
-    var appVersionInfo: DeprecationAndExpiration? = null
+data class ConfigResponse (
+    var sdkConfig: SdkConfig? = null,
+    var appConfig: AppConfig? = null,
+    var appVersionInfo: DeprecationAndExpiration? = null,
+
     //    var taskCancellationReasons: List<String>? = null
-    var userInfo: ProfileInfo? = null
-
+    var userInfo: ProfileInfo? = null,
+    var services: List<Service>? = null,
     //    var dynamicForms: List<DynamicForms>? = null
-    var lookups: List<LookUps>? = null
-
+    var lookups: List<LookUps>? = null,
     //    var dynamicFormConfig: List<DynamicFormConfig>? = null
-    var dynamicForms: List<DynamicFormsNew>? = null
+    var dynamicForms: List<DynamicFormsNew>? = null,
     var refreshConfig: Boolean? = null
+): BaseResponse()
+
+open class Subscription {
+    var message: String? = ""
+    var title: String? = ""
+    var packageId: String? = ""
+    var packageName: String? = ""
+    var payUrl: String? = ""
+    var subscriptionExpired: Boolean? = false
+    var trialExpired: Boolean? = false
+    var type: SubscriptionPlan? = SubscriptionPlan.TRIAL
+    var ucId: String? = ""
+    var ucName: String? = ""
+}
+
+enum class SubscriptionPlan {
+    TRIAL, BUSINESS
 }
 
 class LookUps {
@@ -50,7 +67,11 @@ class DynamicFormsNew {
     var fields: ArrayList<FormData>? = null
 }
 
-data class FoundWidgetItem(var isPresent:Boolean= false,var postion:Int=-1,var name: String?=null)
+data class FoundWidgetItem(
+    var isPresent: Boolean = false,
+    var postion: Int = -1,
+    var name: String? = null
+)
 
 class DynamicForms {
     var formType: FormType? = null
@@ -74,8 +95,9 @@ class WidgetData : Serializable {
             " }"
 }
 
-class FormData : Serializable {//here
-var type: DataType? = null
+class FormData : Serializable {
+    //here
+    var type: DataType? = null
     var `field`: String? = null
     var label: String? = null
     var name: String? = null
@@ -207,43 +229,41 @@ enum class DataType {
     FILE, TEXT, FILES, SOUND, RATING, TEXT_AREA, BOOLEAN, LIST,
     GEO, MULTI_SELECT, CAMERA, TOGGLE, BUTTON, DROPDOWN, CONDITIONAL_DROPDOWN_STATIC,
     CONDITIONAL_DROPDOWN_API, RADIO, CHECKBOX, LABLE, LABEL, DROPDOWN_API, CALCULATE,
-    AUDIO, VIDEO, VERIFY_OTP, IMAGE, IP_ADDRESS,SELECT_EXECUTIVE,SELECT_EXECUTIVE_BY_PLACE,SELECT_NEAR_BY_EXECUTIVE,SELECT_GROUP,ASSIGN_SUBORDINATE,PASSWORD,
-    USER_NAME,PORT,RTSP,AMOUNT,EVENT,SCANNER
+    AUDIO, VIDEO, VERIFY_OTP, IMAGE, IP_ADDRESS, SELECT_EXECUTIVE, SELECT_EXECUTIVE_BY_PLACE, SELECT_NEAR_BY_EXECUTIVE, SELECT_GROUP, ASSIGN_SUBORDINATE, PASSWORD,
+    USER_NAME, PORT, RTSP, AMOUNT, EVENT, SCANNER, MEDIA
 }
 
-class AppConfig {
-    val statusChange: Boolean? =null
-    var apis: List<Api>? = null
-    var roles: List<RoleConfigData>? = null
-    var navigations: List<Navigation>? = null
-    var projectCategories: java.util.ArrayList<ProjectCategories>? = null
-    var autoStart: Boolean? = null
-    var userGeoFilters: Boolean? = null
-    var chatServerUrl: String? = null
-    var allowArrival = false
-    var enableWallet = false
-    var allowArrivalOnGeoIn = false
-    var locationRequired = false
-    var buddyListing= false
-    var manager = false
-    var autoCancelThresholdInMin = 0
-    var allowFingerPrint = false
-    var enablePunchGeofencing = false
-    var servicePref = false
-    var insights = false
-    var shifts: Map<Int, List<ShiftTime>>? = null
-    var workflowCategories: List<WorkFlowCategories>? = null
-    var flavors: List<Flavour>? = null
-    var idleTrackingInfo: IdleTrackingInfo? = null
-    var userTypes:List<UserType>?=null
-    var status:String?=null
-    var defDateRange:Int=0
-    var maxDateRange:Int=0
-    var maxPastDaysAllowed:Int=0
-    var configVersion: String? = null
-
-
-}
+data class AppConfig (
+    var apis: List<Api>? = null,
+    var roles: List<RoleConfigData>? = null,
+    var navigations: List<Navigation>? = null,
+    var projectCategories: java.util.ArrayList<ProjectCategories>? = null,
+    var autoStart: Boolean? = false,
+    var userGeoFilters: Boolean? = false,
+    var chatServerUrl: String? = null,
+    var allowArrival: Boolean = false,
+    var enableWallet: Boolean = false,
+    var allowArrivalOnGeoIn: Boolean = false,
+    var locationRequired: Boolean = false,
+    var buddyListing: Boolean = false,
+    var manager: Boolean = false,
+    var autoCancelThresholdInMin: Int = 0,
+    var allowFingerPrint: Boolean = false,
+    var enablePunchGeofencing: Boolean = false,
+    var servicePref: Boolean = false,
+    var insights: Boolean = false,
+    var shifts: Map<Int, List<ShiftTime>>? = null,
+    var workflowCategories: List<WorkFlowCategories>? = null,
+    var flavors: List<Flavour>? = null,
+    var idleTrackingInfo: IdleTrackingInfo? = null,
+    var userTypes: List<UserType>? = null,
+    var status: String? = null,
+    var defDateRange: Int = 0,
+    var maxDateRange: Int = 0,
+    var maxPastDaysAllowed: Int = 0,
+    var configVersion: String? = null,
+    var splashImage: String? = null,
+)
 
 data class ProjectCategories(
     var projectId: String? = null,
@@ -275,7 +295,7 @@ data class Config(
     @SerializedName("catLabel")
     var catLabel: String?,
     @SerializedName("df")
-    var df: Boolean=false,
+    var df: Boolean = false,
     @SerializedName("dfId")
     var dfId: String?,
     @SerializedName("parentCatLabel")
@@ -294,22 +314,22 @@ data class Config(
 
 data class AllowedField(
     @SerializedName("errMsg")
-    var errMsg: String?=null,
+    var errMsg: String? = null,
     @SerializedName("field")
-    var `field`: String?=null,
+    var `field`: String? = null,
     @SerializedName("label")
-    var label: String?=null,
+    var label: String? = null,
     @SerializedName("required")
-    var required: Boolean=false,
+    var required: Boolean = false,
     @SerializedName("skipVisibilty")
-    var skipVisibilty: Boolean?=null,
+    var skipVisibilty: Boolean? = null,
     @SerializedName("type")
     var type: FieldType? = null,
     @SerializedName("validator")
-    var validator: String?=null,
+    var validator: String? = null,
     @SerializedName("visible")
-    var visible: Boolean=false
-){
+    var visible: Boolean = false
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -325,16 +345,17 @@ data class AllowedField(
         return field?.hashCode() ?: 0
     }
 }
+
 data class RoleConfigData(
-    var dfId: String?=null,
-    var fields: List<Field>?=null,
-    var roleId: String?=null,
-    var roleName: String?=null,
-    var type: String?=null,
-    var isSelected:Boolean=false,
-    var enableWallet:Boolean=false,
-    var enableDocument:Boolean=false
-){
+    var dfId: String? = null,
+    var fields: List<Field>? = null,
+    var roleId: String? = null,
+    var roleName: String? = null,
+    var type: String? = null,
+    var isSelected: Boolean = false,
+    var enableWallet: Boolean = false,
+    var enableDocument: Boolean = false
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -362,7 +383,7 @@ data class ChannelConfig(
 data class ChannelSetting(
     var allowCreation: Boolean? = false,
     var creationMode: CreationMode = CreationMode.DIRECT,
-    var allowGoogleLocation: Boolean? = null    ,
+    var allowGoogleLocation: Boolean? = null,
     var allowedFieldFirst: Boolean? = null,
     var exeLocation: Boolean? = null,
     var locType: String? = null,
@@ -377,13 +398,31 @@ data class ChannelSetting(
     var merchantTaskLabel: String? = null
 
 )
-enum class CreationMode{
-    IN_DIRECT,DIRECT
+
+enum class CreationMode {
+    IN_DIRECT, DIRECT
 }
 
-enum class FieldType{
+enum class FieldType {
     TEXT, NUMBER, RADIO, DROPDOWN
 }
+
+enum class AdvancedConfigSource(val source: String?) {
+    NEAR_BY_HUBS("NEAR_BY_HUBS"), LOGGED_IN_USER_HUBS("LOGGED_IN_USER_HUBS"), ALL_HUBS("ALL_HUBS"),
+    TASK_SCOPE_HUB_SLOTS("TASK_SCOPE_HUB_SLOTS"), LOGGED_IN_USER_HUBS_SLOTS("LOGGED_IN_USER_HUBS_SLOTS"),
+    TASK_SCOPE_PRODUCT_SLOTS("TASK_SCOPE_PRODUCT_SLOTS")
+}
+
+enum class Target(val target: String?) {
+    SOURCE("SOURCE"), DESTINATION("DESTINATION")
+}
+
+data class AdvanceConfig(
+    var source: AdvancedConfigSource? = null,
+    var maxRadius: Float? = 0F,
+    var target: Target? = Target.SOURCE,
+    var maxLimit: Int? = 0
+)
 
 data class Field(
     var `field`: String? = null,
@@ -394,8 +433,9 @@ data class Field(
     var skipVisibilty: Boolean = true,
     var visible: Boolean = false,
     var required: Boolean = false,
-    var value: String? = null
-){
+    var value: String? = null,
+    var advanceConfig: AdvanceConfig? = null
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -412,23 +452,13 @@ data class Field(
     }
 
 }
-//"allocation": "SELF",
-//              "assignmentType": null,
-//              "groupType": null,
-//              "buddyUserType": null,
-//              "autoAccept": false,
-//              "googleAccess": false,
-//              "groupId": null,
-//              "requestedBy": "OTHERS",
-//              "requestUserType": "CLIENT",
-//              "assigneeLabel": "Client",
-//              "buddyLabel": null
+
 data class CreationConfig(
     var allocation: String? = null,
     var assignmentType: String? = null,
     var requestedBy: String? = null,
+    var requestedByLabel: String? = null,
     var requestUserType: List<String>? = null,
-//        var requestUserType: String? = null,
     var assigneeLabel: String? = null,
     var buddyLabel: String? = null,
     var autoAccept: Boolean? = null,
@@ -440,22 +470,33 @@ class IdleTrackingInfo {
     var mode: String? = null
 }
 
+enum class TaggingTypeService {
+    INDIRECT, DIRECT
+}
+
+class ServiceConfig {
+    var taggingType: TaggingTypeService = TaggingTypeService.DIRECT
+    var label: String? = null
+    var referredCategories: List<String>? = null
+}
 
 class WorkFlowCategories {
     var id: String? = null
     var categoryId: String? = null
     var name: String? = null
     var dynamicFormId: String? = null
+    var serviceTagging: Boolean? = false
     var allowSubTask: Boolean? = null
+    var serviceConfig: ServiceConfig? = null
     var allowGeography: Boolean = false
     var enableExpiry: Boolean = false
     var allowedFields: List<String>? = null
     var channelConfig: ChannelConfig? = null
     var inventoryConfig: InventoryConfig? = null
-    var subTaskConfig: SubTaskConfig?=null
+    var subTaskConfig: SubTaskConfig? = null
     var taskReferencingEnabled: Boolean? = false
     var multiTaskReferencingEnabled: Boolean? = false
-    var stageNameMap:LinkedHashMap<String,String>?=null
+    var stageNameMap: LinkedHashMap<String, String>? = null
     var allowCreation: Boolean = false
     var showMerchantTasks: Boolean = false
     override fun equals(other: Any?): Boolean {
@@ -476,8 +517,6 @@ class WorkFlowCategories {
 }
 
 
-
-
 class DeprecationAndExpiration {
     var appVersion: String? = null
     var deprecated = false
@@ -494,16 +533,16 @@ class Api {
     var appendWithKey: String = ""
 }
 
-class SdkApi {
-    var name: String? = null
-    var url: String? = null
-    var version: String? = null
-    var timeOut: Int = 0
-    var cacheable = false
-}
+data class SdkApi (
+    var name: String? = null,
+    var url: String? = null,
+    var version: String? = null,
+    var timeOut: Int = 0,
+    var cacheable: Boolean = false
+    )
 
 
-class Navigation : Serializable,Comparable<Navigation> {
+class Navigation : Serializable, Comparable<Navigation> {
     var title: String? = null
     var primary: Boolean = false
     var newItem: Boolean = false
@@ -513,8 +552,9 @@ class Navigation : Serializable,Comparable<Navigation> {
     var menuType: MenuType? = null
     var nestedMenu: List<Navigation>? = null
     override fun compareTo(other: Navigation): Int {
-        return this.order-other.order
+        return this.order - other.order
     }
+
     override fun equals(obj: Any?): Boolean {
 
         if (this === obj) return true
@@ -547,24 +587,25 @@ class ActionConfig : Serializable {
 }
 
 
-class SdkConfig {
-    val baseUrl: String? = null
-    val accessId: String? = null
-    val vendorConfig: VendorConfig? = null
-    val features: Features? = null
-    val apis: List<SdkApi>? = null
-    val geofences: List<GeoFenceData>? = null
-    val appVersion: String? = null
-    val sdkConfigVersion: String? = null
+data class SdkConfig (
+    var successful: Boolean = false,
+    val baseUrl: String? = null,
+    val accessId: String? = null,
+    val features: Features? = null,
+    val vendorConfig: VendorConfig? = null,
+    val apis: List<SdkApi>? = null,
+    val geofences: List<GeoFenceData>? = null,
+    val appVersion: String? = null,
+    val sdkConfigVersion: String? = null,
     val virtualGeofenceRadius: Float? = null
-}
-//data class GeoFenceData(
-//        var circleData: CircleData? = null,
-//        var geofenceId: String? = null,
-//        var geofenceName: String? = null,
-//        var geofenceType: String? = null
-//)
+)
 
+data class Features (
+    val CAMERA: Boolean = false,
+    val GYROSCOPE: Boolean = false,
+    val PROXIMITY: Boolean = false,
+    val ACCELROMETER: Boolean = false
+)
 
 //data class GeoCoordinate(
 //        var latitude: Double? = null,
@@ -572,50 +613,41 @@ class SdkConfig {
 //        var longitude: Double? = null
 //)
 
-class VendorConfig {
-    var onTripConfig: OnTripConfig? = null
+data class VendorConfig (
+    var onTripConfig: OnTripConfig? = null,
+    var onActiveConfig: OnTripConfig? = null,
+    var  trackingHours: Int? = 0
+)
 
-    // both models are same that's why i am keeping single model and add one extra field into this same model.
-    var onActiveConfig: OnTripConfig? = null
-}
+data class OnTripConfig (
+    val overspeedLimit: Int = 0,
+    var phoneUsageLimit: Int = 0,
+    val overstoppingConfig: OverstoppingConfig? = null,
+    val harshCorneringConfig: HarshCorneringConfig? = null,
+    val harshBreakAndAccelerationConfig: HarshBrakeAndAccelerationConfig? = null,
+    val outOfNetworkLimit: Int = 0,
+    var postFrequency: Int = 0,
+    var locationCaptureFrequency: Int = 0,
+    var speedCaptureFrequency: Int = 0,
+    var active: Boolean = false
+)
 
-class OnTripConfig {
-    val overspeedLimit: Int = 0
-    var phoneUsageLimit: Int = 0
-    val overstoppingConfig: OverstoppingConfig? = null
-    val harshCorneringConfig: HarshCorneringConfig? = null
-    val harshBreakAndAccelerationConfig: HarshBrakeAndAccelerationConfig? = null
-    val outOfNetworkLimit: Int = 0
-    var postFrequency: Int = 0
-    var locationCaptureFrequency: Int = 0
-    var speedCaptureFrequency: Int = 0
-    var active = false
-    /* get() = field                     // getter
-     set(value) { field = value }      // setter*/
-}
-
-class OverstoppingConfig {
-    val timeInMinute: Int = 0
+data class OverstoppingConfig (
+    val timeInMinute: Int = 0,
     val distanceinMeter: Int = 0
-}
+)
 
-class HarshCorneringConfig {
-    val speed: Int = 0
-    val angle: Int = 0
+data class HarshCorneringConfig (
+    val speed: Int = 0,
+    val angle: Int = 0,
     val timeInSec: Int = 0
-}
+)
 
-class HarshBrakeAndAccelerationConfig {
-    val speedThreshold: Int = 0
+data class HarshBrakeAndAccelerationConfig (
+    val speedThreshold: Int = 0,
     val timeThreshold: Int = 0
-}
+)
 
-class Features {
-//    val CAMERA= false
-//    val GYROSCOPE= false
-//    val PROXIMITY= false
-//    val ACCELROMETER= false
-}
 
 class GeoFences {
     var geofenceId: String? = null

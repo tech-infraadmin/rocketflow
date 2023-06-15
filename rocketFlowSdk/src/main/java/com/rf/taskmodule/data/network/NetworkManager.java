@@ -7,6 +7,7 @@ import com.rf.taskmodule.data.model.request.BookSlotRequest;
 import com.rf.taskmodule.data.model.request.EligibleUserRequest;
 import com.rf.taskmodule.data.model.request.PaymentRequest;
 import com.rf.taskmodule.data.model.request.PlaceRequest;
+import com.rf.taskmodule.data.model.request.QrScanRequestLogin;
 import com.rf.taskmodule.data.model.request.SKUInfoSpecsRequest;
 import com.rf.taskmodule.data.model.request.SendCtaOtpRequest;
 import com.rf.taskmodule.data.model.request.UserGetRequest;
@@ -15,6 +16,7 @@ import com.rf.taskmodule.data.model.response.config.Api;
 import com.rf.taskmodule.ui.addplace.AddPlaceRequest;
 import com.rf.taskmodule.ui.category.AddCategoryRequest;
 import com.rf.taskmodule.ui.products.AddProductRequest;
+import com.rf.taskmodule.ui.scanqrcode.QrCodeValueViewModel;
 import com.rf.taskmodule.ui.selectorder.CataLogProductCategory;
 import com.rf.taskmodule.ui.taskdetails.timeline.skuinfopreview.UnitInfoRequest;
 //import com.rf.taskmodule.ui.category.AddCategoryRequest;
@@ -34,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface NetworkManager {
 
+    void getSystemHubs(ApiCallback apiCallback,HttpManager httpManager, Object data, Api api);
+
     void getConfig(HttpManager httpManager, ApiCallback callBack, String configVersion);
 
     void getSDKLoginToken(String sdkClintId,HttpManager httpManager, ApiCallback callBack);
@@ -47,6 +51,8 @@ public interface NetworkManager {
     void buddyListing(ApiCallback apiCallback, HttpManager httpManager, Api api, Object data);
 
     void timeSlotData(ApiCallback apiCallback, HttpManager httpManager, Api api);
+
+    void getTasksListCalendar(ApiCallback apiCallback, HttpManager httpManager, Object data, Api apiUrl);
 
     void bookSlot(ApiCallback apiCallback, HttpManager httpManager, Api api, BookSlotRequest data);
 
@@ -301,4 +307,5 @@ public interface NetworkManager {
 
     void verifyCtaOtp(ApiCallback apiCallback, HttpManager httpManager, VerifyCtaOtpRequest verifyCtaOtpRequest, Api api);
 
+    void getQrCodeLogin(ApiCallback apiCallback, HttpManager httpManager,  Api api);
 }

@@ -3,6 +3,7 @@ package com.rf.taskmodule.data.model.response.config
 import com.rf.taskmodule.ui.custom.GlideApp
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.os.Parcel
 import android.os.Parcelable
 import android.view.View
 import android.widget.Button
@@ -25,6 +26,7 @@ import com.rf.taskmodule.utils.TaskStatus
 import com.rf.taskmodule.utils.UserType
 import kotlinx.android.parcel.Parcelize
 import com.rf.taskmodule.R
+import com.rf.taskmodule.ui.addplace.Hub
 import com.rf.taskmodule.utils.ShiftTime
 import java.io.Serializable
 import java.util.*
@@ -320,9 +322,7 @@ class Task : BaseResponse(), Serializable {
     var multiReferedTask: kotlin.collections.ArrayList<String>? = null
     var taskstats: TripsStatistics? = null
     var subCategoryIds: ArrayList<String>? = null
-
-    //    var startTaskData: List<DynamicFormData>? = null
-//    var endTaskData: List<DynamicFormData>? = null
+    var serviceIds: ArrayList<String>? = null
     var stageHistory: List<StageHistoryData>? = null
     var assignedToDetails: List<AssigneeDetail?>? = null
     var assignmentType: String? = null
@@ -333,10 +333,23 @@ class Task : BaseResponse(), Serializable {
     var userGroup: UserGroup? = null
     var trackable: Boolean = false
     var invDetails: InventoryDetails? = null
-
-    /*  var orderDetails: HashMap<String, OrderDetails>? = null*/
     var orderDetails: ArrayList<OrderDetails>? = null
     var products: ArrayList<ProductOrder>? = null
+    var field1: String? = null
+    var field2: String? = null
+    var field3: String? = null
+    var field4: String? = null
+    var field5: String? = null
+    var field6: String? = null
+    var field7: String? = null
+    var field8: String? = null
+    var field9: String? = null
+    var field10: String? = null
+    var field11: String? = null
+    var field12: String? = null
+    var field13: String? = null
+    var field14: String? = null
+    var field15: String? = null
 
     override fun equals(obj: Any?): Boolean {
 
@@ -555,9 +568,10 @@ data class SubTaskConfig(
 
 class Stage {
     var name: String? = null
+    var color: String? = null
+    var aliasName: String? = null
     var initial: Boolean? = null
     var terminal: Boolean? = null
-
     var callToActions: List<CallToActions>? = null
 
     override fun toString(): String {
@@ -644,6 +658,11 @@ class EligibleUsersResponse : BaseResponse() {
     var count: Int? = 0
     var data: ArrayList<DataEU> = arrayListOf()
 
+}
+
+class SystemHubResponse{
+    var successful: Boolean? = false
+    var data: ArrayList<Hub>? = null
 }
 
 class Location1() {
@@ -912,6 +931,7 @@ data class SlotData(
 
 data class Slot(
     val time: String,
+    val status: String,
     val available: Boolean,
     val slotAvailable: Long
 ) : Serializable
@@ -1418,13 +1438,12 @@ class UploadTaskDataResponse : BaseResponse() {
 }
 
 @Parcelize
-data class Contact(var name: String, var mobileNumber: String?) : Parcelable {
+data class Contact(var name: String? = null , var mobile: String? = null ,var email: String? = null ,var profileImage: String? = null) : Parcelable {
     companion object {
 
         @JvmStatic
         @BindingAdapter("textInitials")
         fun setInitials(textView: TextView, name: String?) {
-
             textView.text = name!!.get(0).toUpperCase().toString()
 
         }
@@ -1436,11 +1455,7 @@ data class Contact(var name: String, var mobileNumber: String?) : Parcelable {
             val color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
             imageView.setColorFilter(color, PorterDuff.Mode.SRC_IN)
         }
-
-
     }
-
-
 }
 
 data class InventoryResponse(
@@ -1772,9 +1787,26 @@ data class Post(
             }
         }
 
+        @JvmStatic
+        @BindingAdapter("loadImage")
+        fun loadImage(
+            view: ImageView,
+            url: String?
+        ) { // This methods should not have any return type, = declaration would make it return that object declaration.
+            if (!url.isNullOrEmpty()) {
+                GlideApp.with(view.context)
+                    .load(url)
+                    .placeholder(R.drawable.ic_picture)
+                    .circleCrop()
+                    .error(R.drawable.ic_picture)
+                    .into(view)
+            }
+        }
     }
 
 }
+
+
 
 data class CommentsResponse(
     var comments: List<Comments>? = null
@@ -1818,10 +1850,12 @@ data class InitiateSignUpResponse(
 
 @Parcelize
 data class Service(
-    var id: String,
-    var img: String?,
-    var title: String,
-    var selected: Boolean = false
+    var id: String?,
+    var name: String?,
+    var projId: String?,
+    var categoryId: String?,
+    var icon: String?,
+    var selected: Boolean? = false
 ) : Parcelable
 
 data class ClientDataResponse(

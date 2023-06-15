@@ -27,7 +27,8 @@ data class Hub(
     var name: String?=null,
     var regionId: String?=null,
     var type: String?=null,
-    var stateId: String?=null
+    var stateId: String?=null,
+    var distance: Float? = 0.0F
 ) : Parcelable {
     companion object {
         @JvmStatic

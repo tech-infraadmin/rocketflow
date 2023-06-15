@@ -14,6 +14,7 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.*
 import android.text.Editable
 import android.text.TextWatcher
@@ -49,6 +50,7 @@ import com.rf.taskmodule.data.model.BaseResponse
 import com.rf.taskmodule.data.model.request.*
 import com.rf.taskmodule.data.model.request.Contact
 import com.rf.taskmodule.data.model.response.config.*
+import com.rf.taskmodule.data.model.response.config.Target
 import com.rf.taskmodule.data.network.APIError
 import com.rf.taskmodule.data.network.ApiCallback
 import com.rf.taskmodule.data.network.HttpManager
@@ -63,6 +65,7 @@ import com.rf.taskmodule.ui.dynamicform.DynamicFormActivity
 import com.rf.taskmodule.ui.dynamicform.dynamicfragment.FormSubmitListener
 import com.rf.taskmodule.ui.dynamicform.dynamicfragment.SlotAdapter
 import com.rf.taskmodule.ui.dynamicform.dynamicfragment.SlotChildAdapter
+import com.rf.taskmodule.ui.facility.ServicesSDKActivity
 import com.rf.taskmodule.ui.newdynamicform.NewDynamicFormFragment
 import com.rf.taskmodule.ui.scanqrcode.ScanQrAndBarCodeActivity
 import com.rf.taskmodule.ui.taskdetails.NewTaskDetailsActivity
@@ -84,11 +87,13 @@ import kotlin.collections.ArrayList
 open class NewCreateTaskActivity :
     BaseSdkActivity<ActivityNewCreateTaskSdkBinding, NewCreateTaskViewModel>(),
     NewCreateTaskNavigator, FormSubmitListener,
-    BaseAutocompleteAdapter.OnItemSelectedAUtoComplete {
-//    init {
+    BaseAutocompleteAdapter.OnItemSelectedAUtoComplete, NearHubAdapter.NearHubInterface {
+    //    init {
 //        System.loadLibrary("keys")
 //    }
 
+    var availType = "GEO"
+    var multiReference = false
     private val SCAN_REFERENCE = 12
     private val REQUEST_CAMERA = 3
     private var snackBar: Snackbar? = null
@@ -101,9 +106,25 @@ open class NewCreateTaskActivity :
     private var parentTaskId: String? = null
     private var parentReffId: String? = null
 
+    private lateinit var tvNearSearch: TextView
+
+    private var selectedHubSource1 = false
+    private var selectedHubSource2 = false
+    private var selectedHubSource3 = false
+
+    private var target_system_hub = Target.SOURCE
+
+    var loggedScope = false
+    var loggedScope1 = false
+
+    private var selectedHubList1 = ArrayList<Hub>()
+    private var selectedHubList2 = ArrayList<Hub>()
+    private var selectedHubList3 = ArrayList<Hub>()
+
     private lateinit var llSlots: LinearLayout
     private lateinit var ivNoData: ImageView
 
+    private var sourceNameA = AdvancedConfigSource.NEAR_BY_HUBS.source
     var slotDataResponse: SlotDataResponse = SlotDataResponse()
     private var timePosition = 0
     private var keyPosition = 0
@@ -112,15 +133,25 @@ open class NewCreateTaskActivity :
     private var dateFinal = ""
     private var date = ""
     private var timeFinal = ""
+    private var hubIdFinalHubsOnly = ""
     private var hubIdFinal = ""
-    private var listRef: kotlin.collections.ArrayList<String> = ArrayList()
-    private var hubs: List<Hub> = ArrayList()
+    private var hubIdFinalDestination = ""
+    private var hubDestination: Hub? = null
+    private var listRefTask: ArrayList<Task> = ArrayList()
+    private var hubs: ArrayList<Hub> = ArrayList()
     private var hub: Hub? = null
     private lateinit var etSlot: EditText
 
     private lateinit var rvSlot: RecyclerView
     private lateinit var slotImg: ImageView
     private lateinit var rvDate: RecyclerView
+
+    lateinit var adapter: ReferencesListAdapter
+
+    private lateinit var dialogNearHub: Dialog
+    private lateinit var nearHubAdapter: NearHubAdapter
+    private lateinit var nearHubNoData: ImageView
+    private lateinit var closeHubDialog: ImageView
 
     private lateinit var dialogSlot: Dialog
 
@@ -198,15 +229,26 @@ open class NewCreateTaskActivity :
     lateinit var etScanner: AutoCompleteTextView
     lateinit var ivSearchRef: ImageView
 
-    var listSlots: kotlin.collections.ArrayList<SlotData> = ArrayList()
-    var listKeys: kotlin.collections.ArrayList<String> = ArrayList()
+    private lateinit var spinnerNear: Spinner
+    private lateinit var spinnerLogged: Spinner
+    private lateinit var spinnerAll: Spinner
 
+    var listSlots: ArrayList<SlotData> = ArrayList()
+    var listKeys: ArrayList<String> = ArrayList()
+    var invIds: List<String>? = ArrayList()
     private var mDynamicHandler: DynamicHandler? = null
     private var handlerThread: ExecutorThread? = null
 
     enum class FIELD {
         START_LOCATION, END_LOCATION, SELECT_BUDDY, SELECT_CLIENT, START_TIME, END_TIME, POINT_OF_CONTACT, TASK_NAME,
-        TASK_TYPE, DESCRIPTION, SELECT_FLEET, SELECT_CITY, TASK_ID, REFERENCE_ID, GOOGLE_OR_MANUAL_SOURCE, GOOGLE_OR_MANUAL_DESTINATION, SYSTEM_LOCATION, SEARCH_REFERENCED_TASK, FIELD1, FIELD2, FIELD3, FIELD4, FIELD5, FIELD6, FIELD7, FIELD8, FIELD9, FIELD10, FIELD11, FIELD12, FIELD13, FIELD14, FIELD15, TIME_SLOT,
+        TASK_TYPE, DESCRIPTION, SELECT_FLEET, SELECT_CITY, TASK_ID, REFERENCE_ID, GOOGLE_OR_MANUAL_SOURCE, GOOGLE_OR_MANUAL_DESTINATION,
+        SYSTEM_LOCATION, SEARCH_REFERENCED_TASK, FIELD1, FIELD2, FIELD3, FIELD4, FIELD5, FIELD6, FIELD7, FIELD8, FIELD9, FIELD10, FIELD11,
+        FIELD12, FIELD13, FIELD14, FIELD15, TIME_SLOT, SYSTEM_HUB
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mDynamicHandler?.removeCallbacksAndMessages(null);
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -222,13 +264,129 @@ open class NewCreateTaskActivity :
             object : TypeToken<HashMap<String?, String?>?>() {}.type
         )
         searchRequest = SearchReferenceRequest()
+
         slotAdapter = SlotAdapter(this)
+
+        dialogNearHub = Dialog(this)
+
+        spinnerNear = mActivityCreateTaskBinding.spNearByHub
+        spinnerLogged = mActivityCreateTaskBinding.spLoggedInHub
+        spinnerAll = mActivityCreateTaskBinding.spAllHub
 
         mGetSuggetionViewModel = getUserSuggestionListViewModel()
 
+
+        nearHubAdapter = NearHubAdapter()
+        nearHubAdapter.setListener(this)
+
+        dialogNearHub.setContentView(R.layout.layout_near_by_hub)
+        tvNearSearch = dialogNearHub.findViewById(R.id.tv_loc_near)
+        nearHubNoData = dialogNearHub.findViewById(R.id.no_data_hub)
+        closeHubDialog = dialogNearHub.findViewById(R.id.iv_close_hub)
+
+        adapter = ReferencesListAdapter(this, listRefTask)
+        mActivityCreateTaskBinding.rvReferences.adapter = adapter
+
         setUp()
         getCurrentLocation()
-        Log.d("NewCreateTaskActivity", "NewCreateTaskActivity")
+
+        spinnerNear.onItemSelectedListener = object : OnItemSelectedListener {
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (selectedHubList1.size > 0) {
+                    if (p2 - 1 >= 0) {
+                        val item = selectedHubList1[p2 - 1]
+                        hubIdFinalHubsOnly = item.hubId.toString()
+                        hub = selectedHubList1[p2 - 1]
+                        val location = GeoCoordinates()
+                        location.latitude = item.hubLocation?.location?.latitude!!
+                        location.longitude = item.hubLocation?.location?.latitude!!
+                        val place: com.rf.taskmodule.data.model.response.config.Place =
+                            com.rf.taskmodule.data.model.response.config.Place()
+
+                        place.address = item.hubLocation?.address
+                        place.location = location
+                        place.hubId = item.hubId
+                        if (target_system_hub == Target.SOURCE) {
+                            createTaskRequest?.source = place
+                        } else {
+                            createTaskRequest?.destination = place
+                        }
+                    }
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+        }
+
+        spinnerLogged.onItemSelectedListener = object : OnItemSelectedListener {
+
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                Log.d("logger", selectedHubList2.toString())
+                if (selectedHubList2.size > 0) {
+                    if (p2 - 1 >= 0) {
+                        val item = selectedHubList2[p2 - 1]
+                        hubIdFinalHubsOnly = item.hubId.toString()
+                        hub = selectedHubList2[p2 - 1]
+                        Log.d("logger", item.name)
+                        val location = GeoCoordinates()
+                        location.latitude = item.hubLocation?.location?.latitude!!
+                        location.longitude = item.hubLocation?.location?.latitude!!
+                        val place: com.rf.taskmodule.data.model.response.config.Place =
+                            com.rf.taskmodule.data.model.response.config.Place()
+                        place.address = item.hubLocation?.address
+                        place.hubId = item.hubId
+                        place.location = location
+                        if (target_system_hub == Target.SOURCE) {
+                            createTaskRequest?.source = place
+                        } else {
+                            createTaskRequest?.destination = place
+                        }
+                    }
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+        }
+        spinnerAll.onItemSelectedListener = object : OnItemSelectedListener {
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                if (selectedHubList3.size > 0) {
+                    if (p2 - 1 >= 0) {
+                        val item = selectedHubList3[p2 - 1]
+                        hubIdFinalHubsOnly = item.hubId.toString()
+                        hub = selectedHubList3[p2 - 1]
+                        val location = GeoCoordinates()
+                        location.latitude = item.hubLocation?.location?.latitude!!
+                        location.longitude = item.hubLocation?.location?.latitude!!
+                        val place: com.rf.taskmodule.data.model.response.config.Place =
+                            com.rf.taskmodule.data.model.response.config.Place()
+                        place.address = item.hubLocation?.address
+                        place.location = location
+                        place.hubId = item.hubId
+                        if (target_system_hub == Target.SOURCE) {
+                            createTaskRequest?.source = place
+                        } else {
+                            createTaskRequest?.destination = place
+                        }
+
+                    }
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+        }
+
     }
 
 
@@ -271,6 +429,7 @@ open class NewCreateTaskActivity :
 
                         edStartDateTime.setText("$selectedDate | $formattedTime")
                     }
+
                     R.id.edEndDateTime -> {
                         endDay = dayOfMonth
                         endMonth = monthOfYear
@@ -347,7 +506,10 @@ open class NewCreateTaskActivity :
     /**
      * Method used to get the current location from the sdk.
      */
-    fun getCurrentLocation() {
+    fun getCurrentLocation(
+        systemHub: Boolean? = false,
+        sourceName: String? = AdvancedConfigSource.NEAR_BY_HUBS.source
+    ) {
         TrackThat.getCurrentLocation(object : TrackThatCallback() {
             override fun onSuccess(successResponse: SuccessResponse) {
                 val loc = successResponse.responseObject as TrackthatLocation
@@ -356,9 +518,22 @@ open class NewCreateTaskActivity :
                 currentLocation!!.longitude = loc.longitude
                 currentLatLng = LatLng(loc.latitude, loc.longitude)
                 startLatLng = currentLatLng
-                var placeName = CommonUtils.getAddress(this@NewCreateTaskActivity, currentLatLng)
-                edEnterStartLocation.setText(placeName)
-                edEnterEndLocation.setText(placeName)
+                val placeName = CommonUtils.getAddress(this@NewCreateTaskActivity, currentLatLng)
+                if (systemHub == false) {
+                    edEnterStartLocation.setText(placeName)
+                    edEnterEndLocation.setText(placeName)
+                } else {
+                    Log.d("Address", placeName)
+                    mActivityCreateTaskBinding.etNearByHubLocation.setText(placeName)
+                    val hubCoordinates = HubCoordinates(
+                        ArrayList(), startLatLng.latitude, "",
+                        startLatLng.longitude
+                    )
+                    sourceNameA = sourceName
+                    val systemHubRequset: SystemHubRequest =
+                        SystemHubRequest(categoryId, hubCoordinates, "", 5000.00, sourceName)
+                    getSystemHubs(systemHubRequset)
+                }
 
             }
 
@@ -368,16 +543,16 @@ open class NewCreateTaskActivity :
         })
     }
 
-    override fun openPlaceAutoComplete(view: View) {
+    override fun openPlaceAutoComplete(view: View, code: Int?) {
         this.view = view
         try {
             val fields: List<Place.Field> =
-                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG)
+                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS)
 
             // Start the autocomplete intent.
             val intent: Intent =
                 Autocomplete.IntentBuilder(AutocompleteActivityMode.FULLSCREEN, fields).build(this)
-            startActivityForResult(intent, AUTOCOMPLETE_REQUEST_CODE)
+            startActivityForResult(intent, code!!)
         } catch (e: GooglePlayServicesRepairableException) {
             Log.e(NewCreateTaskActivity.TAG, e.message)
         } catch (e: GooglePlayServicesNotAvailableException) {
@@ -556,7 +731,6 @@ open class NewCreateTaskActivity :
         var id: String? = null
 
         for (i in workFlowCategoriesList) {
-            Log.d("categoryId", i.categoryId);
             if (i.categoryId != null)
                 if (i.categoryId == categoryId) {
                     if (i.dynamicFormId != null)
@@ -644,6 +818,9 @@ open class NewCreateTaskActivity :
         if (intent.hasExtra(AppConstants.Extra.EXTRA_PARENT_REF_ID)) {
             parentReffId = intent.getStringExtra(AppConstants.Extra.EXTRA_PARENT_REF_ID)
         }
+        if (intent.hasExtra("invIds")) {
+            invIds = intent.getStringArrayListExtra("invIds")
+        }
         enableStartLocation.setOnToggledListener { toggleableView, isChecked ->
             if (isChecked) {
                 tvLableManualStartLocation.text = "Enter Location"
@@ -701,7 +878,7 @@ open class NewCreateTaskActivity :
         rlProgress = viewProgress!!.findViewById<RelativeLayout>(R.id.rlProgress)
         enableStartLocation.isOn = false
         enableEndLocation.isOn = false
-        btnCLick.setOnClickListener {
+        btnCLickSubmit.setOnClickListener {
             if (dynamicFormsNew != null) {
                 if (dynamicFragment != null) {
                     dynamicFragment!!.onclickMainButton()
@@ -744,9 +921,9 @@ open class NewCreateTaskActivity :
         })
         spnCategory = mActivityCreateTaskBinding.spnCategory
         //requestCurrentLocation(locationCallback)
-        var categories: MutableList<String?> = ArrayList();
-        var list: MutableList<WorkFlowCategories> = ArrayList();
-        var mainList = preferencesHelper.workFlowCategoriesList
+        val categories: MutableList<String?> = ArrayList();
+        val list: MutableList<WorkFlowCategories> = ArrayList();
+        val mainList = preferencesHelper.workFlowCategoriesList
         val channelConfigMap = preferencesHelper.workFlowCategoriesListChannel
         for (i in mainList) {
             var categoryId = i.categoryId
@@ -760,23 +937,114 @@ open class NewCreateTaskActivity :
                     if (channelSetting!!.allowCreation != null && channelSetting!!.allowCreation!!) {
                         if (channelSetting!!.creationMode === CreationMode.DIRECT) {
                             list.add(i)
-                            categories!!.add(i.name!!)
+                            categories.add(i.name!!)
                         }
-
                     }
                 }
             }
+        }
 
-
+        if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORIES)) {
+            var categoryMap: Map<String, String>? = null
+            val str: String = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORIES)!!
+            categoryMap =
+                Gson().fromJson(str, object : TypeToken<HashMap<String?, String?>?>() {}.type)
+            if (categoryMap != null && categoryMap!!.containsKey("categoryId")) {
+                categoryId = categoryMap.get("categoryId")
+                if (categoryId != null) {
+                    for (i in list.indices) {
+                        if (list[i].categoryId == categoryId) {
+                            selItem = list[i].name!!
+                            spnCategory!!.setSelection(i)
+                            break
+                        }
+                    }
+                }
+            }
         }
 
 
+        var workFlowCategorie = WorkFlowCategories()
+        for (i in mainList) {
+            if (i.categoryId.equals(categoryId)) {
+                workFlowCategorie = i
+            }
+        }
+
+        Log.d("serviceTagging", workFlowCategorie.serviceTagging.toString())
+        if (workFlowCategorie.serviceTagging == true) {
+            val listCategories: ArrayList<String> = ArrayList()
+            if (workFlowCategorie.serviceConfig?.taggingType == TaggingTypeService.DIRECT) {
+                listCategories.add(categoryId!!)
+                mActivityCreateTaskBinding.cvServices.visibility = View.VISIBLE
+                mActivityCreateTaskBinding.etServices.setOnClickListener {
+                    val rvUpdateServices = Intent(this, ServicesSDKActivity::class.java)
+                    rvUpdateServices.putExtra(
+                        AppConstants.Extra.EXTRA_CATEGORY_ID,
+                        Gson().toJson(listCategories).toString()
+                    )
+                    startActivityForResult(rvUpdateServices, 546)
+                }
+            } else {
+                listCategories.addAll(workFlowCategorie.serviceConfig?.referredCategories!!)
+                mActivityCreateTaskBinding.cvServices.visibility = View.VISIBLE
+                mActivityCreateTaskBinding.etServices.setOnClickListener {
+                    val rvUpdateServices = Intent(this, ServicesSDKActivity::class.java)
+                    rvUpdateServices.putExtra(
+                        AppConstants.Extra.EXTRA_CATEGORY_ID,
+                        Gson().toJson(listCategories).toString()
+                    )
+                    startActivityForResult(rvUpdateServices, 546)
+                }
+            }
+        } else {
+            mActivityCreateTaskBinding.cvServices.visibility = View.GONE
+        }
+
+        if (workFlowCategorie.taskReferencingEnabled!!) {
+            Log.d("taskReferencingEnabled", workFlowCategorie.taskReferencingEnabled.toString())
+            multiReference = workFlowCategorie.multiTaskReferencingEnabled!!
+            Log.d("taskReferencingEnabled", multiReference.toString())
+            mActivityCreateTaskBinding.cvScanner.visibility = View.VISIBLE
+            mActivityCreateTaskBinding.etScanner.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    if (p0.toString().length > 2) {
+                        val api1 =
+                            TrackiSdkApplication.getApiMap()[ApiType.SEARCH_REFERENCE_ELIGIBLE_TASKS]!!
+                        searchRequest!!.query = p0.toString()
+                        searchRequest!!.catId = categoryId
+                        ivSearchRef.setImageDrawable(getDrawable(R.drawable.ic_cross))
+                        ivSearchRef.setOnClickListener {
+                            etScanner.setText("")
+                        }
+                        mCreateTaskViewModel.getSearchReferenceList(
+                            httpManager,
+                            api1,
+                            searchRequest
+                        )
+                    } else {
+                        ivSearchRef.setOnClickListener {
+                            getCameraPermission()
+                        }
+                        ivSearchRef.setImageDrawable(getDrawable(R.drawable.qr_code))
+                    }
+                }
+
+                override fun afterTextChanged(text: Editable?) {
+
+                }
+            })
+        } else {
+            mActivityCreateTaskBinding.cvScanner.visibility = View.GONE
+        }
+
         mCategoryId.observe(this, androidx.lifecycle.Observer { categoryId ->
             if (categoryId != null) {
-                var llallowedFields: List<Field>? = getAllowedFields(categoryId)
-                var jsonConverter =
+                val llallowedFields: List<Field>? = getAllowedFields(categoryId)
+                val jsonConverter =
                     JSONConverter<List<Field>>()
-                var data = jsonConverter.objectToJson(llallowedFields!!)
+                val data = jsonConverter.objectToJson(llallowedFields!!)
                 CommonUtils.showLogMessage("e", "allowed field", data.toString())
                 CommonUtils.showLogMessage("e", "allowed field", llallowedFields.toString())
                 if (requestedBy != null && requestedBy.equals("OTHERS")) {
@@ -805,55 +1073,6 @@ open class NewCreateTaskActivity :
                     } else {
                         mActivityCreateTaskBinding.tilStartLocation.visibility = View.GONE
 
-                    }
-                    if (category.taskReferencingEnabled == true) {
-                        mActivityCreateTaskBinding.cvScanner.visibility = View.VISIBLE
-                        mActivityCreateTaskBinding.etScanner.addTextChangedListener(object :
-                            TextWatcher {
-                            override fun beforeTextChanged(
-                                p0: CharSequence?,
-                                p1: Int,
-                                p2: Int,
-                                p3: Int
-                            ) {
-
-                            }
-
-                            override fun onTextChanged(
-                                p0: CharSequence?,
-                                p1: Int,
-                                p2: Int,
-                                p3: Int
-                            ) {
-                                if (p0.toString().length > 2) {
-                                    val api1 =
-                                        TrackiSdkApplication.getApiMap()[ApiType.SEARCH_REFERENCE_ELIGIBLE_TASKS]!!
-                                    searchRequest!!.query = p0.toString().toString()
-                                    searchRequest!!.catId = categoryId
-                                    ivSearchRef.setImageDrawable(getDrawable(R.drawable.ic_cross))
-                                    ivSearchRef.setOnClickListener {
-                                        etScanner.setText("")
-                                    }
-                                    mCreateTaskViewModel.getSearchReferenceList(
-                                        httpManager,
-                                        api1,
-                                        searchRequest
-                                    )
-                                } else {
-                                    ivSearchRef.setOnClickListener {
-                                        getCameraPermission()
-                                    }
-                                    ivSearchRef.setImageDrawable(getDrawable(R.drawable.qr_code))
-
-                                }
-                            }
-
-                            override fun afterTextChanged(text: Editable?) {
-
-                            }
-                        })
-                    } else {
-                        mActivityCreateTaskBinding.cvScanner.visibility = View.GONE
                     }
 
                     var END_LOCATION = Field(field = FIELD.END_LOCATION.name)
@@ -1110,8 +1329,10 @@ open class NewCreateTaskActivity :
                     }
                     var TASK_ID = Field(field = FIELD.TASK_ID.name)
                     if (llallowedFields.contains(TASK_ID)) {
-                        var position = llallowedFields.indexOf(TASK_ID)
+                        val position = llallowedFields.indexOf(TASK_ID)
                         if (position != -1 && !llallowedFields[position].skipVisibilty) {
+
+
                             mActivityCreateTaskBinding.tilTaskId.visibility = View.VISIBLE
                         } else {
                             mActivityCreateTaskBinding.tilTaskId.visibility = View.GONE
@@ -1122,8 +1343,99 @@ open class NewCreateTaskActivity :
                     } else {
                         mActivityCreateTaskBinding.tilTaskId.visibility = View.GONE
                     }
+
+                    val SYSTEM_HUBS = Field(
+                        field = FIELD.SYSTEM_HUB.name
+                    )
+                    if (llallowedFields.contains(SYSTEM_HUBS)) {
+                        val position = llallowedFields.indexOf(SYSTEM_HUBS)
+                        val data = llallowedFields[position]
+                        val advanceConfig = data.advanceConfig
+                        target_system_hub = data.advanceConfig?.target!!
+                        Log.d("target_system_hub", target_system_hub.toString())
+
+                        if (advanceConfig!!.source!! == AdvancedConfigSource.NEAR_BY_HUBS) {
+                            selectedHubSource1 = true
+                            Log.d("advanceConfig", "NEAR_BY_HUBS")
+                            setNoHub(AdvancedConfigSource.NEAR_BY_HUBS.source!!)
+
+                            val lp = WindowManager.LayoutParams()
+                            lp.copyFrom(dialogNearHub.window?.attributes)
+                            lp.width = WindowManager.LayoutParams.MATCH_PARENT
+                            lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+                            lp.dimAmount = 0.8f
+                            val window: Window? = dialogNearHub.window
+                            window?.setLayout(
+                                WindowManager.LayoutParams.MATCH_PARENT,
+                                WindowManager.LayoutParams.MATCH_PARENT
+                            )
+                            window?.setGravity(Gravity.CENTER)
+                            val rvNearHubs =
+                                dialogNearHub.findViewById<RecyclerView>(R.id.rv_loc_near)
+                            getCurrentLocation(true)
+                            rvNearHubs.adapter = nearHubAdapter
+                            tvNearSearch.setOnClickListener {
+                                mCreateTaskViewModel.selectLocation(
+                                    mActivityCreateTaskBinding.etNearByHubLocation.rootView,
+                                    NEAR_REQUEST_CODE
+                                )
+                            }
+                            closeHubDialog.setOnClickListener {
+                                dialogNearHub.dismiss()
+                            }
+
+                            mActivityCreateTaskBinding.ivNearByHub.setOnClickListener {
+                                if (!dialogNearHub.isShowing) {
+                                    dialogNearHub.show()
+                                }
+                            }
+
+                            if (position != -1 && !data.skipVisibilty) {
+                                mActivityCreateTaskBinding.cvNearByHub.visibility = View.VISIBLE
+                                mActivityCreateTaskBinding.labelNearByHub.text = "${data.label}"
+                                loggedScope1 = false
+                            } else {
+                                loggedScope1 = true
+                                mActivityCreateTaskBinding.cvNearByHub.visibility = View.GONE
+                            }
+                        } else if (advanceConfig.source!! == AdvancedConfigSource.LOGGED_IN_USER_HUBS) {
+                            selectedHubSource2 = true
+                            Log.d("advanceConfig", "LOGGED_IN_USER_HUBS")
+                            setNoHub(AdvancedConfigSource.LOGGED_IN_USER_HUBS.source!!)
+
+                            if (position != -1 && !data.skipVisibilty) {
+                                mActivityCreateTaskBinding.cvLoggedInHub.visibility = View.VISIBLE
+                                mActivityCreateTaskBinding.labelLoggedInHub.text = "${data.label}"
+                                getCurrentLocation(
+                                    true,
+                                    AdvancedConfigSource.LOGGED_IN_USER_HUBS.source
+                                )
+                                loggedScope1 = true
+                            } else {
+                                loggedScope1 = false
+                                mActivityCreateTaskBinding.cvLoggedInHub.visibility = View.GONE
+                            }
+                        } else if (advanceConfig.source!! == AdvancedConfigSource.ALL_HUBS) {
+                            selectedHubSource3 = true
+                            Log.d("advanceConfig", "ALL_HUBS")
+                            setNoHub(AdvancedConfigSource.ALL_HUBS.source!!)
+                            if (position != -1 && !data.skipVisibilty) {
+                                mActivityCreateTaskBinding.cvAllHub.visibility = View.VISIBLE
+                                mActivityCreateTaskBinding.labelAllHub.text = "${data.label}"
+                                loggedScope1 = false
+                                getCurrentLocation(true, AdvancedConfigSource.ALL_HUBS.source)
+                            } else {
+                                loggedScope1 = true
+                                mActivityCreateTaskBinding.cvAllHub.visibility = View.GONE
+                            }
+                        }
+                    }
+
+                    //to update
                     val TIME_SLOT = Field(field = FIELD.TIME_SLOT.name)
                     if (llallowedFields.contains(TIME_SLOT)) {
+                        val position = llallowedFields.indexOf(TIME_SLOT)
+                        val data = llallowedFields[position]
 
                         mCreateTaskViewModel.getUserLocations(httpManager)
 
@@ -1146,9 +1458,9 @@ open class NewCreateTaskActivity :
 
                         val title = dialogSlot.findViewById<TextView>(R.id.titlePop)
                         val ddHubs = dialogSlot.findViewById<Spinner>(R.id.dd_hubs)
+                        val ddTitle = dialogSlot.findViewById<TextView>(R.id.dd_title)
                         val btnDone = dialogSlot.findViewById<AppCompatButton>(R.id.btn_done)
                         val btnClose = dialogSlot.findViewById<ImageView>(R.id.btnClose)
-
 
                         title.text =
                             if (TIME_SLOT.label != null && TIME_SLOT.label.toString() != "" && TIME_SLOT.label.toString() != "null") TIME_SLOT.label.toString() else "Select Preferred Slot"
@@ -1166,34 +1478,125 @@ open class NewCreateTaskActivity :
                             WindowManager.LayoutParams.MATCH_PARENT,
                             WindowManager.LayoutParams.WRAP_CONTENT
                         )
-                        window!!.setGravity(Gravity.CENTER)
-
+                        window.setGravity(Gravity.CENTER)
                         dialogSlot.window!!.attributes = lp
-
-                        mActivityCreateTaskBinding.etVisitTime.setOnClickListener {
-                            dialogSlot.show()
-                            timePosition = 0
-
-                            btnDone?.setOnClickListener {
-                                if (dateFinal != "" && timeFinal != "") {
-                                    dialogSlot.dismiss()
-                                    etSlot.setText("$dateFinal $timeFinal")
-
-                                    hub = hubs.find { it.hubId == hubIdFinal }!!
-
+                        etSlot.setOnClickListener {
+                            Log.d("advanceConfig", data.advanceConfig?.source.toString())
+                            if (selectedHubSource1 || selectedHubSource2 || selectedHubSource3 && data.advanceConfig?.source == AdvancedConfigSource.TASK_SCOPE_HUB_SLOTS) {
+                                Log.d("advanceConfig", "TASK_SCOPE_HUB_SLOTS")
+                                availType = "GEO"
+                                var checkPos = false
+                                var selectedPosition = 0
+                                if (loggedScope1) {
+                                    if (selectedHubSource2) {
+                                        Log.e("logger", "2")
+                                        checkPos = true
+                                        loggedScope = true
+                                        ///hubs.clear()
+                                        hubs = selectedHubList2
+                                        selectedPosition = spinnerLogged.selectedItemPosition
+                                        Log.e("logger", hubs.toString())
+                                    }
                                 } else {
-                                    TrackiToast.Message.showShort(
-                                        this@NewCreateTaskActivity,
-                                        "Select Slot To Continue"
-                                    )
+                                    if (selectedHubSource1) {
+                                        Log.e("logger", "1")
+                                        checkPos = true
+                                        loggedScope = false
+                                        //hubs.clear()
+                                        hubs = selectedHubList1
+                                        selectedPosition = spinnerNear.selectedItemPosition
+                                    }
+                                    if (!checkPos) {
+                                        Log.e("logger", "3")
+                                        if (selectedHubSource3) {
+                                            checkPos = true
+                                            loggedScope = false
+                                            //hubs.clear()
+                                            hubs = selectedHubList3
+                                            selectedPosition = spinnerAll.selectedItemPosition
+                                        }
+                                    }
                                 }
-                            }
-                            btnClose?.setOnClickListener {
-                                dialogSlot.dismiss()
-                            }
+                                if (checkPos) {
+                                    Log.e("checkPos", "in position=$selectedPosition")
+                                    if (!loggedScope && selectedPosition > 0) {
+                                        Log.e("checkPos", "in position=$selectedPosition")
+                                        dialogSlot.show()
+                                    } else if (loggedScope && selectedPosition > 0) {
+                                        dialogSlot.show()
+                                    } else {
+                                        TrackiToast.Message.showShort(this, "Please select the hub")
+                                    }
+                                    timePosition = 0
 
-                            callSlotApi(ddHubs)
-
+                                    btnDone?.setOnClickListener {
+                                        if (dateFinal != "" && timeFinal != "") {
+                                            dialogSlot.dismiss()
+                                            etSlot.setText("$dateFinal $timeFinal")
+                                            hub = hubs.find { it.hubId == hubIdFinal }!!
+                                        } else {
+                                            TrackiToast.Message.showShort(
+                                                this@NewCreateTaskActivity,
+                                                "Select Slot To Continue"
+                                            )
+                                        }
+                                    }
+                                    btnClose?.setOnClickListener {
+                                        dialogSlot.dismiss()
+                                    }
+                                    if (selectedPosition > 0) {
+                                        callSlotApi(ddHubs, ddTitle, selectedPosition, data)
+                                    }
+                                } else {
+                                    TrackiToast.Message.showShort(this, "No Hubs Found")
+                                }
+                            } else if (data.advanceConfig?.source == AdvancedConfigSource.LOGGED_IN_USER_HUBS_SLOTS) {
+                                availType = "USER"
+                                hubs =
+                                    preferencesHelper.userHubList.toMutableList() as ArrayList<Hub>
+                                Log.d("advanceConfig", "LOGGED_IN_USER_HUBS_SLOTS")
+                                dialogSlot.show()
+                                timePosition = 0
+                                btnDone?.setOnClickListener {
+                                    if (dateFinal != "" && timeFinal != "") {
+                                        dialogSlot.dismiss()
+                                        etSlot.setText("$dateFinal $timeFinal")
+                                        hub = hubs.find { it.hubId == hubIdFinal }!!
+                                    } else {
+                                        TrackiToast.Message.showShort(
+                                            this@NewCreateTaskActivity,
+                                            "Select Slot To Continue"
+                                        )
+                                    }
+                                }
+                                btnClose?.setOnClickListener {
+                                    dialogSlot.dismiss()
+                                }
+                                callSlotApi(ddHubs, ddTitle, 1, data)
+                            } else if (data.advanceConfig?.source == AdvancedConfigSource.TASK_SCOPE_PRODUCT_SLOTS) {
+                                availType = "INVENTORY"
+                                hubs =
+                                    preferencesHelper.userHubList.toMutableList() as ArrayList<Hub>
+                                Log.d("advanceConfig", "TASK_SCOPE_PRODUCT_SLOTS")
+                                dialogSlot.show()
+                                timePosition = 0
+                                btnDone?.setOnClickListener {
+                                    if (dateFinal != "" && timeFinal != "") {
+                                        dialogSlot.dismiss()
+                                        etSlot.setText("$dateFinal $timeFinal")
+                                        hub = hubs.find { it.hubId == hubIdFinal }!!
+                                    } else {
+                                        TrackiToast.Message.showShort(
+                                            this@NewCreateTaskActivity,
+                                            "Select Slot To Continue"
+                                        )
+                                    }
+                                }
+                                btnClose?.setOnClickListener {
+                                    dialogSlot.dismiss()
+                                }
+                                callSlotApi(ddHubs, ddTitle, 1, data)
+                            }
                         }
                     } else {
                         mActivityCreateTaskBinding.cvTimeSlot.visibility = View.GONE
@@ -1201,8 +1604,6 @@ open class NewCreateTaskActivity :
 
                     var REFERENCE_ID = Field(field = FIELD.REFERENCE_ID.name)
                     if (llallowedFields.contains(REFERENCE_ID)) {
-
-
                         var position = llallowedFields.indexOf(REFERENCE_ID)
                         if (position != -1 && !llallowedFields[position].skipVisibilty) {
                             mActivityCreateTaskBinding.tilReference.visibility = View.VISIBLE
@@ -1242,11 +1643,13 @@ open class NewCreateTaskActivity :
                                     mActivityCreateTaskBinding.field1text.visibility = View.VISIBLE
                                     mActivityCreateTaskBinding.tvfield1text.text = fieldData.label
                                 }
+
                                 DataType.NUMBER -> {
                                     mActivityCreateTaskBinding.tvfield1number.text = fieldData.label
                                     mActivityCreateTaskBinding.field1number.visibility =
                                         View.VISIBLE
                                 }
+
                                 DataType.DROPDOWN -> {
                                     mActivityCreateTaskBinding.tvfield1spinner.text =
                                         fieldData.label
@@ -1262,6 +1665,7 @@ open class NewCreateTaskActivity :
                                         adapter
                                     mActivityCreateTaskBinding.spinnerfield1spinner.setSelection(0)
                                 }
+
                                 DataType.RADIO -> {
                                     mActivityCreateTaskBinding.tvfield1radio.text = fieldData.label
                                     mActivityCreateTaskBinding.field1radio.visibility = View.VISIBLE
@@ -1288,6 +1692,7 @@ open class NewCreateTaskActivity :
                                         mActivityCreateTaskBinding.radio1Group.addView(radioButton)
                                     }
                                 }
+
                                 else -> {}
                             }
                         }
@@ -1304,11 +1709,13 @@ open class NewCreateTaskActivity :
                                     mActivityCreateTaskBinding.field2text.visibility = View.VISIBLE
                                     mActivityCreateTaskBinding.tvfield2text.text = fieldData.label
                                 }
+
                                 DataType.NUMBER -> {
                                     mActivityCreateTaskBinding.tvfield2number.text = fieldData.label
                                     mActivityCreateTaskBinding.field2number.visibility =
                                         View.VISIBLE
                                 }
+
                                 DataType.DROPDOWN -> {
                                     mActivityCreateTaskBinding.tvfield2spinner.text =
                                         fieldData.label
@@ -1324,6 +1731,7 @@ open class NewCreateTaskActivity :
                                         adapter
                                     mActivityCreateTaskBinding.spinnerfield2spinner.setSelection(0)
                                 }
+
                                 DataType.RADIO -> {
                                     mActivityCreateTaskBinding.tvfield2radio.text = fieldData.label
                                     mActivityCreateTaskBinding.field2radio.visibility = View.VISIBLE
@@ -1350,6 +1758,7 @@ open class NewCreateTaskActivity :
                                         mActivityCreateTaskBinding.radio2Group.addView(radioButton)
                                     }
                                 }
+
                                 else -> {}
                             }
                         }
@@ -1366,11 +1775,13 @@ open class NewCreateTaskActivity :
                                     mActivityCreateTaskBinding.field3text.visibility = View.VISIBLE
                                     mActivityCreateTaskBinding.tvfield3text.text = fieldData.label
                                 }
+
                                 DataType.NUMBER -> {
                                     mActivityCreateTaskBinding.tvfield3number.text = fieldData.label
                                     mActivityCreateTaskBinding.field3number.visibility =
                                         View.VISIBLE
                                 }
+
                                 DataType.DROPDOWN -> {
                                     mActivityCreateTaskBinding.tvfield3spinner.text =
                                         fieldData.label
@@ -1386,6 +1797,7 @@ open class NewCreateTaskActivity :
                                         adapter
                                     mActivityCreateTaskBinding.spinnerfield3spinner.setSelection(0)
                                 }
+
                                 DataType.RADIO -> {
                                     mActivityCreateTaskBinding.tvfield3radio.text = fieldData.label
                                     mActivityCreateTaskBinding.field3radio.visibility = View.VISIBLE
@@ -1412,6 +1824,7 @@ open class NewCreateTaskActivity :
                                         mActivityCreateTaskBinding.radio3Group.addView(radioButton)
                                     }
                                 }
+
                                 else -> {}
                             }
                         }
@@ -1428,11 +1841,13 @@ open class NewCreateTaskActivity :
                                     mActivityCreateTaskBinding.field4text.visibility = View.VISIBLE
                                     mActivityCreateTaskBinding.tvfield4text.text = fieldData.label
                                 }
+
                                 DataType.NUMBER -> {
                                     mActivityCreateTaskBinding.tvfield4number.text = fieldData.label
                                     mActivityCreateTaskBinding.field4number.visibility =
                                         View.VISIBLE
                                 }
+
                                 DataType.DROPDOWN -> {
                                     mActivityCreateTaskBinding.tvfield4spinner.text =
                                         fieldData.label
@@ -1448,6 +1863,7 @@ open class NewCreateTaskActivity :
                                         adapter
                                     mActivityCreateTaskBinding.spinnerfield4spinner.setSelection(0)
                                 }
+
                                 DataType.RADIO -> {
                                     mActivityCreateTaskBinding.tvfield4radio.text = fieldData.label
                                     mActivityCreateTaskBinding.field4radio.visibility = View.VISIBLE
@@ -1474,6 +1890,7 @@ open class NewCreateTaskActivity :
                                         mActivityCreateTaskBinding.radio4Group.addView(radioButton)
                                     }
                                 }
+
                                 else -> {}
                             }
                         }
@@ -1490,15 +1907,17 @@ open class NewCreateTaskActivity :
                                     mActivityCreateTaskBinding.field5text.visibility = View.VISIBLE
                                     mActivityCreateTaskBinding.tvfield5text.text = fieldData.label
                                 }
+
                                 DataType.NUMBER -> {
                                     mActivityCreateTaskBinding.tvfield5number.text = fieldData.label
                                     mActivityCreateTaskBinding.field5number.visibility =
                                         View.VISIBLE
                                 }
+
                                 DataType.DROPDOWN -> {
                                     mActivityCreateTaskBinding.tvfield5spinner.text =
                                         fieldData.label
-                                    mActivityCreateTaskBinding.field1spinner.visibility =
+                                    mActivityCreateTaskBinding.field5spinner.visibility =
                                         View.VISIBLE
                                     val adapter = ArrayAdapter(
                                         this,
@@ -1510,6 +1929,7 @@ open class NewCreateTaskActivity :
                                         adapter
                                     mActivityCreateTaskBinding.spinnerfield5spinner.setSelection(0)
                                 }
+
                                 DataType.RADIO -> {
                                     mActivityCreateTaskBinding.tvfield5radio.text = fieldData.label
                                     mActivityCreateTaskBinding.field5radio.visibility = View.VISIBLE
@@ -1536,6 +1956,7 @@ open class NewCreateTaskActivity :
                                         mActivityCreateTaskBinding.radio5Group.addView(radioButton)
                                     }
                                 }
+
                                 else -> {}
                             }
                         }
@@ -1552,11 +1973,13 @@ open class NewCreateTaskActivity :
                                     mActivityCreateTaskBinding.field6text.visibility = View.VISIBLE
                                     mActivityCreateTaskBinding.tvfield6text.text = fieldData.label
                                 }
+
                                 DataType.NUMBER -> {
                                     mActivityCreateTaskBinding.tvfield6number.text = fieldData.label
                                     mActivityCreateTaskBinding.field6number.visibility =
                                         View.VISIBLE
                                 }
+
                                 DataType.DROPDOWN -> {
                                     mActivityCreateTaskBinding.tvfield6spinner.text =
                                         fieldData.label
@@ -1572,6 +1995,7 @@ open class NewCreateTaskActivity :
                                         adapter
                                     mActivityCreateTaskBinding.spinnerfield6spinner.setSelection(0)
                                 }
+
                                 DataType.RADIO -> {
                                     mActivityCreateTaskBinding.tvfield6radio.text = fieldData.label
                                     mActivityCreateTaskBinding.field6radio.visibility = View.VISIBLE
@@ -1598,6 +2022,7 @@ open class NewCreateTaskActivity :
                                         mActivityCreateTaskBinding.radio6Group.addView(radioButton)
                                     }
                                 }
+
                                 else -> {}
                             }
                         }
@@ -1614,11 +2039,13 @@ open class NewCreateTaskActivity :
                                     mActivityCreateTaskBinding.field7text.visibility = View.VISIBLE
                                     mActivityCreateTaskBinding.tvfield7text.text = fieldData.label
                                 }
+
                                 DataType.NUMBER -> {
                                     mActivityCreateTaskBinding.tvfield7number.text = fieldData.label
                                     mActivityCreateTaskBinding.field7number.visibility =
                                         View.VISIBLE
                                 }
+
                                 DataType.DROPDOWN -> {
                                     mActivityCreateTaskBinding.tvfield7spinner.text =
                                         fieldData.label
@@ -1634,6 +2061,7 @@ open class NewCreateTaskActivity :
                                         adapter
                                     mActivityCreateTaskBinding.spinnerfield7spinner.setSelection(0)
                                 }
+
                                 DataType.RADIO -> {
                                     mActivityCreateTaskBinding.tvfield7radio.text = fieldData.label
                                     mActivityCreateTaskBinding.field7radio.visibility = View.VISIBLE
@@ -1660,6 +2088,7 @@ open class NewCreateTaskActivity :
                                         mActivityCreateTaskBinding.radio7Group.addView(radioButton)
                                     }
                                 }
+
                                 else -> {}
                             }
                         }
@@ -1676,11 +2105,13 @@ open class NewCreateTaskActivity :
                                     mActivityCreateTaskBinding.field8text.visibility = View.VISIBLE
                                     mActivityCreateTaskBinding.tvfield8text.text = fieldData.label
                                 }
+
                                 DataType.NUMBER -> {
                                     mActivityCreateTaskBinding.tvfield8number.text = fieldData.label
                                     mActivityCreateTaskBinding.field8number.visibility =
                                         View.VISIBLE
                                 }
+
                                 DataType.DROPDOWN -> {
                                     mActivityCreateTaskBinding.tvfield8spinner.text =
                                         fieldData.label
@@ -1696,6 +2127,7 @@ open class NewCreateTaskActivity :
                                         adapter
                                     mActivityCreateTaskBinding.spinnerfield8spinner.setSelection(0)
                                 }
+
                                 DataType.RADIO -> {
                                     mActivityCreateTaskBinding.tvfield8radio.text = fieldData.label
                                     mActivityCreateTaskBinding.field8radio.visibility = View.VISIBLE
@@ -1722,6 +2154,7 @@ open class NewCreateTaskActivity :
                                         mActivityCreateTaskBinding.radio8Group.addView(radioButton)
                                     }
                                 }
+
                                 else -> {}
                             }
                         }
@@ -1743,13 +2176,13 @@ open class NewCreateTaskActivity :
                 dynamicFormsNew = CommonUtils.getFormByFormId(getDynamicFormId(categoryId))
                 if (dynamicFormsNew != null && dynamicFormsNew!!.fields != null && dynamicFormsNew!!.fields!!.isNotEmpty()) {
                     try {
-                        var formData: FormData? =
+                        val formData: FormData? =
                             dynamicFormsNew!!.fields!!.filter { s -> s.type == DataType.BUTTON }
                                 .filter { data -> data.actionConfig?.action == Type.DISPOSE || data.actionConfig?.action == Type.FORM || data.actionConfig?.action == Type.API }
                                 .single()
                         formData?.let {
                             it.value?.let {
-                                btnCLick.text = formData.value
+                                btnCLickSubmit.text = formData.value
                             }
                         }
                     } catch (e: java.lang.Exception) {
@@ -1757,13 +2190,12 @@ open class NewCreateTaskActivity :
                     }
 
                 } else {
-                    btnCLick.text = "Create"
+                    btnCLickSubmit.text = "Create"
                 }
             }
-
         })
 
-        var arrayAdapter =
+        val arrayAdapter =
             object : ArrayAdapter<String?>(this, android.R.layout.simple_spinner_item, categories) {
                 override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                     val v = super.getView(position, convertView, parent)
@@ -1788,24 +2220,7 @@ open class NewCreateTaskActivity :
             }
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spnCategory!!.adapter = arrayAdapter
-        if (intent.hasExtra(AppConstants.Extra.EXTRA_CATEGORIES)) {
-            var categoryMap: Map<String, String>? = null
-            val str: String = intent.getStringExtra(AppConstants.Extra.EXTRA_CATEGORIES)!!
-            categoryMap =
-                Gson().fromJson(str, object : TypeToken<HashMap<String?, String?>?>() {}.type)
-            if (categoryMap != null && categoryMap!!.containsKey("categoryId")) {
-                categoryId = categoryMap!!.get("categoryId")
-                if (categoryId != null) {
-                    for (i in list.indices) {
-                        if (list[i].categoryId == categoryId) {
-                            selItem = list[i].name!!
-                            spnCategory!!.setSelection(i)
-                            break
-                        }
-                    }
-                }
-            }
-        }
+
         if (intent.hasExtra("from")) {
             if (intent.getStringExtra("from")!!
                     .equals("taskListing") || intent.getStringExtra("from")!!.equals("dashBoard")
@@ -1824,7 +2239,7 @@ open class NewCreateTaskActivity :
                         }
                     }
                 }
-                mCategoryId.value = categoryId
+                mCategoryId.value = categoryId!!
                 setToolbar(mActivityCreateTaskBinding.toolbar, "Create " + getLabelName(categoryId))
 
             }
@@ -1846,7 +2261,7 @@ open class NewCreateTaskActivity :
                 categoryId = list[position].categoryId
                 category = list[position]
                 selItem = list[position].name!!
-                mCategoryId.value = categoryId
+                mCategoryId.value = categoryId!!
                 val listCategory = preferencesHelper.workFlowCategoriesList
                 if (categoryId != null) {
                     val workFlowCategories = WorkFlowCategories()
@@ -1911,8 +2326,8 @@ open class NewCreateTaskActivity :
                     if (contact.name != null) {
                         edContactName.setText(contact.name)
                     }
-                    if (contact.mobileNumber != null) {
-                        edMobileNumber.setText(contact.mobileNumber)
+                    if (contact.mobile != null) {
+                        edMobileNumber.setText(contact.mobile)
                     }
                 }
                 edTaskName.setText(task.taskName)
@@ -2002,47 +2417,110 @@ open class NewCreateTaskActivity :
 //        mCreateTaskViewModel.getSearchReferenceList(httpManager, apitemp, searchRequest)
     }
 
-    private fun callSlotApi(ddHubs: Spinner) {
-        var list = ArrayList<Hub>()
-        var listNames = kotlin.collections.ArrayList<String>()
+    private fun callSlotApi(
+        ddHubs: Spinner,
+        ddTitle: TextView,
+        selectedPosition: Int,
+        data: Field
+    ) {
+        val list = ArrayList<Hub>()
+        var selectedPos = selectedPosition - 1
+        val listNames = kotlin.collections.ArrayList<String>()
 
-        hubs = preferencesHelper.userHubList!!
         Log.e("hubs", "$hubs")
-        if (hubs.isNotEmpty() && hubs != null) {
-            if (hubs.size > 1) {
+
+        if (hubs.isNotEmpty()) {
+            if (hubs.size > 0) {
                 for (hub in hubs) {
                     list.add(hub)
                     listNames.add(hub.name.toString())
                 }
-                ddHubs.visibility = View.VISIBLE
-                val hubAdapter =
-                    ArrayAdapter(this, android.R.layout.simple_spinner_item, listNames)
+
+                val hubAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listNames)
                 ddHubs.adapter = hubAdapter
 
-
-
-                ddHubs.onItemSelectedListener = object : OnItemSelectedListener {
-                    @SuppressLint("NewApi")
-                    override fun onItemSelected(
-                        p0: AdapterView<*>?,
-                        p1: View?,
-                        p2: Int,
-                        p3: Long
-                    ) {
-                        timePosition = p2
-                        hubIdFinal = list[timePosition].hubId.toString()
-                        mCreateTaskViewModel.getSlotAvailability(
-                            httpManager,
-                            TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
-                            hubIdFinal,
-                            date
-                        )
+                if (hubIdFinal != null) {
+                    list.forEachIndexed { index, item ->
+                        println("index = $index, item = $item ")
+                        if (item.hubId.equals(hubIdFinal)) {
+                            selectedPos = index
+                        }
                     }
+                }
 
-                    override fun onNothingSelected(p0: AdapterView<*>?) {
-
+                if (hubIdFinalDestination != null) {
+                    list.forEachIndexed { index, item ->
+                        println("index = $index, item = $item ")
+                        if (item.hubId.equals(hubIdFinalDestination)) {
+                            selectedPos = index
+                        }
                     }
+                }
 
+                ddHubs.setSelection(selectedPos)
+                hubIdFinal = list[selectedPos].hubId.toString()
+
+                if (data.advanceConfig?.source == AdvancedConfigSource.TASK_SCOPE_HUB_SLOTS) {
+                    ddTitle.text = "Selected Geography"
+                    ddHubs.isEnabled = false
+                    timePosition = selectedPos
+                    mCreateTaskViewModel.getSlotAvailability(
+                        httpManager,
+                        TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
+                        hubIdFinal,
+                        date
+                    )
+                } else if (data.advanceConfig?.source == AdvancedConfigSource.LOGGED_IN_USER_HUBS_SLOTS) {
+                    ddTitle.text = "Select Geography"
+                    ddHubs.onItemSelectedListener = object : OnItemSelectedListener {
+                        @SuppressLint("NewApi")
+                        override fun onItemSelected(
+                            p0: AdapterView<*>?,
+                            p1: View?,
+                            p2: Int,
+                            p3: Long
+                        ) {
+                            Log.e("hubs", "call GET_TIME_SLOTS")
+                            timePosition = p2
+                            hubIdFinalDestination = list[timePosition].hubId.toString()
+                            hubDestination = list[timePosition]
+                            mCreateTaskViewModel.getSlotAvailability(
+                                httpManager,
+                                TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
+                                hubIdFinalDestination,
+                                date
+                            )
+                        }
+
+                        override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                        }
+                    }
+                } else if (data.advanceConfig?.source == AdvancedConfigSource.TASK_SCOPE_PRODUCT_SLOTS) {
+                    ddHubs.onItemSelectedListener = object : OnItemSelectedListener {
+                        @SuppressLint("NewApi")
+                        override fun onItemSelected(
+                            p0: AdapterView<*>?,
+                            p1: View?,
+                            p2: Int,
+                            p3: Long
+                        ) {
+                            Log.e("hubs", "call TASK_SCOPE_PRODUCT_SLOTS")
+                            ddHubs.visibility = View.GONE
+                            ddTitle.visibility = View.GONE
+                            timePosition = selectedPos
+                            mCreateTaskViewModel.getSlotAvailability(
+                                httpManager,
+                                TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
+                                invIds?.get(0).toString(),
+                                date
+                            )
+                        }
+
+                        override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                        }
+                    }
                 }
             } else {
                 timePosition = 0
@@ -2050,16 +2528,11 @@ open class NewCreateTaskActivity :
                 listNames.add(hubs[0].name.toString())
                 hubIdFinal = list[0].hubId.toString()
                 ddHubs.visibility = View.GONE
+                ddTitle.visibility = View.GONE
             }
-
-            mCreateTaskViewModel.getSlotAvailability(
-                httpManager,
-                TrackiSdkApplication.getApiMap()[ApiType.GET_TIME_SLOTS]!!,
-                "${list[timePosition].hubId}",
-                date
-            )
         } else {
-            TrackiToast.Message.showShort(this, "No Hub Found")
+            llSlots.visibility = View.GONE
+            ivNoData.visibility = View.VISIBLE
         }
     }
 
@@ -2186,51 +2659,30 @@ open class NewCreateTaskActivity :
                 requestUserType as java.util.ArrayList<String>?
             )
         sendBroadcast(intent)
-//        var intent = Intent(this, AddCustomerActivity::class.java)
-//        intent.putExtra("from", AppConstants.EMPLOYEES)
-//        intent.putExtra("action", "add")
-//        if(!requestUserType.isNullOrEmpty())
-//            intent.putStringArrayListExtra(
-//                AppConstants.REQUESTED_USER_TYPES,
-//                requestUserType as java.util.ArrayList<String>?
-//            )
-//
-//        startActivity(intent)
+
     }
 
-    /**
-     * Method used to add fragment and show it to user.
-     *
-     * @param fragment fragment that needs to be added/replaced.
-     */
+
+    @SuppressLint("SuspiciousIndentation")
     private fun replaceFragment(fragment: Fragment, fragmentName: String?) {
         val formName = CommonUtils.getFormByFormId(fragmentName)
-        //  CommonUtils.showLogMessage("e", "formid", fragmentName);
+        CommonUtils.showLogMessage("e", "fragmentName ", fragmentName)
         if (formName?.name != null) {
             setToolbar(mActivityCreateTaskBinding.toolbar, "Create " + getLabelName(categoryId))
         } else {
 //            mActivityCreateTaskBinding?.toolbar?.title = ""
             setToolbar(mActivityCreateTaskBinding.toolbar, "Create " + getLabelName(categoryId))
         }
-
         val manager = supportFragmentManager
-
         val ft = manager.beginTransaction()
         if (allowedFieldFirst != null && !allowedFieldFirst!!) {
             CommonUtils.showLogMessage("e", "allowedFieldFirst", "false");
             container.visibility = View.GONE
             ft.replace(R.id.container_second, fragment, fragmentName)
             container_second.visibility = View.VISIBLE
-//            val params = container_second.layoutParams as MarginLayoutParams
-//            var marginData=-1*CommonUtils.dpToPixel(this,70)
-//            params.setMargins(0, 0, 0, marginData)
-//            container_second.layoutParams = params
-
             if (formName == null) {
                 container_second.visibility = View.GONE
             }
-
-
         } else {
             CommonUtils.showLogMessage("e", "allowedFieldFirst", "true");
             container_second.visibility = View.GONE
@@ -2242,6 +2694,14 @@ open class NewCreateTaskActivity :
         }
         ft.commit()
     }
+
+    private fun getSystemHubs(request: SystemHubRequest) {
+        mCreateTaskViewModel.getSystemHubs(httpManager, request)
+    }
+
+    private var services: ArrayList<Service>? = ArrayList()
+    private var serviceIds: ArrayList<String> = ArrayList()
+    private var serviceNames: ArrayList<String> = ArrayList()
 
     @SuppressLint("SetTextI18n")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -2265,11 +2725,54 @@ open class NewCreateTaskActivity :
                         mActivityCreateTaskBinding.edEnterEndLocation.setText(place.name)
                     }
                 }
+
                 AutocompleteActivity.RESULT_ERROR -> {
                     val status = Autocomplete.getStatusFromIntent(data!!)
                     Log.i(TAG, status.statusMessage)
                     TrackiToast.Message.showShort(this, status.statusMessage!!)
                 }
+
+                Activity.RESULT_CANCELED -> // The user canceled the operation.
+                    TrackiToast.Message.showShort(this, "operation cancelled.")
+            }
+        }
+
+        if (requestCode == NEAR_REQUEST_CODE) {
+            when (resultCode) {
+                Activity.RESULT_OK -> {
+                    val place = Autocomplete.getPlaceFromIntent(data!!)
+                    Log.e(TAG, "Place: " + place.name + ", " + place.id)
+                    mActivityCreateTaskBinding.etNearByHubLocation.setText(place.address)
+                    tvNearSearch.text = place.address
+                    val hubCoordinates = HubCoordinates(
+                        ArrayList(), place.latLng?.latitude, "",
+                        place.latLng?.longitude
+                    )
+                    val systemHubRequset = SystemHubRequest(
+                        categoryId,
+                        hubCoordinates,
+                        "",
+                        5000.00,
+                        AdvancedConfigSource.NEAR_BY_HUBS.source
+                    )
+                    val location = GeoCoordinates()
+                    location.latitude = place.latLng?.latitude!!
+                    location.longitude = place.latLng?.longitude!!
+                    val place1: com.rf.taskmodule.data.model.response.config.Place =
+                        com.rf.taskmodule.data.model.response.config.Place()
+                    place1.address = place.address
+                    place1.location = location
+                    createTaskRequest?.source = place1
+                    sourceNameA = AdvancedConfigSource.NEAR_BY_HUBS.source
+                    getSystemHubs(systemHubRequset)
+                }
+
+                AutocompleteActivity.RESULT_ERROR -> {
+                    val status = Autocomplete.getStatusFromIntent(data!!)
+                    Log.i(TAG, status.statusMessage)
+                    TrackiToast.Message.showShort(this, status.statusMessage!!)
+                }
+
                 Activity.RESULT_CANCELED -> // The user canceled the operation.
                     TrackiToast.Message.showShort(this, "operation cancelled.")
             }
@@ -2281,40 +2784,34 @@ open class NewCreateTaskActivity :
                     val gson = Gson()
                     val task = gson.fromJson(data!!.getStringExtra("result"), Task::class.java)
                     if (task.clientTaskId != null) {
-                        mActivityCreateTaskBinding.rlReference.visibility = View.VISIBLE
-                        mActivityCreateTaskBinding.tvClientTaskId.text = task.clientTaskId
-                        mActivityCreateTaskBinding.etScanner.setText(task.clientTaskId)
-                        listRef.clear()
-                        listRef.add(task.taskId.toString())
-                        mActivityCreateTaskBinding.tvReferenceCreatedBy.text = task.contact?.name
-                        mActivityCreateTaskBinding.rlReference.setOnClickListener {
-                            val intent = Intent(
-                                this@NewCreateTaskActivity,
-                                NewTaskDetailsActivity::class.java
-                            )
-                            intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, task.taskId)
-                            intent.putExtra(
-                                AppConstants.Extra.EXTRA_ALLOW_SUB_TASK,
-                                task.allowSubTask
-                            )
-                            intent.putExtra(
-                                AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID,
-                                task.subCategoryIds
-                            )
-                            intent.putExtra(
-                                AppConstants.Extra.EXTRA_PARENT_REF_ID,
-                                task.referenceId
-                            )
-                            intent.putExtra(AppConstants.Extra.EXTRA_CATEGORY_ID, task.categoryId)
-                            intent.putExtra(
-                                AppConstants.Extra.FROM,
-                                AppConstants.Extra.ASSIGNED_TO_ME
-                            )
-                            startActivity(intent)
+                        if (!multiReference) {
+                            listRefTask.clear()
                         }
-                    } else {
-                        mActivityCreateTaskBinding.rlReference.visibility = View.GONE
+                        listRefTask.add(task)
+                        adapter.notifyDataSetChanged()
+                        mActivityCreateTaskBinding.etScanner.setText(task.clientTaskId)
                     }
+                }
+            }
+        }
+
+        if (requestCode == 546) {
+            when (resultCode) {
+                Activity.RESULT_OK -> {
+                    val result = data!!.getStringExtra("serviceIds")
+                    val listType = object : TypeToken<ArrayList<Service?>?>() {}.type
+                    services = Gson().fromJson(result, listType)
+                    services?.forEach { item ->
+                        serviceIds.add(item.id!!)
+                        serviceNames.add(item.name!!)
+                    }
+                    createTaskRequest?.serviceIds = serviceIds
+                    mActivityCreateTaskBinding.etServices.setText(
+                        serviceNames.joinToString(
+                            separator = ", "
+                        )
+                    )
+                    Log.d("serviceIds", services.toString())
                 }
             }
         }
@@ -2325,7 +2822,7 @@ open class NewCreateTaskActivity :
         if (CommonUtils.handleResponse(callback, error, result, this)) {
             val jsonConverter: JSONConverter<BaseResponse> =
                 JSONConverter()
-            var response: BaseResponse =
+            val response: BaseResponse =
                 jsonConverter.jsonToObject(result.toString(), BaseResponse::class.java)
             if (preferencesHelper.formDataMap != null && preferencesHelper.formDataMap.isNotEmpty()) {
                 preferencesHelper.clear(AppPreferencesHelper.PreferencesKeys.PREF_KEY_IS_FORM_DATA_MAP);
@@ -2333,6 +2830,83 @@ open class NewCreateTaskActivity :
             if (response.taskId != null)
                 openMainActivity(response.taskId!!)
         }
+    }
+
+    private fun setHubs(
+        finalSource: String,
+        arrayList: ArrayList<String>,
+        listHubs: ArrayList<Hub>
+    ) {
+        if (arrayList.isNotEmpty()) {
+            val spAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, arrayList)
+            spAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            Log.e("hubsModeDS", "$listHubs")
+            when (finalSource) {
+                AdvancedConfigSource.NEAR_BY_HUBS.source -> {
+                    selectedHubSource1 = true
+                    selectedHubList1.clear()
+                    selectedHubList1.addAll(listHubs)
+                    nearHubAdapter.clearItems()
+                    nearHubAdapter.addItems(listHubs)
+                    spinnerNear.adapter = spAdapter
+                    if (listHubs.isNotEmpty()) {
+                        nearHubNoData.visibility = View.GONE
+                    } else {
+                        nearHubNoData.visibility = View.VISIBLE
+                    }
+                }
+
+                AdvancedConfigSource.LOGGED_IN_USER_HUBS.source -> {
+                    selectedHubSource2 = true
+                    selectedHubList2.clear()
+                    selectedHubList2.addAll(listHubs)
+                    spinnerLogged.adapter = spAdapter
+                    Log.d("logger", "clear data$listHubs")
+                }
+
+                AdvancedConfigSource.ALL_HUBS.source -> {
+                    selectedHubSource3 = true
+                    selectedHubList3.clear()
+                    selectedHubList3.addAll(listHubs)
+                    spinnerAll.adapter = spAdapter
+                }
+
+            }
+        }
+    }
+
+    override fun handleSystemHubs(callback: ApiCallback, result: Any?, error: APIError?) {
+        hideLoading()
+        Log.e("hubMode", "${result.toString()}")
+        if (CommonUtils.handleResponse(callback, error, result, this)) {
+            val systemHubResponse =
+                Gson().fromJson(result.toString(), SystemHubResponse::class.java)
+            if (systemHubResponse.successful == true) {
+                if (systemHubResponse.data != null) {
+                    if (systemHubResponse.data!!.isNotEmpty()) {
+                        val arrayListTemp = systemHubResponse.data!!
+                        val arrayList = ArrayList<String>()
+                        arrayList.add("Select Hub")
+                        arrayListTemp.forEach { arrayList.add(it.name.toString()) }
+                        setHubs(sourceNameA!!, arrayList, arrayListTemp)
+                    } else {
+                        setNoHub(sourceNameA!!)
+                    }
+                } else {
+                    setNoHub(sourceNameA!!)
+                }
+            } else {
+                setNoHub(sourceNameA!!)
+            }
+        }
+
+    }
+
+    private fun setNoHub(sourceB: String) {
+        Log.e("hubMode", "0 $sourceNameA")
+        val arrayList = ArrayList<String>()
+        arrayList.add("No Hub Found")
+        setHubs(sourceB, arrayList, ArrayList())
     }
 
     override fun handleTaskResponse(callback: ApiCallback, result: Any?, error: APIError?) {
@@ -2363,45 +2937,15 @@ open class NewCreateTaskActivity :
             if (taskResponse1 != null) {
                 if (taskResponse1.taskDetail != null) {
                     val taskResponse = taskResponse1.taskDetail
-                    mActivityCreateTaskBinding.rlReference.visibility = View.VISIBLE
-                    mActivityCreateTaskBinding.tvClientTaskId.text = taskResponse!!.clientTaskId
-                    listRef.clear()
-                    listRef.add(taskResponse.taskId.toString())
-                    mActivityCreateTaskBinding.tvReferenceCreatedBy.text =
-                        taskResponse.contact?.name
-                    mActivityCreateTaskBinding.rlReference.setOnClickListener {
-                        val intent = Intent(
-                            this@NewCreateTaskActivity,
-                            NewTaskDetailsActivity::class.java
-                        )
-                        intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, taskResponse.taskId)
-                        intent.putExtra(
-                            AppConstants.Extra.EXTRA_ALLOW_SUB_TASK,
-                            taskResponse.allowSubTask
-                        )
-                        intent.putExtra(
-                            AppConstants.Extra.EXTRA_SUB_TASK_CATEGORY_ID,
-                            taskResponse.subCategoryIds
-                        )
-                        intent.putExtra(
-                            AppConstants.Extra.EXTRA_PARENT_REF_ID,
-                            taskResponse.referenceId
-                        )
-                        intent.putExtra(
-                            AppConstants.Extra.EXTRA_CATEGORY_ID,
-                            taskResponse.categoryId
-                        )
-                        intent.putExtra(
-                            AppConstants.Extra.FROM,
-                            AppConstants.Extra.ASSIGNED_TO_ME
-                        )
-                        startActivity(intent)
+                    if (!multiReference) {
+                        listRefTask.clear()
                     }
+                    listRefTask.add(taskResponse!!)
+                    mActivityCreateTaskBinding.etScanner.setText("")
+                    adapter.notifyDataSetChanged()
                 }
-
             }
         }
-
     }
 
     private fun setupAutoCompleteTextView(list: Map<String, String>) {
@@ -2415,7 +2959,6 @@ open class NewCreateTaskActivity :
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listTemp)
         etScanner.setAdapter(adapter)
         etScanner.setOnItemClickListener { adapterView, view, pos, l ->
-
             mCreateTaskViewModel.getTaskDetails(httpManager, listTemp1[pos])
         }
     }
@@ -2450,10 +2993,12 @@ open class NewCreateTaskActivity :
 
     companion object {
         private const val AUTOCOMPLETE_REQUEST_CODE = 23487
+        private const val NEAR_REQUEST_CODE = 23488
         private val TAG = NewCreateTaskActivity::class.java.simpleName
         fun newIntent(context: Context) = Intent(context, NewCreateTaskActivity::class.java)
     }
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onProcessClick(
         list: ArrayList<FormData>,
         dynamicActionConfig: DynamicActionConfig?,
@@ -2461,8 +3006,14 @@ open class NewCreateTaskActivity :
         dfdid: String?
     ) {
 
+        Log.e(TAG, "dynamicActionConfig----> ${dynamicActionConfig} ")
+        Log.e(TAG, "currentFormId----> ${currentFormId} ")
+        Log.e(TAG, "currentFormId----> ${list} ")
+
         var startAddress = ""
         var endAddress = ""
+
+
         if (cardManualStartLocation.visibility == View.GONE) {
             startAddress = edStartLocation.text.toString().trim()
         } else {
@@ -2472,6 +3023,12 @@ open class NewCreateTaskActivity :
                 startAddress = edEnterStartLocation.text.toString().trim()
             }
         }
+
+        if (mActivityCreateTaskBinding.cvNearByHub.visibility == View.VISIBLE) {
+            startAddress = mActivityCreateTaskBinding.etNearByHubLocation.text.toString().trim()
+            Log.e("Address", "Address ----> $startAddress ")
+        }
+
         if (cardManualEndLocation.visibility == View.GONE) {
             endAddress = edEndLocation.text.toString().trim()
         } else {
@@ -2481,7 +3038,6 @@ open class NewCreateTaskActivity :
                 endAddress = edEnterEndLocation.text.toString().trim()
             }
         }
-
 
 //        val buddy = spnBuddy.selectedItem.toString().trim()
 //        val client = spnClient.selectedItem.toString().trim()
@@ -2786,48 +3342,55 @@ open class NewCreateTaskActivity :
 
             var source: com.rf.taskmodule.data.model.response.config.Place? =
                 com.rf.taskmodule.data.model.response.config.Place()
-            var isCategoryContainsStartLocation = CommonUtils.isCategoryContainsFiled(
+            if (createTaskRequest?.destination != null)
+                source = createTaskRequest?.source
+
+            val isCategoryContainsStartLocation = CommonUtils.isCategoryContainsFiled(
                 FIELD.START_LOCATION.name,
                 categoryId,
                 preferencesHelper
             )
-            var isCategoryContainsEndLocation = CommonUtils.isCategoryContainsFiled(
+            val isCategoryContainsEndLocation = CommonUtils.isCategoryContainsFiled(
                 FIELD.END_LOCATION.name,
                 categoryId,
                 preferencesHelper
             )
             if (tilStartLocation.visibility == View.VISIBLE || cardManualStartLocation.visibility == View.VISIBLE || isCategoryContainsStartLocation) {
-                if (llToggleEnableStartLoc.visibility == View.VISIBLE || isCategoryContainsStartLocation)
-                    source?.address = startAddress
-                source!!.location = startLoc
+                if (llToggleEnableStartLoc.visibility == View.VISIBLE || isCategoryContainsStartLocation) {
+                    source!!.address = startAddress
+                    source!!.location = startLoc
+                }
             }
             if (cardManualStartLocation.visibility == View.VISIBLE) {
                 source!!.regionId = regionId
-                source!!.stateId = stateId
-                source!!.cityId = cityId
-                source!!.hubId = hubId
-                source!!.manualLocation = !enableStartLocation.isOn
-                if (source!!.manualLocation || llToggleEnableStartLoc.visibility == View.GONE)
-                    source!!.location = null
+                source.stateId = stateId
+                source.cityId = cityId
+                source.hubId = hubId
+                source.manualLocation = !enableStartLocation.isOn
+                if (source.manualLocation || llToggleEnableStartLoc.visibility == View.GONE)
+                    source.location = null
 
             }
 
             var destination: com.rf.taskmodule.data.model.response.config.Place? =
                 com.rf.taskmodule.data.model.response.config.Place()
 
+            if (createTaskRequest?.destination != null)
+                destination = createTaskRequest?.destination
+
             if (endLatLng != null && endLatLng?.latitude != 0.0 && endLatLng?.longitude != 0.0) {
                 val endLoc = GeoCoordinates()
                 endLoc.latitude = endLatLng?.latitude!!
                 endLoc.longitude = endLatLng?.longitude!!
                 destination!!.address = endAddress
-                destination!!.location = endLoc
+                destination.location = endLoc
                 if (cardManualEndLocation.visibility == View.VISIBLE) {
-                    destination!!.regionId = regionIdEnd
-                    destination!!.hubId = hubIdEnd
-                    destination!!.stateId = stateIdEnd
-                    destination!!.cityId = cityIdEnd
-                    destination!!.manualLocation = !enableEndLocation.isOn
-                    if (destination!!.manualLocation)
+                    destination.regionId = regionIdEnd
+                    destination.hubId = hubIdEnd
+                    destination.stateId = stateIdEnd
+                    destination.cityId = cityIdEnd
+                    destination.manualLocation = !enableEndLocation.isOn
+                    if (destination.manualLocation)
                         destination.location = null
 
                 }
@@ -2867,7 +3430,6 @@ open class NewCreateTaskActivity :
                 source = null
             }
 
-
             createTaskRequest = CreateTaskRequest(
                 false,
                 buddyId!!,
@@ -2890,10 +3452,17 @@ open class NewCreateTaskActivity :
                 field6,
                 field7,
                 field8,
+                serviceIds
             )
-            if (listRef.isNotEmpty()) {
-                createTaskRequest!!.multiReferedTask = listRef
+
+            if (listRefTask.isNotEmpty()) {
+                var multiReferedTask: ArrayList<String> = ArrayList()
+                listRefTask.forEach { item ->
+                    multiReferedTask.add(item.taskId.toString())
+                }
+                createTaskRequest!!.multiReferedTask = multiReferedTask
             }
+
             if (intent.hasExtra("directMapping")) {
                 createTaskRequest!!.directMapping =
                     intent.getBooleanExtra("directMapping", false)
@@ -2925,7 +3494,7 @@ open class NewCreateTaskActivity :
                 createTaskRequest!!.categoryId = categoryId
             hideKeyboard()
             //showLoading()
-            var json = JSONConverter<CreateTaskRequest>()
+            val json = JSONConverter<CreateTaskRequest>()
                 .objectToJson(createTaskRequest)
             CommonUtils.showLogMessage("e", "jsondata", json)
 
@@ -2938,9 +3507,9 @@ open class NewCreateTaskActivity :
             //add form data after validation into the map
             if (list.isNotEmpty()) {
                 mainMap?.set(currentFormId!!, list)
-                var jsonConverter =
+                val jsonConverter =
                     JSONConverter<HashMap<String, ArrayList<FormData>>>()
-                var data = jsonConverter.objectToJson(mainMap!!)
+                val data = jsonConverter.objectToJson(mainMap!!)
                 CommonUtils.showLogMessage("e", "allowed field", data.toString())
 
 
@@ -2952,19 +3521,21 @@ open class NewCreateTaskActivity :
             }
             var jsonConverter =
                 JSONConverter<ArrayList<FormData>>();
-            Log.e(DynamicFormActivity.TAG, jsonConverter.objectToJson(list))
+            Log.e(TAG, jsonConverter.objectToJson(list))
             // replace a new fragment to the container
             if (dynamicActionConfig?.action == Type.FORM) {
                 showLoading()
                 Log.d("Here", "one")
                 //make the back button visible if user click on next form
+                hideAllAllowedFields()
+                dynamicFragment = NewDynamicFormFragment.getInstance(
+                    dynamicActionConfig.target!!,
+                    taskId,
+                    isEditable,
+                    ArrayList()
+                )
                 replaceFragment(
-                    NewDynamicFormFragment.getInstance(
-                        dynamicActionConfig.target!!,
-                        taskId!!,
-                        isEditable,
-                        ArrayList()
-                    ), dynamicActionConfig.target!!
+                    dynamicFragment!!, dynamicActionConfig.target!!
                 )
                 hideLoading()
             } else if (dynamicActionConfig?.action == Type.API) {
@@ -3020,21 +3591,16 @@ open class NewCreateTaskActivity :
                                     + mainData!![i].enteredValue
                         )
                     }
-                    var jsonConverter =
-                        JSONConverter<HashMap<String, ArrayList<File>>>();
+                    val jsonConverter = JSONConverter<HashMap<String, ArrayList<File>>>();
                     Log.e(
                         DynamicFormActivity.TAG,
                         jsonConverter.objectToJson(hashMapFileRequest)
                     )
                     Log.e(DynamicFormActivity.TAG, "Size =>" + hashMapFileRequest.size)
                     if (hashMapFileRequest.isNotEmpty()) {
-
-
-//                        val api = TrackiApplication.getApiMap()[ApiType.UPLOAD_FILE]
-//                        mCreateTaskViewModel.uploadFileList(hashMapFileRequest, httpManager, api, true)
                         if (NetworkUtils.isNetworkConnected(this@NewCreateTaskActivity)) {
                             if (NetworkUtils.isConnectedFast(this@NewCreateTaskActivity)) {
-                                mActivityCreateTaskBinding.btnCLick.visibility = View.GONE
+                                mActivityCreateTaskBinding.btnCLickSubmit.visibility = View.GONE
                                 mActivityCreateTaskBinding.viewProgress.visibility =
                                     View.VISIBLE
                                 CommonUtils.makeScreenDisable(this)
@@ -3074,7 +3640,7 @@ open class NewCreateTaskActivity :
                     }
                 }
             } else if (dynamicActionConfig?.action == Type.DISPOSE) {
-
+                Log.d("Here", "three")
                 mainData = ArrayList()
                 //add all the values of map to the hashMap and go to all
                 // elements to get the required data
@@ -3096,8 +3662,7 @@ open class NewCreateTaskActivity :
                                     ignoreCase = true
                                 )
                             ) {
-                                // Log.e("path",v[i].path)
-
+                                //Log.e("path", v[i].path)
                                 v.removeAt(0)
                             }
                             if (mainData!![i].type == DataType.CAMERA && v.size > 0 && v[v.size - 1].path.equals(
@@ -3105,7 +3670,7 @@ open class NewCreateTaskActivity :
                                     ignoreCase = true
                                 )
                             ) {
-                                //  Log.e("path",v[i].path)
+                               // Log.e("path", v[i].path)
                                 v.removeAt(v.size - 1)
                             }
                             if (v.isNotEmpty()) {
@@ -3122,6 +3687,7 @@ open class NewCreateTaskActivity :
                             if (v.isNotEmpty()) {
                                 val key = mainData!![i].name!!
                                 hashMapFileRequest[key] = v
+                                Log.e(DynamicFormActivity.TAG, "file to upload $key =>$v")
                             }
                         }
                         Log.e(
@@ -3129,8 +3695,7 @@ open class NewCreateTaskActivity :
                                     + mainData!![i].enteredValue
                         )
                     }
-                    var jsonConverter =
-                        JSONConverter<HashMap<String, ArrayList<File>>>();
+                    val jsonConverter = JSONConverter<HashMap<String, ArrayList<File>>>();
                     Log.e(
                         DynamicFormActivity.TAG,
                         jsonConverter.objectToJson(hashMapFileRequest)
@@ -3148,7 +3713,8 @@ open class NewCreateTaskActivity :
                                 count = 0
                                 Log.e(TAG, "worker thread open")
                                 // showLoading()
-                                mActivityCreateTaskBinding.btnCLick.visibility = View.GONE
+                                mActivityCreateTaskBinding.btnCLickSubmit.visibility =
+                                    View.GONE
                                 mActivityCreateTaskBinding.viewProgress.visibility =
                                     View.VISIBLE
                                 CommonUtils.makeScreenDisable(this)
@@ -3160,8 +3726,7 @@ open class NewCreateTaskActivity :
                                 val thread = HandlerThread("workkker")
                                 thread.start()
                                 //start a handler
-                                mDynamicHandler =
-                                    DynamicHandler(thread.looper, dynamicActionConfig)
+                                mDynamicHandler = DynamicHandler(thread.looper, dynamicActionConfig)
 //                        start a thread other than main
                                 handlerThread?.setRequestParams(
                                     mDynamicHandler!!,
@@ -3179,11 +3744,9 @@ open class NewCreateTaskActivity :
                                 )
                             }
 
-
                         } else {
                             // TrackiToast.Message.showShort(this, getString(R.string.please_check_your_internet_connection_you_are_offline_now))
                         }
-
                     } else {
                         showLoading()
                         perFormCreateTask()
@@ -3194,53 +3757,117 @@ open class NewCreateTaskActivity :
                 }
 
             }
-
-
         }
+    }
+
+    private fun hideAllAllowedFields() {
+        ll_allowed_fields.visibility = View.GONE
     }
 
     private fun perFormCreateTask() {
         if (dynamicFormsNew != null) {
-            var dynamicFormMainData = CommonUtils.createFormData(
+            val dynamicFormMainData = CommonUtils.createFormData(
                 mainData, selItem, taskId!!, dynamicFormsNew!!.formId,
                 dynamicFormsNew!!.version
             )
             Log.e(TAG, "Final Dynamic Form Data-----> $dynamicFormMainData")
 
-            var taskData = dynamicFormMainData!!.taskData
+            val taskData = dynamicFormMainData!!.taskData
             createTaskRequest!!.taskData = taskData
             createTaskRequest!!.dfId = getDynamicFormId(categoryId)
         }
         if (categoryId != null)
             createTaskRequest!!.categoryId = categoryId
 
-        if (dateFinal != "" && timeFinal != "")
-            createTaskRequest?.timeSlot = TimeSlot(dateFinal, timeFinal)
+        if (dateFinal != "" && timeFinal != "") {
+            if (invIds!!.size > 0) {
+                createTaskRequest?.timeSlot = TimeSlot(
+                    date = dateFinal,
+                    slot = timeFinal,
+                    entityId = invIds!![0],
+                    availType = availType
+                )
+            } else {
+                createTaskRequest?.timeSlot =
+                    TimeSlot(date = dateFinal, slot = timeFinal, availType = availType)
+            }
+        }
 
-        if (hubIdFinal != "") {
-            val destination = com.rf.taskmodule.data.model.response.config.Place()
-            destination.regionId = hub?.regionId
-            destination.address = hub?.hubLocation?.address
-            destination.cityId = hub?.cityId
-            destination.hubId = hub?.hubId
-            destination.stateId = hub?.stateId
+        if (hubIdFinalHubsOnly != "") {
+            val place = com.rf.taskmodule.data.model.response.config.Place()
+            place.regionId = hub?.regionId
+            place.address = hub?.hubLocation?.address
+            place.cityId = hub?.cityId
+            place.hubId = hub?.hubId
+            place.stateId = hub?.stateId
 
             val location = GeoCoordinates()
             location.latitude = hub?.hubLocation?.location?.latitude!!
             location.longitude = hub?.hubLocation?.location?.longitude!!
 
-            destination.location = location
+            place.location = location
 
-            createTaskRequest?.destination = destination
+            if (target_system_hub == Target.SOURCE) {
+                if (createTaskRequest?.source?.address.isNullOrEmpty()) {
+                    createTaskRequest?.source = place
+                }
+            } else {
+                if (createTaskRequest?.destination?.address.isNullOrEmpty()) {
+                    createTaskRequest?.destination = place
+                }
+            }
         }
 
-        var jsonConverter =
+        if (hubIdFinal != "") {
+            val place = com.rf.taskmodule.data.model.response.config.Place()
+            place.regionId = hub?.regionId
+            place.address = hub?.hubLocation?.address
+            place.cityId = hub?.cityId
+            place.hubId = hub?.hubId
+            place.stateId = hub?.stateId
+
+            val location = GeoCoordinates()
+            location.latitude = hub?.hubLocation?.location?.latitude!!
+            location.longitude = hub?.hubLocation?.location?.longitude!!
+
+            place.location = location
+
+            if (target_system_hub == Target.SOURCE) {
+                if (createTaskRequest?.source?.address.isNullOrEmpty()) {
+                    createTaskRequest?.source = place
+                }
+            } else {
+                if (createTaskRequest?.destination?.address.isNullOrEmpty()) {
+                    createTaskRequest?.destination = place
+                }
+            }
+        }
+
+        if (hubIdFinalDestination != "") {
+            val place = com.rf.taskmodule.data.model.response.config.Place()
+            place.regionId = hubDestination?.regionId
+            place.address = hubDestination?.hubLocation?.address
+            place.cityId = hubDestination?.cityId
+            place.hubId = hubDestination?.hubId
+            place.stateId = hubDestination?.stateId
+
+            val location = GeoCoordinates()
+            location.latitude = hubDestination?.hubLocation?.location?.latitude!!
+            location.longitude = hubDestination?.hubLocation?.location?.longitude!!
+            place.location = location
+
+            if (createTaskRequest?.destination?.address.isNullOrEmpty()) {
+                createTaskRequest?.destination = place
+            }
+        }
+
+        val jsonConverter =
             JSONConverter<CreateTaskRequest>()
-        var json = jsonConverter.objectToJson(createTaskRequest)
+        val json = jsonConverter.objectToJson(createTaskRequest)
         CommonUtils.showLogMessage("e", "task data", json)
         if (NetworkUtils.isNetworkConnected(this@NewCreateTaskActivity)) {
-            var apiType = ApiType.CREATE_TASK
-            var api = TrackiSdkApplication.getApiMap()[apiType]
+            val apiType = ApiType.CREATE_TASK
+            val api = TrackiSdkApplication.getApiMap()[apiType]
             mCreateTaskViewModel.createTaskApi(httpManager, createTaskRequest!!, api!!)
         } else {
             hideLoading()
@@ -4255,16 +4882,13 @@ open class NewCreateTaskActivity :
                     fileUploadCounter += obj.chunkSize
                     var progressUploadText = "${fileUploadCounter}/${obj.totalSize}"
                     var percentage = ((fileUploadCounter * 100 / obj.totalSize))
-                    Log.e(TAG, "progressUploadText=> " + progressUploadText)
-                    Log.e(TAG, "percentage=> " + percentage.toString())
+                    Log.e(TAG, "progressUploadText=> $progressUploadText")
+                    Log.e(TAG, "percentage=> $percentage")
                     runOnUiThread {
-                        progressBar!!.progress = percentage
+                        progressBar?.progress = percentage
                         percentageText!!.text = "$percentage %"
                         currentStatusText!!.text = progressUploadText
-
                     }
-
-
                 }
                 /*For Success */0 -> {
 
@@ -4273,7 +4897,7 @@ open class NewCreateTaskActivity :
                     //get hashMap from adapter and match the name with key of maps
                     // if found then replace entered value with url of image
                     runOnUiThread {
-                        rlProgress!!.visibility = View.GONE
+                        rlProgress?.visibility = View.GONE
                         rlSubmittingData!!.visibility = View.VISIBLE
 
                     }
@@ -4321,7 +4945,7 @@ open class NewCreateTaskActivity :
                 /*For Error*/1 -> {
                 if (count == 0) {
                     runOnUiThread {
-                        mActivityCreateTaskBinding.btnCLick.visibility = View.VISIBLE
+                        mActivityCreateTaskBinding.btnCLickSubmit.visibility = View.VISIBLE
                         mActivityCreateTaskBinding.viewProgress.visibility = View.GONE
                         CommonUtils.makeScreenClickable(this@NewCreateTaskActivity)
                     }
@@ -4330,27 +4954,27 @@ open class NewCreateTaskActivity :
                     fileUploadCounter = 0
                     // This is where you do your work in the UI thread.
                     // Your worker tells you in the message what to do.
-/*
-                    if (CommonUtils.errorString != null) {
-                        showDialogCancel(
-                            CommonUtils.errorString
-                        ) { dialog: DialogInterface?, which: Int ->
-                            when (which) {
-                                DialogInterface.BUTTON_POSITIVE -> {
-                                    finish()
-                                    CommonUtils.errorString=null
-                                }
-                                DialogInterface.BUTTON_NEGATIVE ->
-                                {
-                                    CommonUtils.errorString=null
-                                    finish()
-                                }// proceed with logic by disabling the related features or quit the app.
+                    /*
+                                        if (CommonUtils.errorString != null) {
+                                            showDialogCancel(
+                                                CommonUtils.errorString
+                                            ) { dialog: DialogInterface?, which: Int ->
+                                                when (which) {
+                                                    DialogInterface.BUTTON_POSITIVE -> {
+                                                        finish()
+                                                        CommonUtils.errorString=null
+                                                    }
+                                                    DialogInterface.BUTTON_NEGATIVE ->
+                                                    {
+                                                        CommonUtils.errorString=null
+                                                        finish()
+                                                    }// proceed with logic by disabling the related features or quit the app.
 
-                            }
-                        }
+                                                }
+                                            }
 
-                    }
-*/
+                                        }
+                    */
                     TrackiToast.Message.showShort(
                         this@NewCreateTaskActivity,
                         AppConstants.UNABLE_TO_PROCESS_REQUEST
@@ -4397,5 +5021,17 @@ open class NewCreateTaskActivity :
                 ViewModelProvider(this, factory)[GetUserSuggestionListViewModel::class.java]
         }
         return mGetSuggetionViewModel
+    }
+
+    override fun addNearHubItems(hub: Hub) {
+        dialogNearHub.dismiss()
+        spinnerNear.setSelection((selectedHubList1.indexOf(hub) + 1))
+    }
+
+    override fun openPlaceOnMaps(hub: Hub) {
+        val geoUri =
+            "http://maps.google.com/maps?q=loc:${hub.hubLocation?.location?.latitude},${hub.hubLocation?.location?.longitude} (${hub.name})"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(geoUri))
+        startActivity(intent)
     }
 }

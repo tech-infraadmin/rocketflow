@@ -1,8 +1,12 @@
 package com.rf.taskmodule.utils
 
 import android.text.format.DateFormat
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.databinding.BindingAdapter
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 /**
  * Created by rahul on 20/2/19
@@ -46,6 +50,7 @@ class DateTimeUtil private constructor() {
                 ""
             }
         }
+
         @JvmStatic
         fun getParsedTime1(milliSeconds: Long): String {
             if (milliSeconds == 0L) {
@@ -60,6 +65,19 @@ class DateTimeUtil private constructor() {
             }
         }
 
+        @JvmStatic
+        fun parsePickerDate(year: Int, Month: Int, day: Int): String {
+            val month: Int = Month + 1
+            var formattedMonth = "" + Month
+            var formattedDayOfMonth = "" + day
+            if (month < 10) {
+                formattedMonth = "0$month"
+            }
+            if (day < 10) {
+                formattedDayOfMonth = "0$day"
+            }
+            return "$formattedDayOfMonth-$formattedMonth-$year"
+        }
 
         @JvmStatic
         fun getParsedDate(milliSeconds: Long): String {
@@ -75,6 +93,20 @@ class DateTimeUtil private constructor() {
             }
         }
 
+        @JvmStatic
+        @BindingAdapter("setDate")
+        fun setDate(textView: TextView, milliSeconds: Long) {
+            if (milliSeconds == 0L) {
+                textView.text = ""
+            }
+            val dateString = SimpleDateFormat(DATE_TIME_FORMAT_3, Locale.getDefault())
+            textView.text = dateString.format(Date(milliSeconds))
+        }
+
+        @BindingAdapter("imageUrl")
+        fun setImageUrl(textView: TextView, milliSeconds: Long) {
+
+        }
 
         @JvmStatic
         fun getParsedDateApply(milliSeconds: Long): String {
@@ -89,6 +121,7 @@ class DateTimeUtil private constructor() {
                 ""
             }
         }
+
         @JvmStatic
         fun getParsedDate(milliSeconds: Long, format: String): String {
             if (milliSeconds == 0L) {
@@ -123,7 +156,7 @@ class DateTimeUtil private constructor() {
                 return ""
             }
             return try {
-                var sdf=SimpleDateFormat(DATE_FORMAT3,Locale.getDefault())
+                var sdf = SimpleDateFormat(DATE_FORMAT3, Locale.getDefault())
                 sdf.timeZone = Calendar.getInstance().timeZone
                 val dateString = SimpleDateFormat(DATE_FORMAT3, Locale.getDefault())
                 dateString.format(Date(milliSeconds))
@@ -146,6 +179,7 @@ class DateTimeUtil private constructor() {
                 ""
             }
         }
+
         @JvmStatic
         fun getParsedDateTime5(milliSeconds: Long): String {
             if (milliSeconds == 0L) {
@@ -159,6 +193,7 @@ class DateTimeUtil private constructor() {
                 ""
             }
         }
+
         @JvmStatic
         fun getFormattedTime(milliSeconds: Long?, format: String): String {
             if (milliSeconds == null || milliSeconds == 0L) {
@@ -217,18 +252,20 @@ class DateTimeUtil private constructor() {
             val now = Calendar.getInstance()
 
             return if (now.get(Calendar.DATE) == messageTime.get(Calendar.DATE)
-                    &&
-                    now.get(Calendar.MONTH) == messageTime.get(Calendar.MONTH)
-                    &&
-                    now.get(Calendar.YEAR) == messageTime.get(Calendar.YEAR)) {
+                &&
+                now.get(Calendar.MONTH) == messageTime.get(Calendar.MONTH)
+                &&
+                now.get(Calendar.YEAR) == messageTime.get(Calendar.YEAR)
+            ) {
 
                 "" + DateFormat.format(TIME_FORMAT_4, messageTime)
 
             } else if (now.get(Calendar.DATE) - messageTime.get(Calendar.DATE) == 1
-                    &&
-                    now.get(Calendar.MONTH) == messageTime.get(Calendar.MONTH)
-                    &&
-                    now.get(Calendar.YEAR) == messageTime.get(Calendar.YEAR)) {
+                &&
+                now.get(Calendar.MONTH) == messageTime.get(Calendar.MONTH)
+                &&
+                now.get(Calendar.YEAR) == messageTime.get(Calendar.YEAR)
+            ) {
                 "Yesterday at " + DateFormat.format(TIME_FORMAT_4, messageTime)
             } else {
                 "" + DateFormat.format(DATE_TIME_FORMAT_4, messageTime)

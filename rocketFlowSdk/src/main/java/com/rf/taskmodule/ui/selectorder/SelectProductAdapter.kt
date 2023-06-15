@@ -18,6 +18,7 @@ import com.rf.taskmodule.databinding.LayoutEmptyCategoryViewSdkBinding
 import com.rf.taskmodule.ui.base.BaseSdkViewHolder
 import com.rf.taskmodule.ui.custom.GlideApp
 import com.rf.taskmodule.utils.CommonUtils
+import com.rf.taskmodule.utils.Log
 import com.rf.taskmodule.utils.TrackiToast
 import java.util.ArrayList
 
@@ -46,6 +47,7 @@ class SelectProductAdapter(var context: Context) :
                 ItemRowSelectOrderSdkBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
+
             StoreProductItemViewHolder(simpleViewItemBinding)
         } else if (viewType == VIEW_TYPE_DIRECT) {
             val simpleViewItemBinding: ItemRowProductOrderSdkBinding =
@@ -112,58 +114,59 @@ class SelectProductAdapter(var context: Context) :
 
     }
 
-    inner class StoreOrderItemViewHolder(var binding: ItemRowProductOrderSdkBinding) :
-        BaseSdkViewHolder(binding.root) {
+    inner class StoreOrderItemViewHolder(var binding: ItemRowProductOrderSdkBinding) : BaseSdkViewHolder(binding.root) {
         override fun onBind(position: Int) {
-            var data: CatalogProduct? = mFilteredList[position]
-            if (data != null) {
-                binding.data = data
-                var mainImage = data.img
-                if (data.img != null && data.img!!.isNotEmpty()) {
-                    GlideApp.with(context!!).load(mainImage)
-                        .placeholder(R.drawable.ic_picture)
-                        .into(binding.ivProducts)
-                } else {
-                    binding.ivProducts.setImageResource(R.drawable.ic_picture)
-                }
-                binding.addProduct.setOnClickListener {
-                    if (!data.addInOrder) {
-                        data.addInOrder = true
-                        data.noOfProduct = 1
-
-                    } else {
-                        data.addInOrder = false
-                        data.noOfProduct = 0
-                    }
-                    notifyDataSetChanged()
-                    if (mListener != null) {
-                        mListener!!.addProduct(data, position)
-                    }
-                }
-
-                binding.llImage.setOnClickListener {
-                    if (mListener != null) {
-                        CommonUtils.preventTwoClick(it)
-                    }
-                }
-                binding.llTxtData.setOnClickListener {
-                    if (mListener != null) {
-                        CommonUtils.preventTwoClick(it)
-                    }
-                }
-
-
+            val data: CatalogProduct = mFilteredList[position]
+            Log.d("name",data.name)
+            binding.data = data
+            val mainImage = data.img
+            if (data.img != null && data.img!!.isNotEmpty()) {
+                GlideApp.with(context).load(mainImage)
+                    .placeholder(R.drawable.ic_picture)
+                    .into(binding.ivProducts)
+            } else {
+                binding.ivProducts.setImageResource(R.drawable.ic_picture)
             }
 
+            if (data.addInOrder) {
+                binding.addProduct.text = "Remove"
+            } else {
+                binding.addProduct.text = "Add"
+            }
 
+            binding.addProduct.setOnClickListener {
+                if (!data.addInOrder) {
+                    data.addInOrder = true
+                    data.noOfProduct = 1
+                } else {
+                    data.addInOrder = false
+                    data.noOfProduct = 0
+                }
+                notifyDataSetChanged()
+                if (mListener != null) {
+                    mListener!!.addProduct(data, position)
+                }
+            }
+
+            binding.llImage.setOnClickListener {
+                if (mListener != null) {
+                    CommonUtils.preventTwoClick(it)
+                }
+            }
+
+            binding.llTxtData.setOnClickListener {
+                if (mListener != null) {
+                    CommonUtils.preventTwoClick(it)
+                }
+            }
         }
-
     }
 
     inner class StoreProductItemViewHolder(var binding: ItemRowSelectOrderSdkBinding) :
         BaseSdkViewHolder(binding.root) {
-        override fun onBind(positionx: Int) {
-            var data: CatalogProduct? = mFilteredList[position]
+        override fun onBind(positionx: Int)
+        {
+            val data: CatalogProduct? = mFilteredList[position]
             if (data != null) {
                 binding.tvProductCounter.text = data.noOfProduct.toString()
                 binding.data = data
@@ -171,7 +174,7 @@ class SelectProductAdapter(var context: Context) :
                     if (!data.addInOrder) {
                         data.addInOrder = true
                         data.noOfProduct = data.noOfProduct + 1
-                        binding.tvProductCounter.text = data.noOfProduct.toString()
+                            binding.tvProductCounter.text = data.noOfProduct.toString()
 
                     }
                     notifyDataSetChanged()
@@ -203,6 +206,10 @@ class SelectProductAdapter(var context: Context) :
                             mListener!!.addProduct(data, position)
                         }
                     }
+                }
+                binding.ivView.setOnClickListener {
+                    if (mListener != null)
+                        mListener!!.viewDimeProducts()
                 }
                 binding.llImage.setOnClickListener {
                     if (mListener != null) {
@@ -335,6 +342,7 @@ class SelectProductAdapter(var context: Context) :
     interface OnProductAddListener {
         fun addProduct(data: CatalogProduct, position: Int)
         fun removeProduct(data: CatalogProduct, position: Int)
+        fun viewDimeProducts()
     }
 
     inner class EmptyViewHolder(var binding: LayoutEmptyCategoryViewSdkBinding) :
