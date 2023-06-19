@@ -303,18 +303,5 @@ class DateTimeUtil private constructor() {
         }
     }
 
-    @BindingAdapter("setDate")
-    fun setDate(textView: TextView, milliSeconds: Long) {
-        if (milliSeconds == 0L) {
-            textView.text = ""
-        }
-        val dateString = SimpleDateFormat(DATE_TIME_FORMAT_3, Locale.getDefault())
-        textView.text = dateString.format(Date(milliSeconds))
-    }
-
-    @BindingAdapter("imageUrl")
-    fun setImageUrl(textView: TextView, milliSeconds: Long) {
-
-    }
 }
 
