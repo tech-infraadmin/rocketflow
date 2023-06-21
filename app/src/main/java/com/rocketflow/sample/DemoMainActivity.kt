@@ -12,7 +12,8 @@ class DemoMainActivity : AppCompatActivity() {
     }
 
     fun initialize(view: View) {
-        RocketFlyer.initialize("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6Ijg4NTE1MjE2NzUiLCJ1bmlxdWVfbmFtZSI6WyJBU0hBIEJSQU5DSCBUV08iLCIxMDg5MSIsIjEiXSwiZW1haWwiOiIiLCJyb2xlIjoiNiIsIm5iZiI6MTY4NjgwNjg5MCwiZXhwIjoxNjg2ODUwMDkwLCJpYXQiOjE2ODY4MDY4OTB9.cZ0n9JtyygbxCMR0vpnXADgSYgMjZBfKurDFXma06-s", this) // SDK init token
+      //  RocketFlyer.initialize("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6Ijg4NTE1MjE2NzUiLCJ1bmlxdWVfbmFtZSI6WyJBU0hBIEJSQU5DSCBUV08iLCIxMDg5MSIsIjEiXSwiZW1haWwiOiIiLCJyb2xlIjoiNiIsIm5iZiI6MTY4NjgwNjg5MCwiZXhwIjoxNjg2ODUwMDkwLCJpYXQiOjE2ODY4MDY4OTB9.cZ0n9JtyygbxCMR0vpnXADgSYgMjZBfKurDFXma06-s", this) // SDK init token
+        RocketFlyer.initialize("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6Ijg4NTE1MjE2NzUiLCJ1bmlxdWVfbmFtZSI6WyJBU0hBIEJSQU5DSCBUV08iLCIxMDg5MSIsIjEiXSwiZW1haWwiOiIiLCJyb2xlIjoiNiIsIm5iZiI6MTY4NzE1ODQ0NCwiZXhwIjoxNjg3MjAxNjQ0LCJpYXQiOjE2ODcxNTg0NDR9.cJbqsasztVPF4vDrEVTk-x1aqMAh_h8unQneudk4d0s", this) // SDK init token
     }
 
     fun start(view: View) {

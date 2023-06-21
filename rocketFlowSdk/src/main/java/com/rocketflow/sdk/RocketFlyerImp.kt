@@ -28,12 +28,7 @@ internal class RocketFlyerImp(
             RocketFlyerBuilder.getPrefInstance()?.sdkClientID = sdkInitToken
             //RocketFlyerBuilder.getPrefInstance()?.loginToken = "c49f0605-e6bd-47b5-9f4b-3363e5035978"
             //RocketFlyerBuilder.getPrefInstance()?.accessId = "3uBdUsyA0w"
-            val pref = RocketFlyerBuilder.getPrefInstance()
-            if(pref?.loginToken != null && pref.loginToken.isNotEmpty()) {
-                hitConfig()
-            }else{
-                hitLoginSDKToken(sdkInitToken,context)
-            }
+            hitLoginSDKToken(sdkInitToken,context)
         }
     }
 
