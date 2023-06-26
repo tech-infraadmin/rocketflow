@@ -16,6 +16,8 @@
         <item name="android:textAppearance">@style/TextAppearance.Text.Regular</item>
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
         <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_white_24dp</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AppThemeGreen" parent="Theme.MaterialComponents.Light.NoActionBar">
