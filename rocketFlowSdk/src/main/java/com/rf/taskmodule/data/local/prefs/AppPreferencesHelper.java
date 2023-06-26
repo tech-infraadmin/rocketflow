@@ -1555,7 +1555,7 @@ public class AppPreferencesHelper implements PreferencesHelper {
         if (BuildConfig.BUILD_TYPE == "releaseBiz" || BuildConfig.BUILD_TYPE == "uatBiz") {
             return mPrefs.getInt(PREF_PREF_KEY_THEME, R.style.AppThemeGreen);
         } else {
-            return mPrefs.getInt(PREF_PREF_KEY_THEME, R.style.AppTheme);
+            return mPrefs.getInt(PREF_PREF_KEY_THEME, R.style.AppThemeBlue);
         }
     }
 

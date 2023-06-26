@@ -165,11 +165,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-
-//import dagger.android.AndroidInjector;
-//import dagger.android.DispatchingAndroidInjector;
-//import dagger.android.support.HasSupportFragmentInjector;
-
 /**
  * Class @{@link MainSDKActivity} used to handle user's current location
  * filter them with active, idle & offline user.
@@ -178,7 +173,6 @@ import java.util.Objects;
  */
 public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, MainViewModel>
         implements MainNavigator, View.OnClickListener, TaskDashBoardFragment.NavigationClickFromTaskDashBoard {
-
 
     private static final String TAG = "MainSDKActivity";
 
@@ -251,6 +245,11 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
 
 
         preferencesHelper.setIsFleetAndBuddyShow(false);
+        if (getIntent().hasExtra(AppConstants.Extra.TITLE)) {
+            setToolbar(mActivityMainBinding.toolbar, getIntent().getStringExtra(AppConstants.Extra.TITLE));
+        } else {
+            setToolbar(mActivityMainBinding.toolbar, getString(R.string.dashboard));
+        }
 
         addFragmentInContainer(TaskDashBoardFragment.newInstance(this));
     }

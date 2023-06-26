@@ -18,6 +18,24 @@
         android:orientation="vertical"
         android:layout_height="match_parent">
 
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbarLayout"
+            android:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.Toolbar
+                android:background="?attr/colorAccent"
+                android:id="@+id/toolbar"
+                style="@style/Toolbar"
+                app:contentInsetLeft="0dp"
+                app:contentInsetStart="0dp"
+                app:contentInsetStartWithNavigation="0dp"
+                app:titleTextColor="@color/white"
+                app:title="@string/dashboard" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
         <FrameLayout
             android:visibility="visible"
             android:id="@+id/fragment_container"

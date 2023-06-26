@@ -219,7 +219,7 @@ public abstract class BaseSdkActivity<T extends ViewDataBinding, V extends BaseS
     }
     PreferencesHelper preferencesHelper;
 
-    static int THEME_BLUE = R.style.AppTheme;
+    static int THEME_BLUE = R.style.AppThemeBlue;
     static int THEME_GREEN = R.style.AppThemeGreen;
     static int THEME_RED = R.style.AppThemeRed;
     @Override

@@ -1,8 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="AppThemeBlue" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowContentOverlay">@null</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
@@ -16,8 +14,6 @@
         <item name="android:textAppearance">@style/TextAppearance.Text.Regular</item>
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
         <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_white_24dp</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AppThemeGreen" parent="Theme.MaterialComponents.Light.NoActionBar">
@@ -229,7 +225,7 @@
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
     -->
 
-    <!--<style name="AppTheme.FullScreen" parent="@style/AppTheme">-->
+    <!--<style name="AppThemeBlue.FullScreen" parent="@style/AppThemeBlue">-->
     <!--<item name="android:windowNoTitle">true</item>-->
     <!--<item name="android:windowActionBar">false</item>-->
     <!--<item name="android:windowFullscreen">true</item>-->
@@ -242,11 +238,11 @@
     <!--<item name="color">@color/white</item>-->
     <!--</style>-->
 
-    <style name="AppTheme.BlackAccent">
+    <style name="AppThemeBlue.BlackAccent">
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
-    <!--<style name="AppThemeFullScreen" parent="AppTheme">-->
+    <!--<style name="AppThemeBlueFullScreen" parent="AppThemeBlue">-->
     <!--<item name="colorPrimary">@color/white</item>-->
     <!--<item name="colorPrimaryDark">@color/white</item>-->
     <!--<item name="android:windowBackground">@color/white</item>-->
@@ -543,14 +539,14 @@
 
     </style>
 
-    <style name="AppTheme.NoActionBar">
+    <style name="AppThemeBlue.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppThemeBlue.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppThemeBlue.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="DialogZoomOutAnimation">
         <item name="android:windowEnterAnimation">@anim/zoom_in</item>

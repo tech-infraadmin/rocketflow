@@ -63,7 +63,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppThemeBlue"
         tools:targetApi="31">
         <activity
             android:name=".ui.availabilitycalender.calendartasklisting.CalendarTaskListingActivity"
@@ -120,23 +120,23 @@
         <activity
             android:name=".ui.category.AddProductCategoryActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppThemeBlue.NoActionBar" />
         <activity
             android:name=".ui.category.ProductCategoryListActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppThemeBlue.NoActionBar" />
         <activity
             android:name=".ui.products.AddProductActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppThemeBlue.NoActionBar" />
         <activity
             android:name=".ui.taskdetails.timeline.skuinfo.SkuInfoActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppThemeBlue.NoActionBar" />
         <activity
             android:name=".ui.taskdetails.timeline.skuinfopreview.SkuInfoPreviewActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppThemeBlue.NoActionBar" />
         <activity
             android:name=".ui.fleetlisting.FleetListingActivity"
             android:screenOrientation="portrait"
@@ -175,7 +175,7 @@
         <activity
             android:name=".ui.selectorder.SelectOrderActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppThemeBlue.NoActionBar" />
         <activity
             android:name=".ui.main.filter.TaskFilterActivity"
             android:screenOrientation="portrait" />
@@ -186,7 +186,7 @@
         <activity
             android:name=".ui.cart.CartActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppThemeBlue.NoActionBar" />
         <activity
             android:name=".ui.scanqrcode.ScanQrAndBarCodeActivity"
             android:exported="true"
@@ -223,6 +223,7 @@
             android:name=".ui.main.MainSDKActivity"
             android:exported="true"
             android:label="Dashboard"
+            android:theme="@style/AppThemeBlue.NoActionBar"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
 
