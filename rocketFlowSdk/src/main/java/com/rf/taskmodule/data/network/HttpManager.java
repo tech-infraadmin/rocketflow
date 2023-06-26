@@ -26,11 +26,22 @@ import com.rf.taskmodule.utils.Log;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -115,7 +126,7 @@ public class HttpManager {
                 .url(Objects.requireNonNull(api.getUrl()))
                 .post(body);
         requestBuilder.addHeader("Content-Type", "application/json");
-        buildHeaders(requestBuilder,api.getName());
+        buildHeaders(requestBuilder, api.getName());
 
         OkHttpClient timeOut = getOkHttpClient(800);
 
@@ -140,7 +151,7 @@ public class HttpManager {
                 .url(Objects.requireNonNull(api.getUrl()))
                 .delete(body);
         requestBuilder.addHeader("Content-Type", "application/json");
-        buildHeaders(requestBuilder,api.getName());
+        buildHeaders(requestBuilder, api.getName());
 
         OkHttpClient timeOut = getOkHttpClient(800);
 
@@ -166,7 +177,7 @@ public class HttpManager {
 //                .header("Connection", "close") //close the connection
                 .put(body);
         requestBuilder.addHeader("Content-Type", "application/json");
-        buildHeaders(requestBuilder,api.getName());
+        buildHeaders(requestBuilder, api.getName());
 
         OkHttpClient timeOut = getOkHttpClient(api.getTimeOut());
         Response response = timeOut.newCall(requestBuilder.build()).execute();
@@ -182,16 +193,16 @@ public class HttpManager {
      * @return @{@link OkHttpClient} instance
      */
     private OkHttpClient getOkHttpClient(int timeOutInSec) {
+        // Create an ssl socket factory with our all-trusting manager
         return client.newBuilder()
-                .readTimeout(timeOutInSec * 1000, TimeUnit.MILLISECONDS)
-                .writeTimeout(timeOutInSec * 1000, TimeUnit.MILLISECONDS)
-                .connectTimeout(timeOutInSec * 1000, TimeUnit.MILLISECONDS)
+                .readTimeout(timeOutInSec * 1000L, TimeUnit.MILLISECONDS)
+                .writeTimeout(timeOutInSec * 1000L, TimeUnit.MILLISECONDS)
+                .connectTimeout(timeOutInSec * 1000L, TimeUnit.MILLISECONDS)
                 .addInterceptor(new LoggingInterceptor())
+                .hostnameVerifier((hostname, session) -> true)
                 .retryOnConnectionFailure(true)
-//                .cache(new Cache(context.getCacheDir(), cacheSize)
                 .build();
     }
-
 
     String deleteUrl(Api api) throws IOException {
         String responseS;
@@ -203,7 +214,7 @@ public class HttpManager {
 
 
         requestBuilder.addHeader("Content-Type", "application/json");
-        buildHeaders(requestBuilder,api.getName());
+        buildHeaders(requestBuilder, api.getName());
 
         OkHttpClient timeOut = getOkHttpClient(api.getTimeOut());
         Response response = timeOut.newCall(requestBuilder.build()).execute();
@@ -227,7 +238,7 @@ public class HttpManager {
 
 
         requestBuilder.addHeader("Content-Type", "application/json");
-        buildHeaders(requestBuilder,api.getName());
+        buildHeaders(requestBuilder, api.getName());
 
         OkHttpClient timeOut = getOkHttpClient(api.getTimeOut());
         Response response = timeOut.newCall(requestBuilder.build()).execute();
@@ -245,7 +256,7 @@ public class HttpManager {
 
 
         requestBuilder.addHeader("Content-Type", "application/json");
-        buildHeaders(requestBuilder,api.getName());
+        buildHeaders(requestBuilder, api.getName());
 
         OkHttpClient timeOut = getOkHttpClient(api.getTimeOut());
         Response response = timeOut.newCall(requestBuilder.build()).execute();
@@ -277,7 +288,7 @@ public class HttpManager {
                 .url(Objects.requireNonNull(api.getUrl()))
                 .header("Connection", "close") //close the connection
                 .post(formBody);
-        buildHeaders(requestBuilder,api.getName());
+        buildHeaders(requestBuilder, api.getName());
         Response response = timeOut.newCall(requestBuilder.build()).execute();
         responseS = response.body().string();
         Log.i(api.getName().name(), responseS);
@@ -336,7 +347,7 @@ public class HttpManager {
         Request.Builder requestBuilder = new Request.Builder()
                 .url(Objects.requireNonNull(api.getUrl()))
                 .post(requestBody);
-        buildHeaders(requestBuilder,api.getName());
+        buildHeaders(requestBuilder, api.getName());
         // requestBuilder.addHeader("Cache-Control","no-cache");
 //        Log.i(api.getName().name(), requestBuilder.build().body().);
 
@@ -412,7 +423,7 @@ public class HttpManager {
         //String loginToken = "abb55484-3d4f-4335-aa01-cd0320208dc9";
 
         String deviceId = preferencesHelper.getDeviceId();
-        deviceId = deviceId==null?"asdfgthjy":deviceId;
+        deviceId = deviceId == null ? "asdfgthjy" : deviceId;
         String fcmToken = preferencesHelper.getFcmToken();
         String accessId;
         //String accessId = "2YwC80gKsM";
@@ -446,7 +457,7 @@ public class HttpManager {
         //if (accessId != null) {
         requestBuilder.addHeader("tracki-ai", accessId);
 
-        if(ApiType.SDK_LOGIN_TOKEN==apiType && getSdkClientId()!=null){
+        if (ApiType.SDK_LOGIN_TOKEN == apiType && getSdkClientId() != null) {
             requestBuilder.addHeader("X-SDK-INIT-TOKEN", getSdkClientId());
         }
         //}

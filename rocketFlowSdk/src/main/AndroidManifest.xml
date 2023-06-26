@@ -218,9 +218,11 @@
             android:name=".ui.webview.PaymentViewActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+
         <activity
             android:name=".ui.main.MainSDKActivity"
             android:exported="true"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
         <activity

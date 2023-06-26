@@ -199,9 +199,8 @@ public class TrackiSdkApplication extends Application {
         //initialize tracking SDK
         try {
             TrackThat.initialize(this, CommonUtils.getIMEINumber(this));
-            HttpsTrustManager.allowAllSSL();
         }catch (Exception e){
-
+            e.printStackTrace();
         }
 
         //Stetho.initializeWithDefaults(this);
