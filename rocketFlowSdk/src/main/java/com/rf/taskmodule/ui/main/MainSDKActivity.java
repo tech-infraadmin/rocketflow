@@ -251,13 +251,6 @@ public class MainSDKActivity extends BaseSdkActivity<ActivitySdkMainBinding, Mai
 
 
         preferencesHelper.setIsFleetAndBuddyShow(false);
-        if (getIntent().hasExtra(AppConstants.Extra.TITLE)) {
-            setToolbar(mActivityMainBinding.toolbar, getIntent().getStringExtra(AppConstants.Extra.TITLE));
-        } else {
-            setToolbar(mActivityMainBinding.toolbar, getString(R.string.dashboard));
-        }
-
-
 
         addFragmentInContainer(TaskDashBoardFragment.newInstance(this));
     }
