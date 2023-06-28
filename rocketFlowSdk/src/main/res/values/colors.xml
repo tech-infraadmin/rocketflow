@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="colorPrimary">#3581F3</color>
-    <color name="colorPrimaryDark">#BF3581F3</color>
-    <color name="colorPrimaryDark_10">#B33581F3</color>
-    <color name="colorAccent">#3581F3</color>
+    <color name="colorPrimary">#1e456e</color>
+    <color name="colorPrimaryDark">#1e456e</color>
+    <color name="colorPrimaryDark_10">#1e456e</color>
+    <color name="colorAccent">#1e456e</color>
     <color name="semitransparent">#33000000</color>
     <color name="light_blue">#DFDDF9</color>
-    <!--<color name="colorPrimary">#056cc3</color>-->
-    <!--<color name="colorPrimaryDark">#084e8a</color>-->
-    <!--<color name="colorPrimaryDark_10">#1A084e8a</color>-->
     <color name="background">#dddddd</color>
 
-    <color name="blue">#3581F3</color>
-    <color name="blue_1">#1e81ce</color>
+    <color name="blue">#1e456e</color>
+    <color name="blue_1">#1e456e</color>
     <color name="brown">#9E682A</color>
     <color name="purple">#a020f0</color>
     <color name="pink">#D81B60</color>
@@ -20,9 +17,9 @@
     <color name="blue_gray">#607D8B</color>
     <!--<color name="light_blue">#1894fe</color>-->
     <!--<color name="light_blue_1">#1a91f7</color>-->
-    <color name="light_blue_2">#49a0ea</color>
-    <color name="light_blue_3">#1A80DB</color>
-    <color name="light_blue_4">#4a90e2</color>
+    <color name="light_blue_2">#1e456e</color>
+    <color name="light_blue_3">#1e456e</color>
+    <color name="light_blue_4">#1e456e</color>
     <color name="light_blue_5">#9DC8FB</color>
     <color name="warm_gray">#8d8d8d</color>
     <color name="warm_gray_1">#d8d8d8</color>

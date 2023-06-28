@@ -5,13 +5,14 @@ package com.rf.taskmodule.ui.taskdetails
 //import androidmads.library.qrgenearator.QRGEncoder
 //import com.bumptech.glide.Glide
 //import com.google.zxing.WriterException
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.MotionEvent
+import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -40,11 +41,16 @@ import com.rf.taskmodule.ui.taskdetails.subtask.SubTaskFragment
 import com.rf.taskmodule.ui.taskdetails.timeline.TaskDetailsFragment
 import com.rf.taskmodule.ui.taskdetails.tripdetails.TripDetailsFragment
 import com.rf.taskmodule.ui.tasklisting.TaskPagerAdapter
+import com.rf.taskmodule.ui.tasklisting.ihaveassigned.IhaveAssignedFragment
 import com.rf.taskmodule.ui.tasklisting.ihaveassigned.TabDataClass
-import com.rf.taskmodule.utils.*
+import com.rf.taskmodule.utils.AppConstants
+import com.rf.taskmodule.utils.CommonUtils
+import com.rf.taskmodule.utils.Log
 import com.rocketflow.sdk.RocketFlyer
 import com.trackthat.lib.TrackThat
-import kotlinx.android.synthetic.main.activity_new_task_details_sdk.*
+import kotlinx.android.synthetic.main.activity_new_task_details_sdk.tabLayout
+import kotlinx.android.synthetic.main.activity_new_task_details_sdk.textViewId
+import kotlinx.android.synthetic.main.activity_new_task_details_sdk.vpTask
 
 
 data class UserDetails(
@@ -111,6 +117,17 @@ open class NewTaskDetailsActivity :
                 ViewModelProvider(this, factory)[TaskDetailsActivityViewModel::class.java]
         }
         return mNewTaskViewModel!!
+    }
+
+    override fun onBackPressed() {
+        val jsonString = GsonBuilder().serializeSpecialFloatingPointValues().create().toJson(taskResponse)
+        val intent = Intent()
+        Log.d(TAG, jsonString)
+        intent.putExtra("test", "jsonString")
+        intent.putExtra("taskDetails", jsonString)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
+        super.onBackPressed()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

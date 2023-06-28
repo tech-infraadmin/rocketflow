@@ -6,7 +6,7 @@
         <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorControlNormal">@color/white</item>
-        <item name="colorAccent">@color/blue</item>
+        <item name="colorAccent">@color/colorPrimary</item>
         <item name="colorSecondary">@color/colorAccent</item>
         <item name="colorOnSecondary">@color/white</item>
         <item name="android:statusBarColor" tools:ignore="NewApi">@color/colorPrimary</item>

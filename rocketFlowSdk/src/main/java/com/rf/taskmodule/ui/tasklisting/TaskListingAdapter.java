@@ -100,8 +100,6 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
     }
 
     public void addItems(List<Task> stringList) {
-        //  clearItems();
-
         mResponseList.addAll(stringList);
         Set<Task> set = new TreeSet<>(new TaskComparator());
         set.addAll(mResponseList);
