@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.rf.taskmodule.data.DataManager;
+import com.rf.taskmodule.data.model.request.AcceptRejectRequest;
 import com.rf.taskmodule.data.model.request.ExecuteUpdateRequest;
 import com.rf.taskmodule.data.model.request.TaskRequest;
 import com.rf.taskmodule.data.model.response.config.Api;
@@ -72,18 +73,6 @@ public class IhaveAssignedViewModel extends BaseSdkViewModel<IhaveAssignedNaviga
         new GetTaskList().hitApi();
     }
 
-//    void cancelTask(HttpManager httpManager, Task task, Api api) {
-//        this.httpManager = httpManager;
-//        this.apiUrl = api;
-//        new CancelTask(new AcceptRejectRequest(task.getTaskId())).hitApi();
-//    }
-//
-//    void endTask(HttpManager httpManager, Task task, Api api) {
-//        this.httpManager = httpManager;
-//        this.apiUrl = api;
-//        new EndTask(new AcceptRejectRequest(task.getTaskId())).hitApi();
-//    }
-
     void executeUpdates(HttpManager httpManager, ExecuteUpdateRequest request, Api api) {
         this.httpManager = httpManager;
         this.apiUrl = api;
@@ -101,13 +90,13 @@ public class IhaveAssignedViewModel extends BaseSdkViewModel<IhaveAssignedNaviga
         @Override
         public void onResponse(Object result, APIError error) {
             if(getNavigator()!=null)
-            getNavigator().handleExecuteUpdateResponse(this, result, error);
+                getNavigator().handleExecuteUpdateResponse(this, result, error);
         }
 
         @Override
         public void hitApi() {
             if(getDataManager()!=null)
-            getDataManager().executeUpdateTask(this, httpManager, request, apiUrl);
+                getDataManager().executeUpdateTask(this, httpManager, request, apiUrl);
         }
 
         @Override
@@ -123,7 +112,55 @@ public class IhaveAssignedViewModel extends BaseSdkViewModel<IhaveAssignedNaviga
         @Override
         public void onRequestTimeOut(ApiCallback callBack) {
             if(getNavigator()!=null)
-            getNavigator().showTimeOutMessage(callBack);
+                getNavigator().showTimeOutMessage(callBack);
+        }
+
+        @Override
+        public void onLogout() {
+
+        }
+    }
+
+    void getTaskById(HttpManager httpManager, AcceptRejectRequest request, Api api) {
+        this.httpManager = httpManager;
+        this.apiUrl = api;
+        new GetTaskById(request).hitApi();
+    }
+
+    class GetTaskById implements ApiCallback {
+
+        AcceptRejectRequest request;
+
+        GetTaskById(AcceptRejectRequest request) {
+            this.request = request;
+        }
+
+        @Override
+        public void onResponse(Object result, APIError error) {
+            if(getNavigator()!=null)
+                getNavigator().handleGetTaskDataResponse(this, result, error);
+        }
+
+        @Override
+        public void hitApi() {
+            if(getDataManager()!=null)
+                getDataManager().getTaskById(this, httpManager, request, apiUrl);
+        }
+
+        @Override
+        public boolean isAvailable() {
+            return true;
+        }
+
+        @Override
+        public void onNetworkErrorClose() {
+
+        }
+
+        @Override
+        public void onRequestTimeOut(ApiCallback callBack) {
+            if(getNavigator()!=null)
+                getNavigator().showTimeOutMessage(callBack);
         }
 
         @Override
@@ -213,13 +250,13 @@ public class IhaveAssignedViewModel extends BaseSdkViewModel<IhaveAssignedNaviga
         @Override
         public void onResponse(Object result, APIError error) {
             if(getNavigator()!=null)
-            getNavigator().handleResponse(this, result, error);
+                getNavigator().handleResponse(this, result, error);
         }
 
         @Override
         public void hitApi() {
             if(getDataManager()!=null)
-            getDataManager().getTasksList(this, httpManager, buddyRequest, apiUrl);
+                getDataManager().getTasksList(this, httpManager, buddyRequest, apiUrl);
         }
 
         @Override

@@ -14,6 +14,6 @@ public interface IhaveAssignedNavigator extends BaseSdkNavigator {
     //    void handleCancelTaskResponse(ApiCallback apiCallback, Object result, APIError error);
     //    void handleEndTaskResponse(ApiCallback apiCallback, Object result, APIError error);
     void handleExecuteUpdateResponse(ApiCallback apiCallback, Object result, APIError error);
-
+    void handleGetTaskDataResponse(ApiCallback apiCallback, Object result, APIError error);
 
 }

@@ -1,7 +1,6 @@
 package com.rf.taskmodule.ui.taskdetails
 
-import android.content.Intent
-import android.net.Uri
+import android.R.id.input
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.rf.taskmodule.R
 import com.rf.taskmodule.databinding.UserDetailsCardBinding
 import com.rf.taskmodule.ui.custom.GlideApp
-import com.rf.taskmodule.utils.CommonUtils
+import java.util.Locale
 
 
 class CustomAdapter(
@@ -47,14 +46,38 @@ class CustomAdapter(
                     ).error(R.drawable.ic_user)
             }
 
-            itemBinding.textViewName.text = hero.name
+            itemBinding.textViewName.text = hero.name.toCam()
+
             itemBinding.textViewMobile.text = hero.phone
             if (hero.email.isNullOrEmpty()) {
                 itemBinding.textView15.visibility = View.GONE
             } else {
                 itemBinding.textView15.visibility = View.VISIBLE
-                itemBinding.textViewEmail.text = hero.email
+                itemBinding.textViewEmail.text = hero.email.lowercase()
             }
         }
     }
+}
+
+private fun String.toCam(): CharSequence? {
+    val words: List<String> = this.split(" ")
+    val sb = StringBuilder()
+    if (words[0].isNotEmpty()) {
+        sb.append(
+            words[0][0].uppercaseChar().toString() + words[0].subSequence(1, words[0].length)
+                .toString().lowercase(
+                    Locale.getDefault()
+                )
+        )
+        for (i in 1 until words.size) {
+            sb.append(" ")
+            sb.append(
+                words[i][0].uppercaseChar().toString() + words[i].subSequence(1, words[i].length)
+                    .toString().lowercase(
+                        Locale.getDefault()
+                    )
+            )
+        }
+    }
+   return sb.toString()
 }

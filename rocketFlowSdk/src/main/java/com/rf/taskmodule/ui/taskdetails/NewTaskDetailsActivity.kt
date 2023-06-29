@@ -119,17 +119,6 @@ open class NewTaskDetailsActivity :
         return mNewTaskViewModel!!
     }
 
-    override fun onBackPressed() {
-        val jsonString = GsonBuilder().serializeSpecialFloatingPointValues().create().toJson(taskResponse)
-        val intent = Intent()
-        Log.d(TAG, jsonString)
-        intent.putExtra("test", "jsonString")
-        intent.putExtra("taskDetails", jsonString)
-        setResult(Activity.RESULT_OK, intent)
-        finish()
-        super.onBackPressed()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mActivityNewTaskDetailBinding = viewDataBinding

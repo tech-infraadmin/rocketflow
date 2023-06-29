@@ -49,6 +49,7 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
     }
+
     public void setAssignedToTask(boolean assignedToTask) {
         this.assignedToTask = assignedToTask;
     }
@@ -100,6 +101,8 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
     }
 
     public void addItems(List<Task> stringList) {
+        //  clearItems();
+
         mResponseList.addAll(stringList);
         Set<Task> set = new TreeSet<>(new TaskComparator());
         set.addAll(mResponseList);
@@ -135,6 +138,13 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
         this.mListener = listener;
     }
 
+    public void updateTask(int pos, Task taskDetail) {
+        Log.d("updateTask", taskDetail.getCurrentStage().getName());
+        Log.d("updateTask", pos +"");
+        mResponseList.set(pos , taskDetail);
+        notifyItemChanged(pos );
+    }
+
 
     public class TaskViewHolder extends BaseSdkViewHolder implements AssignTaskViewModel
             .TaskItemViewModelListener {
@@ -149,7 +159,7 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
         public void onBind(int position) {
             final Task task = mResponseList.get(position);
 
-            if (task.getServiceIds()!=null) {
+            if (task.getServiceIds() != null) {
                 if (task.getServiceIds().size() > 0) {
                     mBinding.llServices.setVisibility(View.VISIBLE);
                     ArrayList<Service> services = new ArrayList<>(preferencesHelper.getServices());
@@ -166,7 +176,7 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
                     mBinding.recyclerViewServices.setLayoutManager(manager);
                     TaskServicesListAdapter taskServicesListAdapter = new TaskServicesListAdapter(finalServices);
                     mBinding.recyclerViewServices.setAdapter(taskServicesListAdapter);
-                }else {
+                } else {
                     mBinding.llServices.setVisibility(View.GONE);
                 }
             } else {
@@ -181,26 +191,24 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
             } else {
                 mBinding.imageTracking.setVisibility(View.GONE);
             }
+          //  itemView.setOnClickListener(view -> mListener.onItemClick(task, position));
 
-            mBinding.imageTracking.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(task.getTrackingUrl()!=null) {
-                        Navigation navigation = new Navigation();
-                        ActionConfig actionConfig = new ActionConfig();
-                        actionConfig.setActionUrl(task.getTrackingUrl());
-                        navigation.setActionConfig(actionConfig);
-                        navigation.setTitle("Tracking Details");
-                        context.startActivity(WebViewActivity.Companion.newIntent(context)
-                                .putExtra(AppConstants.Extra.EXTRA_WEB_INFO, navigation));
-                    }
+            mBinding.imageTracking.setOnClickListener(view -> {
+                if (task.getTrackingUrl() != null) {
+                    Navigation navigation = new Navigation();
+                    ActionConfig actionConfig = new ActionConfig();
+                    actionConfig.setActionUrl(task.getTrackingUrl());
+                    navigation.setActionConfig(actionConfig);
+                    navigation.setTitle("Tracking Details");
+                    context.startActivity(WebViewActivity.Companion.newIntent(context)
+                            .putExtra(AppConstants.Extra.EXTRA_WEB_INFO, navigation));
                 }
             });
-
         }
 
         @Override
         public void onItemClick(Task bean) {
+            Log.d("updateTask",  getAdapterPosition()+"");
             mListener.onItemClick(bean, getAdapterPosition());
         }
 
@@ -208,7 +216,6 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
         public void onCallClick(String mobile) {
             mListener.onCallClick(mobile);
         }
-
 
         @Override
         public void onDetailsClick(Task task) {

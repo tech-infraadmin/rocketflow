@@ -36,6 +36,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rf.taskmodule.data.model.request.AcceptRejectRequest;
 import com.rf.taskmodule.data.model.request.SaveFilterData;
 import com.rf.taskmodule.data.model.request.TaskRequest;
 import com.rf.taskmodule.data.model.response.config.Api;
@@ -44,6 +45,7 @@ import com.rf.taskmodule.data.model.response.config.DashBoardBoxItem;
 import com.rf.taskmodule.data.model.response.config.Service;
 import com.rf.taskmodule.data.model.response.config.Task;
 import com.rf.taskmodule.data.model.response.config.TaskListing;
+import com.rf.taskmodule.data.model.response.config.TaskResponse;
 import com.rf.taskmodule.data.model.response.config.WorkFlowCategories;
 import com.rf.taskmodule.data.network.APIError;
 import com.rf.taskmodule.data.network.ApiCallback;
@@ -88,7 +90,6 @@ import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 import static com.rf.taskmodule.ui.tasklisting.PaginationListener.PAGE_START;
-import static com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_TASK_INFO;
 
 /**
  * Created by rahul on 8/10/18
@@ -96,7 +97,10 @@ import static com.rf.taskmodule.utils.AppConstants.REQUEST_CODE_TASK_INFO;
 public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssignedSdkBinding, IhaveAssignedViewModel>
         implements IhaveAssignedNavigator, TaskItemClickListener, SwipeRefreshLayout.OnRefreshListener, StageListAdapter.DashBoardListener, View.OnClickListener {
 
-    private static final String TAG = "IhaveAssigned";
+    private static final String TAG = IhaveAssignedFragment.class.getSimpleName();
+
+    int pos = 0;
+    Task clickedTask;
 
     TaskListingAdapter mIhaveAssignedAdapter;
     LinearLayoutManager mLayoutManager;
@@ -241,97 +245,6 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         tvFromDate.setText(DateTimeUtil.getParsedDate(fromDate) + " - " + DateTimeUtil.getParsedDate(toDate));
         subscribeToLiveData();
         perFormStageTask(categoryMap);
-        getTasks();
-    }
-
-    private void getTasks() {
-        if (!getUserVisibleHint()) {
-            return;
-        }
-        isLastPage = false;
-        currentPage = PAGE_START;
-        PagingData pagingData = new PagingData();
-        pagingData.setDatalimit(10);
-        pagingData.setPageOffset(0);
-        pagingData.setPageIndex(currentPage);
-        buddyRequest.setPaginationData(pagingData);
-        buddyRequest.setUserGeoReq(userGeoReq);
-        if ((preferencesHelper.getFilterMap() != null)) {
-            if (preferencesHelper.getFilterMap().containsKey(categoryId)) {
-                SaveFilterData saveFilterData = preferencesHelper.getFilterMap().get(categoryId);
-                if (saveFilterData != null) {
-                    buddyRequest.setRegionId(saveFilterData.getRegionId());
-                    buddyRequest.setStateId(saveFilterData.getStateId());
-                    buddyRequest.setCityId(saveFilterData.getCityId());
-                    hubIdStr = saveFilterData.getHubId();
-                    if (hubIdStr != null && !hubIdStr.isEmpty()) {
-                        hubIds = Arrays.asList(hubIdStr.split("\\s*,\\s*"));
-                    }
-                    buddyRequest.setHubIds(hubIds);
-                    buddyRequest.setUserGeoReq(userGeoReq);
-                }
-
-            }
-        }
-        if (getBaseActivity() != null && getBaseActivity().isNetworkConnected()) {
-            api = TrackiSdkApplication.getApiMap().get(ApiType.TASKS);
-            if (api != null) {
-                api.setAppendWithKey("ASSIGNED_BY_ME");
-            }
-            if (rvIhaveAssigned != null)
-                rvIhaveAssigned.setVisibility(View.GONE);
-
-            showLoading();
-            buddyRequest.setUserGeoReq(userGeoReq);
-            mFragmentIHaveAssignedSdkBinding.shimmerViewContainer.setVisibility(View.VISIBLE);
-            mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
-        }
-
-        if (rvIhaveAssigned == null) {
-            rvIhaveAssigned = mFragmentIHaveAssignedSdkBinding.rvIhaveAssigned;
-            mLayoutManager = new LinearLayoutManager(this.getActivity());
-            mLayoutManager.setOrientation(RecyclerView.VERTICAL);
-            rvIhaveAssigned.setLayoutManager(mLayoutManager);
-            rvIhaveAssigned.setItemAnimator(new DefaultItemAnimator());
-            rvIhaveAssigned.setAdapter(mIhaveAssignedAdapter);
-        }
-        if (rvIhaveAssigned != null)
-            rvIhaveAssigned.setVisibility(View.VISIBLE);
-        rvIhaveAssigned.addOnScrollListener(new PaginationListener(mLayoutManager) {
-            @Override
-            protected void loadMoreItems() {
-                isLoading = true;
-                currentPage++;
-                Log.e("userGeoReq", userGeoReq + " - check");
-                buddyRequest.setUserGeoReq(userGeoReq);
-                showLoading();
-                //buddyRequest.setCategoryId(categoryMap.get("categoryId"));
-                api = TrackiSdkApplication.getApiMap().get(ApiType.TASKS);
-
-                if (api != null) {
-                    api.setAppendWithKey("ASSIGNED_BY_ME");
-                }
-                if (rvIhaveAssigned != null)
-                    rvIhaveAssigned.setVisibility(View.VISIBLE);
-                PagingData pagingData = new PagingData();
-                pagingData.setDatalimit(10);
-                pagingData.setPageOffset((currentPage - 1) * 10);
-                pagingData.setPageIndex(currentPage);
-                buddyRequest.setPaginationData(pagingData);
-                buddyRequest.setUserGeoReq(userGeoReq);
-                mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
-            }
-
-            @Override
-            public boolean isLastPage() {
-                return isLastPage;
-            }
-
-            @Override
-            public boolean isLoading() {
-                return isLoading;
-            }
-        });
     }
 
     @Override
@@ -346,10 +259,59 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
     @Override
     public void onResume() {
         super.onResume();
+        if (clickedTask == null) {
+            if (!getUserVisibleHint()) {
+                return;
+            }
+            isLastPage = false;
+            currentPage = PAGE_START;
+            PagingData pagingData = new PagingData();
+            pagingData.setDatalimit(10);
+            pagingData.setPageOffset(0);
+            pagingData.setPageIndex(currentPage);
+            buddyRequest.setPaginationData(pagingData);
+            buddyRequest.setUserGeoReq(userGeoReq);
+            if ((preferencesHelper.getFilterMap() != null)) {
+                if (preferencesHelper.getFilterMap().containsKey(categoryId)) {
+                    SaveFilterData saveFilterData = preferencesHelper.getFilterMap().get(categoryId);
+                    if (saveFilterData != null) {
+                        buddyRequest.setRegionId(saveFilterData.getRegionId());
+                        buddyRequest.setStateId(saveFilterData.getStateId());
+                        buddyRequest.setCityId(saveFilterData.getCityId());
+                        hubIdStr = saveFilterData.getHubId();
+                        if (hubIdStr != null && !hubIdStr.isEmpty()) {
+                            hubIds = Arrays.asList(hubIdStr.split("\\s*,\\s*"));
+                        }
+                        buddyRequest.setHubIds(hubIds);
+                        buddyRequest.setUserGeoReq(userGeoReq);
+                    }
+                }
+            }
+
+            if (getBaseActivity() != null && getBaseActivity().isNetworkConnected()) {
+                api = TrackiSdkApplication.getApiMap().get(ApiType.TASKS);
+                if (api != null) {
+                    api.setAppendWithKey("ASSIGNED_BY_ME");
+                }
+                if (rvIhaveAssigned != null)
+                    rvIhaveAssigned.setVisibility(View.GONE);
+                mIhaveAssignedAdapter.clearItems();
+                showLoading();
+                buddyRequest.setUserGeoReq(userGeoReq);
+                mFragmentIHaveAssignedSdkBinding.shimmerViewContainer.setVisibility(View.VISIBLE);
+                mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
+            }
+        } else {
+            api = TrackiSdkApplication.getApiMap().get(ApiType.GET_TASK_BY_ID);
+
+            if (clickedTask != null) {
+                Log.d(TAG, clickedTask.getTaskId());
+                mIhaveAssignedViewModel.getTaskById(httpManager, new AcceptRejectRequest(clickedTask.getTaskId()), api);
+            }
+        }
     }
 
     private void setUp() {
-        // SwipeRefreshLayout
         mSwipeRefreshLayout = mFragmentIHaveAssignedSdkBinding.swipeContainer;
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
@@ -411,9 +373,6 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
 
                     if (stageNameMap == null) {
                         stageNameMap = new LinkedHashMap<>();
-                        //stageNameMap.put("abcde","demo3");
-                        //stageNameMap.put("abcdef","demo4");
-
                     }
                     mStageNameMap = myCatData.getStageNameMap();
                     Iterator hmIterator = stageNameMap.entrySet().iterator();
@@ -463,7 +422,51 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
     }
 
     private void setRecyclerView() {
+        if (rvIhaveAssigned == null) {
+            rvIhaveAssigned = mFragmentIHaveAssignedSdkBinding.rvIhaveAssigned;
+            mLayoutManager = new LinearLayoutManager(this.getActivity());
+            mLayoutManager.setOrientation(RecyclerView.VERTICAL);
+            rvIhaveAssigned.setLayoutManager(mLayoutManager);
+            rvIhaveAssigned.setItemAnimator(new DefaultItemAnimator());
+            rvIhaveAssigned.setAdapter(mIhaveAssignedAdapter);
+        }
+        if (rvIhaveAssigned != null)
+            rvIhaveAssigned.setVisibility(View.VISIBLE);
+        rvIhaveAssigned.addOnScrollListener(new PaginationListener(mLayoutManager) {
+            @Override
+            protected void loadMoreItems() {
+                isLoading = true;
+                currentPage++;
+                Log.e("userGeoReq", userGeoReq + " - check");
+                buddyRequest.setUserGeoReq(userGeoReq);
+                showLoading();
+                //buddyRequest.setCategoryId(categoryMap.get("categoryId"));
+                api = TrackiSdkApplication.getApiMap().get(ApiType.TASKS);
 
+                if (api != null) {
+                    api.setAppendWithKey("ASSIGNED_BY_ME");
+                }
+                if (rvIhaveAssigned != null)
+                    rvIhaveAssigned.setVisibility(View.VISIBLE);
+                PagingData pagingData = new PagingData();
+                pagingData.setDatalimit(10);
+                pagingData.setPageOffset((currentPage - 1) * 10);
+                pagingData.setPageIndex(currentPage);
+                buddyRequest.setPaginationData(pagingData);
+                buddyRequest.setUserGeoReq(userGeoReq);
+                mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
+            }
+
+            @Override
+            public boolean isLastPage() {
+                return isLastPage;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return isLoading;
+            }
+        });
         mIhaveAssignedViewModel.addItemsToList(mIhaveAssignedViewModel.getTaskListLiveData().getValue());
         mIhaveAssignedAdapter.addItems(mIhaveAssignedViewModel.getBuddyObservableArrayList());
 //        if (mIhaveAssignedAdapter != null) {
@@ -541,25 +544,10 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
     }
 
-//    @Override
-//    public void onCallClick(Task task, int position) {
-//        if (task.getAssignedToDetails() != null && !task.getAssignedToDetails().isEmpty()) {
-//            CommonUtils.showLogMessage("e", "task.getAssignmentType()", task.getAssignmentType());
-//            if (task.getAssignmentType() != null && task.getAssignmentType().equals("USER")) {
-//                AssigneeDetail assigneeDetail = task.getAssignedToDetails().get(0);
-//                if (assigneeDetail != null && assigneeDetail.getMobile() != null) {
-//                    String mobile = assigneeDetail.getMobile();
-//                    CommonUtils.openDialer(getBaseActivity(), mobile);
-//                }
-//
-//            }
-//
-//        }
-//
-//    }
-
     @Override
     public void onItemClick(Task task, int position) {
+        pos = position;
+        clickedTask = task;
         Intent intent = new Intent(getBaseActivity(), NewTaskDetailsActivity.class);
         intent.putExtra(AppConstants.Extra.EXTRA_TASK_ID, task.getTaskId());
         intent.putExtra(AppConstants.Extra.EXTRA_ALLOW_SUB_TASK, task.getAllowSubTask());
@@ -569,13 +557,14 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
         intent.putExtra(AppConstants.Extra.FROM, AppConstants.Extra.ASSIGNED_BY_ME);
         intent.putExtra(AppConstants.Extra.FROM_DATE, fromDate);
         intent.putExtra(AppConstants.Extra.FROM_TO, toDate);
-        startActivityForResult(intent, REQUEST_CODE_TASK_INFO);
+        startActivity(intent);
     }
 
     @Override
     public void onCallClick(String mobile) {
         CommonUtils.openDialer(getBaseActivity(), mobile);
     }
+
 
     @Override
     public void onDetailsTaskClick(Task task) {
@@ -590,7 +579,6 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
                         .putExtra(AppConstants.Extra.EXTRA_IS_EDITABLE, false),
                 AppConstants.REQUEST_CODE_DYNAMIC_FORM);
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -660,14 +648,28 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
                 showLoading();
                 mIhaveAssignedViewModel.getTaskList(httpManager, api, buddyRequest);
             }
-        } else if (requestCode == REQUEST_CODE_TASK_INFO) {
-            Log.d(TAG, "REQUEST_CODE_TASK_INFO");
         }
+
     }
+
 
     @Override
     public void handleExecuteUpdateResponse(ApiCallback apiCallback, Object result, APIError error) {
         hideLoading();
+
+    }
+
+    @Override
+    public void handleGetTaskDataResponse(ApiCallback callback, Object result, APIError error) {
+        if (getBaseActivity() != null) {
+            if (CommonUtils.handleResponse(callback, error, result, getBaseActivity())) {
+                TaskResponse taskData = new Gson().fromJson(String.valueOf(result), TaskResponse.class);
+                if (taskData != null) {
+                    Log.d(TAG, taskData.getTaskDetail().getTaskId());
+                    mIhaveAssignedAdapter.updateTask(pos, taskData.getTaskDetail());
+                }
+            }
+        }
     }
 
 
