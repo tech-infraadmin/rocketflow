@@ -102,11 +102,11 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:2.2.19"
 
     //TrackThat SDK
-   //    implementation "org.bitbucket.brahmarf:trackthat-core-sdk:2.0.1"
+       implementation "org.bitbucket.brahmarf:trackthat-core-sdk:2.0.1"
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
-    implementation project(path: ':trackthatsdk')
+   // implementation project(path: ':trackthatsdk')
 
     def work_version = "2.0.0"
     // (Java only)
