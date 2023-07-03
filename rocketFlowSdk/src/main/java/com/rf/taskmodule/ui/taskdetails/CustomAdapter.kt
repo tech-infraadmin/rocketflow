@@ -59,25 +59,32 @@ class CustomAdapter(
     }
 }
 
-private fun String.toCam(): CharSequence? {
+private fun String.toCam(): CharSequence {
     val words: List<String> = this.split(" ")
     val sb = StringBuilder()
-    if (words[0].isNotEmpty()) {
-        sb.append(
-            words[0][0].uppercaseChar().toString() + words[0].subSequence(1, words[0].length)
-                .toString().lowercase(
-                    Locale.getDefault()
-                )
-        )
-        for (i in 1 until words.size) {
-            sb.append(" ")
+    try {
+        if (words[0].isNotEmpty()) {
             sb.append(
-                words[i][0].uppercaseChar().toString() + words[i].subSequence(1, words[i].length)
+                words[0][0].uppercaseChar().toString() + words[0].subSequence(1, words[0].length)
                     .toString().lowercase(
                         Locale.getDefault()
                     )
             )
+            for (i in 1 until words.size) {
+                sb.append(" ")
+                sb.append(
+                    words[i][0].uppercaseChar().toString() + words[i].subSequence(
+                        1,
+                        words[i].length
+                    )
+                        .toString().lowercase(
+                            Locale.getDefault()
+                        )
+                )
+            }
         }
+    } catch (e: Exception) {
+        e.printStackTrace()
     }
-   return sb.toString()
+    return sb.toString()
 }

@@ -140,11 +140,14 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
 
     public void updateTask(int pos, Task taskDetail) {
         Log.d("updateTask", taskDetail.getCurrentStage().getName());
-        Log.d("updateTask", pos +"");
-        mResponseList.set(pos , taskDetail);
-        notifyItemChanged(pos );
+        Log.d("updateTask", pos + "");
+        try{
+            mResponseList.set(pos, taskDetail);
+            notifyItemChanged(pos);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
-
 
     public class TaskViewHolder extends BaseSdkViewHolder implements AssignTaskViewModel
             .TaskItemViewModelListener {
@@ -191,7 +194,7 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
             } else {
                 mBinding.imageTracking.setVisibility(View.GONE);
             }
-          //  itemView.setOnClickListener(view -> mListener.onItemClick(task, position));
+            //  itemView.setOnClickListener(view -> mListener.onItemClick(task, position));
 
             mBinding.imageTracking.setOnClickListener(view -> {
                 if (task.getTrackingUrl() != null) {
@@ -208,7 +211,7 @@ public class TaskListingAdapter extends RecyclerView.Adapter<BaseSdkViewHolder> 
 
         @Override
         public void onItemClick(Task bean) {
-            Log.d("updateTask",  getAdapterPosition()+"");
+            Log.d("updateTask", getAdapterPosition() + "");
             mListener.onItemClick(bean, getAdapterPosition());
         }
 

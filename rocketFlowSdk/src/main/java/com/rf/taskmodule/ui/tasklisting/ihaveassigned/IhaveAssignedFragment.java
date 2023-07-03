@@ -303,7 +303,6 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
             }
         } else {
             api = TrackiSdkApplication.getApiMap().get(ApiType.GET_TASK_BY_ID);
-
             if (clickedTask != null) {
                 Log.d(TAG, clickedTask.getTaskId());
                 mIhaveAssignedViewModel.getTaskById(httpManager, new AcceptRejectRequest(clickedTask.getTaskId()), api);
