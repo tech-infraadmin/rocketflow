@@ -60,7 +60,7 @@
                 android:layout_marginLeft="@dimen/dimen_10"
                 android:layout_marginRight="@dimen/dimen_10"
                 android:layout_toRightOf="@+id/tvFirst"
-                android:background="@color/colorPrimary" />
+                android:background="@color/colorPrimaryLib" />
 
             <TextView
                 style="@style/TextViewStyle"
@@ -72,7 +72,7 @@
                 android:gravity="center"
                 android:padding="@dimen/dimen_4"
                 android:text="2"
-                android:textColor="@color/colorPrimary" />
+                android:textColor="@color/colorPrimaryLib" />
 
 
         </RelativeLayout>

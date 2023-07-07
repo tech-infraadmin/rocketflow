@@ -489,7 +489,7 @@
                         android:paddingLeft="@dimen/dimen_10"
                         android:paddingRight="@dimen/dimen_10"
                         android:text="@{viewModel.task.currentStage.name}"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/colorPrimaryLib"
                         android:textSize="@dimen/text_size_14"
                         tools:text="@string/current_state" />
 
@@ -546,7 +546,7 @@
                         android:paddingLeft="@dimen/dimen_10"
                         android:paddingRight="@dimen/dimen_10"
                         android:text="@{viewModel.taskType}"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/colorPrimaryLib"
                         android:textSize="@dimen/text_size_16"
                         android:textStyle="bold"
                         tools:text="@string/current_state" />
@@ -597,7 +597,7 @@
                         android:paddingLeft="@dimen/dimen_10"
                         android:paddingRight="@dimen/dimen_10"
                         android:text="@{viewModel.fleetDetail}"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/colorPrimaryLib"
                         android:textSize="@dimen/text_size_16"
                         android:textStyle="bold"
                         tools:text="@string/current_state" />

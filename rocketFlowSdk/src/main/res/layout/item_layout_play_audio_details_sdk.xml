@@ -82,7 +82,7 @@
                     android:layout_height="@dimen/dimen_50"/>
                 <TextView
                     style="@style/TextViewStyle"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/colorPrimaryLib"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="@dimen/dimen_8"
                     android:textStyle="bold"

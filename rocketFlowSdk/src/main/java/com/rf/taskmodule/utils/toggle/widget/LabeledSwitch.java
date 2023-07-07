@@ -108,9 +108,9 @@ public class LabeledSwitch extends ToggleableView {
         this.textSize = (int)(12f * getResources().getDisplayMetrics().scaledDensity);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            colorBorder = colorOn = getResources().getColor(R.color.colorAccent, getContext().getTheme());
+            colorBorder = colorOn = getResources().getColor(R.color.colorAccentLib, getContext().getTheme());
         } else {
-            colorBorder = colorOn = getResources().getColor(R.color.colorAccent);
+            colorBorder = colorOn = getResources().getColor(R.color.colorAccentLib);
         }
 
         paint = new Paint();
@@ -139,17 +139,17 @@ public class LabeledSwitch extends ToggleableView {
             } else if (attr == R.styleable.Toggle_colorBorder) {
                 int accentColor;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    accentColor = getResources().getColor(R.color.colorAccent, getContext().getTheme());
+                    accentColor = getResources().getColor(R.color.colorAccentLib, getContext().getTheme());
                 } else {
-                    accentColor = getResources().getColor(R.color.colorAccent);
+                    accentColor = getResources().getColor(R.color.colorAccentLib);
                 }
                 colorBorder = tarr.getColor(R.styleable.Toggle_colorBorder, accentColor);
             } else if (attr == R.styleable.Toggle_colorOn) {
                 int accentColor;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    accentColor = getResources().getColor(R.color.colorAccent, getContext().getTheme());
+                    accentColor = getResources().getColor(R.color.colorAccentLib, getContext().getTheme());
                 } else {
-                    accentColor = getResources().getColor(R.color.colorAccent);
+                    accentColor = getResources().getColor(R.color.colorAccentLib);
                 }
                 colorOn = tarr.getColor(R.styleable.Toggle_colorOn, accentColor);
             } else if (attr == R.styleable.Toggle_colorDisabled) {

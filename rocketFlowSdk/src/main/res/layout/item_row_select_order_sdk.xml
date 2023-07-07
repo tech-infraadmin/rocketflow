@@ -156,7 +156,7 @@
                         android:text="0"
                         android:fontFamily="@font/campton_book"
                         android:layout_gravity="center"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/colorPrimaryLib"
                         android:textSize="@dimen/text_size_14" />
 
                     <ImageView

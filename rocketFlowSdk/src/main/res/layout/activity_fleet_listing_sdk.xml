@@ -63,7 +63,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight=".25"
-                    android:background="@color/colorPrimary" />
+                    android:background="@color/colorPrimaryLib" />
 
                 <View
                     android:layout_width="match_parent"
@@ -96,7 +96,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorPrimaryLib"
             android:onClick="@{() -> viewModel.onProceedClick()}"
             android:paddingTop="@dimen/dimen_10"
             android:paddingBottom="@dimen/dimen_10"

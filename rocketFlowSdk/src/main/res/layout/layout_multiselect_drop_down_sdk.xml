@@ -28,7 +28,7 @@
         android:layout_toLeftOf="@+id/ivClose"
         android:fontFamily="@font/campton_book"
         android:text="@string/done"
-        android:textColor="@color/colorPrimary" />
+        android:textColor="@color/colorPrimaryLib" />
 
     <EditText
         android:id="@+id/etSearch"

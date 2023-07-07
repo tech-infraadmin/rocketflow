@@ -65,7 +65,7 @@
                 android:layout_gravity="center"
                 android:contentDescription="@null"
                 android:padding="@dimen/dimen_5"
-                android:tint="@color/colorPrimary"
+                android:tint="@color/colorPrimaryLib"
                 app:srcCompat="@drawable/ic_request" />
 
             <TextView
@@ -109,7 +109,7 @@
             android:layout_marginEnd="@dimen/dimen_10"
             android:contentDescription="@null"
             android:padding="@dimen/dimen_10"
-            android:tint="@color/colorPrimary"
+            android:tint="@color/colorPrimaryLib"
             android:visibility="gone"
             app:srcCompat="@drawable/ic_filter_blue" />
 

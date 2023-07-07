@@ -183,7 +183,7 @@
                         android:fontFamily="@font/campton_book"
                         android:gravity="center"
                         android:text="0"
-                        android:textColor="@color/colorPrimary"
+                        android:textColor="@color/colorPrimaryLib"
                         android:textSize="@dimen/text_size_14" />
 
                     <ImageView

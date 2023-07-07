@@ -118,7 +118,7 @@
                     android:enabled="false"
                     android:inputType="number"
                     android:text="1"
-                    android:textColor="@color/colorPrimary" />
+                    android:textColor="@color/colorPrimaryLib" />
 
                 <EditText
                     android:id="@+id/et_measure"
@@ -162,7 +162,7 @@
             android:enabled="false"
             android:inputType="number"
             android:text="₹ 1"
-            android:textColor="@color/colorPrimary" />
+            android:textColor="@color/colorPrimaryLib" />
 
     </LinearLayout>
 

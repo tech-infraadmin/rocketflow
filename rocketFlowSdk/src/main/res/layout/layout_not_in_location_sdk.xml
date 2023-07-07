@@ -28,7 +28,7 @@
         android:layout_gravity="center_horizontal"
         android:padding="@dimen/dimen_10"
         android:text="@string/not_in_place"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/colorPrimaryLib"
         android:textSize="@dimen/text_size_16" />
 
     <ImageView

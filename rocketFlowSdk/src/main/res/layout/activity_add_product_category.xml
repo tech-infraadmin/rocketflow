@@ -186,7 +186,7 @@
                             android:layout_alignParentRight="true"
                             android:button="@drawable/bg_toggle"
                             android:text=""
-                            app:thumbTint="@color/colorPrimary" />
+                            app:thumbTint="@color/colorPrimaryLib" />
                     </RelativeLayout>
 
                     <LinearLayout
@@ -202,7 +202,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="end"
                             android:text="@string/add_description"
-                            android:textColor="@color/colorPrimary">
+                            android:textColor="@color/colorPrimaryLib">
 
                         </TextView>
 

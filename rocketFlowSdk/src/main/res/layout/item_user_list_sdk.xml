@@ -53,7 +53,7 @@
                     android:fontFamily="@font/campton_semi_bold"
                     android:text="@{data.roleName}"
                     android:visibility="@{data.roleName!=null?View.VISIBLE:View.GONE}"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/colorPrimaryLib"
                     android:textSize="@dimen/text_size_14"
                     tools:text="Manager" />
 

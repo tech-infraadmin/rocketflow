@@ -829,7 +829,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="end"
                                 android:text="@string/add_description"
-                                android:textColor="@color/colorPrimary">
+                                android:textColor="@color/colorPrimaryLib">
 
                             </TextView>
 
@@ -911,7 +911,7 @@
                             android:layout_toLeftOf="@+id/tvNumVariants"
                             android:fontFamily="@font/campton_book"
                             android:text="@string/add_variants"
-                            android:textColor="@color/colorPrimary" />
+                            android:textColor="@color/colorPrimaryLib" />
 
                         <TextView
                             android:id="@+id/tvNumVariants"

@@ -5,7 +5,7 @@
     android:checkable="true"
     android:clickable="true"
     android:focusable="true"
-    android:textColor="@color/colorPrimary"
+    android:textColor="@color/colorPrimaryLib"
     app:iconStartPadding="5dp"
     app:chipCornerRadius="5dp"
     app:checkedIcon="@null"

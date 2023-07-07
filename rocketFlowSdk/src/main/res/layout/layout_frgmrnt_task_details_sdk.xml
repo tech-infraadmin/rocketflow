@@ -1068,7 +1068,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_horizontal"
                                     android:text="Touch to Expand"
-                                    android:textColor="@color/colorPrimary"
+                                    android:textColor="@color/colorPrimaryLib"
                                     android:textSize="@dimen/text_size_12" />
 
                             </LinearLayout>
@@ -1105,7 +1105,7 @@
                         android:layout_marginHorizontal="@dimen/dimen_20"
                         android:layout_marginVertical="@dimen/dimen_10"
                         android:text="@string/click_here_to_see_referenced_task"
-                        android:textColor="@color/colorPrimary" />
+                        android:textColor="@color/colorPrimaryLib" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvReferences"

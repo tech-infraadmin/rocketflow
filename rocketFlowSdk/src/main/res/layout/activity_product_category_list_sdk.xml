@@ -51,8 +51,8 @@
             android:layout_gravity="bottom|end"
             android:layout_marginRight="@dimen/dimen_15"
             android:layout_marginBottom="@dimen/dimen_15"
-            android:background="@color/colorPrimary"
-            android:backgroundTint="@color/colorPrimary"
+            android:background="@color/colorPrimaryLib"
+            android:backgroundTint="@color/colorPrimaryLib"
             app:srcCompat="@drawable/fab_add"
             android:visibility="gone"
             tools:ignore="VectorDrawableCompat" />

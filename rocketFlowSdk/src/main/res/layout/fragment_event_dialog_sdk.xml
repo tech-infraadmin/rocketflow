@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/dimen_20"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorPrimaryLib"
             android:textSize="@dimen/text_size_15"
             android:textStyle="bold"
             tools:text="Avoid Harsh Acceleration" />

@@ -26,7 +26,7 @@
             android:layout_marginTop="@dimen/dimen_10"
             android:fontFamily="@font/campton_semi_bold"
             android:text="@string/Upload_Image"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorPrimaryLib"
             android:textSize="@dimen/text_size_16" />
 
         <ProgressBar
@@ -80,7 +80,7 @@
             android:fontFamily="@font/campton_semi_bold"
             android:paddingTop="@dimen/dimen_10"
             android:text="@string/sending_data"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorPrimaryLib"
             android:textSize="@dimen/text_size_16" />
 
         <ProgressBar
@@ -94,7 +94,7 @@
             android:layout_marginBottom="@dimen/dimen_20"
             android:indeterminate="true"
             android:indeterminateBehavior="repeat"
-            android:indeterminateTint="@color/colorPrimary"
+            android:indeterminateTint="@color/colorPrimaryLib"
             android:indeterminateTintMode="src_atop" />
     </RelativeLayout>
 

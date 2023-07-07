@@ -31,7 +31,7 @@
             app:elevation="@dimen/dimen_0">
 
             <androidx.appcompat.widget.Toolbar
-            android:background="?attr/colorAccent"
+                android:background="?attr/colorAccent"
                 android:id="@+id/toolbar"
                 style="@style/Toolbar"
                 app:contentInsetStartWithNavigation="0dp"

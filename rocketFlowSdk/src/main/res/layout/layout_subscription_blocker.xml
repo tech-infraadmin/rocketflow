@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="9.9dp"
         android:layout_marginVertical="19.9dp"
-        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardBackgroundColor="@color/colorPrimaryLib"
         app:cardCornerRadius="@dimen/dimen_5"
         app:cardElevation="@dimen/dimen_2"
         app:cardUseCompatPadding="true">

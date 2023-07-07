@@ -313,7 +313,7 @@ public class IhaveAssignedFragment extends BaseSdkFragment<FragmentIHaveAssigned
     private void setUp() {
         mSwipeRefreshLayout = mFragmentIHaveAssignedSdkBinding.swipeContainer;
         mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryLib,
                 android.R.color.holo_green_dark,
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);

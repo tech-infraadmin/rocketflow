@@ -660,7 +660,7 @@ public class TaskAssignToMeViewModel {
                 view.setTextColor(ContextCompat.getColor(view.getContext(), android.R.color.holo_red_dark));
             } else {
                 view.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.layout_bg_payments_status));
-                view.setTextColor(ContextCompat.getColor(view.getContext(), R.color.colorPrimary));
+                view.setTextColor(ContextCompat.getColor(view.getContext(), R.color.colorPrimaryLib));
             }
         }
     }

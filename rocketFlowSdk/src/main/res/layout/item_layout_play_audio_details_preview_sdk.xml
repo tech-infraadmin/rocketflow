@@ -93,7 +93,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="@dimen/dimen_8"
                     android:text="Play"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/colorPrimaryLib"
                     android:textSize="@dimen/text_size_18"
                     android:textStyle="bold"
                     android:visibility="gone" />

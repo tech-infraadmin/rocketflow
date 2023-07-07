@@ -51,14 +51,14 @@
             android:layout_height="wrap_content">
 
             <RadioButton
-                android:buttonTint="@color/colorPrimary"
+                android:buttonTint="@color/colorPrimaryLib"
                 android:id="@+id/radioUAT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="UAT"/>
 
             <RadioButton
-                android:buttonTint="@color/colorPrimary"
+                android:buttonTint="@color/colorPrimaryLib"
                 android:layout_marginTop="@dimen/dimen_10"
                 android:id="@+id/radioPROD"
                 android:layout_width="wrap_content"

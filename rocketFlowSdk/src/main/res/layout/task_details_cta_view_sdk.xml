@@ -37,7 +37,7 @@
             android:fontFamily="@font/campton_semi_bold"
             android:textSize="@dimen/text_size_16"
             android:layout_marginTop="@dimen/dimen_10"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorPrimaryLib"
             android:layout_centerHorizontal="true"
             android:text="@string/take_action"
             android:layout_width="wrap_content"

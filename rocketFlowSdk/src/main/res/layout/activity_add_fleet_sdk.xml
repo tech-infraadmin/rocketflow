@@ -53,7 +53,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight=".25"
-                        android:background="@color/colorPrimary" />
+                        android:background="@color/colorPrimaryLib" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -150,7 +150,7 @@
                                 style="@style/ButtonStyle"
                                 android:layout_width="0dp"
                                 android:layout_weight=".35"
-                                android:background="@color/colorPrimary"
+                                android:background="@color/colorPrimaryLib"
                                 android:onClick="@{() -> viewModel.onUploadClick()}"
                                 android:text="@string/Upload"
                                 android:textSize="@dimen/text_size_16" />

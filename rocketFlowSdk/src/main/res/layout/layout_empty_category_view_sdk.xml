@@ -36,7 +36,7 @@
                     android:layout_width="@dimen/dimen_100"
                     android:layout_height="@dimen/dimen_100"
                     android:padding="@dimen/dimen_10"
-                    app:tint="@color/colorPrimary" />
+                    app:tint="@color/colorPrimaryLib" />
 
                 <TextView
                     android:id="@+id/tvTitle"

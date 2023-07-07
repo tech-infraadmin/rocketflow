@@ -195,7 +195,7 @@ package com.rf.taskmodule.ui.tasklisting.filter;//package com.rf.taskmodule.ui.t
 //        TextView tvMenuText = view.findViewById(R.id.tvMenuText);
 //        tvMenuText.setVisibility(View.VISIBLE);
 //        tvMenuText.setText(getString(R.string.reset));
-//        tvMenuText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+//        tvMenuText.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryLib));
 //        FrameLayout fLayoutNotification = view.findViewById(R.id.fLayoutNotification);
 //        fLayoutNotification.setVisibility(View.GONE);
 //        ImageView ivShare = view.findViewById(R.id.ivFilter);

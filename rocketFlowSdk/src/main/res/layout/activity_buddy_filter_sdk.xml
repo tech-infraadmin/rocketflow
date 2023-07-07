@@ -148,7 +148,7 @@
                     android:layout_width="match_parent"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentBottom="true"
-                    android:background="@color/colorPrimary"
+                    android:background="@color/colorPrimaryLib"
                     android:onClick="@{() -> viewModel.onProceedClick()}"
                     android:paddingTop="@dimen/dimen_10"
                     android:paddingBottom="@dimen/dimen_10"

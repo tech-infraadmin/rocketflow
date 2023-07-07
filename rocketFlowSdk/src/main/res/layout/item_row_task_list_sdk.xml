@@ -47,7 +47,7 @@
                     android:drawablePadding="@dimen/dimen_5"
                     android:fontFamily="@font/campton_semi_bold"
                     android:text="@{viewModel.stageText}"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/colorPrimaryLib"
                     android:textSize="@dimen/text_size_14"
                     android:visibility="@{viewModel.isStageRelativeLayoutVisible ? View.VISIBLE : View.GONE}" />
 

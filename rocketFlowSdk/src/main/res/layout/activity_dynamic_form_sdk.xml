@@ -47,7 +47,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dimen_2"
-                    android:background="@color/colorPrimary"
+                    android:background="@color/colorPrimaryLib"
                     android:contentDescription="@null"
                     android:padding="@dimen/dimen_10"
                     android:visibility="gone"

@@ -30,7 +30,7 @@
             android:text="@string/add_more"
             android:id="@+id/addMore"
             android:visibility="gone"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorPrimaryLib"
             android:textStyle="bold" />
     </RelativeLayout>
 

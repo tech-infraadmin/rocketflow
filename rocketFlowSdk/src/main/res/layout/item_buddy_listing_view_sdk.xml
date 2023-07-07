@@ -48,7 +48,7 @@
                     android:layout_height="@dimen/dimen_40"
                     android:layout_centerInParent="true"
                     android:background="@drawable/bg_image_circle"
-                    android:backgroundTint="@color/colorPrimary"
+                    android:backgroundTint="@color/colorPrimaryLib"
                     android:fontFamily="@font/campton_book"
                     android:gravity="center|center_vertical"
                     android:text="@{viewModel.abbreviation}"

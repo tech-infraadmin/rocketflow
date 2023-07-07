@@ -78,7 +78,7 @@
                             android:layout_width="@dimen/dimen_40"
                             android:layout_height="@dimen/dimen_40"
                             android:background="@drawable/bg_image_circle"
-                            android:backgroundTint="@color/colorPrimary"
+                            android:backgroundTint="@color/colorPrimaryLib"
                             android:fontFamily="@font/campton_semi_bold"
                             android:gravity="center|center_vertical"
                             android:textColor="@color/white"
@@ -503,7 +503,7 @@
                                     android:layout_height="@dimen/dimen_40"
                                     android:layout_marginEnd="@dimen/dimen_8"
                                     android:background="@drawable/bg_image_circle"
-                                    android:backgroundTint="@color/colorPrimary"
+                                    android:backgroundTint="@color/colorPrimaryLib"
                                     android:fontFamily="@font/campton_semi_bold"
                                     android:gravity="center|center_vertical"
                                     android:textColor="@color/white"
@@ -719,7 +719,7 @@
                                         android:layout_centerInParent="true"
                                         android:onClick="@{()->viewModel.onCallClick()}"
                                         android:padding="@dimen/dimen_15"
-                                        android:tint="@color/colorPrimary"
+                                        android:tint="@color/colorPrimaryLib"
                                         app:srcCompat="@drawable/ic_call" />
                                 </RelativeLayout>
                             </androidx.cardview.widget.CardView>
