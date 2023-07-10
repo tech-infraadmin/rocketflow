@@ -76,7 +76,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fitsSystemWindows="true"
-                        app:contentScrim="?attr/colorAccent"
+                        app:contentScrim="@color/colorAccentLib"
                         app:layout_scrollFlags="scroll|exitUntilCollapsed"
                         app:titleEnabled="false">
 
@@ -85,7 +85,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="?attr/actionBarSize"
-                            android:background="?attr/colorAccent"
+                            android:background="@color/colorAccentLib"
                             android:visibility="visible">
 
                             <androidx.constraintlayout.widget.ConstraintLayout
@@ -174,7 +174,6 @@
                             style="@style/Toolbar"
                             android:layout_height="?attr/actionBarSize"
                             android:layout_gravity="top"
-                            android:background="?attr/colorAccent"
                             app:contentInsetLeft="0dp"
                             app:contentInsetStart="0dp"
                             app:contentInsetStartWithNavigation="0dp"

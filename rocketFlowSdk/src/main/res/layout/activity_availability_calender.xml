@@ -13,7 +13,6 @@
         tools:context=".ui.availabilitycalender.AvailabilityCalenderActivity">
 
         <androidx.appcompat.widget.Toolbar
-            android:background="?attr/colorAccent"
             android:id="@+id/toolbar2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

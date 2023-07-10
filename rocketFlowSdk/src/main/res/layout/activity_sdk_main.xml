@@ -25,7 +25,6 @@
             android:layout_height="wrap_content">
 
             <androidx.appcompat.widget.Toolbar
-                android:background="?attr/colorAccent"
                 android:id="@+id/toolbar"
                 style="@style/Toolbar"
                 app:contentInsetLeft="0dp"
