@@ -3,13 +3,13 @@
     <style name="AppThemeBlue" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowContentOverlay">@null</item>
         <item name="colorPrimary">@color/colorPrimaryLib</item>
-        <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkLib</item>
         <item name="colorControlNormal">@color/white</item>
         <item name="colorAccent">@color/blue</item>
         <item name="colorSecondary">@color/colorAccentLib</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="android:statusBarColor" tools:ignore="NewApi">@color/colorPrimaryLib</item>
+        <item name="android:statusBarColor">@color/colorPrimaryLib</item>
         <item name="android:windowBackground">@color/windowBackgroundColor</item>
         <item name="android:textAppearance">@style/TextAppearance.Text.Regular</item>
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
