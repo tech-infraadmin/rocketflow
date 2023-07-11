@@ -232,9 +232,7 @@ internal class RocketFlyerImp(
                             if (result == null) {
                                 return
                             }
-                            if (CommonUtils.handleResponse(
-                                    this,
-                                    error,
+                            if (CommonUtils.handleResponse(this, error,
                                     result,
                                     it
                                 )
