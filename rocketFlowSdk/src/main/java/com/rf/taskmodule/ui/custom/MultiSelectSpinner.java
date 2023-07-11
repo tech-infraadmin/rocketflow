@@ -82,7 +82,7 @@ public class MultiSelectSpinner extends AppCompatSpinner implements
 //        super.performClick();
 //        checkItemValue();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.DialogTheme);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.DialogThemeLib);
         builder.setTitle(label);
         builder.setMultiChoiceItems(items.toArray(new CharSequence[0]), selected, this);
         builder.setPositiveButton(android.R.string.ok,

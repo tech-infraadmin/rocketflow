@@ -19,7 +19,7 @@ import java.util.*
  * Created by rahul on 5/12/18
  */
 class FilterDialog(var ctx: Context, val listener: OnClickSearchListener, val statusList : List<String>, val title:String)
-    : Dialog(ctx, R.style.DialogTheme) {
+    : Dialog(ctx, R.style.DialogThemeLib) {
     var toInMillis = 0L
     var fromInMillis = 0L
     var spnStatus: Spinner? = null

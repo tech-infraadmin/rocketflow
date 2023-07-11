@@ -25,7 +25,7 @@
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
-                style="@style/ToolbarBlack"
+                style="@style/Toolbar"
                 app:contentInsetStartWithNavigation="0dp"
                 app:titleTextColor="@color/white"
                 tools:title="@string/add_fleet">

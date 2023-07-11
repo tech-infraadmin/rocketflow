@@ -26,30 +26,32 @@ internal class RocketFlyerImp(
             if (sdkInitToken.isEmpty()) throw Exception("Token cannot be null")
             RFLog.d("Token value : $sdkInitToken")
             RocketFlyerBuilder.getPrefInstance()?.sdkClientID = sdkInitToken
-            //RocketFlyerBuilder.getPrefInstance()?.loginToken = "c49f0605-e6bd-47b5-9f4b-3363e5035978"
-            //RocketFlyerBuilder.getPrefInstance()?.accessId = "3uBdUsyA0w"
-            hitLoginSDKToken(sdkInitToken,context)
+            val pref = RocketFlyerBuilder.getPrefInstance()
+            if (pref?.loginToken != null && pref.loginToken.isNotEmpty()) {
+                hitConfig()
+            } else {
+                hitLoginSDKToken(sdkInitToken, context)
+            }
         }
     }
 
     @SuppressLint("SuspiciousIndentation")
     override fun start(processId: String, startActivity: Boolean) {
-
         contextRef.get()?.let {
-
-            try{
-
+            try {
                 val listCategory: List<WorkFlowCategories> =
-                    RocketFlyerBuilder.getDataManagerInstance()?.workFlowCategoriesList ?: ArrayList()
+                    RocketFlyerBuilder.getDataManagerInstance()?.workFlowCategoriesList
+                        ?: ArrayList()
 
                 val pref = RocketFlyerBuilder.getPrefInstance()
-                Log.d("TAG", "start: "+ pref!!.loginToken)
-                Log.d("TAG", "start: "+ pref.loginToken)
+                Log.d("TAG", "start: " + pref!!.loginToken)
+                Log.d("TAG", "start: " + pref.loginToken)
                 Log.d("TAG", "start: $listCategory")
-                if(pref==null
-                    || pref.loginToken==null
+                if (pref == null
+                    || pref.loginToken == null
                     || pref.loginToken.isEmpty()
-                    || listCategory.isEmpty()){
+                    || listCategory.isEmpty()
+                ) {
 
                     /*showToast(it,"Call init before start method")*/
                     return
@@ -64,14 +66,15 @@ internal class RocketFlyerImp(
                     it,
                     configResponse,
                     RocketFlyer.preferenceHelper(),
-                    "1")
+                    "1"
+                )
 
                 if (startActivity) {
                     val intent = com.rf.taskmodule.ui.main.MainSDKActivity.newIntent(it)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     it.startActivity(intent)
                 }
-            }catch (e : Exception){
+            } catch (e: Exception) {
                 showToast(it, "Call init before start method :$e")
             }
 
@@ -83,7 +86,6 @@ internal class RocketFlyerImp(
 //            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //            intent.putExtra(AppConstants.Extra.EXTRA_STAGEID, processId)
 //            it.startActivity(intent);
-
 
 
 //            intent.putExtra(
@@ -104,9 +106,9 @@ internal class RocketFlyerImp(
     @SuppressLint("SuspiciousIndentation")
     override fun copy(processId: String, startActivity: Boolean) {
         contextRef.get()?.let {
-            try{
+            try {
                 val pref = RocketFlyerBuilder.getPrefInstance()
-                if(pref==null|| pref.loginToken==null|| pref.loginToken.isEmpty()){
+                if (pref == null || pref.loginToken == null || pref.loginToken.isEmpty()) {
                     return
                 }
 
@@ -119,14 +121,15 @@ internal class RocketFlyerImp(
                     it,
                     configResponse,
                     RocketFlyer.preferenceHelper(),
-                    "1")
+                    "1"
+                )
 
                 if (startActivity) {
                     val intent = com.rf.taskmodule.ui.main.MainSDKActivity.newIntent(it)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     it.startActivity(intent)
                 }
-            }catch (e : Exception){
+            } catch (e: Exception) {
                 showToast(it, "Call init before start method :$e")
             }
         }
@@ -140,51 +143,193 @@ internal class RocketFlyerImp(
         }
     }
 
-    private fun showToast(context: Context, str : String){
-        Toast.makeText(context,str,Toast.LENGTH_SHORT).show()
+    override fun initializeAndStart(sdkInitToken: String, context: Context) {
+        contextRef.get()?.let {
+            if (sdkInitToken.isEmpty()) throw Exception("Token cannot be null")
+            RFLog.d("Token value : $sdkInitToken")
+            RocketFlyerBuilder.getPrefInstance()?.sdkClientID = sdkInitToken
+            val pref = RocketFlyerBuilder.getPrefInstance()
+            if (pref?.loginToken != null && pref.loginToken.isNotEmpty()) {
+                //Hit config
+                hitConfigAndStartActivity()
+            } else {
+                RocketFlyerBuilder.getDataManagerInstance()
+                    ?.getSDKLoginToken(
+                        sdkInitToken,
+                        RocketFlyerBuilder.getHttpManagerInstance(),
+                        object : com.rf.taskmodule.data.network.ApiCallback {
+                            override fun hitApi() {
+                                RFLog.d("hitLoginSDKToken : hitApi")
+                            }
+
+                            override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+                                RFLog.d("hitLoginSDKToken : onRequestTimeOut")
+                            }
+
+                            override fun onLogout() {
+                                RFLog.d("hitLoginSDKToken : onLogout")
+                            }
+
+                            override fun onNetworkErrorClose() {
+                                RFLog.d("hitLoginSDKToken : onNetworkErrorClose")
+                            }
+
+                            override fun onResponse(result: Any?, error: APIError?) {
+                                RFLog.d("hitLoginSDKToken : onResponse")
+                                if (CommonUtils.handleResponse(this, error, result, context)) {
+                                    val gson = Gson()
+                                    val token =
+                                        gson.fromJson(result.toString(), SDKToken::class.java)
+                                    if (token != null) {
+                                        CommonUtils.saveSDKAccessToken(
+                                            token,
+                                            RocketFlyer.preferenceHelper()
+                                        )
+                                    }
+                                    //Hit config
+                                    hitConfigAndStartActivity()
+
+
+                                }
+                            }
+
+                            override fun isAvailable(): Boolean {
+                                return true
+                            }
+                        })
+            }
+
+        }
+    }
+
+    private fun hitConfigAndStartActivity() {
+        contextRef.get()?.let {
+            RocketFlyerBuilder.getDataManagerInstance()
+                ?.getConfig(
+                    RocketFlyerBuilder.getHttpManagerInstance(),
+                    object :
+                        com.rf.taskmodule.data.network.ApiCallback {
+                        override fun hitApi() {
+
+                        }
+
+                        override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+
+                        }
+
+                        override fun onLogout() {
+
+                        }
+
+                        override fun onNetworkErrorClose() {
+
+                        }
+
+                        override fun onResponse(
+                            result: Any?,
+                            error: APIError?
+                        ) {
+                            if (result == null) {
+                                return
+                            }
+                            if (CommonUtils.handleResponse(
+                                    this,
+                                    error,
+                                    result,
+                                    it
+                                )
+                            ) {
+                                val gson = Gson()
+                                Log.d(
+                                    CommonUtils.TAG,
+                                    "saveConfigResponse: $result"
+                                )
+                                val configResponse = gson.fromJson(
+                                    result.toString(),
+                                    ConfigResponse::class.java
+                                )
+                                Log.d(
+                                    CommonUtils.TAG,
+                                    "saveConfigResponse: sdkConfig ${configResponse.appConfig.toString()}"
+                                )
+                                CommonUtils.saveConfigDetails(
+                                    it,
+                                    configResponse,
+                                    RocketFlyer.preferenceHelper(),
+                                    "1"
+                                )
+
+                                //Start activity
+                                val pref = RocketFlyerBuilder.getPrefInstance()
+                                if (pref == null || pref.loginToken == null || pref.loginToken.isEmpty()) {
+                                    return
+                                }
+                                val intent =
+                                    com.rf.taskmodule.ui.main.MainSDKActivity.newIntent(
+                                        it
+                                    )
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                it.startActivity(intent)
+                            }
+                        }
+
+                        override fun isAvailable(): Boolean {
+                            return true
+                        }
+                    },
+                    ""
+                )
+        }
+    }
+
+    private fun showToast(context: Context, str: String) {
+        Toast.makeText(context, str, Toast.LENGTH_SHORT).show()
     }
 
     private fun hitLoginSDKToken(sdkClintId: String, context: Context) {
 
         RocketFlyerBuilder.getDataManagerInstance()
-            ?.getSDKLoginToken(sdkClintId,RocketFlyerBuilder.getHttpManagerInstance(), object :
+            ?.getSDKLoginToken(sdkClintId, RocketFlyerBuilder.getHttpManagerInstance(), object :
                 com.rf.taskmodule.data.network.ApiCallback {
-            override fun hitApi() {
-                //SyncCallback.super.hitApi();z
-                RFLog.d("hitLoginSDKToken : hitApi")
-            }
+                override fun hitApi() {
+                    //SyncCallback.super.hitApi();z
+                    RFLog.d("hitLoginSDKToken : hitApi")
+                }
 
-            override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
-                //SyncCallback.super.onRequestTimeOut(callBack);
-                RFLog.d("hitLoginSDKToken : onRequestTimeOut")
-            }
+                override fun onRequestTimeOut(callBack: com.rf.taskmodule.data.network.ApiCallback) {
+                    //SyncCallback.super.onRequestTimeOut(callBack);
+                    RFLog.d("hitLoginSDKToken : onRequestTimeOut")
+                }
 
-            override fun onLogout() {
-                RFLog.d("hitLoginSDKToken : onLogout")
-            }
+                override fun onLogout() {
+                    RFLog.d("hitLoginSDKToken : onLogout")
+                }
 
-            override fun onNetworkErrorClose() {
-                RFLog.d("hitLoginSDKToken : onNetworkErrorClose")
-            }
+                override fun onNetworkErrorClose() {
+                    RFLog.d("hitLoginSDKToken : onNetworkErrorClose")
+                }
 
-            override fun onResponse(result: Any?, error: APIError?) {
-                RFLog.d("hitLoginSDKToken : onResponse")
-                contextRef.get()?.let {
-                    if (CommonUtils.handleResponse(this, error, result, context)) {
-                        val gson = Gson()
-                        val token = gson.fromJson(result.toString(), SDKToken::class.java)
-                        if (token != null) {
-                            CommonUtils.saveSDKAccessToken(token, RocketFlyer.preferenceHelper())
+                override fun onResponse(result: Any?, error: APIError?) {
+                    RFLog.d("hitLoginSDKToken : onResponse")
+                    contextRef.get()?.let {
+                        if (CommonUtils.handleResponse(this, error, result, context)) {
+                            val gson = Gson()
+                            val token = gson.fromJson(result.toString(), SDKToken::class.java)
+                            if (token != null) {
+                                CommonUtils.saveSDKAccessToken(
+                                    token,
+                                    RocketFlyer.preferenceHelper()
+                                )
+                            }
+                            hitConfig()
                         }
-                        hitConfig()
                     }
                 }
-            }
 
-            override fun isAvailable(): Boolean {
-                return true
-            }
-        })
+                override fun isAvailable(): Boolean {
+                    return true
+                }
+            })
     }
 
     private fun hitConfig() {
@@ -219,9 +364,9 @@ internal class RocketFlyerImp(
                             )
 
                             val configResponse = gson.fromJson(
-                                 result.toString(),
-                                 ConfigResponse::class.java
-                             )
+                                result.toString(),
+                                ConfigResponse::class.java
+                            )
 
                             Log.d(
                                 CommonUtils.TAG,
@@ -243,7 +388,7 @@ internal class RocketFlyerImp(
                 override fun isAvailable(): Boolean {
                     return true
                 }
-                                                    },"")
+            }, "")
     }
 
 }

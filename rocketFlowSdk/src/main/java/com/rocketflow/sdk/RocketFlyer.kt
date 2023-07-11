@@ -5,7 +5,7 @@ import androidx.annotation.Keep
 import com.trackthat.lib.TrackThat
 
 @Keep
-class RocketFlyer private constructor(){
+class RocketFlyer private constructor() {
 
     @Keep
     companion object {
@@ -15,9 +15,12 @@ class RocketFlyer private constructor(){
          *  Call this method in onCreate method of Application class
          */
         @JvmStatic
-        fun initializeRocketFlyer(context: Context,stageServer: Boolean = false) {
-            TrackThat.initialize(context, com.rf.taskmodule.utils.CommonUtils.getIMEINumber(context))
-            RocketFlyerBuilder.initialize(context,stageServer)
+        fun initializeRocketFlyer(context: Context, stageServer: Boolean = false) {
+            TrackThat.initialize(
+                context,
+                com.rf.taskmodule.utils.CommonUtils.getIMEINumber(context)
+            )
+            RocketFlyerBuilder.initialize(context, stageServer)
         }
 
 
@@ -45,7 +48,7 @@ class RocketFlyer private constructor(){
             sdkInitToken: String,
             context: Context
         ) {
-            RocketFlyerBuilder.getRFInstance()!!.initialize(sdkInitToken,context)
+            RocketFlyerBuilder.getRFInstance()!!.initialize(sdkInitToken, context)
         }
 
         /**
@@ -59,19 +62,19 @@ class RocketFlyer private constructor(){
             RocketFlyerBuilder.getRFInstance()!!.terminate()
         }
 
-        fun preferenceHelper() : com.rf.taskmodule.data.local.prefs.PreferencesHelper? {
+        fun preferenceHelper(): com.rf.taskmodule.data.local.prefs.PreferencesHelper? {
             return RocketFlyerBuilder.getPrefInstance()
         }
 
-        fun httpManager() : com.rf.taskmodule.data.network.HttpManager? {
+        fun httpManager(): com.rf.taskmodule.data.network.HttpManager? {
             return RocketFlyerBuilder.getHttpManagerInstance()
         }
 
-        fun dataManager() : com.rf.taskmodule.data.DataManager? {
+        fun dataManager(): com.rf.taskmodule.data.DataManager? {
             return RocketFlyerBuilder.getDataManagerInstance()
         }
 
-        fun networkManager() : com.rf.taskmodule.data.network.NetworkManager? {
+        fun networkManager(): com.rf.taskmodule.data.network.NetworkManager? {
             return RocketFlyerBuilder.getNetworkManagerInstance()
         }
 
@@ -80,14 +83,20 @@ class RocketFlyer private constructor(){
          */
 
         @JvmStatic
-        fun start(processId: String, startActivity : Boolean) {
-            RocketFlyerBuilder.getRFInstance()!!.start(processId,startActivity)
+        fun start(processId: String, startActivity: Boolean) {
+            RocketFlyerBuilder.getRFInstance()!!.start(processId, startActivity)
         }
 
         @JvmStatic
-        fun copy(processId: String, startActivity : Boolean) {
-            RocketFlyerBuilder.getRFInstance()!!.start(processId,startActivity)
+        fun copy(processId: String, startActivity: Boolean) {
+            RocketFlyerBuilder.getRFInstance()!!.start(processId, startActivity)
         }
 
+        fun initializeAndStart(
+            sdkInitToken: String,
+            context: Context
+        ) {
+            RocketFlyerBuilder.getRFInstance()!!.initializeAndStart(sdkInitToken, context)
+        }
     }
 }

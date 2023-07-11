@@ -17,12 +17,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:title="Your Calender"
-            style="@style/ToolbarBlack"
+            style="@style/Toolbar"
             android:minHeight="?attr/actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <FrameLayout
             android:id="@+id/root_container"

@@ -113,7 +113,7 @@
     <color name="time_line">#4F518F</color>
     <color name="text_color_current_state" tools:ignore="MissingDefaultResource">#E4B32C</color>
     <color name="booking_id" tools:ignore="MissingDefaultResource">#D6E4F4</color>
-    <color name="booking_details_id" tools:ignore="MissingDefaultResource">#3581F3</color>
+    <color name="booking_details_id" tools:ignore="MissingDefaultResource">#1d456e</color>
 
 
     <color name="disable_forground_grey">#42221f1f</color>

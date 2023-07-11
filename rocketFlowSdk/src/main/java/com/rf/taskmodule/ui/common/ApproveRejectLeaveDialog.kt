@@ -16,7 +16,7 @@ import com.rf.taskmodule.data.model.response.config.Action
 /**
  * Created by rahul on 5/12/18
  */
-class ApproveRejectLeaveDialog(context: Context) : Dialog(context, R.style.DialogTheme) {
+class ApproveRejectLeaveDialog(context: Context) : Dialog(context, R.style.DialogThemeLib) {
 
     private var cancelableDialog: Boolean = true
     private var title: String? = null

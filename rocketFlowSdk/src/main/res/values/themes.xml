@@ -504,7 +504,7 @@
     </style>
 
     <!-- Dialog  application theme. -->
-    <style name="DialogTheme" parent="Base.Theme.AppCompat.Light.Dialog">
+    <style name="DialogThemeLib" parent="Base.Theme.AppCompat.Light.Dialog">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorAccentLib</item>
         <item name="colorPrimaryDark">@color/colorAccentLib</item>

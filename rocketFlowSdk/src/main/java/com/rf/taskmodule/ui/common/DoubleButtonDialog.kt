@@ -11,7 +11,7 @@ import com.rf.taskmodule.R
 /**
  * Created by rahul on 5/12/18
  */
-class DoubleButtonDialog(context: Context) : Dialog(context, R.style.DialogTheme) {
+class DoubleButtonDialog(context: Context) : Dialog(context, R.style.DialogThemeLib) {
 
     private var cancelableDialog: Boolean = true
     private var titleDialog: String? = null
